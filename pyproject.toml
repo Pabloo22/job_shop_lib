@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "job-shop-lib"
+version = "0.1.0"
+description = "A framework to model and solve the Job Shop Scheduling Problem with a special focus on graph representations."
+authors = ["Pabloo22 <pablete.arino@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "job_shop_lib"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
