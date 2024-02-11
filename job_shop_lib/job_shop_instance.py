@@ -104,7 +104,8 @@ class JobShopInstance:
         machine_times = [0 for _ in range(self.n_machines)]
         for job in self.jobs:
             for operation in job:
-                machine_times[operation.machine_id] += operation.duration
+                for machine_id in operation.machines:
+                    machine_times[machine_id] += operation.duration
         return machine_times
 
     @functools.cached_property
