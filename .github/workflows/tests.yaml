@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip
-        pip install poetry=1.7
+        pip install poetry==1.7
         poetry install --with dev
 
     - name: Run tests
