@@ -1,6 +1,3 @@
-from typing import Iterable
-
-
 class Operation:
 
     def __init__(self, machines: int | list[int], duration: int):
