@@ -21,7 +21,7 @@ def test_n_jobs(job_shop_instance):
 
 
 def test_bounds(job_shop_instance):
-    # Assuming you set these metadata values somewhere or pass 
+    # Assuming you set these metadata values somewhere or pass
     # them during instantiation
     job_shop_instance.metadata["lower_bound"] = 10.0
     job_shop_instance.metadata["upper_bound"] = 100.0
@@ -65,7 +65,7 @@ def test_machine_loads(job_shop_instance):
         10,
         35,
         10,
-    ]  # Machine 0 has 10, Machine 1 has 35 (20 from Job 1 and 15 from Job 2), 
+    ]  # Machine 0 has 10, Machine 1 has 35 (20 from Job 1 and 15 from Job 2),
     # Machine 2 has 10
     assert job_shop_instance.machine_loads == expected_loads
 
