@@ -11,6 +11,9 @@ packages = [{include = "job_shop_lib"}]
 python = "^3.11"
 numpy = "^1.26.4"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
