@@ -1,4 +1,6 @@
 # job_shop_lib
+[![Tests](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml/badge.svg)](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml)
+
 A framework to model and solve the Job Shop Scheduling Problem with a special focus on graph representations.
 
 ## Installation
