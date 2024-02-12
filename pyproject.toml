@@ -13,6 +13,8 @@ numpy = "^1.26.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
+flake8 = "^7.0.0"
+mypy = "^1.8.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -20,3 +22,11 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 79
+
+[tool.mypy]
+files = ["job_shop_lib"]
+check_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
