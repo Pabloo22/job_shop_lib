@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import functools
-from typing import Optional, Any, Iterable
+from typing import Optional, Any
 
 import numpy as np
 
@@ -15,7 +15,7 @@ class JobShopInstance:
 
     def __init__(
         self,
-        jobs: Iterable[Iterable[Operation]],
+        jobs: list[list[Operation]],
         name: str = "JobShopInstance",
         **metadata: Any,
     ):
@@ -30,7 +30,7 @@ class JobShopInstance:
         return len(self.jobs)
 
     @property
-    def bounds(self) -> tuple[float, float]:
+    def bounds(self) -> tuple[float | None, float | None]:
         """Returns the lower and upper bounds of the instance."""
         return self.lower_bound, self.upper_bound
 
@@ -99,7 +99,7 @@ class JobShopInstance:
         )
 
     @functools.cached_property
-    def machine_loads(self) -> list[float]:
+    def machine_loads(self) -> list[int]:
         """Returns the total duration of each machine in the instance."""
         machine_times = [0 for _ in range(self.n_machines)]
         for job in self.jobs:

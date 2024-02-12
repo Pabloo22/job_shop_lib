@@ -3,7 +3,7 @@ from typing import Iterable
 
 class Operation:
 
-    def __init__(self, machines: int | Iterable[int], duration: int):
+    def __init__(self, machines: int | list[int], duration: int):
         self.machines = [machines] if isinstance(machines, int) else machines
         self.duration = duration
 
