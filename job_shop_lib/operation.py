@@ -1,6 +1,6 @@
 class Operation:
     __slots__ = ("machines", "duration")
- 
+
     def __init__(self, machines: int | list[int], duration: int):
         self.machines = [machines] if isinstance(machines, int) else machines
         self.duration = duration
