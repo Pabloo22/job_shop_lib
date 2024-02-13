@@ -25,7 +25,7 @@ class JobShopInstance:
 
     # --- PROPERTIES ---
     @property
-    def n_jobs(self) -> int:
+    def num_jobs(self) -> int:
         """Returns the number of jobs in the instance."""
         return len(self.jobs)
 
@@ -74,7 +74,7 @@ class JobShopInstance:
         return sum(self.job_durations)
 
     @functools.cached_property
-    def n_machines(self) -> int:
+    def num_machines(self) -> int:
         """Returns the number of machines in the instance."""
         mx = 0
         for job in self.jobs:
@@ -101,7 +101,7 @@ class JobShopInstance:
     @functools.cached_property
     def machine_loads(self) -> list[int]:
         """Returns the total duration of each machine in the instance."""
-        machine_times = [0 for _ in range(self.n_machines)]
+        machine_times = [0 for _ in range(self.num_machines)]
         for job in self.jobs:
             for operation in job:
                 for machine_id in operation.machines:
@@ -116,6 +116,6 @@ class JobShopInstance:
     @functools.cached_property
     def mean_machine_load(self) -> float:
         """Returns the mean duration of a machine in the instance."""
-        return self.total_duration / self.n_machines
+        return self.total_duration / self.num_machines
 
     # -------------------
