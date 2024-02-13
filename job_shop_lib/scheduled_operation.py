@@ -11,7 +11,7 @@ class ScheduledOperation:
                 f"Operation cannot be scheduled on machine {machine_id}. "
                 f"Valid machines are {operation.machines}."
             )
-        
+
         self.operation = operation
         self.start_time = start_time
         self.machine_id = machine_id
