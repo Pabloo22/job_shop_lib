@@ -16,8 +16,8 @@ def job_shop_instance():
     return instance
 
 
-def test_n_jobs(job_shop_instance):
-    assert job_shop_instance.n_jobs == 2
+def test_num_jobs(job_shop_instance):
+    assert job_shop_instance.num_jobs == 2
 
 
 def test_bounds(job_shop_instance):
@@ -48,8 +48,8 @@ def test_total_duration(job_shop_instance):
     assert job_shop_instance.total_duration == 55
 
 
-def test_n_machines(job_shop_instance):
-    assert job_shop_instance.n_machines == 3
+def test_num_machines(job_shop_instance):
+    assert job_shop_instance.num_machines == 3
 
 
 def test_max_duration(job_shop_instance):
