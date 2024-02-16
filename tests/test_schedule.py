@@ -1,23 +1,9 @@
 import pytest
-from job_shop_lib import (
-    Schedule,
-    Operation,
-    ScheduledOperation,
-    JobShopInstance,
-)
+from job_shop_lib import Schedule, ScheduledOperation
 
 
-@pytest.fixture
-def job_shop_instance():
-    jobs = [
-        [Operation([0], 10), Operation([1], 20)],
-        [Operation([1], 15), Operation([0], 10)],
-    ]
-    return JobShopInstance(jobs=jobs)
-
-
-@pytest.fixture
-def complete_schedule(job_shop_instance):
+@pytest.fixture(name="complete_schedule")
+def fixture_complete_schedule(job_shop_instance):
     schedule = Schedule(instance=job_shop_instance, check=True)
     operations = [
         ScheduledOperation(
