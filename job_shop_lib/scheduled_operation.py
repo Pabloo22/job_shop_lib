@@ -1,14 +1,20 @@
-from typing import NamedTuple
-
 from job_shop_lib import Operation
 
 
-class ScheduledOperation(NamedTuple):
-    """Stores information about the scheduled operation."""
+class ScheduledOperation:
 
-    operation: Operation
-    start_time: int
-    machine_id: int
+    __slots__ = ("operation", "start_time", "machine_id")
+
+    def __init__(self, operation: Operation, start_time: int, machine_id: int):
+        if machine_id not in operation.machines:
+            raise ValueError(
+                f"Operation cannot be scheduled on machine {machine_id}. "
+                f"Valid machines are {operation.machines}."
+            )
+
+        self.operation = operation
+        self.start_time = start_time
+        self.machine_id = machine_id
 
     @property
     def end_time(self) -> int:
