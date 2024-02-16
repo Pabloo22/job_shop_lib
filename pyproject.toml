@@ -10,6 +10,7 @@ packages = [{include = "job_shop_lib"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 numpy = "^1.26.4"
+ortools = "^9.8.3296"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
