@@ -70,6 +70,10 @@ def test_machine_loads(job_shop_instance):
     assert job_shop_instance.machine_loads == expected_loads
 
 
+def test_num_operations(job_shop_instance):
+    assert job_shop_instance.num_operations == 4
+
+
 def test_max_machine_load(job_shop_instance):
     assert job_shop_instance.max_machine_load == 35
 

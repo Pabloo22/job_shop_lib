@@ -83,6 +83,11 @@ class JobShopInstance:
         return mx + 1
 
     @functools.cached_property
+    def num_operations(self) -> int:
+        """Returns the number of operations in the instance."""
+        return sum(len(job) for job in self.jobs)
+
+    @functools.cached_property
     def max_duration(self) -> float:
         """Returns the maximum duration of the instance."""
         mx = 0
