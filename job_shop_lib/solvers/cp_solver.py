@@ -4,6 +4,7 @@ from typing import Optional
 import time
 
 from ortools.sat.python import cp_model
+from ortools.sat.python.cp_model import IntVar
 
 from job_shop_lib import (
     JobShopInstance,
@@ -24,9 +25,9 @@ class CPSolver:
         self.time_limit = time_limit
 
         self.makespan = None
-        self.model = None
-        self.solver = None
-        self.operations_start = {}
+        self.model = cp_model.CpModel()
+        self.solver = cp_model.CpSolver()
+        self._operations_start: dict[str, tuple[IntVar, IntVar]] = {}
 
     def initialize_model(self, instance: JobShopInstance):
         self.model = cp_model.CpModel()
@@ -52,7 +53,7 @@ class CPSolver:
         status = self.solver.Solve(self.model)
         elapsed_time = time.perf_counter() - start_time
 
-        if not status in {cp_model.OPTIMAL, cp_model.FEASIBLE}:
+        if status not in {cp_model.OPTIMAL, cp_model.FEASIBLE}:
             msg = (
                 f"No solution could be found for the given problem. "
                 f"Elapsed time: {elapsed_time} seconds."
@@ -66,18 +67,6 @@ class CPSolver:
         }
         return self._create_schedule(instance, metadata)
 
-        # if status in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
-        #     # Retrieve solution
-        #     solution = {
-        #         op_id: self.solver.Value(start_var)
-        #         for op_id, (start_var, _) in self.operations_start.items()
-        #     }
-        #     solution["makespan"] = self.solver.Value(self.makespan)
-        #     solution["elapsed_time"] = elapsed_time
-        #     status = "optimal" if status == cp_model.OPTIMAL else "feasible"
-        #     solution["status"] = status
-        #     return solution
-
     def __call__(self, instance: JobShopInstance) -> Schedule:
         return self.solve(instance)
 
@@ -85,12 +74,14 @@ class CPSolver:
         self, instance: JobShopInstance, metadata: dict[str, float | str]
     ) -> Schedule:
         """Creates a Schedule object from the solution."""
-        operations_start = {
+        operations_start: dict[str, int] = {
             op_id: self.solver.Value(start_var)
-            for op_id, (start_var, _) in self.operations_start.items()
+            for op_id, (start_var, _) in self._operations_start.items()
         }
 
-        unsorted_schedule = [[] for _ in range(instance.num_machines)]
+        unsorted_schedule: list[list[ScheduledOperation]] = [
+            [] for _ in range(instance.num_machines)
+        ]
         for op_id, start_time in operations_start.items():
             job_id = Operation.get_job_id_from_id(op_id)
             position = Operation.get_position_from_id(op_id)
@@ -104,7 +95,9 @@ class CPSolver:
             for scheduled_operation in unsorted_schedule
         ]
 
-        return Schedule(sorted_schedule, metadata)
+        return Schedule(
+            instance=instance, schedule=sorted_schedule, metadata=metadata
+        )
 
     def _create_variables(self, instance: JobShopInstance):
         """Creates two variables for each operation: start and end time."""
@@ -117,7 +110,7 @@ class CPSolver:
                 end_var = self.model.NewIntVar(
                     0, instance.total_duration, f"end_{op_id}"
                 )
-                self.operations_start[op_id] = (start_var, end_var)
+                self._operations_start[op_id] = (start_var, end_var)
                 self.model.Add(end_var == start_var + operation.duration)
 
     def _add_constraints(self, instance: JobShopInstance):
@@ -143,10 +136,10 @@ class CPSolver:
         for job_id, job in enumerate(instance.jobs):
             for position in range(1, len(job)):
                 self.model.Add(
-                    self.operations_start[
+                    self._operations_start[
                         job[position - 1].get_id(job_id, position - 1)
                     ][1]
-                    <= self.operations_start[
+                    <= self._operations_start[
                         job[position].get_id(job_id, position)
                     ][0]
                 )
@@ -159,12 +152,14 @@ class CPSolver:
         each machine."""
 
         # Create interval variables for each operation on each machine
-        machines_operations = [[] for _ in range(instance.num_machines)]
+        machines_operations: list[list[tuple[tuple[IntVar, IntVar], int]]] = [
+            [] for _ in range(instance.num_machines)
+        ]
         for j, job in enumerate(instance.jobs):
             for p, operation in enumerate(job):
                 machines_operations[operation.machine_id].append(
                     (
-                        self.operations_start[operation.get_id(j, p)],
+                        self._operations_start[operation.get_id(j, p)],
                         operation.duration,
                     )
                 )
@@ -183,15 +178,6 @@ class CPSolver:
         self.makespan = self.model.NewIntVar(
             0, instance.total_duration, "makespan"
         )
-        end_times = [end for _, end in self.operations_start.values()]
+        end_times = [end for _, end in self._operations_start.values()]
         self.model.AddMaxEquality(self.makespan, end_times)
         self.model.Minimize(self.makespan)
-
-
-# if __name__ == "__main__":
-#     from gnn_scheduler.job_shop import load_from_benchmark
-
-#     instance = load_from_benchmark("swv10")
-#     solver = CPSolver(instance, time_limit=1)
-#     solution_ = solver.solve()
-#     print(solution_)
