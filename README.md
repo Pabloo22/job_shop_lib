@@ -7,7 +7,6 @@ A framework to model and solve the Job Shop Scheduling Problem with a special fo
 
 In the future, the library will be available on PyPI. For now, you can install it from the source code.
 
-### For development
 1. Clone the repository:
 
 2. Install [poetry](https://python-poetry.org/docs/) if you don't have it already:
