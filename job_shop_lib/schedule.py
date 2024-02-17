@@ -24,15 +24,6 @@ class Schedule:
         self.check = check
         self.metadata = metadata
 
-    @staticmethod
-    def get_empty_schedule(
-        num_machines: int,
-    ) -> list[list[ScheduledOperation]]:
-        empty_schedule: list[list[ScheduledOperation]] = [
-            [] for _ in range(num_machines)
-        ]
-        return empty_schedule
-
     def is_complete(self) -> bool:
         num_scheduled_operations = sum(
             len(machine_schedule) for machine_schedule in self.schedule
@@ -84,6 +75,8 @@ class Schedule:
         scheduled_operation: ScheduledOperation,
         previous_operation: ScheduledOperation,
     ):
+        """Raises a ValueError if the start time of the new operation is before
+        the end time of the last operation on the same machine."""
 
         if previous_operation.end_time <= scheduled_operation.start_time:
             return
