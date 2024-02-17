@@ -20,5 +20,5 @@ poetry shell
 ```
 4. Install dependencies:
 ```bash
-poetry install --with dev
+poetry install --with notebooks --with test --with lint
 ```
