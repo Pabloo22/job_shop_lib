@@ -28,7 +28,7 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install poetry==1.7
-        poetry install --with dev
+        poetry install --with test
 
     - name: Run tests
       run: poetry run pytest -v
@@ -50,7 +50,7 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install poetry==1.7
-        poetry install
+        poetry install --only lint
 
     - name: Run flake8
       run: |
