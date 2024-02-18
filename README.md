@@ -38,7 +38,7 @@ For more details, check the [tutorial](tutorial) folder.
 
 In the future, the library will be available on PyPI. For now, you can install it from the source code.
 
-1. Clone the repository:
+1. Clone the repository.
 
 2. Install [poetry](https://python-poetry.org/docs/) if you don't have it already:
 ```bash
