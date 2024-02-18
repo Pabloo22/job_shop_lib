@@ -26,8 +26,8 @@ def test_machine_id_multiple():
 
 
 def test_get_id():
-    op = Operation(1, 5)
-    assert op.get_id(1, 2) == "J1M1P2"
+    op = Operation(1, 5, 1, 2)
+    assert op.operation_id == "J1M1P2"
 
 
 def test_get_job_id_from_id():
