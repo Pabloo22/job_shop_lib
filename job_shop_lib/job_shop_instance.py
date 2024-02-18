@@ -58,16 +58,29 @@ class JobShopInstance:
         return self.metadata.get("optimum")
 
     @functools.cached_property
+    def is_flexible(self) -> bool:
+        """Returns True is any operation has more than one machine."""
+        return any(
+            len(operation.machines) > 1
+            for job in self.jobs
+            for operation in job
+        )
+
+    @functools.cached_property
     def durations_matrix(self) -> np.ndarray:
         """Returns the duration matrix of the instance."""
-        return np.array(
-            [[operation.duration for operation in job] for job in self.jobs]
-        )
+        return [[operation.duration for operation in job] for job in self.jobs]
 
     @functools.cached_property
     def machines_matrix(self) -> list[list[list[int]]]:
         """Returns the machines matrix of the instance."""
-        return [[operation.machines for operation in job] for job in self.jobs]
+        if self.is_flexible:
+            return [
+                [operation.machines for operation in job] for job in self.jobs
+            ]
+        return [
+            [operation.machine_id for operation in job] for job in self.jobs
+        ]
 
     @functools.cached_property
     def job_durations(self) -> list[float]:
