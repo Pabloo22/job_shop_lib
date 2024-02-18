@@ -21,3 +21,7 @@ poetry shell
 ```bash
 poetry install --with notebooks --with test --with lint
 ```
+or equivalently:
+```bash
+make poetry_install_all 
+```
