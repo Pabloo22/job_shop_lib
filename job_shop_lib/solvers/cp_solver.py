@@ -18,8 +18,8 @@ from job_shop_lib.solvers import NoSolutionFound
 class CPSolver:
     def __init__(
         self,
-        log_search_progress: bool = False,
         time_limit: Optional[float] = None,
+        log_search_progress: bool = False,
     ):
         self.log_search_progress = log_search_progress
         self.time_limit = time_limit
@@ -29,15 +29,8 @@ class CPSolver:
         self.solver = cp_model.CpSolver()
         self._operations_start: dict[str, tuple[IntVar, IntVar]] = {}
 
-    def initialize_model(self, instance: JobShopInstance):
-        self.model = cp_model.CpModel()
-        self.solver = cp_model.CpSolver()
-        self.solver.parameters.log_search_progress = self.log_search_progress
-        if self.time_limit is not None:
-            self.solver.parameters.max_time_in_seconds = self.time_limit
-        self._create_variables(instance)
-        self._add_constraints(instance)
-        self._set_objective(instance)
+    def __call__(self, instance: JobShopInstance) -> Schedule:
+        return self.solve(instance)
 
     def solve(self, instance: JobShopInstance) -> Schedule:
         """Creates the variables, constraints and objective, and solves the
@@ -54,11 +47,10 @@ class CPSolver:
         elapsed_time = time.perf_counter() - start_time
 
         if status not in {cp_model.OPTIMAL, cp_model.FEASIBLE}:
-            msg = (
+            raise NoSolutionFound(
                 f"No solution could be found for the given problem. "
                 f"Elapsed time: {elapsed_time} seconds."
             )
-            raise NoSolutionFound(msg)
 
         metadata = {
             "status": "optimal" if status == cp_model.OPTIMAL else "feasible",
@@ -67,8 +59,15 @@ class CPSolver:
         }
         return self._create_schedule(instance, metadata)
 
-    def __call__(self, instance: JobShopInstance) -> Schedule:
-        return self.solve(instance)
+    def initialize_model(self, instance: JobShopInstance):
+        self.model = cp_model.CpModel()
+        self.solver = cp_model.CpSolver()
+        self.solver.parameters.log_search_progress = self.log_search_progress
+        if self.time_limit is not None:
+            self.solver.parameters.max_time_in_seconds = self.time_limit
+        self._create_variables(instance)
+        self._add_constraints(instance)
+        self._set_objective(instance)
 
     def _create_schedule(
         self, instance: JobShopInstance, metadata: dict[str, float | str]
@@ -96,14 +95,14 @@ class CPSolver:
         ]
 
         return Schedule(
-            instance=instance, schedule=sorted_schedule, metadata=metadata
+            instance=instance, schedule=sorted_schedule, **metadata
         )
 
     def _create_variables(self, instance: JobShopInstance):
         """Creates two variables for each operation: start and end time."""
-        for j, job in enumerate(instance.jobs):
-            for p, operation in enumerate(job):
-                op_id = operation.get_id(j, p)
+        for job in instance.jobs:
+            for operation in job:
+                op_id = operation.operation_id
                 start_var = self.model.NewIntVar(
                     0, instance.total_duration, f"start_{op_id}"
                 )
@@ -129,19 +128,25 @@ class CPSolver:
         self._add_job_constraints(instance)
         self._add_machine_constraints(instance)
 
+    def _set_objective(self, instance: JobShopInstance):
+        """The objective is to minimize the makespan, which is the total
+        duration of the schedule."""
+        self.makespan = self.model.NewIntVar(
+            0, instance.total_duration, "makespan"
+        )
+        end_times = [end for _, end in self._operations_start.values()]
+        self.model.AddMaxEquality(self.makespan, end_times)
+        self.model.Minimize(self.makespan)
+
     def _add_job_constraints(self, instance: JobShopInstance):
         """Adds job constraints to the model. Operations within a job must be
         performed in sequence. If operation A must precede operation B in a
         job, we ensure A's end time is less than or equal to B's start time."""
-        for job_id, job in enumerate(instance.jobs):
+        for job in instance.jobs:
             for position in range(1, len(job)):
                 self.model.Add(
-                    self._operations_start[
-                        job[position - 1].get_id(job_id, position - 1)
-                    ][1]
-                    <= self._operations_start[
-                        job[position].get_id(job_id, position)
-                    ][0]
+                    self._operations_start[job[position - 1].operation_id][1]
+                    <= self._operations_start[job[position].operation_id][0]
                 )
 
     def _add_machine_constraints(self, instance: JobShopInstance):
@@ -155,11 +160,11 @@ class CPSolver:
         machines_operations: list[list[tuple[tuple[IntVar, IntVar], int]]] = [
             [] for _ in range(instance.num_machines)
         ]
-        for j, job in enumerate(instance.jobs):
-            for p, operation in enumerate(job):
+        for job in instance.jobs:
+            for operation in job:
                 machines_operations[operation.machine_id].append(
                     (
-                        self._operations_start[operation.get_id(j, p)],
+                        self._operations_start[operation.operation_id],
                         operation.duration,
                     )
                 )
@@ -171,13 +176,3 @@ class CPSolver:
                 )
                 intervals.append(interval_var)
             self.model.AddNoOverlap(intervals)
-
-    def _set_objective(self, instance: JobShopInstance):
-        """The objective is to minimize the makespan, which is the total
-        duration of the schedule."""
-        self.makespan = self.model.NewIntVar(
-            0, instance.total_duration, "makespan"
-        )
-        end_times = [end for _, end in self._operations_start.values()]
-        self.model.AddMaxEquality(self.makespan, end_times)
-        self.model.Minimize(self.makespan)
