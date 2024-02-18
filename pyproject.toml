@@ -11,7 +11,7 @@ packages = [{include = "job_shop_lib"}]
 python = "^3.11"
 ortools = "^9.8.3296"
 matplotlib = "^3.8.3"
-pyarrow = "^15.0.0"
+pyarrow = "^15.0.0"  # An optional pandas' dependency that will be required in the future
 
 [tool.poetry.group.test]
 optional = true
