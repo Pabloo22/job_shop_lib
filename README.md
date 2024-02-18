@@ -1,5 +1,7 @@
 # job_shop_lib
 [![Tests](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml/badge.svg)](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml)
+![Python 3.11](https://img.shields.io/badge/python-3.11-3776AB)
+
 
 A framework to model and solve the Job Shop Scheduling Problem with a special focus on graph representations.
 
