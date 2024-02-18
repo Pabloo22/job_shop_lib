@@ -9,7 +9,6 @@ packages = [{include = "job_shop_lib"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-numpy = "^1.26.4"
 ortools = "^9.8.3296"
 matplotlib = "^3.8.3"
 
@@ -32,6 +31,8 @@ optional = true
 
 [tool.poetry.group.notebooks.dependencies]
 ipykernel = "^6.29.2"
+nbconvert = "^7.16.0"
+numpy = "^1.26.4"
 
 [build-system]
 requires = ["poetry-core"]
