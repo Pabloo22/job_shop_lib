@@ -5,8 +5,6 @@ from __future__ import annotations
 import functools
 from typing import Optional, Any
 
-import numpy as np
-
 from job_shop_lib import Operation
 
 
@@ -67,12 +65,12 @@ class JobShopInstance:
         )
 
     @functools.cached_property
-    def durations_matrix(self) -> np.ndarray:
+    def durations_matrix(self) -> list[list[int]]:
         """Returns the duration matrix of the instance."""
         return [[operation.duration for operation in job] for job in self.jobs]
 
     @functools.cached_property
-    def machines_matrix(self) -> list[list[list[int]]]:
+    def machines_matrix(self) -> list[list[list[int]]] | list[list[int]]:
         """Returns the machines matrix of the instance."""
         if self.is_flexible:
             return [
