@@ -24,5 +24,23 @@ class ScheduledOperation:
         self._machine_id = value
 
     @property
+    def job_id(self) -> int:
+        if self.operation.job_id is None:
+            raise ValueError("Operation has no job_id.")
+        return self.operation.job_id
+
+    @property
+    def position(self) -> int:
+        if self.operation.position is None:
+            raise ValueError("Operation has no position.")
+        return self.operation.position
+
+    @property
     def end_time(self) -> int:
         return self.start_time + self.operation.duration
+
+    def __repr__(self) -> str:
+        return (
+            f"S-Op(operation={self.operation}, "
+            f"start_time={self.start_time}, machine_id={self.machine_id})"
+        )
