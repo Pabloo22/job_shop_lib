@@ -20,8 +20,16 @@ class JobShopInstance:
         **metadata: Any,
     ):
         self.jobs = jobs
+        self.set_operation_ids()
         self.name = name
         self.metadata = metadata
+
+    def set_operation_ids(self):
+        """Sets the job_id and position of each operation."""
+        for job_id, job in enumerate(self.jobs):
+            for position, operation in enumerate(job):
+                operation.job_id = job_id
+                operation.position = position
 
     # --- PROPERTIES ---
     @property
