@@ -1,17 +1,17 @@
 import pytest
-from job_shop_lib.generators import SimpleGenerator
+from job_shop_lib.generators import ClassicGenerator
 
 
 def test_simple_generator_initialization_defaults():
     """Test initialization with default parameters"""
-    generator = SimpleGenerator(max_duration=10)
+    generator = ClassicGenerator(max_duration=10)
     assert generator.max_duration == 10
     assert generator.min_duration == 1
 
 
 def test_simple_generator_initialization_custom():
     """Test initialization with custom parameters"""
-    generator = SimpleGenerator(
+    generator = ClassicGenerator(
         max_duration=15, min_duration=5, max_num_jobs=30
     )
     assert generator.max_duration == 15
@@ -21,7 +21,7 @@ def test_simple_generator_initialization_custom():
 
 def test_generate():
     """Test generation of job shop instances"""
-    generator = SimpleGenerator(max_duration=10, min_duration=5, seed=42)
+    generator = ClassicGenerator(max_duration=10, min_duration=5, seed=42)
     instance = generator.generate(num_jobs=5, num_machines=5)
     assert len(instance.jobs) == 5
     for job in instance.jobs:
@@ -35,7 +35,7 @@ def test_generate():
 
 @pytest.mark.parametrize("limit", [1, 5, 10])
 def test_iteration_limit(limit):
-    generator = SimpleGenerator(
+    generator = ClassicGenerator(
         max_duration=10, iteration_limit=limit, seed=42
     )
     instances = list(generator)

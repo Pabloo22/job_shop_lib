@@ -5,7 +5,7 @@ from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.generators import BaseGenerator
 
 
-class SimpleGenerator(BaseGenerator):
+class ClassicGenerator(BaseGenerator):
     """Generates classic job shop instances with random operations.
 
     The number of operations per job is the same as the number of machines,
@@ -14,7 +14,7 @@ class SimpleGenerator(BaseGenerator):
     The minimum number of machines is the same as the number of jobs.
 
     Useful for generating instances with similar characteristics to most
-    benchmark instances.
+    benchmark ones.
     """
 
     def __init__(
@@ -24,7 +24,7 @@ class SimpleGenerator(BaseGenerator):
         max_num_jobs: int = 20,
         min_num_jobs: int = 2,
         max_num_machines: int = 10,
-        name_suffix: str = "simple_generated_instance",
+        name_suffix: str = "classic_generated_instance",
         seed: Optional[int] = None,
         iteration_limit: Optional[int] = None,
     ):
