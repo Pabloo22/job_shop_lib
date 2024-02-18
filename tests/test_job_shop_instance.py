@@ -1,6 +1,3 @@
-import numpy as np
-
-
 def test_num_jobs(job_shop_instance):
     assert job_shop_instance.num_jobs == 2
 
@@ -14,14 +11,12 @@ def test_bounds(job_shop_instance):
 
 
 def test_durations_matrix(job_shop_instance):
-    expected_matrix = np.array([[10, 20], [15, 10]])
-    np.testing.assert_array_equal(
-        job_shop_instance.durations_matrix, expected_matrix
-    )
+    expected_matrix = [[10, 20], [15, 10]]
+    assert job_shop_instance.durations_matrix == expected_matrix
 
 
 def test_machines_matrix(job_shop_instance):
-    expected_matrix = [[[0], [1]], [[1], [2]]]
+    expected_matrix = [[0, 1], [1, 2]]
     assert job_shop_instance.machines_matrix == expected_matrix
 
 
