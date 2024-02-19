@@ -32,3 +32,14 @@ def test_different_names():
     assert instance1.name != instance2.name
     assert instance1.name.startswith("classic_generated_instance")
     assert instance2.name.startswith("classic_generated_instance")
+
+
+def test_machines_per_operation():
+    generator = InstanceGenerator(machines_per_operation=(2, 3), seed=42)
+
+    instance = generator.generate()
+    for job in instance.jobs:
+        for operation in job:
+            assert 2 <= len(operation.machines) <= 3
+            for machine_id in operation.machines:
+                assert 0 <= machine_id < instance.num_machines
