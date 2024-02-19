@@ -38,7 +38,8 @@ class ClassicGenerator(BaseGenerator):
         self.name_suffix = name_suffix
         self.counter = 0
         self.seed = seed
-        random.seed(self.seed)
+        if seed is not None:
+            random.seed(seed)
 
     def generate(
         self,
