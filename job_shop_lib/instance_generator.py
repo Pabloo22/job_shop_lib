@@ -4,7 +4,7 @@ from typing import Optional, Iterator
 from job_shop_lib import JobShopInstance, Operation
 
 
-class InstanceGenerator:
+class InstanceGenerator:  # pylint: disable=too-many-instance-attributes
     """Generates classic job shop instances with random operations.
 
     The number of operations per job is the same as the number of machines,
@@ -16,10 +16,10 @@ class InstanceGenerator:
     benchmark ones.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         num_jobs: int | tuple[int, int] = (10, 20),
-        num_machines: int | tuple[int, int] = (2, 10),
+        num_machines: int | tuple[int, int] = (5, 10),
         duration_range: tuple[int, int] = (1, 99),
         allow_less_jobs_than_machines: bool = True,
         allow_recirculation: bool = False,
