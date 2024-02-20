@@ -13,13 +13,13 @@ import matplotlib.pyplot as plt
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.solvers import CPSolver
 
-CPU = 0
-GPU = 1
-DATA_CENTER = 2
+MACHINE_1 = 0
+MACHINE_2 = 1
+MACHINE_3 = 2
 
-job_1 = [Operation(CPU, duration=1), Operation(GPU, 1), Operation(DATA_CENTER, 7)]
-job_2 = [Operation(GPU, 5), Operation(DATA_CENTER, 1), Operation(CPU, 1)]
-job_3 = [Operation(DATA_CENTER, 1), Operation(CPU, 3), Operation(GPU, 2)]
+job_1 = [Operation(MACHINE_1, 1), Operation(MACHINE_2, 1), Operation(MACHINE_3, 7)]
+job_2 = [Operation(MACHINE_2, 5), Operation(MACHINE_3, 1), Operation(MACHINE_1, 1)]
+job_3 = [Operation(MACHINE_3, 1), Operation(MACHINE_1, 3), Operation(MACHINE_2, 2)]
 
 jobs = [job_1, job_2, job_3]
 
