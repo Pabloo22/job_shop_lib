@@ -1,7 +1,5 @@
 """Contains the JobShopInstance and Operation classes."""
 
-from __future__ import annotations
-
 import functools
 from typing import Any
 
@@ -121,7 +119,7 @@ class JobShopInstance:
         return [max(op.duration for op in job) for job in self.jobs]
 
     @functools.cached_property
-    def max_duration_per_machine(self) -> list[float]:
+    def max_duration_per_machine(self) -> list[int]:
         """Returns the maximum duration of each machine in the instance.
 
         The maximum duration of the machine with id i is stored in the i-th
@@ -140,7 +138,7 @@ class JobShopInstance:
         return max_duration_per_machine
 
     @functools.cached_property
-    def job_durations(self) -> list[float]:
+    def job_durations(self) -> list[int]:
         """Returns a list with the duration of each job in the instance.
 
         The duration of a job is the sum of the durations of its operations.
