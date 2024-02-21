@@ -25,6 +25,9 @@ class Schedule:
         self.schedule = schedule
         self.metadata = metadata
 
+    def reset(self):
+        self.schedule = [[] for _ in range(self.instance.num_machines)]
+
     def makespan(self) -> int:
         return max(
             scheduled_operation.end_time
