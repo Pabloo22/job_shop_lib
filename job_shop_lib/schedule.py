@@ -29,11 +29,11 @@ class Schedule:
         self.schedule = [[] for _ in range(self.instance.num_machines)]
 
     def makespan(self) -> int:
-        return max(
-            scheduled_operation.end_time
-            for machine_schedule in self.schedule
-            for scheduled_operation in machine_schedule
-        )
+        max_end_time = 0
+        for machine_schedule in self.schedule:
+            if machine_schedule:
+                max_end_time = max(max_end_time, machine_schedule[-1].end_time)
+        return max_end_time
 
     def is_complete(self) -> bool:
         num_scheduled_operations = sum(
@@ -124,13 +124,12 @@ class Schedule:
 
     def _plot_machine_schedules(
         self, ax: plt.Axes, cmap_name: str
-    ) -> tuple[dict, dict]:
+    ) -> dict[int, Patch]:
         """Plots the schedules for each machine."""
         max_job_id = self.instance.num_jobs - 1
         cmap = plt.cm.get_cmap(cmap_name, max_job_id + 1)
         norm = Normalize(vmin=0, vmax=max_job_id)
         legend_handles = {}
-        colors = {}
 
         for machine_index, machine_schedule in enumerate(self.schedule):
             y_position_for_machines = 10 + 10 * machine_index
@@ -145,7 +144,7 @@ class Schedule:
                         facecolor=color, label=f"Job {scheduled_op.job_id + 1}"
                     )
 
-        return legend_handles, colors
+        return legend_handles
 
     def _plot_scheduled_operation(
         self, ax: plt.Axes, scheduled_op, y_position_for_machines: int, color
@@ -159,12 +158,12 @@ class Schedule:
             facecolors=color,
         )
 
-    def _configure_legend(self, ax: plt.Axes, legend_handles: dict):
+    def _configure_legend(self, ax: plt.Axes, legend_handles: dict[int, Patch]):
         """Configures the legend for the plot."""
         sorted_legend_handles = [
             legend_handles[job_id] for job_id in sorted(legend_handles)
         ]
-        ax.legend(handles=sorted_legend_handles)
+        ax.legend(handles=sorted_legend_handles, loc="lower right")
 
     def _configure_axes(self, ax: plt.Axes):
         """Sets the limits and labels for the axes."""
