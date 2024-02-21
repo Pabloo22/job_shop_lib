@@ -28,7 +28,6 @@ instance = JobShopInstance(jobs, name="Example")
 cp_sat_solver = CPSolver()
 schedule = cp_sat_solver(instance)
 
-plt.style.use("ggplot")
 fig, ax = schedule.plot_gantt_chart()
 plt.show()
 ```
