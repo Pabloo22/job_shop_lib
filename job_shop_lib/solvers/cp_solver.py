@@ -16,6 +16,13 @@ from job_shop_lib.solvers import NoSolutionFound
 
 
 class CPSolver:
+    """A solver for the job shop scheduling problem using constraint
+    programming.
+
+    This solver uses the ortools library to solve the job shop scheduling
+    problem using constraint programming.
+    """
+
     def __init__(
         self,
         time_limit: Optional[float] = None,
