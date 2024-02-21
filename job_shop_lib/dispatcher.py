@@ -16,11 +16,12 @@ class Dispatcher:
         self.job_next_available_time = [0] * self.instance.num_jobs
 
     def reset(self) -> None:
-        self.schedule = Schedule(self.instance)
+        self.schedule.reset()
         self.machine_next_available_time = [0] * self.instance.num_machines
         self.job_next_operation_index = [0] * self.instance.num_jobs
+        self.job_next_available_time = [0] * self.instance.num_jobs
 
-    def step(self, operation: Operation, machine_id: int) -> None:
+    def dispatch(self, operation: Operation, machine_id: int) -> None:
         if not self.is_operation_ready(operation):
             raise ValueError("Operation is not ready to be scheduled.")
 
