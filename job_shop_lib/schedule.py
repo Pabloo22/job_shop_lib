@@ -158,7 +158,9 @@ class Schedule:
             facecolors=color,
         )
 
-    def _configure_legend(self, ax: plt.Axes, legend_handles: dict[int, Patch]):
+    def _configure_legend(
+        self, ax: plt.Axes, legend_handles: dict[int, Patch]
+    ):
         """Configures the legend for the plot."""
         sorted_legend_handles = [
             legend_handles[job_id] for job_id in sorted(legend_handles)
