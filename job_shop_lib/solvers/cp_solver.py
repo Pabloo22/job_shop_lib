@@ -27,7 +27,7 @@ class CPSolver:
         self.makespan = None
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
-        self._operations_start: dict[str, tuple[IntVar, IntVar]] = {}
+        self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
 
     def __call__(self, instance: JobShopInstance) -> Schedule:
         return self.solve(instance)
@@ -73,18 +73,15 @@ class CPSolver:
         self, instance: JobShopInstance, metadata: dict[str, float | str]
     ) -> Schedule:
         """Creates a Schedule object from the solution."""
-        operations_start: dict[str, int] = {
-            op_id: self.solver.Value(start_var)
-            for op_id, (start_var, _) in self._operations_start.items()
+        operations_start: dict[Operation, int] = {
+            operation: self.solver.Value(start_var)
+            for operation, (start_var, _) in self._operations_start.items()
         }
 
         unsorted_schedule: list[list[ScheduledOperation]] = [
             [] for _ in range(instance.num_machines)
         ]
-        for op_id, start_time in operations_start.items():
-            job_id = Operation.get_job_id_from_id(op_id)
-            position = Operation.get_position_from_id(op_id)
-            operation = instance.jobs[job_id][position]
+        for operation, start_time in operations_start.items():
             unsorted_schedule[operation.machine_id].append(
                 ScheduledOperation(operation, start_time, operation.machine_id)
             )
@@ -102,14 +99,13 @@ class CPSolver:
         """Creates two variables for each operation: start and end time."""
         for job in instance.jobs:
             for operation in job:
-                op_id = operation.operation_id
                 start_var = self.model.NewIntVar(
-                    0, instance.total_duration, f"start_{op_id}"
+                    0, instance.total_duration, f"start_{operation}"
                 )
                 end_var = self.model.NewIntVar(
-                    0, instance.total_duration, f"end_{op_id}"
+                    0, instance.total_duration, f"end_{operation}"
                 )
-                self._operations_start[op_id] = (start_var, end_var)
+                self._operations_start[operation] = (start_var, end_var)
                 self.model.Add(end_var == start_var + operation.duration)
 
     def _add_constraints(self, instance: JobShopInstance):
@@ -145,8 +141,8 @@ class CPSolver:
         for job in instance.jobs:
             for position in range(1, len(job)):
                 self.model.Add(
-                    self._operations_start[job[position - 1].operation_id][1]
-                    <= self._operations_start[job[position].operation_id][0]
+                    self._operations_start[job[position - 1]][1]
+                    <= self._operations_start[job[position]][0]
                 )
 
     def _add_machine_constraints(self, instance: JobShopInstance):
@@ -164,7 +160,7 @@ class CPSolver:
             for operation in job:
                 machines_operations[operation.machine_id].append(
                     (
-                        self._operations_start[operation.operation_id],
+                        self._operations_start[operation],
                         operation.duration,
                     )
                 )

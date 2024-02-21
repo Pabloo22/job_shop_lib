@@ -1,3 +1,33 @@
+from job_shop_lib import JobShopInstance, Operation
+
+
+def test_set_operation_attributes():
+    op1 = Operation(machines=0, duration=1)
+    op2 = Operation(machines=1, duration=2)
+    op3 = Operation(machines=2, duration=3)
+
+    job1 = [op1, op2]
+    job2 = [op3]
+
+    JobShopInstance(jobs=[job1, job2])
+
+    assert (
+        job1[0].job_id == 0
+        and job1[0].position_in_job == 0
+        and job1[0].id == 0
+    ), "Job 1 Operation 1 attributes not set correctly"
+    assert (
+        job1[1].job_id == 0
+        and job1[1].position_in_job == 1
+        and job1[1].id == 1
+    ), "Job 1 Operation 2 attributes not set correctly"
+    assert (
+        job2[0].job_id == 1
+        and job2[0].position_in_job == 0
+        and job2[0].id == 2
+    ), "Job 2 Operation 1 attributes not set correctly"
+
+
 def test_num_jobs(job_shop_instance):
     assert job_shop_instance.num_jobs == 2
 

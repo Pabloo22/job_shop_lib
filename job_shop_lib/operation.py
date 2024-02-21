@@ -6,19 +6,21 @@ from typing import Optional
 class Operation:
     """Stores machine and duration information for a job operation."""
 
-    __slots__ = ("machines", "duration", "job_id", "position")
+    __slots__ = ("machines", "duration", "job_id", "position_in_job", "id")
 
     def __init__(
         self,
         machines: int | list[int],
         duration: int,
         job_id: Optional[int] = None,
-        position: Optional[int] = None,
+        position_in_job: Optional[int] = None,
+        operation_id: Optional[int] = None,
     ):
         self.machines = [machines] if isinstance(machines, int) else machines
         self.duration = duration
         self.job_id = job_id
-        self.position = position
+        self.position_in_job = position_in_job
+        self.id = operation_id
 
     @property
     def machine_id(self) -> int:
@@ -28,27 +30,8 @@ class Operation:
             raise ValueError("Operation has multiple machines.")
         return self.machines[0]
 
-    @property
-    def operation_id(self) -> str:
-        """Returns the id of the operation."""
-        if self.job_id is None or self.position is None:
-            raise ValueError("Operation has no job_id or position.")
-        return f"J{self.job_id}M{self.machine_id}P{self.position}"
-
-    @staticmethod
-    def get_job_id_from_id(op_id: str) -> int:
-        """Returns the job id from the operation id."""
-        return int(op_id.split("M")[0][1:])
-
-    @staticmethod
-    def get_machine_id_from_id(op_id: str) -> int:
-        """Returns the machine id from the operation id."""
-        return int(op_id.split("M")[1][0])
-
-    @staticmethod
-    def get_position_from_id(op_id: str) -> int:
-        """Returns the position from the operation id."""
-        return int(op_id.split("P")[1])
+    def __hash__(self) -> int:
+        return hash(self.id)
 
     def __repr__(self) -> str:
         machines = (
@@ -56,5 +39,5 @@ class Operation:
         )
         return (
             f"O(m={machines}, d={self.duration}, "
-            f"j={self.job_id}, p={self.position})"
+            f"j={self.job_id}, p={self.position_in_job})"
         )

@@ -31,9 +31,9 @@ class ScheduledOperation:
 
     @property
     def position(self) -> int:
-        if self.operation.position is None:
+        if self.operation.position_in_job is None:
             raise ValueError("Operation has no position.")
-        return self.operation.position
+        return self.operation.position_in_job
 
     @property
     def end_time(self) -> int:
