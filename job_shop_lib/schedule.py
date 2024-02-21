@@ -8,7 +8,12 @@ from job_shop_lib import ScheduledOperation, JobShopInstance
 
 
 class Schedule:
-    __slots__ = ("instance", "schedule", "metadata")
+    __slots__ = (
+        "instance",
+        "_schedule",
+        "num_scheduled_operations",
+        "metadata",
+    )
 
     def __init__(
         self,
@@ -22,8 +27,23 @@ class Schedule:
         Schedule.check_schedule(schedule)
 
         self.instance = instance
-        self.schedule = schedule
+        self._schedule = schedule
+        self.num_scheduled_operations = sum(
+            len(machine_schedule) for machine_schedule in self.schedule
+        )
         self.metadata = metadata
+
+    @property
+    def schedule(self) -> list[list[ScheduledOperation]]:
+        return self._schedule
+
+    @schedule.setter
+    def schedule(self, new_schedule: list[list[ScheduledOperation]]):
+        Schedule.check_schedule(new_schedule)
+        self._schedule = new_schedule
+        self.num_scheduled_operations = sum(
+            len(machine_schedule) for machine_schedule in self.schedule
+        )
 
     def reset(self):
         self.schedule = [[] for _ in range(self.instance.num_machines)]
@@ -36,16 +56,14 @@ class Schedule:
         return max_end_time
 
     def is_complete(self) -> bool:
-        num_scheduled_operations = sum(
-            len(machine_schedule) for machine_schedule in self.schedule
-        )
-        return num_scheduled_operations == self.instance.num_operations
+        return self.num_scheduled_operations == self.instance.num_operations
 
     def add(self, scheduled_operation: ScheduledOperation):
         self._check_start_time_of_new_operation(scheduled_operation)
         self.schedule[scheduled_operation.machine_id].append(
             scheduled_operation
         )
+        self.num_scheduled_operations += 1
 
     def _check_start_time_of_new_operation(
         self,
