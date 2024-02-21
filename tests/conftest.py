@@ -14,13 +14,25 @@ def job_shop_instance():
 
 @pytest.fixture
 def example_job_shop_instance():
-    cpu = 0
-    gpu = 1
-    data_center = 2
+    machine_1 = 0
+    machine_2 = 1
+    machine_3 = 2
 
-    job_1 = [Operation(cpu, 1), Operation(gpu, 1), Operation(data_center, 7)]
-    job_2 = [Operation(gpu, 5), Operation(data_center, 1), Operation(cpu, 1)]
-    job_3 = [Operation(data_center, 1), Operation(cpu, 3), Operation(gpu, 2)]
+    job_1 = [
+        Operation(machine_1, 1),
+        Operation(machine_2, 1),
+        Operation(machine_3, 7),
+    ]
+    job_2 = [
+        Operation(machine_2, 5),
+        Operation(machine_3, 1),
+        Operation(machine_1, 1),
+    ]
+    job_3 = [
+        Operation(machine_3, 1),
+        Operation(machine_1, 3),
+        Operation(machine_2, 2),
+    ]
 
     jobs = [job_1, job_2, job_3]
 
