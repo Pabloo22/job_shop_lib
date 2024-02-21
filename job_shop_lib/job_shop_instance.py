@@ -43,7 +43,11 @@ class JobShopInstance:
 
         Computed as the maximum machine id present in the instance plus one.
         """
-        return max(max(max(operation.machines) for operation in self.jobs)) + 1
+        max_machine_id = -1
+        for job in self.jobs:
+            for operation in job:
+                max_machine_id = max(max_machine_id, *operation.machines)
+        return max_machine_id + 1
 
     @functools.cached_property
     def num_operations(self) -> int:
@@ -161,3 +165,10 @@ class JobShopInstance:
             for operation in job:
                 for machine_id in operation.machines:
                     machine_times[machine_id] += operation.duration
+
+        return machine_times
+
+    @functools.cached_property
+    def total_duration(self) -> int:
+        """Returns the total duration of the instance."""
+        return sum(self.job_durations)
