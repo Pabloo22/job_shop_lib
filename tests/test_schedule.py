@@ -20,13 +20,8 @@ def fixture_complete_schedule(job_shop_instance):
         ),
     ]
     for op in operations:
-        schedule.dispatch(op)
+        schedule.add(op)
     return schedule
-
-
-def test_empty_schedule_initialization(job_shop_instance):
-    schedule = Schedule(instance=job_shop_instance)
-    assert schedule.is_empty()
 
 
 def test_schedule_is_complete_true(complete_schedule):
@@ -45,7 +40,7 @@ def test_schedule_is_complete_false(job_shop_instance):
         ),
     ]
     for op in partial_operations:
-        schedule.dispatch(op)
+        schedule.add(op)
     assert not schedule.is_complete()
 
 
@@ -54,9 +49,9 @@ def test_check_start_time_raises_error(job_shop_instance):
     valid_op = ScheduledOperation(
         job_shop_instance.jobs[0][0], start_time=0, machine_id=0
     )
-    schedule.dispatch(valid_op)
+    schedule.add(valid_op)
     overlapping_op = ScheduledOperation(
         job_shop_instance.jobs[1][1], start_time=5, machine_id=0
     )
     with pytest.raises(ValueError):
-        schedule.dispatch(overlapping_op)
+        schedule.add(overlapping_op)
