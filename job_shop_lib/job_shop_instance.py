@@ -32,7 +32,6 @@ class JobShopInstance:
                 operation.id = operation_id
                 operation_id += 1
 
-    # --- PROPERTIES ---
     @property
     def num_jobs(self) -> int:
         """Returns the number of jobs in the instance."""
@@ -44,11 +43,7 @@ class JobShopInstance:
 
         Computed as the maximum machine id present in the instance plus one.
         """
-        mx = 0
-        for job in self.jobs:
-            mx_machine = max(max(operation.machines) for operation in job)
-            mx = max(mx, mx_machine)
-        return mx + 1
+        return max(max(max(operation.machines) for operation in self.jobs)) + 1
 
     @functools.cached_property
     def num_operations(self) -> int:
@@ -57,16 +52,23 @@ class JobShopInstance:
 
     @functools.cached_property
     def is_flexible(self) -> bool:
-        """Returns True is any operation has more than one machine."""
+        """Returns True if any operation has more than one machine."""
         return any(
-            len(operation.machines) > 1
+            any(len(operation.machines) > 1 for operation in job)
             for job in self.jobs
-            for operation in job
         )
 
     @functools.cached_property
     def durations_matrix(self) -> list[list[int]]:
-        """Returns the duration matrix of the instance."""
+        """Returns the duration matrix of the instance.
+
+        The duration of the operation with `job_id` i and `position_in_job` j
+        is stored in the i-th position of the j-th list of the returned matrix:
+
+        ```python
+        duration = instance.durations_matrix[i][j]
+        ```
+        """
         return [[operation.duration for operation in job] for job in self.jobs]
 
     @functools.cached_property
@@ -99,11 +101,39 @@ class JobShopInstance:
         """Returns the maximum duration of the instance.
 
         Useful for normalizing the durations of the operations."""
-        mx = 0
+        return max(
+            max(operation.duration for operation in job) for job in self.jobs
+        )
+
+    @functools.cached_property
+    def max_duration_per_job(self) -> list[float]:
+        """Returns the maximum duration of each job in the instance.
+
+        The maximum duration of the job with id i is stored in the i-th
+        position of the returned list.
+
+        Useful for normalizing the durations of the operations.
+        """
+        return [max(op.duration for op in job) for job in self.jobs]
+
+    @functools.cached_property
+    def max_duration_per_machine(self) -> list[float]:
+        """Returns the maximum duration of each machine in the instance.
+
+        The maximum duration of the machine with id i is stored in the i-th
+        position of the returned list.
+
+        Useful for normalizing the durations of the operations.
+        """
+        max_duration_per_machine = [0] * self.num_machines
         for job in self.jobs:
-            mx_duration = max(operation.duration for operation in job)
-            mx = max(mx, mx_duration)
-        return mx
+            for operation in job:
+                for machine_id in operation.machines:
+                    max_duration_per_machine[machine_id] = max(
+                        max_duration_per_machine[machine_id],
+                        operation.duration,
+                    )
+        return max_duration_per_machine
 
     @functools.cached_property
     def job_durations(self) -> list[float]:
@@ -114,9 +144,7 @@ class JobShopInstance:
         The duration of the job with id i is stored in the i-th position of the
         returned list.
         """
-        return [
-            sum(operation.duration for operation in job) for job in self.jobs
-        ]
+        return [sum(op.duration for op in job) for job in self.jobs]
 
     @functools.cached_property
     def machine_loads(self) -> list[int]:
@@ -128,9 +156,8 @@ class JobShopInstance:
         The total machine load of the machine with id i is stored in the i-th
         position of the returned list.
         """
-        machine_times = [0 for _ in range(self.num_machines)]
+        machine_times = [0] * self.num_machines
         for job in self.jobs:
             for operation in job:
                 for machine_id in operation.machines:
                     machine_times[machine_id] += operation.duration
-        return machine_times
