@@ -6,7 +6,7 @@ from typing import Optional
 class Operation:
     """Stores machine and duration information for a job operation."""
 
-    __slots__ = ("machines", "duration", "job_id", "position_in_job", "id")
+    __slots__ = ("machines", "duration", "_job_id", "_position_in_job", "_id")
 
     def __init__(
         self,
@@ -18,9 +18,9 @@ class Operation:
     ):
         self.machines = [machines] if isinstance(machines, int) else machines
         self.duration = duration
-        self.job_id = job_id
-        self.position_in_job = position_in_job
-        self.id = operation_id
+        self._job_id = job_id
+        self._position_in_job = position_in_job
+        self._id = operation_id
 
     @property
     def machine_id(self) -> int:
@@ -29,6 +29,39 @@ class Operation:
         if len(self.machines) > 1:
             raise ValueError("Operation has multiple machines.")
         return self.machines[0]
+
+    @property
+    def job_id(self) -> int:
+        """Returns the id of the job."""
+        if self._job_id is None:
+            raise ValueError("Operation has no job_id.")
+        return self._job_id
+
+    @job_id.setter
+    def job_id(self, value: int) -> None:
+        self._job_id = value
+
+    @property
+    def position_in_job(self) -> int:
+        """Returns the position of the operation in the job."""
+        if self._position_in_job is None:
+            raise ValueError("Operation has no position_in_job.")
+        return self._position_in_job
+
+    @position_in_job.setter
+    def position_in_job(self, value: int) -> None:
+        self._position_in_job = value
+
+    @property
+    def id(self) -> int:
+        """Returns the id of the operation."""
+        if self._id is None:
+            raise ValueError("Operation has no id.")
+        return self._id
+
+    @id.setter
+    def id(self, value: int) -> None:
+        self._id = value
 
     def __hash__(self) -> int:
         return hash(self.id)
