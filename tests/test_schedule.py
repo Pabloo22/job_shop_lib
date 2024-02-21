@@ -1,5 +1,5 @@
 import pytest
-from job_shop_lib import Schedule, ScheduledOperation
+from job_shop_lib import Schedule, ScheduledOperation, JobShopInstance
 
 
 @pytest.fixture(name="complete_schedule")
@@ -24,11 +24,11 @@ def fixture_complete_schedule(job_shop_instance):
     return schedule
 
 
-def test_schedule_is_complete_true(complete_schedule):
+def test_schedule_is_complete_true(complete_schedule: Schedule):
     assert complete_schedule.is_complete()
 
 
-def test_schedule_is_complete_false(job_shop_instance):
+def test_schedule_is_complete_false(job_shop_instance: JobShopInstance):
     schedule = Schedule(instance=job_shop_instance)
     # Schedule only a subset of operations
     partial_operations = [
@@ -44,7 +44,7 @@ def test_schedule_is_complete_false(job_shop_instance):
     assert not schedule.is_complete()
 
 
-def test_check_start_time_raises_error(job_shop_instance):
+def test_check_start_time_raises_error(job_shop_instance: JobShopInstance):
     schedule = Schedule(instance=job_shop_instance)
     valid_op = ScheduledOperation(
         job_shop_instance.jobs[0][0], start_time=0, machine_id=0
