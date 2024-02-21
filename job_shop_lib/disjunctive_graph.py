@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import itertools
 import functools
 import enum
@@ -16,6 +14,11 @@ from job_shop_lib import JobShopInstance
 class EdgeType(enum.Enum):
     CONJUNCTIVE = 0
     DISJUNCTIVE = 1
+
+
+class SpecialNodes(enum.Enum):
+    SOURCE = -1
+    SINK = -2
 
 
 Layout = Callable[[nx.Graph], dict[str, tuple[float, float]]]
@@ -37,33 +40,35 @@ class DisjunctiveGraph(nx.DiGraph):
         counter = 0
         # Adding operations as nodes and conjunctive arcs as edges
         for job_id, job in enumerate(instance.jobs):
-            prev_op = "S"  # start from source
+            prev_op = SpecialNodes.SOURCE.value
 
             for position, operation in enumerate(job):
-                op_id = operation.get_id(job_id, position)
                 self.add_node(
-                    op_id,
+                    operation.id,
                     duration=operation.duration,
                     machine_id=operation.machine_id,
                     job_id=job_id,
                     position=position,
                     node_index=counter,
                 )
-                self.add_edge(prev_op, op_id, type=EdgeType.CONJUNCTIVE)
-                prev_op = op_id
+                self.add_edge(prev_op, operation.id, type=EdgeType.CONJUNCTIVE)
+                prev_op = operation.id
                 counter += 1
 
             # from last operation to sink
-            self.add_edge(prev_op, "T", type=EdgeType.CONJUNCTIVE)
+            self.add_edge(
+                prev_op, SpecialNodes.SINK.value, type=EdgeType.CONJUNCTIVE
+            )
 
     def add_disjunctive_edges(self, instance: JobShopInstance) -> None:
         # Adding disjunctive arcs (edges) between operations on the same
         # machine
-        machine_operations = {i: [] for i in range(instance.n_machines)}
-        for job_id, job in enumerate(instance.jobs):
-            for position, operation in enumerate(job):
-                op_id = operation.get_id(job_id, position)
-                machine_operations[operation.machine_id].append(op_id)
+        machine_operations: dict[int, list[int]] = {
+            i: [] for i in range(instance.num_machines)
+        }
+        for job in instance.jobs:
+            for operation in job:
+                machine_operations[operation.machine_id].append(operation.id)
 
         # Adding disjunctive arcs
         for operations in machine_operations.values():
@@ -138,7 +143,7 @@ class DisjunctiveGraph(nx.DiGraph):
                 if d["type"] == EdgeType.DISJUNCTIVE
             ]
         )
-        pos = layout(temp_graph)
+        pos = layout(temp_graph)  # type: ignore
 
         # Draw nodes
         # ----------
