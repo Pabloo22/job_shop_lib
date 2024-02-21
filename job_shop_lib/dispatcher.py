@@ -31,14 +31,7 @@ class Dispatcher:
             operation, start_time, machine_id
         )
         self.schedule.add(scheduled_operation)
-
-        self.machine_next_available_time[machine_id] = (
-            start_time + operation.duration
-        )
-        self.job_next_operation_index[operation.job_id] += 1
-        self.job_next_available_time[operation.job_id] = (
-            start_time + operation.duration
-        )
+        self._update_tracking_attributes(scheduled_operation)
 
     def is_operation_ready(self, operation: Operation) -> bool:
         return (
@@ -51,3 +44,34 @@ class Dispatcher:
             self.machine_next_available_time[machine_id],
             self.job_next_available_time[operation.job_id],
         )
+
+    def _update_tracking_attributes(
+        self, scheduled_operation: ScheduledOperation
+    ) -> None:
+        # Variables defined here to make the lines shorter
+        job_id = scheduled_operation.job_id
+        machine_id = scheduled_operation.machine_id
+        end_time = scheduled_operation.end_time
+
+        self.machine_next_available_time[machine_id] = end_time
+        self.job_next_operation_index[job_id] += 1
+        self.job_next_available_time[job_id] = end_time
+
+    def available_operations(self) -> list[Operation]:
+        available_operations = []
+        for job_id, next_position in enumerate(self.job_next_operation_index):
+            if next_position >= len(self.instance.jobs[job_id]):
+                continue
+            available_operations.append(
+                self.instance.jobs[job_id][next_position]
+            )
+        return available_operations
+
+    def uncompleted_operations(self) -> list[Operation]:
+        uncompleted_operations = []
+        for job_id, next_position in enumerate(self.job_next_operation_index):
+            if next_position >= len(self.instance.jobs[job_id]):
+                continue
+            for operation in self.instance.jobs[job_id][next_position:]:
+                uncompleted_operations.append(operation)
+        return uncompleted_operations
