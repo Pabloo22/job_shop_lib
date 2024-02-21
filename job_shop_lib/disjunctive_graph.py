@@ -57,7 +57,8 @@ class DisjunctiveGraph(nx.DiGraph):
             self.add_edge(prev_op, "T", type=EdgeType.CONJUNCTIVE)
 
     def add_disjunctive_edges(self, instance: JobShopInstance) -> None:
-        # Adding disjunctive arcs (edges) between operations on the same machine
+        # Adding disjunctive arcs (edges) between operations on the same
+        # machine
         machine_operations = {i: [] for i in range(instance.n_machines)}
         for job_id, job in enumerate(instance.jobs):
             for position, operation in enumerate(job):
