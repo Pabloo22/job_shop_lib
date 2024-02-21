@@ -4,7 +4,15 @@ from typing import Optional
 
 
 class Operation:
-    """Stores machine and duration information for a job operation."""
+    """Stores machine and duration information for a job operation.
+
+    Note:
+    To increase performance, some solvers such as the CP-SAT solver use
+    only integers to represent operation's attributes. Should a problem
+    involve operations with non-integer durations, it would be necessary to
+    multiply all durations by a sufficiently large integer so that every
+    duration is an integer.
+    """
 
     __slots__ = ("machines", "duration", "_job_id", "_position_in_job", "_id")
 
