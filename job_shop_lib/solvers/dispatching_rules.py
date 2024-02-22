@@ -73,10 +73,10 @@ def shortest_processing_time(dispatcher: Dispatcher) -> Operation:
 
 
 def first_come_first_served(dispatcher: Dispatcher) -> Operation:
-    """Dispatches the operation with the lowest id."""
+    """Dispatches the operation with the lowest position in job."""
     return min(
         dispatcher.available_operations(),
-        key=lambda operation: operation.id,
+        key=lambda operation: operation.position_in_job,
     )
 
 
