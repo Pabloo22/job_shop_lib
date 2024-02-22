@@ -60,18 +60,15 @@ class Dispatcher:
     def available_operations(self) -> list[Operation]:
         available_operations = []
         for job_id, next_position in enumerate(self.job_next_operation_index):
-            if next_position >= len(self.instance.jobs[job_id]):
+            if next_position == len(self.instance.jobs[job_id]):
                 continue
-            available_operations.append(
-                self.instance.jobs[job_id][next_position]
-            )
+            operation = self.instance.jobs[job_id][next_position]
+            available_operations.append(operation)
         return available_operations
 
     def uncompleted_operations(self) -> list[Operation]:
         uncompleted_operations = []
         for job_id, next_position in enumerate(self.job_next_operation_index):
-            if next_position >= len(self.instance.jobs[job_id]):
-                continue
-            for operation in self.instance.jobs[job_id][next_position:]:
-                uncompleted_operations.append(operation)
+            operations = self.instance.jobs[job_id][next_position:]
+            uncompleted_operations.extend(operations)
         return uncompleted_operations
