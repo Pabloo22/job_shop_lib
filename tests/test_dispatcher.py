@@ -52,3 +52,33 @@ def test_reset(example_job_shop_instance: JobShopInstance):
     assert dispatcher.job_next_available_time == [0, 0, 0]
     assert dispatcher.machine_next_available_time == [0, 0, 0]
     assert dispatcher.job_next_operation_index == [0, 0, 0]
+
+
+def test_is_operation_ready(example_job_shop_instance: JobShopInstance):
+    dispatcher = Dispatcher(example_job_shop_instance)
+
+    job_1 = example_job_shop_instance.jobs[0]
+    job_2 = example_job_shop_instance.jobs[1]
+    job_3 = example_job_shop_instance.jobs[2]
+
+    machine_1 = 0
+    machine_2 = 1
+    machine_3 = 2
+
+    dispatcher.dispatch(job_1[0], machine_1)
+    dispatcher.dispatch(job_1[1], machine_2)
+    dispatcher.dispatch(job_3[0], machine_3)
+    dispatcher.dispatch(job_3[1], machine_1)
+    dispatcher.dispatch(job_2[0], machine_2)
+
+    assert not dispatcher.is_operation_ready(job_1[0])
+    assert not dispatcher.is_operation_ready(job_1[1])
+    assert dispatcher.is_operation_ready(job_1[2])
+
+    assert not dispatcher.is_operation_ready(job_2[0])
+    assert dispatcher.is_operation_ready(job_2[1])
+    assert not dispatcher.is_operation_ready(job_2[2])
+
+    assert not dispatcher.is_operation_ready(job_3[0])
+    assert not dispatcher.is_operation_ready(job_3[1])
+    assert dispatcher.is_operation_ready(job_3[2])
