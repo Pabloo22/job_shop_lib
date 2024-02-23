@@ -1,39 +1,20 @@
 from typing import Callable
 import random
 
-from job_shop_lib import JobShopInstance, Dispatcher, Schedule, Operation
-
-
-def dispatching_rule_solver(
-    instance: JobShopInstance,
-    dispatching_rule: Callable[[Dispatcher], Operation] | str = "mwkr",
-    machine_chooser: Callable[[Dispatcher, Operation], int] | str = "first",
-) -> Schedule:
-    if isinstance(dispatching_rule, str):
-        dispatching_rule = dispatching_rule_factory(dispatching_rule)
-    if isinstance(machine_chooser, str):
-        machine_chooser = machine_chooser_factory(machine_chooser)
-
-    dispatcher = Dispatcher(instance)
-    while not dispatcher.schedule.is_complete():
-        selected_operation = dispatching_rule(dispatcher)
-        machine_id = machine_chooser(dispatcher, selected_operation)
-        dispatcher.dispatch(selected_operation, machine_id)
-
-    return dispatcher.schedule
+from job_shop_lib import Dispatcher, Operation
 
 
 def dispatching_rule_factory(
     dispatching_rule: str,
 ) -> Callable[[Dispatcher], Operation]:
     dispatching_rules = {
-        "shortest_processing_time": shortest_processing_time,
-        "first_come_first_served": first_come_first_served,
-        "most_work_remaining": most_work_remaining,
-        "spt": shortest_processing_time,
-        "fcfs": first_come_first_served,
-        "mwkr": most_work_remaining,
-        "random": random_operation,
+        "shortest_processing_time": shortest_processing_time_rule,
+        "first_come_first_served": first_come_first_served_rule,
+        "most_work_remaining": most_work_remaining_rule,
+        "spt": shortest_processing_time_rule,
+        "fcfs": first_come_first_served_rule,
+        "mwkr": most_work_remaining_rule,
+        "random": random_operation_rule,
     }
 
     dispatching_rule = dispatching_rule.lower()
@@ -64,7 +45,7 @@ def machine_chooser_factory(
     return machine_choosers[machine_chooser]
 
 
-def shortest_processing_time(dispatcher: Dispatcher) -> Operation:
+def shortest_processing_time_rule(dispatcher: Dispatcher) -> Operation:
     """Dispatches the operation with the shortest duration."""
     return min(
         dispatcher.available_operations(),
@@ -72,7 +53,7 @@ def shortest_processing_time(dispatcher: Dispatcher) -> Operation:
     )
 
 
-def first_come_first_served(dispatcher: Dispatcher) -> Operation:
+def first_come_first_served_rule(dispatcher: Dispatcher) -> Operation:
     """Dispatches the operation with the lowest position in job."""
     return min(
         dispatcher.available_operations(),
@@ -80,7 +61,7 @@ def first_come_first_served(dispatcher: Dispatcher) -> Operation:
     )
 
 
-def most_work_remaining(dispatcher: Dispatcher) -> Operation:
+def most_work_remaining_rule(dispatcher: Dispatcher) -> Operation:
     """Dispatches the operation which job has the most remaining work."""
     job_remaining_work = [0] * dispatcher.instance.num_jobs
     for operation in dispatcher.uncompleted_operations():
@@ -92,6 +73,6 @@ def most_work_remaining(dispatcher: Dispatcher) -> Operation:
     )
 
 
-def random_operation(dispatcher: Dispatcher) -> Operation:
+def random_operation_rule(dispatcher: Dispatcher) -> Operation:
     """Dispatches a random operation."""
     return random.choice(dispatcher.available_operations())
