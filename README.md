@@ -34,6 +34,7 @@ plt.show()
 ![Example Gannt Chart](example_gantt_chart.png)
 
 For more details, check the [tutorial](tutorial) folder.
+
 ## Installation
 
 In the future, the library will be available on PyPI. For now, you can install it from the source code.
