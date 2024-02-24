@@ -14,7 +14,7 @@ from job_shop_lib.visualization import plot_gantt_chart
 
 def get_default_plot_function(
     title: Optional[str] = None, cmap: str = "viridis"
-) -> Callable[[Callable], Callable]:
+) -> Callable[[Schedule, int], Figure]:
     def default_plot_function(schedule: Schedule, makespan: int) -> Figure:
         fig, _ = plot_gantt_chart(
             schedule, title=title, cmap_name=cmap, xlim=makespan
@@ -28,7 +28,7 @@ def create_gif(
     gif_path: str,
     instance: JobShopInstance,
     solver: DispatchingRuleSolver,
-    plot_function: Callable[[Schedule, int], Figure] = None,
+    plot_function: Optional[Callable[[Schedule, int], Figure]] = None,
     fps: int = 1,
     remove_frames: bool = True,
 ) -> None:
