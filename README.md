@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.solvers import CPSolver
+from job_shop_lib.visualization import plot_gantt_chart
 
 MACHINE_1 = 0
 MACHINE_2 = 1
@@ -28,7 +29,7 @@ instance = JobShopInstance(jobs, name="Example")
 cp_sat_solver = CPSolver()
 schedule = cp_sat_solver(instance)
 
-fig, ax = schedule.plot_gantt_chart()
+fig, ax = plot_gantt_chart(schedule)
 plt.show()
 ```
 ![Example Gannt Chart](example_gantt_chart.png)
