@@ -160,8 +160,5 @@ cython_debug/
 #.idea/
 
 # -----------------------------
-# Notebooks
-tests/charts.ipynb
-
 # Coverage
 lcov.info
