@@ -7,4 +7,10 @@ from job_shop_lib.visualization.create_gif import (
 )
 
 
-__all__ = ["plot_gantt_chart"]
+__all__ = [
+    "plot_gantt_chart",
+    "create_gif",
+    "create_gantt_chart_frames",
+    "get_default_plot_function",
+    "create_gif_from_frames",
+]
