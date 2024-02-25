@@ -8,6 +8,7 @@ from job_shop_lib.solvers.dispatching_rules import (
 
 
 class DispatchingRuleSolver:
+    """Solves a job shop instance using a dispatching rule algorithm."""
 
     def __init__(
         self,
