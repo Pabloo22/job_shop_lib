@@ -7,7 +7,7 @@ def test_scheduled_operation_initialization():
     scheduled_operation = ScheduledOperation(
         operation, start_time=10, machine_id=1
     )
-    assert scheduled_operation.operation == operation
+    assert scheduled_operation.operation is operation
     assert scheduled_operation.start_time == 10
     assert scheduled_operation.machine_id == 1
 
