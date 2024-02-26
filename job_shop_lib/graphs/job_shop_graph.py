@@ -5,8 +5,7 @@ import collections
 import networkx as nx
 
 from job_shop_lib import JobShopInstance
-from job_shop_lib.graphs.constants import EdgeType, NodeTypes, NODE_ID_DEFAULT
-from job_shop_lib.graphs import Node
+from job_shop_lib.graphs import Node, EdgeType, NodeTypes
 
 
 class JobShopGraph(nx.DiGraph):
@@ -17,7 +16,9 @@ class JobShopGraph(nx.DiGraph):
     ):
         super().__init__(incoming_graph_data, **attr)
         self.instance = instance
-        self.nodes_by_type = collections.defaultdict(list)
+        self.nodes_by_type: dict[NodeTypes, list[Node]] = (
+            collections.defaultdict(list)
+        )
         self.next_node_id = 0
 
         self.add_operation_nodes()
@@ -72,7 +73,7 @@ class JobShopGraph(nx.DiGraph):
 
     def add_node(self, node_for_adding: Node, **attr) -> None:
         """Adds a node to the graph.
-        
+
         Overrides the `add_node` method of the `DiGraph` class. This method
         assigns automatically an id to the node and adds it to the
         `nodes_by_type` dictionary.
@@ -82,12 +83,6 @@ class JobShopGraph(nx.DiGraph):
             **attr: Any other additional attributes that are not part of the
                 `Node` class interface.
         """
-        if not isinstance(node_for_adding, Node):
-            raise ValueError("node_for_adding must be a Node.")
-
-        if node_for_adding.node_id != NODE_ID_DEFAULT:
-            raise ValueError("node_for_adding already has an id.")
-
         node_for_adding.node_id = self.next_node_id
         super().add_node(node_for_adding, **attr)
         self.nodes_by_type[node_for_adding.node_type].append(node_for_adding)
