@@ -99,6 +99,21 @@ class JobShopInstance:
         ]
 
     @functools.cached_property
+    def operations_by_machine(self) -> list[list[Operation]]:
+        """Returns a list of lists of operations.
+
+        The i-th list contains the operations that can be processed in the
+        machine with id i.
+        """
+        operations_by_machine = [[] for _ in range(self.num_machines)]
+        for job in self.jobs:
+            for operation in job:
+                for machine_id in operation.machines:
+                    operations_by_machine[machine_id].append(operation)
+
+        return operations_by_machine
+
+    @functools.cached_property
     def max_duration(self) -> float:
         """Returns the maximum duration of the instance.
 

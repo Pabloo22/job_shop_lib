@@ -42,6 +42,15 @@ def test_machines_matrix(job_shop_instance: JobShopInstance):
     assert job_shop_instance.machines_matrix == expected_matrix
 
 
+def test_operations_by_machine(job_shop_instance: JobShopInstance):
+    expected_operations = [
+        [job_shop_instance.jobs[0][0]],
+        [job_shop_instance.jobs[0][1], job_shop_instance.jobs[1][0]],
+        [job_shop_instance.jobs[1][1]],
+    ]
+    assert job_shop_instance.operations_by_machine == expected_operations
+
+
 def test_job_durations(job_shop_instance: JobShopInstance):
     assert job_shop_instance.job_durations == [30, 25]
 
