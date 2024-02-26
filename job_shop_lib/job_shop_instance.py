@@ -27,7 +27,7 @@ class JobShopInstance:
             for position, operation in enumerate(job):
                 operation.job_id = job_id
                 operation.position_in_job = position
-                operation.id = operation_id
+                operation.operation_id = operation_id
                 operation_id += 1
 
     @property

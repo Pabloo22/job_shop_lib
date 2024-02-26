@@ -16,7 +16,13 @@ class Operation:
     duration is an integer.
     """
 
-    __slots__ = ("machines", "duration", "_job_id", "_position_in_job", "_id")
+    __slots__ = (
+        "machines",
+        "duration",
+        "_job_id",
+        "_position_in_job",
+        "_operation_id",
+    )
 
     def __init__(
         self,
@@ -30,7 +36,7 @@ class Operation:
         self.duration = duration
         self._job_id = job_id
         self._position_in_job = position_in_job
-        self._id = operation_id
+        self._operation_id = operation_id
 
     @property
     def machine_id(self) -> int:
@@ -63,23 +69,23 @@ class Operation:
         self._position_in_job = value
 
     @property
-    def id(self) -> int:
+    def operation_id(self) -> int:
         """Returns the id of the operation."""
-        if self._id is None:
+        if self._operation_id is None:
             raise ValueError("Operation has no id.")
-        return self._id
+        return self._operation_id
 
-    @id.setter
-    def id(self, value: int) -> None:
-        self._id = value
+    @operation_id.setter
+    def operation_id(self, value: int) -> None:
+        self._operation_id = value
 
     def __hash__(self) -> int:
-        return hash(self.id)
+        return hash(self.operation_id)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Operation):
             return NotImplemented
-        return self.id == other.id
+        return self.operation_id == other.operation_id
 
     def __repr__(self) -> str:
         machines = (

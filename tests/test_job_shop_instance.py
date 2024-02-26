@@ -14,17 +14,17 @@ def test_set_operation_attributes():
     assert (
         job1[0].job_id == 0
         and job1[0].position_in_job == 0
-        and job1[0].id == 0
+        and job1[0].operation_id == 0
     ), "Job 1 Operation 1 attributes not set correctly"
     assert (
         job1[1].job_id == 0
         and job1[1].position_in_job == 1
-        and job1[1].id == 1
+        and job1[1].operation_id == 1
     ), "Job 1 Operation 2 attributes not set correctly"
     assert (
         job2[0].job_id == 1
         and job2[0].position_in_job == 0
-        and job2[0].id == 2
+        and job2[0].operation_id == 2
     ), "Job 2 Operation 1 attributes not set correctly"
 
 
