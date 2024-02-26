@@ -105,7 +105,9 @@ class JobShopInstance:
         The i-th list contains the operations that can be processed in the
         machine with id i.
         """
-        operations_by_machine = [[] for _ in range(self.num_machines)]
+        operations_by_machine: list[list[Operation]] = [
+            [] for _ in range(self.num_machines)
+        ]
         for job in self.jobs:
             for operation in job:
                 for machine_id in operation.machines:
