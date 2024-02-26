@@ -10,7 +10,7 @@ class Operation:
 
     Note:
     To increase performance, some solvers such as the CP-SAT solver use
-    only integers to represent operation's attributes. Should a problem
+    only integers to represent the operation's attributes. Should a problem
     involve operations with non-integer durations, it would be necessary to
     multiply all durations by a sufficiently large integer so that every
     duration is an integer.
