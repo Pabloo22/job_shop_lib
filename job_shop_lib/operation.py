@@ -1,5 +1,7 @@
 """Home of the Operation class."""
 
+from __future__ import annotations
+
 from typing import Optional
 
 
@@ -73,6 +75,9 @@ class Operation:
 
     def __hash__(self) -> int:
         return hash(self.id)
+
+    def __eq__(self, operation: Operation) -> bool:
+        return self.id == operation.id
 
     def __repr__(self) -> str:
         machines = (
