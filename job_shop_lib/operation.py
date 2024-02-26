@@ -76,8 +76,10 @@ class Operation:
     def __hash__(self) -> int:
         return hash(self.id)
 
-    def __eq__(self, operation: Operation) -> bool:
-        return self.id == operation.id
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Operation):
+            return NotImplemented
+        return self.id == other.id
 
     def __repr__(self) -> str:
         machines = (
