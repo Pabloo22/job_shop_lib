@@ -1,24 +1,22 @@
-from typing import TypeVar
+from typing import Optional, Any
 
 from job_shop_lib.graphs.constants import NodeType
-
-_T = TypeVar("_T")
 
 
 class Node:
     __slots__ = "_node_type", "_value", "_node_id"
 
-    def __init__(self, node_type: NodeType, value: _T = None):
+    def __init__(self, node_type: NodeType, value: Any = None):
         self._node_type = node_type
         self._value = value
-        self._node_id = None
+        self._node_id: Optional[int] = None
 
     @property
     def node_type(self) -> NodeType:
         return self._node_type
 
     @property
-    def value(self) -> _T:
+    def value(self) -> Any:
         return self._value
 
     @property
