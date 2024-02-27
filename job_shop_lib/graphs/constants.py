@@ -9,7 +9,7 @@ class EdgeType(enum.Enum):
     DISJUNCTIVE = 1
 
 
-class NodeTypes(enum.Enum):
+class NodeType(enum.Enum):
     """Enumeration of node types."""
 
     # The actual values are not important here.
