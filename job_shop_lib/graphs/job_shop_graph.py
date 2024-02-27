@@ -21,8 +21,12 @@ class JobShopGraph(nx.DiGraph):
         self.nodes_by_type: dict[NodeType, list[Node]] = (
             collections.defaultdict(list)
         )
-        self.nodes_by_machine = [[] for _ in range(instance.num_machines)]
-        self.nodes_by_job = [[] for _ in range(instance.num_jobs)]
+        self.nodes_by_machine: list[list[Node]] = [
+            [] for _ in range(instance.num_machines)
+        ]
+        self.nodes_by_job: list[list[Node]] = [
+            [] for _ in range(instance.num_jobs)
+        ]
         self._next_node_id = 0
 
         self._add_operation_nodes()
