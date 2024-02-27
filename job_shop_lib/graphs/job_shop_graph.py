@@ -5,7 +5,7 @@ import collections
 import networkx as nx
 
 from job_shop_lib import JobShopInstance
-from job_shop_lib.graphs import Node, EdgeType, NodeTypes
+from job_shop_lib.graphs import Node, EdgeType, NodeType
 
 
 class JobShopGraph(nx.DiGraph):
@@ -16,7 +16,7 @@ class JobShopGraph(nx.DiGraph):
     ):
         super().__init__(incoming_graph_data, **attr)
         self.instance = instance
-        self.nodes_by_type: dict[NodeTypes, list[Node]] = (
+        self.nodes_by_type: dict[NodeType, list[Node]] = (
             collections.defaultdict(list)
         )
         self.next_node_id = 0
@@ -28,7 +28,7 @@ class JobShopGraph(nx.DiGraph):
         for job in self.instance.jobs:
             for operation in job:
                 node = Node(
-                    node_type=NodeTypes.OPERATION,
+                    node_type=NodeType.OPERATION,
                     value=operation,
                 )
                 self.add_node(node)
@@ -49,7 +49,7 @@ class JobShopGraph(nx.DiGraph):
                     type=EdgeType.DISJUNCTIVE,
                 )
 
-    def add_conjuctive_edges(self) -> None:
+    def add_conjunctive_edges(self) -> None:
         """Adds conjunctive edges to the graph."""
         for job in self.instance.jobs:
             for i in range(1, len(job)):
@@ -57,15 +57,15 @@ class JobShopGraph(nx.DiGraph):
 
     def add_source_sink_nodes(self) -> None:
         """Adds source and sink nodes to the graph."""
-        source = Node(node_type=NodeTypes.SOURCE)
-        sink = Node(node_type=NodeTypes.SINK)
+        source = Node(node_type=NodeType.SOURCE)
+        sink = Node(node_type=NodeType.SINK)
         self.add_node(source)
         self.add_node(sink)
 
     def add_source_sink_edges(self) -> None:
         """Adds edges between source and sink nodes and operations."""
-        source = self.nodes_by_type[NodeTypes.SOURCE][0]
-        sink = self.nodes_by_type[NodeTypes.SINK][0]
+        source = self.nodes_by_type[NodeType.SOURCE][0]
+        sink = self.nodes_by_type[NodeType.SINK][0]
 
         for job in self.instance.jobs:
             self.add_edge(source, job[0], type=EdgeType.CONJUNCTIVE)
