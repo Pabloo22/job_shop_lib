@@ -1,12 +1,13 @@
 import functools
 from typing import Optional, Callable
 import warnings
+import copy
 
 import matplotlib
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from job_shop_lib.graphs import JobShopGraph, EdgeType
+from job_shop_lib.graphs import JobShopGraph, EdgeType, NodeType, Node
 
 
 Layout = Callable[[nx.Graph], dict[str, tuple[float, float]]]
@@ -21,7 +22,7 @@ Layout = Callable[[nx.Graph], dict[str, tuple[float, float]]]
 # function signature or adding a dataclass for configuration (it would add
 # unnecessary complexity).
 # pylint: disable=too-many-arguments, too-many-locals
-def plot_classic_disjunctive_graph(
+def plot_disjunctive_graph(
     job_shop_graph: JobShopGraph,
     figsize: tuple[float, float] = (12, 8),
     node_size: int = 1600,
@@ -40,7 +41,9 @@ def plot_classic_disjunctive_graph(
     # ----------------
     plt.figure(figsize=figsize)
     if title is None:
-        title = f"Disjunctive Graph Visualization: {job_shop_graph.name}"
+        title = (
+            f"Disjunctive Graph Visualization: {job_shop_graph.instance.name}"
+        )
     plt.title(title)
 
     # Set up the layout
@@ -61,7 +64,7 @@ def plot_classic_disjunctive_graph(
             )
             layout = nx.spring_layout
 
-    temp_graph = job_shop_graph.copy()
+    temp_graph = copy.deepcopy(job_shop_graph)
     # Remove disjunctive edges to get a better layout
     temp_graph.remove_edges_from(
         [
@@ -74,9 +77,7 @@ def plot_classic_disjunctive_graph(
 
     # Draw nodes
     # ----------
-    node_colors = [
-        node.get("machine_id", -1) for node in temp_graph.nodes.values()
-    ]
+    node_colors = [_get_node_color(node) for node in job_shop_graph.nodes]
 
     nx.draw_networkx_nodes(
         job_shop_graph,
@@ -121,16 +122,19 @@ def plot_classic_disjunctive_graph(
 
     # Draw node labels
     # ----------------
-    durations = list(
-        nx.get_node_attributes(job_shop_graph, "duration").values()
-    )[2:]
-    nodes = list(job_shop_graph.nodes.keys())[2:]
+    operation_nodes = job_shop_graph.nodes_by_type[NodeType.OPERATION]
 
     labels = {}
-    labels["S"] = "S"
-    labels["T"] = "T"
-    for node, machine, duration in zip(nodes, node_colors[2:], durations):
-        labels[node] = f"m={machine}\nd={duration}"
+    source_node = job_shop_graph.nodes_by_type[NodeType.SOURCE][0]
+    labels[source_node] = "S"
+
+    sink_node = job_shop_graph.nodes_by_type[NodeType.SINK][0]
+    labels[sink_node] = "T"
+    for operation_node in operation_nodes:
+        labels[operation_node] = (
+            f"m={operation_node.operation.machine_id}\n"
+            f"d={operation_node.operation.duration}"
+        )
 
     nx.draw_networkx_labels(
         job_shop_graph,
@@ -172,3 +176,15 @@ def plot_classic_disjunctive_graph(
         borderaxespad=0.0,
     )
     return plt.gcf()
+
+
+def _get_node_color(node: Node) -> int:
+    """Returns the color of the node."""
+    if node.node_type == NodeType.SOURCE:
+        return -1
+    if node.node_type == NodeType.SINK:
+        return -1
+    if node.node_type == NodeType.OPERATION:
+        return node.operation.machine_id
+
+    raise ValueError("Invalid node type.")
