@@ -1,5 +1,7 @@
 """Contains functions to build disjunctive graphs and its variants."""
 
+from __future__ import annotations
+
 import itertools
 import collections
 import networkx as nx
@@ -19,39 +21,57 @@ class JobShopGraph(nx.DiGraph):
         self.nodes_by_type: dict[NodeType, list[Node]] = (
             collections.defaultdict(list)
         )
-        self.next_node_id = 0
+        self.nodes_by_machine = [[] for _ in range(instance.num_machines)]
+        self.nodes_by_job = [[] for _ in range(instance.num_jobs)]
+        self._next_node_id = 0
 
-        self.add_operation_nodes()
+        self._add_operation_nodes()
 
-    def add_operation_nodes(self) -> None:
+    @classmethod
+    def build_disjunctive_graph(
+        cls, instance: JobShopInstance
+    ) -> JobShopGraph:
+        """Creates a disjunctive graph from a `JobShopInstance`.
+
+        Args:
+            instance (JobShopInstance): The instance to represent as a graph.
+
+        Returns:
+            JobShopGraph: The disjunctive graph of the instance.
+        """
+        graph = cls(instance)
+        graph.add_disjunctive_edges()
+        graph.add_conjunctive_edges()
+        graph.add_source_sink_nodes()
+        graph.add_source_sink_edges()
+        return graph
+
+    def _add_operation_nodes(self) -> None:
         """Adds operation nodes to the graph."""
         for job in self.instance.jobs:
             for operation in job:
-                node = Node(
-                    node_type=NodeType.OPERATION,
-                    value=operation,
-                )
+                node = Node(node_type=NodeType.OPERATION, value=operation)
                 self.add_node(node)
 
     def add_disjunctive_edges(self) -> None:
         """Adds disjunctive edges to the graph."""
 
-        for operations in self.instance.operations_by_machine:
-            for op1, op2 in itertools.combinations(operations, 2):
+        for machine in self.nodes_by_machine:
+            for node1, node2 in itertools.combinations(machine, 2):
                 self.add_edge(
-                    op1.operation_id,
-                    op2.operation_id,
+                    node1,
+                    node2,
                     type=EdgeType.DISJUNCTIVE,
                 )
                 self.add_edge(
-                    op2.operation_id,
-                    op1.operation_id,
+                    node2,
+                    node1,
                     type=EdgeType.DISJUNCTIVE,
                 )
 
     def add_conjunctive_edges(self) -> None:
         """Adds conjunctive edges to the graph."""
-        for job in self.instance.jobs:
+        for job in self.nodes_by_job:
             for i in range(1, len(job)):
                 self.add_edge(job[i - 1], job[i], type=EdgeType.CONJUNCTIVE)
 
@@ -67,7 +87,7 @@ class JobShopGraph(nx.DiGraph):
         source = self.nodes_by_type[NodeType.SOURCE][0]
         sink = self.nodes_by_type[NodeType.SINK][0]
 
-        for job in self.instance.jobs:
+        for job in self.nodes_by_job:
             self.add_edge(source, job[0], type=EdgeType.CONJUNCTIVE)
             self.add_edge(job[-1], sink, type=EdgeType.CONJUNCTIVE)
 
@@ -83,7 +103,14 @@ class JobShopGraph(nx.DiGraph):
             **attr: Any other additional attributes that are not part of the
                 `Node` class interface.
         """
-        node_for_adding.node_id = self.next_node_id
+        node_for_adding.node_id = self._next_node_id
         super().add_node(node_for_adding, **attr)
         self.nodes_by_type[node_for_adding.node_type].append(node_for_adding)
-        self.next_node_id += 1
+        self._next_node_id += 1
+
+        if node_for_adding.node_type != NodeType.OPERATION:
+            return
+        operation = node_for_adding.operation
+        self.nodes_by_job[operation.job_id].append(node_for_adding)
+        for machine_id in operation.machines:
+            self.nodes_by_machine[machine_id].append(node_for_adding)
