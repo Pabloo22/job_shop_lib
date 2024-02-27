@@ -14,6 +14,7 @@ matplotlib = "^3.8.3"
 pyarrow = "^15.0.0"  # An optional pandas' dependency that will be required in the future
 networkx = "^3.2.1"
 imageio = "^2.34.0"
+pygraphviz = {version = "^1.12", optional = true}
 
 [tool.poetry.group.test]
 optional = true
@@ -36,6 +37,9 @@ optional = true
 ipykernel = "^6.29.2"
 nbconvert = "^7.16.0"
 numpy = "^1.26.4"
+
+[tool.poetry.extras]
+pygraphviz = ["pygraphviz"]
 
 [build-system]
 requires = ["poetry-core"]
