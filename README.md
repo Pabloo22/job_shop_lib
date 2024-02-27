@@ -4,7 +4,7 @@
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<img src="logo_with_transparent_background.png" alt="Job Shop Lib" width="150">
+<img src="images/logo_with_transparent_background.png" alt="Job Shop Lib" width="150">
 
 
 A framework to model and solve the Job Shop Scheduling Problem with a special focus on graph representations.
@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.solvers import CPSolver
 from job_shop_lib.visualization import plot_gantt_chart
+
 
 MACHINE_1 = 0
 MACHINE_2 = 1
@@ -35,7 +36,16 @@ schedule = cp_sat_solver(instance)
 fig, ax = plot_gantt_chart(schedule)
 plt.show()
 ```
-![Example Gannt Chart](example_gantt_chart.png)
+![Example Gannt Chart](images/example_gantt_chart.png)
+
+
+```python
+disjunctive_graph = JobShopGraph.build_disjunctive_graph(instance)
+plot_disjunctive_graph(disjunctive_graph)
+plt.show()
+```
+
+![Example Disjunctive Graph](images/example_disjunctive_graph.png)
 
 For more details, check the [tutorial](tutorial) folder.
 
