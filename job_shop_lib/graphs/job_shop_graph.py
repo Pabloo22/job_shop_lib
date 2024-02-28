@@ -2,16 +2,23 @@
 
 from __future__ import annotations
 
-import itertools
 import collections
 import networkx as nx
 
 from job_shop_lib import JobShopInstance
-from job_shop_lib.graphs import Node, EdgeType, NodeType
+from job_shop_lib.graphs import Node, NodeType
 
 
 class JobShopGraph(nx.DiGraph):
     """Represents a `JobShopInstance` as a graph."""
+
+    __slots__ = (
+        "instance",
+        "nodes_by_type",
+        "nodes_by_machine",
+        "nodes_by_job",
+        "_next_node_id",
+    )
 
     def __init__(
         self, instance: JobShopInstance, incoming_graph_data=None, **attr
@@ -31,69 +38,12 @@ class JobShopGraph(nx.DiGraph):
 
         self._add_operation_nodes()
 
-    @classmethod
-    def build_disjunctive_graph(
-        cls, instance: JobShopInstance
-    ) -> JobShopGraph:
-        """Creates a disjunctive graph from a `JobShopInstance`.
-
-        Args:
-            instance (JobShopInstance): The instance to represent as a graph.
-
-        Returns:
-            JobShopGraph: The disjunctive graph of the instance.
-        """
-        graph = cls(instance)
-        graph.add_disjunctive_edges()
-        graph.add_conjunctive_edges()
-        graph.add_source_sink_nodes()
-        graph.add_source_sink_edges()
-        return graph
-
     def _add_operation_nodes(self) -> None:
         """Adds operation nodes to the graph."""
         for job in self.instance.jobs:
             for operation in job:
                 node = Node(node_type=NodeType.OPERATION, value=operation)
                 self.add_node(node)
-
-    def add_disjunctive_edges(self) -> None:
-        """Adds disjunctive edges to the graph."""
-
-        for machine in self.nodes_by_machine:
-            for node1, node2 in itertools.combinations(machine, 2):
-                self.add_edge(
-                    node1,
-                    node2,
-                    type=EdgeType.DISJUNCTIVE,
-                )
-                self.add_edge(
-                    node2,
-                    node1,
-                    type=EdgeType.DISJUNCTIVE,
-                )
-
-    def add_conjunctive_edges(self) -> None:
-        """Adds conjunctive edges to the graph."""
-        for job in self.nodes_by_job:
-            for i in range(1, len(job)):
-                self.add_edge(job[i - 1], job[i], type=EdgeType.CONJUNCTIVE)
-
-    def add_source_sink_nodes(self) -> None:
-        """Adds source and sink nodes to the graph."""
-        source = Node(node_type=NodeType.SOURCE)
-        sink = Node(node_type=NodeType.SINK)
-        self.add_node(source)
-        self.add_node(sink)
-
-    def add_source_sink_edges(self) -> None:
-        """Adds edges between source and sink nodes and operations."""
-        source = self.nodes_by_type[NodeType.SOURCE][0]
-        sink = self.nodes_by_type[NodeType.SINK][0]
-
-        for job in self.nodes_by_job:
-            self.add_edge(source, job[0], type=EdgeType.CONJUNCTIVE)
-            self.add_edge(job[-1], sink, type=EdgeType.CONJUNCTIVE)
 
     def add_node(self, node_for_adding: Node, **attr) -> None:
         """Adds a node to the graph.
