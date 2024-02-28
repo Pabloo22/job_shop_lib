@@ -21,6 +21,51 @@ def test_distinct_node_ids(example_job_shop_instance):
     )
 
 
+def test_node_types(example_job_shop_instance):
+    graph = JobShopGraph(example_job_shop_instance)
+    assert all(node.node_type == NodeType.OPERATION for node in graph.nodes)
+    graph.add_source_sink_nodes()
+    assert all(
+        node.node_type in (NodeType.OPERATION, NodeType.SOURCE, NodeType.SINK)
+        for node in graph.nodes
+    )
+
+
+def test_nodes_by_type(example_job_shop_instance):
+    graph = JobShopGraph(example_job_shop_instance)
+    graph.add_source_sink_nodes()
+
+    all_nodes = set()
+    for nodes in graph.nodes_by_type.values():
+        all_nodes.update(nodes)
+
+    assert all_nodes == set(graph.nodes)
+
+
+def test_nodes_by_machine(example_job_shop_instance):
+    graph = JobShopGraph(example_job_shop_instance)
+
+    # Intermediate operations to test against potential side effects
+    graph.add_source_sink_nodes()
+    graph.add_conjunctive_edges()
+    graph.add_disjunctive_edges()
+
+    for machine_id, nodes in enumerate(graph.nodes_by_machine):
+        assert all(node.operation.machine_id == machine_id for node in nodes)
+
+
+def test_nodes_by_job(example_job_shop_instance):
+    graph = JobShopGraph(example_job_shop_instance)
+
+    # Intermediate operations to test against potential side effects
+    graph.add_source_sink_nodes()
+    graph.add_conjunctive_edges()
+    graph.add_disjunctive_edges()
+
+    for job_id, nodes in enumerate(graph.nodes_by_job):
+        assert all(node.operation.job_id == job_id for node in nodes)
+
+
 def test_operation_nodes_addition(example_job_shop_instance):
     graph = JobShopGraph(example_job_shop_instance)
     operation_nodes = [
