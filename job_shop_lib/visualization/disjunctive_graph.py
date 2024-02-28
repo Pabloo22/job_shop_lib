@@ -24,7 +24,7 @@ Layout = Callable[[nx.Graph], dict[str, tuple[float, float]]]
 # pylint: disable=too-many-arguments, too-many-locals
 def plot_disjunctive_graph(
     job_shop_graph: JobShopGraph,
-    figsize: tuple[float, float] = (12, 8),
+    figsize: tuple[float, float] = (6, 4),
     node_size: int = 1600,
     title: Optional[str] = None,
     layout: Optional[Layout] = None,
