@@ -4,7 +4,6 @@ import enum
 class EdgeType(enum.Enum):
     """Enumeration of edge types."""
 
-    # The values 0 and 1 could be used to index different adjacency matrices.
     CONJUNCTIVE = 0
     DISJUNCTIVE = 1
 
@@ -12,10 +11,10 @@ class EdgeType(enum.Enum):
 class NodeType(enum.Enum):
     """Enumeration of node types."""
 
-    # The actual values are not important here.
     OPERATION = enum.auto()
     MACHINE = enum.auto()
     JOB = enum.auto()
+    GLOBAL = enum.auto()
     SOURCE = enum.auto()
     SINK = enum.auto()
 
