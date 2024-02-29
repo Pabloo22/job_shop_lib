@@ -1,7 +1,5 @@
 """Contains functions to build disjunctive graphs and its variants."""
 
-from __future__ import annotations
-
 import collections
 import networkx as nx
 
@@ -9,31 +7,40 @@ from job_shop_lib import JobShopInstance
 from job_shop_lib.graphs import Node, NodeType
 
 
-class JobShopGraph(nx.DiGraph):
+NODE_ATTR = "node"
+
+
+class JobShopGraph:
     """Represents a `JobShopInstance` as a graph."""
 
     __slots__ = (
         "instance",
+        "graph",
+        "nodes",
         "nodes_by_type",
         "nodes_by_machine",
         "nodes_by_job",
         "_next_node_id",
     )
 
-    def __init__(
-        self, instance: JobShopInstance, incoming_graph_data=None, **attr
-    ):
-        super().__init__(incoming_graph_data, **attr)
+    def __init__(self, instance: JobShopInstance):
+        self.graph = nx.DiGraph()
         self.instance = instance
+
+        self.nodes: list[Node] = []
+
         self.nodes_by_type: dict[NodeType, list[Node]] = (
             collections.defaultdict(list)
         )
+
         self.nodes_by_machine: list[list[Node]] = [
             [] for _ in range(instance.num_machines)
         ]
+
         self.nodes_by_job: list[list[Node]] = [
             [] for _ in range(instance.num_jobs)
         ]
+
         self._next_node_id = 0
 
         self._add_operation_nodes()
@@ -42,15 +49,16 @@ class JobShopGraph(nx.DiGraph):
         """Adds operation nodes to the graph."""
         for job in self.instance.jobs:
             for operation in job:
-                node = Node(node_type=NodeType.OPERATION, value=operation)
+                node = Node.from_type(
+                    node_type=NodeType.OPERATION, value=operation
+                )
                 self.add_node(node)
 
-    def add_node(self, node_for_adding: Node, **attr) -> None:
+    def add_node(self, node_for_adding: Node) -> None:
         """Adds a node to the graph.
 
-        Overrides the `add_node` method of the `DiGraph` class. This method
-        assigns automatically an id to the node and adds it to the
-        `nodes_by_type` dictionary.
+        Note:
+            Don't modify self.graph directly. Use this method instead.
 
         Args:
             node_for_adding (Node): The node to add to the graph.
@@ -58,8 +66,9 @@ class JobShopGraph(nx.DiGraph):
                 `Node` class interface.
         """
         node_for_adding.node_id = self._next_node_id
-        super().add_node(node_for_adding, **attr)
+        self.graph.add_node(self._next_node_id, **{NODE_ATTR: node_for_adding})
         self.nodes_by_type[node_for_adding.node_type].append(node_for_adding)
+        self.nodes.append(node_for_adding)
         self._next_node_id += 1
 
         if node_for_adding.node_type != NodeType.OPERATION:
@@ -68,3 +77,27 @@ class JobShopGraph(nx.DiGraph):
         self.nodes_by_job[operation.job_id].append(node_for_adding)
         for machine_id in operation.machines:
             self.nodes_by_machine[machine_id].append(node_for_adding)
+
+    def add_edge(
+        self, u_of_edge: Node | int, v_of_edge: Node | int, **attr
+    ) -> None:
+        """Adds an edge to the graph.
+
+        Note:
+            Don't modify self.graph directly. Use this method instead.
+
+        Args:
+            u_of_edge (Node): The source node of the edge.
+            v_of_edge (Node): The destination node of the edge.
+            **attr: Any other additional attributes that are not part of the
+                `Edge` class interface.
+        """
+        u_of_edge = (
+            u_of_edge.node_id if isinstance(u_of_edge, Node) else u_of_edge
+        )
+        v_of_edge = (
+            v_of_edge.node_id if isinstance(v_of_edge, Node) else v_of_edge
+        )
+        if u_of_edge not in self.graph or v_of_edge not in self.graph:
+            raise ValueError("u_of_edge and v_of_edge must be in the graph.")
+        self.graph.add_edge(u_of_edge, v_of_edge, **attr)
