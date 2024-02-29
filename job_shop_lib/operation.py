@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 
 class Operation:
     """Stores machine and duration information for a job operation.
@@ -24,19 +22,14 @@ class Operation:
         "_operation_id",
     )
 
-    def __init__(
-        self,
-        machines: int | list[int],
-        duration: int,
-        job_id: Optional[int] = None,
-        position_in_job: Optional[int] = None,
-        operation_id: Optional[int] = None,
-    ):
+    def __init__(self, machines: int | list[int], duration: int):
         self.machines = [machines] if isinstance(machines, int) else machines
         self.duration = duration
-        self._job_id = job_id
-        self._position_in_job = position_in_job
-        self._operation_id = operation_id
+
+        # Defined outside the class by the JobShopInstance class:
+        self._job_id = None
+        self._position_in_job = None
+        self._operation_id = None
 
     @property
     def machine_id(self) -> int:
@@ -82,10 +75,10 @@ class Operation:
     def __hash__(self) -> int:
         return hash(self.operation_id)
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Operation):
-            return NotImplemented
-        return self.operation_id == other.operation_id
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, Operation):
+            __value = __value.operation_id
+        return self.operation_id == __value
 
     def __repr__(self) -> str:
         machines = (
