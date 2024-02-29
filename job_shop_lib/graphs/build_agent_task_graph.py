@@ -32,9 +32,7 @@ def build_agent_task_graph(instance: JobShopInstance) -> JobShopGraph:
 # -------------
 def add_machine_nodes(graph: JobShopGraph) -> None:
     for machine_id in range(graph.instance.num_machines):
-        machine_node = Node.create_node_with_data(
-            node_type=NodeType.MACHINE, data=machine_id
-        )
+        machine_node = Node(node_type=NodeType.MACHINE, machine_id=machine_id)
         graph.add_node(machine_node)
 
 
@@ -60,9 +58,7 @@ def add_machine_machine_edges(graph: JobShopGraph) -> None:
 # ---------
 def add_job_nodes(graph: JobShopGraph) -> None:
     for job_id in range(graph.instance.num_jobs):
-        job_node = Node.create_node_with_data(
-            node_type=NodeType.JOB, data=job_id
-        )
+        job_node = Node(node_type=NodeType.JOB, job_id=job_id)
         graph.add_node(job_node)
 
 
