@@ -64,12 +64,12 @@ def plot_disjunctive_graph(
             )
             layout = nx.spring_layout
 
-    temp_graph = copy.deepcopy(job_shop_graph)
+    temp_graph = copy.deepcopy(job_shop_graph.graph)
     # Remove disjunctive edges to get a better layout
     temp_graph.remove_edges_from(
         [
             (u, v)
-            for u, v, d in job_shop_graph.edges(data=True)
+            for u, v, d in job_shop_graph.graph.edges(data=True)
             if d["type"] == EdgeType.DISJUNCTIVE
         ]
     )
@@ -80,7 +80,7 @@ def plot_disjunctive_graph(
     node_colors = [_get_node_color(node) for node in job_shop_graph.nodes]
 
     nx.draw_networkx_nodes(
-        job_shop_graph,
+        job_shop_graph.graph,
         pos,
         node_size=node_size,
         node_color=node_colors,
@@ -92,17 +92,17 @@ def plot_disjunctive_graph(
     # ----------
     conjunctive_edges = [
         (u, v)
-        for u, v, d in job_shop_graph.edges(data=True)
+        for u, v, d in job_shop_graph.graph.edges(data=True)
         if d["type"] == EdgeType.CONJUNCTIVE
     ]
     disjunctive_edges = [
         (u, v)
-        for u, v, d in job_shop_graph.edges(data=True)
+        for u, v, d in job_shop_graph.graph.edges(data=True)
         if d["type"] == EdgeType.DISJUNCTIVE
     ]
 
     nx.draw_networkx_edges(
-        job_shop_graph,
+        job_shop_graph.graph,
         pos,
         edgelist=conjunctive_edges,
         width=edge_width,
@@ -112,7 +112,7 @@ def plot_disjunctive_graph(
 
     if draw_disjunctive_edges:
         nx.draw_networkx_edges(
-            job_shop_graph,
+            job_shop_graph.graph,
             pos,
             edgelist=disjunctive_edges,
             width=edge_width,
@@ -137,7 +137,7 @@ def plot_disjunctive_graph(
         )
 
     nx.draw_networkx_labels(
-        job_shop_graph,
+        job_shop_graph.graph,
         pos,
         labels=labels,
         font_color=node_font_color,
