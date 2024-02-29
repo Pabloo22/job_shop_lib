@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Optional
 
 from job_shop_lib import Operation
