@@ -89,6 +89,10 @@ class JobShopGraph:
             **attr: Any other additional attributes that are not part of the
                 `Edge` class interface.
         """
+        if isinstance(u_of_edge, Node):
+            u_of_edge = u_of_edge.node_id
+        if isinstance(v_of_edge, Node):
+            v_of_edge = v_of_edge.node_id
         if u_of_edge not in self.graph or v_of_edge not in self.graph:
             raise ValueError("u_of_edge and v_of_edge must be in the graph.")
         self.graph.add_edge(u_of_edge, v_of_edge, **attr)
