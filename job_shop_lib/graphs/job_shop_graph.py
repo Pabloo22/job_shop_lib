@@ -49,9 +49,7 @@ class JobShopGraph:
         """Adds operation nodes to the graph."""
         for job in self.instance.jobs:
             for operation in job:
-                node = Node.create_node_with_data(
-                    node_type=NodeType.OPERATION, data=operation
-                )
+                node = Node(node_type=NodeType.OPERATION, operation=operation)
                 self.add_node(node)
 
     def add_node(self, node_for_adding: Node) -> None:
@@ -71,12 +69,11 @@ class JobShopGraph:
         self.nodes.append(node_for_adding)
         self._next_node_id += 1
 
-        if node_for_adding.node_type != NodeType.OPERATION:
-            return
-        operation = node_for_adding.operation
-        self.nodes_by_job[operation.job_id].append(node_for_adding)
-        for machine_id in operation.machines:
-            self.nodes_by_machine[machine_id].append(node_for_adding)
+        if node_for_adding.node_type == NodeType.OPERATION:
+            operation = node_for_adding.operation
+            self.nodes_by_job[operation.job_id].append(node_for_adding)
+            for machine_id in operation.machines:
+                self.nodes_by_machine[machine_id].append(node_for_adding)
 
     def add_edge(
         self, u_of_edge: Node | int, v_of_edge: Node | int, **attr
