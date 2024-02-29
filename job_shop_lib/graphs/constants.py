@@ -17,8 +17,3 @@ class NodeType(enum.Enum):
     GLOBAL = enum.auto()
     SOURCE = enum.auto()
     SINK = enum.auto()
-
-
-# We use a default value of -1 to indicate that the node has not been
-# assigned an id yet at the same time we avoid problems with the type checker.
-NODE_ID_DEFAULT = -1
