@@ -10,12 +10,12 @@ def test_disjunctive_edges_addition(example_job_shop_instance):
             continue
         for node1, node2 in itertools.combinations(machine_operations, 2):
             assert (
-                graph.has_edge(node1, node2)
-                and graph[node1][node2]["type"] == EdgeType.DISJUNCTIVE
+                graph.graph.has_edge(node1, node2)
+                and graph.graph[node1][node2]["type"] == EdgeType.DISJUNCTIVE
             )
             assert (
-                graph.has_edge(node2, node1)
-                and graph[node2][node1]["type"] == EdgeType.DISJUNCTIVE
+                graph.graph.has_edge(node2, node1)
+                and graph.graph[node2][node1]["type"] == EdgeType.DISJUNCTIVE
             )
 
 
@@ -24,8 +24,10 @@ def test_conjunctive_edges_addition(example_job_shop_instance):
     for job_operations in graph.nodes_by_job:
         for i in range(1, len(job_operations)):
             assert (
-                graph.has_edge(job_operations[i - 1], job_operations[i])
-                and graph[job_operations[i - 1]][job_operations[i]]["type"]
+                graph.graph.has_edge(job_operations[i - 1], job_operations[i])
+                and graph.graph[job_operations[i - 1]][job_operations[i]][
+                    "type"
+                ]
                 == EdgeType.CONJUNCTIVE
             )
 
@@ -52,11 +54,12 @@ def test_source_and_sink_edges_addition(example_job_shop_instance):
     )
     for job_operations in graph.nodes_by_job:
         assert (
-            graph.has_edge(source, job_operations[0])
-            and graph[source][job_operations[0]]["type"]
+            graph.graph.has_edge(source, job_operations[0])
+            and graph.graph[source][job_operations[0]]["type"]
             == EdgeType.CONJUNCTIVE
         )
         assert (
-            graph.has_edge(job_operations[-1], sink)
-            and graph[job_operations[-1]][sink]["type"] == EdgeType.CONJUNCTIVE
+            graph.graph.has_edge(job_operations[-1], sink)
+            and graph.graph[job_operations[-1]][sink]["type"]
+            == EdgeType.CONJUNCTIVE
         )

@@ -14,15 +14,14 @@ def test_initialization(example_job_shop_instance):
     assert len(graph.nodes) == graph.instance.num_operations
 
 
-def test_distinct_node_ids(example_job_shop_instance):
+def test_node_ids(example_job_shop_instance):
     graph = JobShopGraph(example_job_shop_instance)
     add_source_sink_nodes(graph)
-    node_ids = [node.node_id for node in graph.nodes]
-    assert (
-        len(node_ids)
-        == len(set(node_ids))
-        == graph.instance.num_operations + 2
-    )
+
+    # We don't use enumerate here because we want to test if we can
+    # access the node by its id
+    for i in range(graph.graph.number_of_nodes()):
+        assert graph.nodes[i].node_id == i
 
 
 def test_node_types(example_job_shop_instance):
