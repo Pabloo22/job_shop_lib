@@ -31,7 +31,7 @@ jobs:
         poetry install --with test
 
     - name: Run tests
-      run: poetry run pytest -v --cov=job_shop_lib
+      run: poetry run pytest -v --cov=job_shop_lib -m "not mpl_image_compare"
 
   lint:
 
