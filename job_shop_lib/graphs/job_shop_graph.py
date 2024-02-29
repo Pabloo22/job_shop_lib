@@ -49,8 +49,8 @@ class JobShopGraph:
         """Adds operation nodes to the graph."""
         for job in self.instance.jobs:
             for operation in job:
-                node = Node.from_type(
-                    node_type=NodeType.OPERATION, value=operation
+                node = Node.create_node_with_data(
+                    node_type=NodeType.OPERATION, data=operation
                 )
                 self.add_node(node)
 

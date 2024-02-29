@@ -14,31 +14,28 @@ class Node:
         self._node_id: Optional[int] = None
 
     @staticmethod
-    def from_type(
-        node_type: NodeType, value: Optional[Operation | int] = None
+    def create_node_with_data(
+        node_type: NodeType, data: Operation | int
     ) -> Node | OperationNode | MachineNode | JobNode:
         node_info_map = {
             NodeType.OPERATION: (OperationNode, Operation),
             NodeType.MACHINE: (MachineNode, int),
             NodeType.JOB: (JobNode, int),
-            NodeType.SOURCE: (Node, None),
-            NodeType.SINK: (Node, None),
-            NodeType.GLOBAL: (Node, None),
         }
         if node_type not in node_info_map:
             raise ValueError(
-                f"NodeType {node_type} is not supported by the factory. "
+                f"NodeTypes not supported by the factory must "
                 f"Supported types are {list(node_info_map.keys())}"
             )
 
-        node_class, expected_value_type = node_info_map[node_type]
+        node_class, expected_type = node_info_map[node_type]
 
-        if not isinstance(value, expected_value_type):
+        if not isinstance(data, expected_type):
             raise ValueError(
-                f"Expected value type {expected_value_type}, got {type(value)}"
+                f"Expected value type {expected_type}, got {type(data)}"
             )
 
-        return node_class(value)
+        return node_class(data)
 
     @property
     def node_id(self) -> int:
