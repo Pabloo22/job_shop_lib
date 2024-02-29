@@ -79,8 +79,8 @@ class Operation:
 
     def __eq__(self, __value: object) -> bool:
         if isinstance(__value, Operation):
-            __value = __value.operation_id
-        return self.operation_id == __value
+            return self.operation_id == __value.operation_id
+        return False
 
     def __repr__(self) -> str:
         machines = (
