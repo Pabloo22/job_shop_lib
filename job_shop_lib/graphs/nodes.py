@@ -15,8 +15,12 @@ class Node:
 
     @staticmethod
     def create_node_with_data(
-        node_type: NodeType, data: Operation | int
+        node_type: NodeType, data: Optional[Operation | int]
     ) -> Node | OperationNode | MachineNode | JobNode:
+
+        if data is None:
+            return Node(node_type)
+
         node_info_map = {
             NodeType.OPERATION: (OperationNode, Operation),
             NodeType.MACHINE: (MachineNode, int),
