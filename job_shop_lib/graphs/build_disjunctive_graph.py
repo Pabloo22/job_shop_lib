@@ -44,8 +44,8 @@ def add_conjunctive_edges(graph: JobShopGraph) -> None:
 
 def add_source_sink_nodes(graph: JobShopGraph) -> None:
     """Adds source and sink nodes to the graph."""
-    source = Node(node_type=NodeType.SOURCE)
-    sink = Node(node_type=NodeType.SINK)
+    source = Node.from_type(node_type=NodeType.SOURCE)
+    sink = Node.from_type(node_type=NodeType.SINK)
     graph.add_node(source)
     graph.add_node(sink)
 
