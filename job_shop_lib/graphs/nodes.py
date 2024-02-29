@@ -75,7 +75,7 @@ class OperationNode(Node):
         return self.operation.machine_id
 
     @property
-    def machines(self) -> int:
+    def machines(self) -> list[int]:
         return self.operation.machines
 
     @property
