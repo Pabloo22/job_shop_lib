@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Optional
+
 
 class Operation:
     """Stores machine and duration information for a job operation.
@@ -27,9 +29,9 @@ class Operation:
         self.duration = duration
 
         # Defined outside the class by the JobShopInstance class:
-        self._job_id = None
-        self._position_in_job = None
-        self._operation_id = None
+        self._job_id: Optional[int] = None
+        self._position_in_job: Optional[int] = None
+        self._operation_id: Optional[int] = None
 
     @property
     def machine_id(self) -> int:
