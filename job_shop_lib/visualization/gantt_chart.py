@@ -5,7 +5,11 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 from matplotlib.patches import Patch
 
-from job_shop_lib import Schedule
+from job_shop_lib import Schedule, ScheduledOperation
+
+
+_BASE_Y_POSITION = 0
+_Y_POSITION_INCREMENT = 10
 
 
 def plot_gantt_chart(
@@ -47,7 +51,9 @@ def _plot_machine_schedules(
     legend_handles = {}
 
     for machine_index, machine_schedule in enumerate(schedule.schedule):
-        y_position_for_machines = 10 + 10 * machine_index
+        y_position_for_machines = (
+            _BASE_Y_POSITION + _Y_POSITION_INCREMENT * machine_index
+        )
 
         for scheduled_op in machine_schedule:
             color = cmap(norm(scheduled_op.job_id))
@@ -64,7 +70,7 @@ def _plot_machine_schedules(
 
 def _plot_scheduled_operation(
     ax: plt.Axes,
-    scheduled_op,
+    scheduled_op: ScheduledOperation,
     y_position_for_machines: int,
     color,
 ):
@@ -83,14 +89,35 @@ def _configure_legend(ax: plt.Axes, legend_handles: dict[int, Patch]):
     sorted_legend_handles = [
         legend_handles[job_id] for job_id in sorted(legend_handles)
     ]
-    ax.legend(handles=sorted_legend_handles, loc="lower right")
+    ax.legend(
+        handles=sorted_legend_handles,
+        loc="upper left",
+        bbox_to_anchor=(1.01, 1),
+    )
 
 
 def _configure_axes(schedule: Schedule, ax: plt.Axes, xlim: Optional[int]):
     """Sets the limits and labels for the axes."""
     num_machines = len(schedule.schedule)
-    ax.set_ylim(0, 10 + 10 * num_machines)
-    ax.set_yticks([15 + 10 * i for i in range(num_machines)])
+    ax.set_ylim(0, _BASE_Y_POSITION + _Y_POSITION_INCREMENT * num_machines)
+    ax.set_yticks(
+        [
+            _BASE_Y_POSITION
+            + _Y_POSITION_INCREMENT // 2
+            + _Y_POSITION_INCREMENT * i
+            for i in range(num_machines)
+        ]
+    )
     ax.set_yticklabels([str(i + 1) for i in range(num_machines)])
-    xlim = xlim if xlim is not None else schedule.makespan() + 1
+    makespan = schedule.makespan()
+    xlim = xlim if xlim is not None else makespan + 1
     ax.set_xlim(0, xlim)
+
+    tick_interval = max(1, makespan // 10) 
+    xticks = list(range(0, makespan + 1, tick_interval))
+
+    if xticks[-1] != makespan:
+        xticks.pop()
+        xticks.append(makespan)
+
+    ax.set_xticks(xticks)
