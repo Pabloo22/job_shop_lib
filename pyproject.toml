@@ -6,6 +6,7 @@ authors = ["Pabloo22 <pablete.arino@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "job_shop_lib"}]
+include = ["benchmarks/benchmark_instances.json"]
 
 [tool.poetry.dependencies]
 python = "^3.11"

@@ -1,7 +1,9 @@
 """Contains the JobShopInstance and Operation classes."""
 
+from __future__ import annotations
+
 import functools
-from typing import Any
+from typing import Any, Optional
 
 from job_shop_lib import Operation
 
@@ -29,6 +31,43 @@ class JobShopInstance:
                 operation.position_in_job = position
                 operation.operation_id = operation_id
                 operation_id += 1
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "duration_matrix": self.durations_matrix,
+            "machines_matrix": self.machines_matrix,
+            "metadata": self.metadata,
+        }
+
+    @classmethod
+    def from_matrices(
+        cls,
+        duration_matrix: list[list[int]],
+        machines_matrix: list[list[list[int]]] | list[list[int]],
+        name: str = "JobShopInstance",
+        metadata: Optional[dict[str, Any]] = None,
+    ) -> JobShopInstance:
+        jobs: list[list[Operation]] = [[] for _ in range(len(duration_matrix))]
+        for durations_row, machines_row in zip(
+            duration_matrix, machines_matrix
+        ):
+            for job, duration, machines in zip(
+                jobs, durations_row, machines_row
+            ):  # type: ignore
+                # mypy cannot infer the correct type of machines_row
+                # it could be either list[list[int]] or list[int], but mypy
+                # resolves it as object due to the uncertainty.
+                job.append(Operation(duration=duration, machines=machines))
+
+        metadata = {} if metadata is None else metadata
+        return cls(jobs=jobs, name=name, **metadata)
+
+    def __repr__(self) -> str:
+        return (
+            f"JobShopInstance(name={self.name}, "
+            f"num_jobs={self.num_jobs}, num_machines={self.num_machines})"
+        )
 
     @property
     def num_jobs(self) -> int:
