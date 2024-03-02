@@ -113,7 +113,7 @@ def _configure_axes(schedule: Schedule, ax: plt.Axes, xlim: Optional[int]):
     xlim = xlim if xlim is not None else makespan + 1
     ax.set_xlim(0, xlim)
 
-    tick_interval = max(1, makespan // 10) 
+    tick_interval = max(1, makespan // 10)
     xticks = list(range(0, makespan + 1, tick_interval))
 
     if xticks[-1] != makespan:
