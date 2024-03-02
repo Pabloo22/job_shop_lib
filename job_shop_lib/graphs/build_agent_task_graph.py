@@ -5,27 +5,58 @@ from job_shop_lib.graphs import JobShopGraph, NodeType, Node
 
 
 def build_agent_task_graph_complete(instance: JobShopInstance) -> JobShopGraph:
-    graph = build_agent_task_graph_with_jobs(instance)
+    graph = JobShopGraph(instance)
+
     add_machine_nodes(graph)
     add_operation_machine_edges(graph)
-    add_machine_machine_edges(graph)
+
+    add_job_nodes(graph)
+    add_operation_job_edges(graph)
+
+    add_global_node(graph)
+    add_machine_global_edges(graph)
+    add_job_global_edges(graph)
+
     return graph
 
 
 def build_agent_task_graph_with_jobs(
     instance: JobShopInstance,
 ) -> JobShopGraph:
-    graph = build_agent_task_graph(instance)
+    graph = JobShopGraph(instance)
+
+    add_machine_nodes(graph)
+    add_operation_machine_edges(graph)
+    add_machine_machine_edges(graph)
+
+    add_job_nodes(graph)
+    add_operation_job_edges(graph)
+    add_job_job_edges(graph)
+
     return graph
 
 
 def build_agent_task_graph(instance: JobShopInstance) -> JobShopGraph:
     graph = JobShopGraph(instance)
+
+    add_machine_nodes(graph)
+    add_operation_machine_edges(graph)
+    add_machine_machine_edges(graph)
+
+    add_same_job_operations_edges(graph)
+
     return graph
 
 
 # BUILDING BLOCKS
 # -----------------------------------------------------------------------------
+
+
+def add_same_job_operations_edges(graph: JobShopGraph) -> None:
+    for job in graph.nodes_by_job:
+        for operation1, operation2 in itertools.combinations(job, 2):
+            graph.add_edge(operation1, operation2)
+            graph.add_edge(operation2, operation1)
 
 
 # MACHINE NODES
