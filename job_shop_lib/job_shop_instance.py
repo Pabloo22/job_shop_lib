@@ -49,16 +49,16 @@ class JobShopInstance:
         metadata: Optional[dict[str, Any]] = None,
     ) -> JobShopInstance:
         jobs: list[list[Operation]] = [[] for _ in range(len(duration_matrix))]
-        for durations_row, machines_row in zip(
-            duration_matrix, machines_matrix
-        ):
-            for job, duration, machines in zip(
-                jobs, durations_row, machines_row
-            ):  # type: ignore
-                # mypy cannot infer the correct type of machines_row
-                # it could be either list[list[int]] or list[int], but mypy
-                # resolves it as object due to the uncertainty.
-                job.append(Operation(duration=duration, machines=machines))
+
+        num_jobs = len(duration_matrix)
+        for job_id in range(num_jobs):
+            num_operations = len(duration_matrix[job_id])
+            for position_in_job in range(num_operations):
+                duration = duration_matrix[job_id][position_in_job]
+                machines = machines_matrix[job_id][position_in_job]
+                jobs[job_id].append(
+                    Operation(duration=duration, machines=machines)
+                )
 
         metadata = {} if metadata is None else metadata
         return cls(jobs=jobs, name=name, **metadata)
