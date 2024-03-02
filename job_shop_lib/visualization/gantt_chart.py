@@ -8,7 +8,7 @@ from matplotlib.patches import Patch
 from job_shop_lib import Schedule, ScheduledOperation
 
 
-_BASE_Y_POSITION = 0
+_BASE_Y_POSITION = 1
 _Y_POSITION_INCREMENT = 10
 
 
