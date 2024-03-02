@@ -28,17 +28,42 @@ def test_set_operation_attributes():
     ), "Job 2 Operation 1 attributes not set correctly"
 
 
+def test_from_matrices(job_shop_instance: JobShopInstance):
+    duration_matrix = job_shop_instance.durations_matrix
+    machines_matrix = job_shop_instance.machines_matrix
+    name = job_shop_instance.name
+    metadata = job_shop_instance.metadata
+
+    new_instance = JobShopInstance.from_matrices(
+        duration_matrix=duration_matrix,
+        machines_matrix=machines_matrix,
+        name=name,
+        metadata=metadata,
+    )
+
+    assert new_instance.durations_matrix == duration_matrix
+    assert new_instance.machines_matrix == machines_matrix
+    assert new_instance.name == name
+    assert new_instance.metadata == metadata
+
+
 def test_num_jobs(job_shop_instance: JobShopInstance):
     assert job_shop_instance.num_jobs == 2
 
 
 def test_durations_matrix(job_shop_instance: JobShopInstance):
-    expected_matrix = [[10, 20], [15, 10]]
+    expected_matrix = [
+        [10, 20],
+        [15, 10],
+    ]
     assert job_shop_instance.durations_matrix == expected_matrix
 
 
 def test_machines_matrix(job_shop_instance: JobShopInstance):
-    expected_matrix = [[0, 1], [1, 2]]
+    expected_matrix = [
+        [0, 1],
+        [1, 2],
+    ]
     assert job_shop_instance.machines_matrix == expected_matrix
 
 
