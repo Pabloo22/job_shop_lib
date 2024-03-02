@@ -7,6 +7,7 @@ from importlib import resources
 from job_shop_lib import JobShopInstance
 
 
+@functools.cache
 def load_all_benchmark_instances() -> dict[str, JobShopInstance]:
     benchmark_instances_dict = load_benchmark_json()
     return {
