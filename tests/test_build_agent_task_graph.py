@@ -153,15 +153,3 @@ def get_expected_num_nodes_for_graph_with_jobs(
 
 def get_expected_num_nodes(instance: JobShopInstance) -> int:
     return instance.num_operations + instance.num_machines
-
-
-# def test_build_agent_task_graph_with_jobs(example_job_shop_instance):
-#     graph = build_agent_task_graph_with_jobs(example_job_shop_instance)
-#     assert isinstance(graph, JobShopGraph)
-#     # Add more assertions here
-
-
-# def test_build_agent_task_graph(example_job_shop_instance):
-#     graph = build_agent_task_graph(example_job_shop_instance)
-#     assert isinstance(graph, JobShopGraph)
-#     # Add more assertions here
