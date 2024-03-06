@@ -74,4 +74,4 @@ def create_gif_from_frames(frames_dir: str, gif_path: str, fps: int) -> None:
         for frame in sorted(os.listdir(frames_dir))
     ]
     images = [imageio.imread(frame) for frame in frames]
-    imageio.mimsave(gif_path, images, fps=fps)
+    imageio.mimsave(gif_path, images, fps=fps, loop=0)
