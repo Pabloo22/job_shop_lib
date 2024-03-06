@@ -9,19 +9,7 @@ from matplotlib.figure import Figure
 
 from job_shop_lib import JobShopInstance, Dispatcher, Schedule
 from job_shop_lib.solvers import DispatchingRuleSolver
-from job_shop_lib.visualization import plot_gantt_chart
-
-
-def get_default_plot_function(
-    title: Optional[str] = None, cmap: str = "viridis"
-) -> Callable[[Schedule, int], Figure]:
-    def default_plot_function(schedule: Schedule, makespan: int) -> Figure:
-        fig, _ = plot_gantt_chart(
-            schedule, title=title, cmap_name=cmap, xlim=makespan
-        )
-        return fig
-
-    return default_plot_function
+from job_shop_lib.visualization.gantt_chart import plot_gantt_chart
 
 
 def create_gif(
@@ -45,6 +33,18 @@ def create_gif(
         shutil.rmtree(frames_dir)
 
 
+def get_default_plot_function(
+    title: Optional[str] = None, cmap: str = "viridis"
+) -> Callable[[Schedule, int], Figure]:
+    def default_plot_function(schedule: Schedule, makespan: int) -> Figure:
+        fig, _ = plot_gantt_chart(
+            schedule, title=title, cmap_name=cmap, xlim=makespan
+        )
+        return fig
+
+    return default_plot_function
+
+
 def create_gantt_chart_frames(
     frames_dir: str,
     instance: JobShopInstance,
@@ -56,9 +56,6 @@ def create_gantt_chart_frames(
     makespan = solver(instance).makespan()
     iteration = 0
 
-    fig = plot_function(schedule, makespan)
-    _save_frame(fig, frames_dir, iteration)
-
     while not schedule.is_complete():
         solver.step(dispatcher)
         iteration += 1
@@ -67,7 +64,7 @@ def create_gantt_chart_frames(
 
 
 def _save_frame(figure: Figure, frames_dir: str, number: int) -> None:
-    figure.savefig(f"{frames_dir}/frame_{number:02d}.png")
+    figure.savefig(f"{frames_dir}/frame_{number:02d}.png", bbox_inches="tight")
     plt.close(figure)
 
 

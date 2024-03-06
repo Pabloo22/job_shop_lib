@@ -38,6 +38,21 @@ plt.show()
 ```
 ![Example Gannt Chart](images/example_gantt_chart.png)
 
+There is also a function to create gif animations from a Dispatching Rule Solver:
+
+```python
+from job_shop_lib.visualization import create_gif, get_default_plot_function
+
+plt.style.use("ggplot")
+
+solver = DispatchingRuleSolver()
+plot_func = get_default_plot_function("Solution with Most Work Remaining Rule")
+create_gif("example.gif", instance, solver, plot_function=plot_func)
+```
+
+![Example Gif](tutorial/example.gif)
+
+Furthermore, you can represent instances as graphs:
 
 ```python
 disjunctive_graph = JobShopGraph.build_disjunctive_graph(instance)
