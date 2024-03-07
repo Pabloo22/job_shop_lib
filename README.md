@@ -55,6 +55,9 @@ create_gif("example.gif", instance, solver, plot_function=plot_func)
 Furthermore, you can represent instances as graphs:
 
 ```python
+from job_shop_lib.graphs import JobShopGraph
+from job_shop_lib.visualization import plot_disjunctive_graph
+
 disjunctive_graph = JobShopGraph.build_disjunctive_graph(instance)
 plot_disjunctive_graph(disjunctive_graph)
 plt.show()
