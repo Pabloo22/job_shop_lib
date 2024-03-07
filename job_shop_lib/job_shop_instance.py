@@ -1,4 +1,4 @@
-"""Contains the JobShopInstance and Operation classes."""
+"""Contains the JobShopInstance class."""
 
 from __future__ import annotations
 
@@ -9,7 +9,19 @@ from job_shop_lib import Operation
 
 
 class JobShopInstance:
-    """Data structure which stores a Job Shop Scheduling Problem instance."""
+    """Data structure to store a Job Shop Scheduling Problem instance.
+
+    Attributes:
+        jobs:
+            A list of lists of operations. Each list of operations represents
+            a job, and the operations are ordered by their position in the job.
+            The `job_id`, `position_in_job`, and `operation_id` attributes of
+            the operations are set when the instance is created.
+        name:
+            A string with the name of the instance.
+        metadata:
+            A dictionary with additional information about the instance.
+    """
 
     def __init__(
         self,
@@ -32,7 +44,22 @@ class JobShopInstance:
                 operation.operation_id = operation_id
                 operation_id += 1
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
+        """Returns a dictionary representation of the instance.
+
+        This representation is useful for saving the instance to a JSON file,
+        which is a more computer-friendly format than more traditional ones
+        like Taillard's.
+
+        Returns:
+        The returned dictionary has the following structure:
+        {
+            "name": self.name,
+            "duration_matrix": self.durations_matrix,
+            "machines_matrix": self.machines_matrix,
+            "metadata": self.metadata,
+        }
+        """
         return {
             "name": self.name,
             "duration_matrix": self.durations_matrix,
@@ -48,6 +75,25 @@ class JobShopInstance:
         name: str = "JobShopInstance",
         metadata: Optional[dict[str, Any]] = None,
     ) -> JobShopInstance:
+        """Creates a JobShopInstance from duration and machines matrices.
+
+        Args:
+            duration_matrix:
+                A list of lists of integers. The i-th list contains the
+                durations of the operations of the job with id i.
+            machines_matrix:
+            A list of lists of lists of integers if the
+                instance is flexible, or a list of lists of integers if the
+                instance is not flexible. The i-th list contains the machines
+                in which the operations of the job with id i can be processed.
+            name:
+                A string with the name of the instance.
+            metadata:
+                A dictionary with additional information about the instance.
+
+        Returns:
+            A JobShopInstance object.
+        """
         jobs: list[list[Operation]] = [[] for _ in range(len(duration_matrix))]
 
         num_jobs = len(duration_matrix)
@@ -122,8 +168,9 @@ class JobShopInstance:
 
         Otherwise, the returned matrix is a list of lists of integers.
 
-        To access the machines of the operation with id i in the job with id j,
-        the following code must be used:
+        To access the machines of the operation with position i in the job
+        with id j, the following code must be used:
+
         ```python
         machines = instance.machines_matrix[j][i]
         ```
@@ -224,5 +271,5 @@ class JobShopInstance:
 
     @functools.cached_property
     def total_duration(self) -> int:
-        """Returns the total duration of the instance."""
+        """Returns the sum of the durations of all operations in all jobs."""
         return sum(self.job_durations)
