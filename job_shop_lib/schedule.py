@@ -1,9 +1,40 @@
+"""Home of the Schedule class."""
+
 from typing import Optional
 
 from job_shop_lib import ScheduledOperation, JobShopInstance
 
 
 class Schedule:
+    """Data structure to store a schedule for a `JobShopInstance` object.
+
+    Attributes:
+        instance:
+            The `JobShopInstance` object that the schedule is for.
+        schedule:
+            A list of lists of `ScheduledOperation` objects. Each list of
+            `ScheduledOperation` objects represents the order of operations
+            on a machine.
+        num_scheduled_operations:
+            The number of operations that have been scheduled. This allows
+            to check if the schedule is complete in O(1) time.
+        metadata:
+            A dictionary with additional information about the schedule. It
+            can be used to store information about the algorithm that generated
+            the schedule, for example.
+    
+    Args:
+        instance:
+            The `JobShopInstance` object that the schedule is for.
+        schedule:
+            A list of lists of `ScheduledOperation` objects. Each list of
+            `ScheduledOperation` objects represents the order of operations
+            on a machine. If not provided, the schedule is initialized as an
+            empty schedule.
+        **metadata:
+            Additional information about the schedule.
+    """
+
     __slots__ = (
         "instance",
         "_schedule",
@@ -31,6 +62,7 @@ class Schedule:
 
     @property
     def schedule(self) -> list[list[ScheduledOperation]]:
+        """Returns the schedule attribute."""
         return self._schedule
 
     @schedule.setter
@@ -42,9 +74,14 @@ class Schedule:
         )
 
     def reset(self):
+        """Resets the schedule to an empty state."""
         self.schedule = [[] for _ in range(self.instance.num_machines)]
 
     def makespan(self) -> int:
+        """Returns the makespan of the schedule. 
+        
+        The makespan is the time at which all operations are completed.
+        """
         max_end_time = 0
         for machine_schedule in self.schedule:
             if machine_schedule:
@@ -52,9 +89,20 @@ class Schedule:
         return max_end_time
 
     def is_complete(self) -> bool:
+        """Returns True if all operations have been scheduled."""
         return self.num_scheduled_operations == self.instance.num_operations
 
     def add(self, scheduled_operation: ScheduledOperation):
+        """Adds a new `ScheduledOperation` to the schedule.
+        
+        Args:
+            scheduled_operation:
+                The `ScheduledOperation` to add to the schedule.
+        
+        Raises:
+            ValueError: If the start time of the new operation is before the
+                end time of the last operation on the same machine.
+        """
         self._check_start_time_of_new_operation(scheduled_operation)
         self.schedule[scheduled_operation.machine_id].append(
             scheduled_operation
@@ -74,6 +122,22 @@ class Schedule:
 
     @staticmethod
     def check_schedule(schedule: list[list[ScheduledOperation]]):
+        """Checks if a schedule is valid and raises a ValueError if it is not.
+        
+        A schedule is considered invalid if:
+            - A `ScheduledOperation` has a machine id that does not match the
+              machine id of the machine schedule (the list of 
+              `ScheduledOperation` objects) that it belongs to.
+            - The start time of a `ScheduledOperation` is before the end time of
+        
+        Args:
+            schedule:
+                The schedule (a list of lists of `ScheduledOperation` objects)
+                to check.
+        
+        Raises:
+            ValueError: If the schedule is invalid.
+        """
         for machine_id, scheduled_operations in enumerate(schedule):
             for i, scheduled_operation in enumerate(scheduled_operations):
                 if scheduled_operation.machine_id != machine_id:
