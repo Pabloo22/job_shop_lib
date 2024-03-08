@@ -10,7 +10,7 @@ class Operation:
 
     Note:
         To increase performance, some solvers such as the CP-SAT solver use
-        only integers to represent the operation's attributes. Should a 
+        only integers to represent the operation's attributes. Should a
         problem involve operations with non-integer durations, it would be
         necessary to multiply all durations by a sufficiently large integer so
         that every duration is an integer.
@@ -61,7 +61,7 @@ class Operation:
 
     @property
     def position_in_job(self) -> int:
-        """Returns the position (starting at zero) of the operation in the 
+        """Returns the position (starting at zero) of the operation in the
         job.
 
         Raises:
@@ -79,7 +79,7 @@ class Operation:
     def operation_id(self) -> int:
         """Returns the id of the operation.
 
-        The operation id is unique within a job shop instance and should 
+        The operation id is unique within a job shop instance and should
         be set by the JobShopInstance class.
 
         It starts at 0 and is incremented by 1 for each operation in the
