@@ -9,11 +9,15 @@ class Operation:
     """Stores machine and duration information for a job operation.
 
     Note:
-    To increase performance, some solvers such as the CP-SAT solver use
-    only integers to represent the operation's attributes. Should a problem
-    involve operations with non-integer durations, it would be necessary to
-    multiply all durations by a sufficiently large integer so that every
-    duration is an integer.
+        To increase performance, some solvers such as the CP-SAT solver use
+        only integers to represent the operation's attributes. Should a 
+        problem involve operations with non-integer durations, it would be
+        necessary to multiply all durations by a sufficiently large integer so
+        that every duration is an integer.
+
+    Attributes:
+        machines: A list of machine ids that can perform the operation.
+        duration: The time it takes to perform the operation.
     """
 
     __slots__ = (
@@ -35,15 +39,18 @@ class Operation:
 
     @property
     def machine_id(self) -> int:
-        """Returns the id of the machine and raises an error if there are
-        multiple machines."""
+        """Returns the id of the machine associated with the operation.
+
+        Raises:
+            ValueError: If the operation has multiple machines in its list.
+        """
         if len(self.machines) > 1:
             raise ValueError("Operation has multiple machines.")
         return self.machines[0]
 
     @property
     def job_id(self) -> int:
-        """Returns the id of the job."""
+        """Returns the id of the job that the operation belongs to."""
         if self._job_id is None:
             raise ValueError("Operation has no job_id.")
         return self._job_id
@@ -54,7 +61,12 @@ class Operation:
 
     @property
     def position_in_job(self) -> int:
-        """Returns the position of the operation in the job."""
+        """Returns the position (starting at zero) of the operation in the 
+        job.
+
+        Raises:
+            ValueError: If the operation has no position_in_job.
+        """
         if self._position_in_job is None:
             raise ValueError("Operation has no position_in_job.")
         return self._position_in_job
@@ -65,7 +77,17 @@ class Operation:
 
     @property
     def operation_id(self) -> int:
-        """Returns the id of the operation."""
+        """Returns the id of the operation.
+
+        The operation id is unique within a job shop instance and should 
+        be set by the JobShopInstance class.
+
+        It starts at 0 and is incremented by 1 for each operation in the
+        instance.
+
+        Raises:
+            ValueError: If the operation has no id.
+        """
         if self._operation_id is None:
             raise ValueError("Operation has no id.")
         return self._operation_id
