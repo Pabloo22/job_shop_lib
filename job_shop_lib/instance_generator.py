@@ -1,3 +1,5 @@
+"""Home of the `InstanceGenerator` class."""
+
 import random
 from typing import Optional, Iterator
 
@@ -5,20 +7,45 @@ from job_shop_lib import JobShopInstance, Operation
 
 
 class InstanceGenerator:  # pylint: disable=too-many-instance-attributes
-    """Generates job shop instances with random operations.
+    """Generates instances for job shop problems.
 
-    The number of operations per job is the same as the number of machines,
-    and there is no recirculation of machines. The duration of each operation
-    is a random integer between `min_duration` and `max_duration`.
-    The minimum number of machines is the same as the number of jobs.
+    This class is designed to be versatile, enabling the creation of various
+    job shop instances without the need for multiple dedicated classes.
 
-    Useful for generating instances with similar characteristics to most
-    benchmark ones.
+    It supports customization of the number of jobs, machines, operation
+    durations, and more.
 
-    This class has many attributes and arguments to avoid having
-    to create many different classes for different types of instances.
-    This class should be general enough to cover most use cases.
+    The class supports both single instance generation and iteration over
+    multiple instances, controlled by the `iteration_limit` parameter. It
+    implements the iterator protocol, allowing it to be used in a `for` loop.
 
+    Note:
+        When used as an iterator, the generator will produce instances until it
+        reaches the specified `iteration_limit`. If `iteration_limit` is None,
+        it will continue indefinitely.
+
+    Attributes:
+        num_jobs_range:
+            The range of the number of jobs to generate. If a single
+            int is provided, it is used as both the minimum and maximum.
+        duration_range:
+            The range of durations for each operation.
+        num_machines_range:
+            The range of the number of machines available. If a
+            single int is provided, it is used as both the minimum and maximum.
+        machines_per_operation:
+            Specifies how many machines each operation
+            can be assigned to. If a single int is provided, it is used for
+            all operations.
+        allow_less_jobs_than_machines:
+            If True, allows generating instances where the number of jobs is
+            less than the number of machines.
+        allow_recirculation:
+            If True, a job can visit the same machine more than once.
+        name_suffix:
+            A suffix to append to each instance's name for identification.
+        seed:
+            Seed for the random number generator to ensure reproducibility.
     """
 
     def __init__(  # pylint: disable=too-many-arguments
@@ -33,6 +60,29 @@ class InstanceGenerator:  # pylint: disable=too-many-instance-attributes
         seed: Optional[int] = None,
         iteration_limit: Optional[int] = None,
     ):
+        """Initializes the instance generator with the given parameters.
+
+        Args:
+            num_jobs:
+                The range of the number of jobs to generate.
+            num_machines:
+                The range of the number of machines available.
+            duration_range:
+                The range of durations for each operation.
+            allow_less_jobs_than_machines:
+                Allows instances with fewer jobs than machines.
+            allow_recirculation:
+                Allows jobs to visit the same machine multiple times.
+            machines_per_operation:
+                Specifies how many machines each operation can be assigned to.
+                If a single int is provided, it is used for all operations.
+            name_suffix:
+                Suffix for instance names.
+            seed:
+                Seed for the random number generator.
+            iteration_limit:
+                Maximum number of instances to generate in iteration mode.
+        """
         if isinstance(num_jobs, int):
             num_jobs = (num_jobs, num_jobs)
 
@@ -62,6 +112,7 @@ class InstanceGenerator:  # pylint: disable=too-many-instance-attributes
             random.seed(seed)
 
     def generate(self) -> JobShopInstance:
+        """Generates a single job shop instance"""
         num_jobs = random.randint(*self.num_jobs_range)
 
         min_num_machines, max_num_machines = self.num_machines_range
@@ -97,6 +148,13 @@ class InstanceGenerator:  # pylint: disable=too-many-instance-attributes
     def create_random_operation(
         self, available_machines: Optional[list[int]] = None
     ) -> Operation:
+        """Creates a random operation with the given available machines.
+
+        Args:
+            available_machines:
+                A list of available machine_ids to choose from.
+                If None, all machines are available.
+        """
         duration = random.randint(*self.duration_range)
 
         if self.machines_per_operation[1] > 1:
