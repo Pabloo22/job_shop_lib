@@ -1,4 +1,4 @@
-"""Home of the Operation class."""
+"""Home of the `Operation` class."""
 
 from __future__ import annotations
 
@@ -29,6 +29,14 @@ class Operation:
     )
 
     def __init__(self, machines: int | list[int], duration: int):
+        """Initializes the object with the given machines and duration.
+
+        Args:
+            machines: A list of machine ids that can perform the operation. If
+                only one machine can perform the operation, it can be passed as
+                an integer.
+            duration: The time it takes to perform the operation.
+        """
         self.machines = [machines] if isinstance(machines, int) else machines
         self.duration = duration
 
