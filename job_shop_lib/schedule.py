@@ -1,4 +1,4 @@
-"""Home of the Schedule class."""
+"""Home of the `Schedule` class."""
 
 from typing import Optional
 
@@ -22,17 +22,6 @@ class Schedule:
             A dictionary with additional information about the schedule. It
             can be used to store information about the algorithm that generated
             the schedule, for example.
-
-    Args:
-        instance:
-            The `JobShopInstance` object that the schedule is for.
-        schedule:
-            A list of lists of `ScheduledOperation` objects. Each list of
-            `ScheduledOperation` objects represents the order of operations
-            on a machine. If not provided, the schedule is initialized as an
-            empty schedule.
-        **metadata:
-            Additional information about the schedule.
     """
 
     __slots__ = (
@@ -48,6 +37,19 @@ class Schedule:
         schedule: Optional[list[list[ScheduledOperation]]] = None,
         **metadata,
     ):
+        """Initializes the object with the given instance and schedule.
+
+        Args:
+            instance:
+                The `JobShopInstance` object that the schedule is for.
+            schedule:
+                A list of lists of `ScheduledOperation` objects. Each list of
+                `ScheduledOperation` objects represents the order of operations
+                on a machine. If not provided, the schedule is initialized as
+                an empty schedule.
+            **metadata:
+                Additional information about the schedule.
+        """
         if schedule is None:
             schedule = [[] for _ in range(instance.num_machines)]
 
