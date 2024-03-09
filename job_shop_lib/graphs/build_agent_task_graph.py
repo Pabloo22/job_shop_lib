@@ -1,3 +1,21 @@
+"""Contains functions to build agent task graphs.
+
+The agent-task graph was introduced by Junyoung Park et al. (2021).
+In contrast to the disjunctive graph, instead of connecting operations that
+share the same resources directly by disjunctive edges, operation nodes are
+connected with machine ones. All machine nodes are connected between them, and
+all operation nodes from the same job are connected by non-directed edges too.
+
+We also support a generalization of this approach by the addition of job nodes
+and a global node. Job nodes are connected to all operation nodes of the same
+job, and the global node is connected to all machine and job nodes.
+
+References:
+- Junyoung Park, Sanjar Bakhtiyar, and Jinkyoo Park. Schedulenet: Learn to
+solve multi-agent scheduling problems with reinforcement learning. ArXiv,
+abs/2106.03051, 2021.
+"""
+
 import itertools
 
 from job_shop_lib import JobShopInstance
