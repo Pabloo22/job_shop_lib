@@ -1,3 +1,6 @@
+"""Exceptions raised by solvers."""
+
+
 class NoSolutionFound(ValueError):
     """Exception raised when no solution is found by a solver.
 
