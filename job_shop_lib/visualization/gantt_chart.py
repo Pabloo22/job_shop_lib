@@ -27,7 +27,7 @@ def plot_gantt_chart(
 
 
 def _initialize_plot(
-    schedule, title: Optional[str]
+    schedule: Schedule, title: Optional[str]
 ) -> tuple[Figure, plt.Axes]:
     """Initializes the plot."""
     fig, ax = plt.subplots()
