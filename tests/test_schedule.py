@@ -16,7 +16,7 @@ def fixture_complete_schedule(job_shop_instance):
             job_shop_instance.jobs[1][0], start_time=100, machine_id=1
         ),
         ScheduledOperation(
-            job_shop_instance.jobs[1][1], start_time=100, machine_id=0
+            job_shop_instance.jobs[1][1], start_time=100, machine_id=2
         ),
     ]
     for op in operations:
@@ -47,11 +47,11 @@ def test_schedule_is_complete_false(job_shop_instance: JobShopInstance):
 def test_check_start_time_raises_error(job_shop_instance: JobShopInstance):
     schedule = Schedule(instance=job_shop_instance)
     valid_op = ScheduledOperation(
-        job_shop_instance.jobs[0][0], start_time=0, machine_id=0
+        job_shop_instance.jobs[0][1], start_time=0, machine_id=1
     )
     schedule.add(valid_op)
     overlapping_op = ScheduledOperation(
-        job_shop_instance.jobs[1][1], start_time=5, machine_id=0
+        job_shop_instance.jobs[1][0], start_time=0, machine_id=1
     )
     with pytest.raises(ValueError):
         schedule.add(overlapping_op)
