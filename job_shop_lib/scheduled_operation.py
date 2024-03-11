@@ -28,10 +28,15 @@ class ScheduledOperation:
                 The time at which the operation is scheduled to start.
             machine_id:
                 The id of the machine on which the operation is scheduled.
+        
+        Raises:
+            ValueError: 
+                If the machine_id is not valid for the operation.
         """
         self.operation = operation
         self.start_time = start_time
         self._machine_id = machine_id
+        self.machine_id = machine_id  # Validate machine_id
 
     @property
     def machine_id(self) -> int:
