@@ -15,9 +15,6 @@ class Schedule:
             A list of lists of `ScheduledOperation` objects. Each list of
             `ScheduledOperation` objects represents the order of operations
             on a machine.
-        num_scheduled_operations:
-            The number of operations that have been scheduled. This allows
-            to check if the schedule is complete in O(1) time.
         metadata:
             A dictionary with additional information about the schedule. It
             can be used to store information about the algorithm that generated
@@ -27,7 +24,6 @@ class Schedule:
     __slots__ = (
         "instance",
         "_schedule",
-        "num_scheduled_operations",
         "metadata",
     )
 
@@ -57,9 +53,6 @@ class Schedule:
 
         self.instance = instance
         self._schedule = schedule
-        self.num_scheduled_operations = sum(
-            len(machine_schedule) for machine_schedule in self.schedule
-        )
         self.metadata = metadata
 
     @property
@@ -71,9 +64,11 @@ class Schedule:
     def schedule(self, new_schedule: list[list[ScheduledOperation]]):
         Schedule.check_schedule(new_schedule)
         self._schedule = new_schedule
-        self.num_scheduled_operations = sum(
-            len(machine_schedule) for machine_schedule in self.schedule
-        )
+
+    @property
+    def num_scheduled_operations(self) -> int:
+        """Returns the number of operations that have been scheduled."""
+        return sum(len(machine_schedule) for machine_schedule in self.schedule)
 
     def reset(self):
         """Resets the schedule to an empty state."""
@@ -109,7 +104,6 @@ class Schedule:
         self.schedule[scheduled_operation.machine_id].append(
             scheduled_operation
         )
-        self.num_scheduled_operations += 1
 
     def _check_start_time_of_new_operation(
         self,
