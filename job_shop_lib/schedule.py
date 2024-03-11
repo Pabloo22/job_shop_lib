@@ -55,6 +55,9 @@ class Schedule:
         self._schedule = schedule
         self.metadata = metadata
 
+    def __repr__(self) -> str:
+        return str(self.schedule)
+
     @property
     def schedule(self) -> list[list[ScheduledOperation]]:
         """Returns the schedule attribute."""
@@ -98,7 +101,9 @@ class Schedule:
 
         Raises:
             ValueError: If the start time of the new operation is before the
-                end time of the last operation on the same machine.
+                end time of the last operation on the same machine. In favor of
+                performance, this method does not checks precedence
+                constraints.
         """
         self._check_start_time_of_new_operation(scheduled_operation)
         self.schedule[scheduled_operation.machine_id].append(
@@ -115,6 +120,24 @@ class Schedule:
 
         last_operation = self.schedule[new_operation.machine_id][-1]
         self._check_start_time(new_operation, last_operation)
+
+    @staticmethod
+    def _check_start_time(
+        scheduled_operation: ScheduledOperation,
+        previous_operation: ScheduledOperation,
+    ):
+        """Raises a ValueError if the start time of the new operation is before
+        the end time of the last operation on the same machine."""
+
+        if previous_operation.end_time <= scheduled_operation.start_time:
+            return
+
+        raise ValueError(
+            "Operation cannot be scheduled before the last operation on "
+            "the same machine: end time of last operation "
+            f"({previous_operation.end_time}) > start time of new operation "
+            f"({scheduled_operation.start_time})."
+        )
 
     @staticmethod
     def check_schedule(schedule: list[list[ScheduledOperation]]):
@@ -151,24 +174,3 @@ class Schedule:
                 Schedule._check_start_time(
                     scheduled_operation, scheduled_operations[i - 1]
                 )
-
-    @staticmethod
-    def _check_start_time(
-        scheduled_operation: ScheduledOperation,
-        previous_operation: ScheduledOperation,
-    ):
-        """Raises a ValueError if the start time of the new operation is before
-        the end time of the last operation on the same machine."""
-
-        if previous_operation.end_time <= scheduled_operation.start_time:
-            return
-
-        raise ValueError(
-            "Operation cannot be scheduled before the last operation on "
-            "the same machine: end time of last operation "
-            f"({previous_operation.end_time}) > start time of new operation "
-            f"({scheduled_operation.start_time})."
-        )
-
-    def __repr__(self) -> str:
-        return str(self.schedule)
