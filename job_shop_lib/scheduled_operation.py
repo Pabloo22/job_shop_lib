@@ -28,9 +28,9 @@ class ScheduledOperation:
                 The time at which the operation is scheduled to start.
             machine_id:
                 The id of the machine on which the operation is scheduled.
-        
+
         Raises:
-            ValueError: 
+            ValueError:
                 If the machine_id is not valid for the operation.
         """
         self.operation = operation
