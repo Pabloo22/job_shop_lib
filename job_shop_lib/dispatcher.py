@@ -11,6 +11,11 @@ from job_shop_lib import (
 class Dispatcher:
     """Handles the logic of scheduling operations on machines.
 
+    This class allow us to just define the order in which operations are
+    sequenced and the machines in which they are processed. It is then
+    responsible for scheduling the operations on the machines and keeping
+    track of the next available time for each machine and job.
+
     Attributes:
         instance:
             The instance of the job shop problem to be scheduled.
