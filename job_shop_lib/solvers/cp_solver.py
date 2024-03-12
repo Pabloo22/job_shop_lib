@@ -31,7 +31,7 @@ class CPSolver:
         self.log_search_progress = log_search_progress
         self.time_limit = time_limit
 
-        self.makespan = None
+        self.makespan: Optional[cp_model.IntVar] = None
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
@@ -58,6 +58,9 @@ class CPSolver:
                 f"No solution could be found for the given problem. "
                 f"Elapsed time: {elapsed_time} seconds."
             )
+        if self.makespan is None:
+            # Check added to satisfy mypy
+            raise ValueError("The makespan variable was not set.")
 
         metadata = {
             "status": "optimal" if status == cp_model.OPTIMAL else "feasible",
@@ -77,7 +80,7 @@ class CPSolver:
         self._set_objective(instance)
 
     def _create_schedule(
-        self, instance: JobShopInstance, metadata: dict[str, float | str]
+        self, instance: JobShopInstance, metadata: dict[str, object]
     ) -> Schedule:
         """Creates a Schedule object from the solution."""
         operations_start: dict[Operation, int] = {
