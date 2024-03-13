@@ -1,4 +1,5 @@
-"""Contains functions to build agent task graphs.
+"""Contains helper functions to build the agent-task graph or one of
+its generalizations from a job shop instance.
 
 The agent-task graph was introduced by Junyoung Park et al. (2021).
 In contrast to the disjunctive graph, instead of connecting operations that
@@ -23,13 +24,17 @@ from job_shop_lib.graphs import JobShopGraph, NodeType, Node
 
 
 def build_agent_task_graph_complete(instance: JobShopInstance) -> JobShopGraph:
-    """Builds the complete agent-task graph of the instance.
+    """Builds the agent-task graph of the instance with job and global nodes.
 
     The complete agent-task graph is a generalization of the agent-task graph
-    that includes job nodes and a global node. Job nodes are connected to all
-    operation nodes of the same job, and the global node is connected to all
-    machine and job nodes. This representation does not include edges
-    between job or machine nodes with the same type.
+    that includes job nodes and a global node.
+
+    Job nodes are connected to all operation nodes of the same job, and the
+    global node is connected to all machine and job nodes.
+
+    This representation does not include edges between job or machine nodes
+    with the same type because they are connected indirectly by the global
+    node.
 
     Args:
         instance:
@@ -59,8 +64,10 @@ def build_agent_task_graph_with_jobs(
     """Builds the agent-task graph of the instance with job nodes.
 
     The agent-task graph with job nodes is a generalization of the agent-task
-    graph that includes job nodes. Job nodes are connected to all operation
-    nodes of the same job, and their are connected between them.
+    graph that includes job nodes.
+
+    Job nodes are connected to all operation nodes of the same job, and their
+    are connected between them.
 
     Args:
         instance:
@@ -85,13 +92,14 @@ def build_agent_task_graph_with_jobs(
 def build_agent_task_graph(instance: JobShopInstance) -> JobShopGraph:
     """Builds the agent-task graph of the instance.
 
-
     The agent-task graph was introduced by Junyoung Park et al. (2021).
+
     In contrast to the disjunctive graph, instead of connecting operations
     that share the same resources directly by disjunctive edges, operation
-    nodes are connected with machine ones. All machine nodes are connected
-    between them, and all operation nodes from the same job are connected by
-    non-directed edges too.
+    nodes are connected with machine ones.
+
+    All machine nodes are connected  between them, and all operation nodes
+    from the same job are connected by non-directed edges too.
 
     Args:
         instance:
