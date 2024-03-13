@@ -4,8 +4,6 @@
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<img src="images/logo_with_transparent_background.png" alt="Job Shop Lib" width="150">
-
 
 A framework to model and solve the Job Shop Scheduling Problem with a special focus on graph representations.
 
