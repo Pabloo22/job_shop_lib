@@ -23,6 +23,21 @@ from job_shop_lib.graphs import JobShopGraph, NodeType, Node
 
 
 def build_agent_task_graph_complete(instance: JobShopInstance) -> JobShopGraph:
+    """Builds the complete agent-task graph of the instance.
+
+    The complete agent-task graph is a generalization of the agent-task graph
+    that includes job nodes and a global node. Job nodes are connected to all
+    operation nodes of the same job, and the global node is connected to all
+    machine and job nodes. This representation does not include edges
+    between job or machine nodes with the same type.
+
+    Args:
+        instance:
+            The job shop instance in which the agent-task graph will be built.
+
+    Returns:
+        The complete agent-task graph of the instance.
+    """
     graph = JobShopGraph(instance)
 
     add_machine_nodes(graph)
@@ -41,6 +56,19 @@ def build_agent_task_graph_complete(instance: JobShopInstance) -> JobShopGraph:
 def build_agent_task_graph_with_jobs(
     instance: JobShopInstance,
 ) -> JobShopGraph:
+    """Builds the agent-task graph of the instance with job nodes.
+
+    The agent-task graph with job nodes is a generalization of the agent-task
+    graph that includes job nodes. Job nodes are connected to all operation
+    nodes of the same job, and their are connected between them.
+
+    Args:
+        instance:
+            The job shop instance in which the agent-task graph will be built.
+
+    Returns:
+        The agent-task graph of the instance with job nodes.
+    """
     graph = JobShopGraph(instance)
 
     add_machine_nodes(graph)
@@ -55,6 +83,23 @@ def build_agent_task_graph_with_jobs(
 
 
 def build_agent_task_graph(instance: JobShopInstance) -> JobShopGraph:
+    """Builds the agent-task graph of the instance.
+
+
+    The agent-task graph was introduced by Junyoung Park et al. (2021).
+    In contrast to the disjunctive graph, instead of connecting operations
+    that share the same resources directly by disjunctive edges, operation
+    nodes are connected with machine ones. All machine nodes are connected
+    between them, and all operation nodes from the same job are connected by
+    non-directed edges too.
+
+    Args:
+        instance:
+            The job shop instance in which the agent-task graph will be built.
+
+    Returns:
+        The agent-task graph of the instance.
+    """
     graph = JobShopGraph(instance)
 
     add_machine_nodes(graph)
@@ -68,9 +113,8 @@ def build_agent_task_graph(instance: JobShopInstance) -> JobShopGraph:
 
 # BUILDING BLOCKS
 # -----------------------------------------------------------------------------
-
-
 def add_same_job_operations_edges(graph: JobShopGraph) -> None:
+    """Adds edges between all operations of the same job."""
     for job in graph.nodes_by_job:
         for operation1, operation2 in itertools.combinations(job, 2):
             graph.add_edge(operation1, operation2)
@@ -80,12 +124,14 @@ def add_same_job_operations_edges(graph: JobShopGraph) -> None:
 # MACHINE NODES
 # -------------
 def add_machine_nodes(graph: JobShopGraph) -> None:
+    """Adds a machine node for each machine in the instance."""
     for machine_id in range(graph.instance.num_machines):
         machine_node = Node(node_type=NodeType.MACHINE, machine_id=machine_id)
         graph.add_node(machine_node)
 
 
 def add_operation_machine_edges(graph: JobShopGraph) -> None:
+    """Adds edges between operation and machine nodes."""
     for machine_node in graph.nodes_by_type[NodeType.MACHINE]:
         operation_nodes_in_machine = graph.nodes_by_machine[
             machine_node.machine_id
@@ -96,6 +142,7 @@ def add_operation_machine_edges(graph: JobShopGraph) -> None:
 
 
 def add_machine_machine_edges(graph: JobShopGraph) -> None:
+    """Adds edges between all machine nodes."""
     for machine1, machine2 in itertools.combinations(
         graph.nodes_by_type[NodeType.MACHINE], 2
     ):
@@ -106,12 +153,14 @@ def add_machine_machine_edges(graph: JobShopGraph) -> None:
 # JOB NODES
 # ---------
 def add_job_nodes(graph: JobShopGraph) -> None:
+    """Adds a job node for each job in the instance."""
     for job_id in range(graph.instance.num_jobs):
         job_node = Node(node_type=NodeType.JOB, job_id=job_id)
         graph.add_node(job_node)
 
 
 def add_operation_job_edges(graph: JobShopGraph) -> None:
+    """Adds edges between operation and job nodes."""
     for job_node in graph.nodes_by_type[NodeType.JOB]:
         operation_nodes_in_job = graph.nodes_by_job[job_node.job_id]
         for operation_node in operation_nodes_in_job:
@@ -120,6 +169,7 @@ def add_operation_job_edges(graph: JobShopGraph) -> None:
 
 
 def add_job_job_edges(graph: JobShopGraph) -> None:
+    """Adds edges between all job nodes."""
     for job1, job2 in itertools.combinations(
         graph.nodes_by_type[NodeType.JOB], 2
     ):
@@ -130,11 +180,13 @@ def add_job_job_edges(graph: JobShopGraph) -> None:
 # GLOBAL NODE
 # -----------
 def add_global_node(graph: JobShopGraph) -> None:
+    """Adds a global node to the graph."""
     global_node = Node(node_type=NodeType.GLOBAL)
     graph.add_node(global_node)
 
 
 def add_machine_global_edges(graph: JobShopGraph) -> None:
+    """Adds edges between machine and global nodes."""
     global_node = graph.nodes_by_type[NodeType.GLOBAL][0]
     for machine_node in graph.nodes_by_type[NodeType.MACHINE]:
         graph.add_edge(global_node, machine_node)
@@ -142,6 +194,7 @@ def add_machine_global_edges(graph: JobShopGraph) -> None:
 
 
 def add_job_global_edges(graph: JobShopGraph) -> None:
+    """Adds edges between job and global nodes."""
     global_node = graph.nodes_by_type[NodeType.GLOBAL][0]
     for job_node in graph.nodes_by_type[NodeType.JOB]:
         graph.add_edge(global_node, job_node)
