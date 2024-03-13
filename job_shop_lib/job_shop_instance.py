@@ -11,6 +11,10 @@ from job_shop_lib import Operation
 class JobShopInstance:
     """Data structure to store a Job Shop Scheduling Problem instance.
 
+    Additional attributes such as `num_jobs` or `num_machines` can be computed
+    from the instance and are cached for performance if they require expensive
+    computations.
+
     Attributes:
         jobs:
             A list of lists of operations. Each list of operations represents
