@@ -141,12 +141,12 @@ def task_agent_layout(
         A dictionary with the position of each node in the graph. The keys are
         the node ids, and the values are tuples with the x and y coordinates.
     """
-    center_pos = (
+    center_position = (
         leftmost_position + (rightmost_position - leftmost_position) / 2
     )
     x_positions = {
         "machine": leftmost_position,
-        "operation": center_pos,
+        "operation": center_position,
         "job": rightmost_position,
     }
 
