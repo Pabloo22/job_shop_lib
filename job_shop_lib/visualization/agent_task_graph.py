@@ -84,13 +84,12 @@ def plot_agent_task_graph(
     nx.draw_networkx_edges(graph, layout, ax=ax)
 
     # Draw labels
-    labels = {
-        node.node_id: str(node.node_id) for node in job_shop_graph.nodes
-    }
+    labels = {node.node_id: str(node.node_id) for node in job_shop_graph.nodes}
     nx.draw_networkx_labels(graph, layout, labels, ax=ax)
 
     ax.set_axis_off()
     return fig
+
 
 def task_agent_layout(
     job_shop_graph: JobShopGraph,
