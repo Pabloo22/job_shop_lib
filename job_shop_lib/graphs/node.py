@@ -22,7 +22,7 @@ class Node:
     MACHINE         | `machine_id`
     JOB             | `job_id`
 
-    In terms of equality, two nodes are equal if they have the same id. 
+    In terms of equality, two nodes are equal if they have the same id.
     Additionally, one node is equal to an integer if the integer is equal to
     its id. It is also hashable by its id.
 
