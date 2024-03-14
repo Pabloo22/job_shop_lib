@@ -50,14 +50,14 @@ def plot_agent_task_graph(
     # Define colors and shapes
     color_map = plt.get_cmap(color_map_name)
     machine_colors = {
-        machine.node_id: color_map(i)
+        machine.machine_id: color_map(i)
         for i, machine in enumerate(
             job_shop_graph.nodes_by_type[NodeType.MACHINE]
         )
     }
     node_colors = [
         (
-            machine_colors.get(node.operation.machine_id, "gray")
+            machine_colors[node.operation.machine_id]
             if node.node_type == NodeType.OPERATION
             else "lightblue"
         )
@@ -73,7 +73,7 @@ def plot_agent_task_graph(
             nodelist=job_shop_graph.nodes,
             node_color=[
                 node_colors[node.node_id]
-                for node in graph.nodes(data=NODE_ATTR)
+                for _, node in graph.nodes(data=NODE_ATTR)
                 if node.node_type.name.lower() == node_type
             ],
             node_shape=shape,
