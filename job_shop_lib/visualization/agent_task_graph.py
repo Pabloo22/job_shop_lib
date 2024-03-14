@@ -45,7 +45,7 @@ def plot_agent_task_graph(
 
     # Create the layout if it was not provided
     if layout is None:
-        layout = task_agent_layout(job_shop_graph)
+        layout = three_columns_layout(job_shop_graph)
 
     # Define colors and shapes
     color_map = plt.get_cmap(color_map_name)
@@ -91,7 +91,7 @@ def plot_agent_task_graph(
     return fig
 
 
-def task_agent_layout(
+def three_columns_layout(
     job_shop_graph: JobShopGraph,
     *,
     leftmost_position: float = 0.1,
