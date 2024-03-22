@@ -1,4 +1,4 @@
-"""Job Shop Environment for Reinforcement Learning."""
+"""Graph-Based Environment for Job Shop Scheduling."""
 
 from typing import Optional
 
