@@ -14,14 +14,18 @@ from typing import Optional
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from job_shop_lib.graphs import NodeType, JobShopGraph, Node, NODE_ATTR
+from job_shop_lib.graphs import NodeType, JobShopGraph, Node
 
 
 def plot_agent_task_graph(
     job_shop_graph: JobShopGraph,
+    title: Optional[str] = None,
     figsize: tuple[int, int] = (10, 10),
     layout: Optional[dict[Node, tuple[float, float]]] = None,
     color_map_name: str = "tab10",
+    node_size: int = 1000,
+    alpha: float = 0.95,
+    add_legend: bool = False,
 ) -> plt.Figure:
     """Returns a plot of the agent-task graph of the instance.
 
@@ -37,8 +41,13 @@ def plot_agent_task_graph(
         The figure of the plot. This figure can be used to save the plot to a
         file or to show it in a Jupyter notebook.
     """
+    if title is None:
+        title = (
+            f"Agent-Task Graph Visualization: {job_shop_graph.instance.name}"
+        )
     # Create a new figure and axis
     fig, ax = plt.subplots(figsize=figsize)
+    fig.suptitle(title)
 
     # Create the networkx graph
     graph = job_shop_graph.graph
@@ -56,39 +65,68 @@ def plot_agent_task_graph(
         )
     }
     node_colors = [
-        (
-            machine_colors[node.operation.machine_id]
-            if node.node_type == NodeType.OPERATION
-            else "lightblue"
-        )
-        for node in job_shop_graph.nodes
+        _get_node_color(node, machine_colors) for node in job_shop_graph.nodes
     ]
     node_shapes = {"machine": "s", "job": "s", "operation": "o", "global": "o"}
 
     # Draw nodes with different shapes based on their type
     for node_type, shape in node_shapes.items():
+        current_nodes = [
+            node.node_id
+            for node in job_shop_graph.nodes
+            if node.node_type.name.lower() == node_type
+        ]
         nx.draw_networkx_nodes(
             graph,
             layout,
-            nodelist=job_shop_graph.nodes,
-            node_color=[
-                node_colors[node.node_id]
-                for _, node in graph.nodes(data=NODE_ATTR)
-                if node.node_type.name.lower() == node_type
-            ],
+            nodelist=current_nodes,
+            node_color=[node_colors[i] for i in current_nodes],
             node_shape=shape,
             ax=ax,
+            node_size=node_size,
+            alpha=alpha,
         )
 
     # Draw edges
     nx.draw_networkx_edges(graph, layout, ax=ax)
 
-    # Draw labels
-    labels = {node.node_id: str(node.node_id) for node in job_shop_graph.nodes}
-    nx.draw_networkx_labels(graph, layout, labels, ax=ax)
+    node_labels = {
+        node.node_id: _get_node_label(node) for node in job_shop_graph.nodes
+    }
+    nx.draw_networkx_labels(graph, layout, node_labels, ax=ax)
 
     ax.set_axis_off()
+
+    plt.tight_layout()
+
+    # Add to the legend the meaning of m and d
+    if add_legend:
+        plt.figtext(0, 0.95, "d = duration", wrap=True, fontsize=12)
     return fig
+
+
+def _get_node_color(
+    node: Node, machine_colors: dict[int, tuple[float, float, float, float]]
+) -> tuple[float, float, float, float] | str:
+    if node.node_type == NodeType.OPERATION:
+        return machine_colors[node.operation.machine_id]
+    if node.node_type == NodeType.MACHINE:
+        return machine_colors[node.machine_id]
+
+    return "lightblue"
+
+
+def _get_node_label(node: Node) -> str:
+    if node.node_type == NodeType.OPERATION:
+        return f"d={node.operation.duration}"
+    if node.node_type == NodeType.MACHINE:
+        return f"M{node.machine_id}"
+    if node.node_type == NodeType.JOB:
+        return f"J{node.job_id}"
+    if node.node_type == NodeType.GLOBAL:
+        return "G"
+
+    raise ValueError(f"Invalid node type: {node.node_type}")
 
 
 def three_columns_layout(
@@ -96,8 +134,8 @@ def three_columns_layout(
     *,
     leftmost_position: float = 0.1,
     rightmost_position: float = 0.9,
-    topmost_position: float = 0.9,
-    bottommost_position: float = 0.1,
+    topmost_position: float = 1.0,
+    bottommost_position: float = 0.0,
 ) -> dict[Node, tuple[float, float]]:
     """Returns the layout of the agent-task graph.
 
@@ -140,14 +178,8 @@ def three_columns_layout(
         A dictionary with the position of each node in the graph. The keys are
         the node ids, and the values are tuples with the x and y coordinates.
     """
-    center_position = (
-        leftmost_position + (rightmost_position - leftmost_position) / 2
-    )
-    x_positions = {
-        "machine": leftmost_position,
-        "operation": center_position,
-        "job": rightmost_position,
-    }
+
+    x_positions = _get_x_positions(leftmost_position, rightmost_position)
 
     operation_nodes = job_shop_graph.nodes_by_type[NodeType.OPERATION]
     machine_nodes = job_shop_graph.nodes_by_type[NodeType.MACHINE]
@@ -159,38 +191,67 @@ def three_columns_layout(
 
     layout: dict[Node, tuple[float, float]] = {}
 
-    _assign_positions_from_top(
-        layout,
-        machine_nodes,
-        x_positions["machine"],
-        topmost_position,
-        y_spacing,
+    machines_spacing_multiplier = len(operation_nodes) // len(machine_nodes)
+    layout.update(
+        _assign_positions_from_top(
+            machine_nodes,
+            x_positions["machine"],
+            topmost_position,
+            y_spacing * machines_spacing_multiplier,
+        )
     )
-    _assign_positions_from_top(
-        layout,
-        operation_nodes,
-        x_positions["operation"],
-        topmost_position,
-        y_spacing,
+    layout.update(
+        (
+            _assign_positions_from_top(
+                operation_nodes,
+                x_positions["operation"],
+                topmost_position,
+                y_spacing,
+            )
+        )
     )
 
     if global_nodes:
-        global_node = global_nodes[0]
-        layout[global_node] = (x_positions["operation"], bottommost_position)
+        layout[global_nodes[0]] = (
+            x_positions["operation"],
+            bottommost_position,
+        )
 
-    _assign_positions_from_top(
-        layout, job_nodes, x_positions["job"], topmost_position, y_spacing
-    )
+    if job_nodes:
+        job_multiplier = len(operation_nodes) // len(job_nodes)
+        layout.update(
+            _assign_positions_from_top(
+                job_nodes,
+                x_positions["job"],
+                topmost_position,
+                y_spacing * job_multiplier,
+            )
+        )
     return layout
 
 
+def _get_x_positions(
+    leftmost_position: float, rightmost_position: float
+) -> dict[str, float]:
+    center_position = (
+        leftmost_position + (rightmost_position - leftmost_position) / 2
+    )
+    return {
+        "machine": leftmost_position,
+        "operation": center_position,
+        "job": rightmost_position,
+    }
+
+
 def _assign_positions_from_top(
-    layout: dict[Node, tuple[float, float]],
     nodes: list[Node],
     x: float,
     top: float,
     y_spacing: float,
-) -> None:
+) -> dict[Node, tuple[float, float]]:
+    layout: dict[Node, tuple[float, float]] = {}
     for i, node in enumerate(nodes):
         y = top - (i + 1) * y_spacing
         layout[node] = (x, y)
+
+    return layout
