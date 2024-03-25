@@ -67,7 +67,7 @@ def plot_agent_task_graph(
     node_colors = [
         _get_node_color(node, machine_colors) for node in job_shop_graph.nodes
     ]
-    node_shapes = {"machine": "s", "job": "s", "operation": "o", "global": "o"}
+    node_shapes = {"machine": "s", "job": "d", "operation": "o", "global": "o"}
 
     # Draw nodes with different shapes based on their type
     for node_type, shape in node_shapes.items():
