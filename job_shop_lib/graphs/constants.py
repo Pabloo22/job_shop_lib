@@ -1,3 +1,5 @@
+"""Constants for the graph module."""
+
 import enum
 
 
