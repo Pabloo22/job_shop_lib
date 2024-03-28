@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
-A framework to model and solve the Job Shop Scheduling Problem with a special focus on graph representations.
+A Python library to model and solve the Job Shop Scheduling Problem with a special focus on graph representations.
 
 ## Example
 ```python
