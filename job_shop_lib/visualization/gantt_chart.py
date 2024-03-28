@@ -14,9 +14,9 @@ _Y_POSITION_INCREMENT = 10
 
 def plot_gantt_chart(
     schedule: Schedule,
-    title: Optional[str] = None,
+    title: str | None = None,
     cmap_name: str = "viridis",
-    xlim: Optional[int] = None,
+    xlim: int | None = None,
 ) -> tuple[Figure, plt.Axes]:
     """Plots a Gantt chart for the schedule."""
     fig, ax = _initialize_plot(schedule, title)
@@ -27,7 +27,7 @@ def plot_gantt_chart(
 
 
 def _initialize_plot(
-    schedule: Schedule, title: Optional[str]
+    schedule: Schedule, title: str | None
 ) -> tuple[Figure, plt.Axes]:
     """Initializes the plot."""
     fig, ax = plt.subplots()
