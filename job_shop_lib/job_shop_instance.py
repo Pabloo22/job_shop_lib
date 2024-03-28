@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import functools
-from typing import Any, Optional
+from typing import Any
 
 from job_shop_lib import Operation
 
@@ -91,7 +91,7 @@ class JobShopInstance:
         duration_matrix: list[list[int]],
         machines_matrix: list[list[list[int]]] | list[list[int]],
         name: str = "JobShopInstance",
-        metadata: Optional[dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> JobShopInstance:
         """Creates a JobShopInstance from duration and machines matrices.
 
