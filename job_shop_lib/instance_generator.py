@@ -1,7 +1,7 @@
 """Home of the `InstanceGenerator` class."""
 
 import random
-from typing import Optional, Iterator
+from typing import Iterator
 
 from job_shop_lib import JobShopInstance, Operation
 
@@ -57,8 +57,8 @@ class InstanceGenerator:  # pylint: disable=too-many-instance-attributes
         allow_recirculation: bool = False,
         machines_per_operation: int | tuple[int, int] = 1,
         name_suffix: str = "classic_generated_instance",
-        seed: Optional[int] = None,
-        iteration_limit: Optional[int] = None,
+        seed: int | None = None,
+        iteration_limit: int | None = None,
     ):
         """Initializes the instance generator with the given parameters.
 
@@ -146,7 +146,7 @@ class InstanceGenerator:  # pylint: disable=too-many-instance-attributes
         return self.generate()
 
     def create_random_operation(
-        self, available_machines: Optional[list[int]] = None
+        self, available_machines: list[int] | None = None
     ) -> Operation:
         """Creates a random operation with the given available machines.
 
@@ -175,7 +175,7 @@ class InstanceGenerator:  # pylint: disable=too-many-instance-attributes
         return machines
 
     def _choose_one_machine(
-        self, available_machines: Optional[list[int]] = None
+        self, available_machines: list[int] | None = None
     ) -> int:
         if available_machines is None:
             _, max_num_machines = self.num_machines_range

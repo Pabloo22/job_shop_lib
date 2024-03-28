@@ -1,7 +1,5 @@
 """Home of the `Schedule` class."""
 
-from typing import Optional
-
 from job_shop_lib import ScheduledOperation, JobShopInstance
 
 
@@ -30,7 +28,7 @@ class Schedule:
     def __init__(
         self,
         instance: JobShopInstance,
-        schedule: Optional[list[list[ScheduledOperation]]] = None,
+        schedule: list[list[ScheduledOperation]] | None = None,
         **metadata,
     ):
         """Initializes the object with the given instance and schedule.
