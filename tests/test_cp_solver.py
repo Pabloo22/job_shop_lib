@@ -13,7 +13,7 @@ def test_solve(example_job_shop_instance):
 
 
 def test_solve_with_time_limit(example_job_shop_instance):
-    solver = CPSolver(time_limit=0.000000001)
+    solver = CPSolver(max_time_in_seconds=0.000000001)
 
     with pytest.raises(NoSolutionFound):
         solver(example_job_shop_instance)

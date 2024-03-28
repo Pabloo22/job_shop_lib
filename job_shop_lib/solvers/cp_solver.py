@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
 import time
 
 from ortools.sat.python import cp_model
@@ -25,13 +24,13 @@ class CPSolver:
 
     def __init__(
         self,
-        time_limit: Optional[float] = None,
+        max_time_in_seconds: float | None = None,
         log_search_progress: bool = False,
     ):
         self.log_search_progress = log_search_progress
-        self.time_limit = time_limit
+        self.max_time_in_seconds = max_time_in_seconds
 
-        self.makespan: Optional[cp_model.IntVar] = None
+        self.makespan: cp_model.IntVar | None = None
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
@@ -47,7 +46,7 @@ class CPSolver:
         each operation and the makespan. If no solution is found, it raises
         a NoSolutionFound exception.
         """
-        self.initialize_model(instance)
+        self._initialize_model(instance)
 
         start_time = time.perf_counter()
         status = self.solver.Solve(self.model)
@@ -69,12 +68,24 @@ class CPSolver:
         }
         return self._create_schedule(instance, metadata)
 
-    def initialize_model(self, instance: JobShopInstance):
+    def _initialize_model(self, instance: JobShopInstance):
+        """Initializes the model with variables, constraints and objective.
+
+        The model is initialized with two variables for each operation: start
+        and end time. The constraints ensure that operations within a job are
+        performed in sequence and that operations assigned to the same machine
+        do not overlap. The objective is to minimize the makespan.
+
+        Args:
+            instance: The job shop instance to be solved.
+        """
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         self.solver.parameters.log_search_progress = self.log_search_progress
-        if self.time_limit is not None:
-            self.solver.parameters.max_time_in_seconds = self.time_limit
+        if self.max_time_in_seconds is not None:
+            self.solver.parameters.max_time_in_seconds = (
+                self.max_time_in_seconds
+            )
         self._create_variables(instance)
         self._add_constraints(instance)
         self._set_objective(instance)
