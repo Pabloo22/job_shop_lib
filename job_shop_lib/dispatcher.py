@@ -124,7 +124,23 @@ class Dispatcher:
         self.job_next_operation_index[job_id] += 1
         self.job_next_available_time[job_id] = end_time
 
-    def available_operations(self) -> list[Operation]:
+    def current_time(self) -> int:
+        """Returns the current time of the schedule.
+
+        The current time is the minimum start time of the available
+        operations.
+        """
+        available_operations = self.available_operations()
+        if not available_operations:
+            return self.schedule.makespan()
+        current_time = float("inf")
+        for operation in available_operations:
+            for machine_id in operation.machines:
+                start_time = self.compute_start_time(operation, machine_id)
+                current_time = min(current_time, start_time)
+        return int(current_time)
+
+    def _available_operations(self) -> list[Operation]:
         """Returns the list of operations that are ready to be scheduled.
 
         An operation is ready to be scheduled if it is the next operation
@@ -139,6 +155,34 @@ class Dispatcher:
             operation = self.instance.jobs[job_id][next_position]
             available_operations.append(operation)
         return available_operations
+
+    def available_operations(self) -> list[Operation]:
+        """Returns the list of operations that are ready to be scheduled, but
+        excluding sub-optimal operations.
+
+        An operation is sub-optimal if there is another operation that could 
+        be scheduled in the same machine that would finish before the start 
+        time of the sub-optimal operation.
+
+        Assumes that operations only can be scheduled in one machine.
+        """
+        available_operations = self._available_operations()
+        available_operations = sorted(
+            available_operations,
+            key=lambda op: self.compute_start_time(op, op.machine_id)
+            + op.duration,
+        )
+        end_times_per_machine = [float("inf")] * self.instance.num_machines
+        optimized_operations: list[Operation] = []
+
+        for op in available_operations:
+            start_time = self.compute_start_time(op, op.machine_id)
+            is_suboptimal = end_times_per_machine[op.machine_id] <= start_time
+            if not is_suboptimal:
+                optimized_operations.append(op)
+                end_times_per_machine[op.machine_id] = start_time + op.duration
+
+        return optimized_operations
 
     def uncompleted_operations(self) -> list[Operation]:
         """Returns the list of operations that have not been scheduled.

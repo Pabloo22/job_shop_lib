@@ -1,4 +1,5 @@
 from job_shop_lib import Dispatcher, JobShopInstance
+from job_shop_lib.solvers import DispatchingRuleSolver
 
 
 def test_dispatch(example_job_shop_instance: JobShopInstance):
@@ -82,3 +83,14 @@ def test_is_operation_ready(example_job_shop_instance: JobShopInstance):
     assert not dispatcher.is_operation_ready(job_3[0])
     assert not dispatcher.is_operation_ready(job_3[1])
     assert dispatcher.is_operation_ready(job_3[2])
+
+
+def test_current_time(example_job_shop_instance: JobShopInstance):
+    solver = DispatchingRuleSolver(dispatching_rule="mwkr")
+    dispatcher = Dispatcher(example_job_shop_instance)
+    current_times = [0, 0, 2, 9, 10, 10, 13, 13, 15]
+    for i, current_time in enumerate(current_times):
+        solver.step(dispatcher)
+        assert (
+            dispatcher.current_time() == current_time
+        ), f"Failed at iteration {i}."
