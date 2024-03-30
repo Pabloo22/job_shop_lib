@@ -11,6 +11,8 @@ from job_shop_lib import Schedule, ScheduledOperation
 _BASE_Y_POSITION = 1
 _Y_POSITION_INCREMENT = 10
 
+NUMBER_OF_X_TICKS = 15
+
 
 def plot_gantt_chart(
     schedule: Schedule,
@@ -110,14 +112,14 @@ def _configure_axes(schedule: Schedule, ax: plt.Axes, xlim: Optional[int]):
     )
     ax.set_yticklabels([str(i + 1) for i in range(num_machines)])
     makespan = schedule.makespan()
-    xlim = xlim if xlim is not None else makespan + 1
+    xlim = xlim if xlim is not None else makespan
     ax.set_xlim(0, xlim)
 
-    tick_interval = max(1, makespan // 10)
-    xticks = list(range(0, makespan + 1, tick_interval))
+    tick_interval = max(1, xlim // NUMBER_OF_X_TICKS)
+    xticks = list(range(0, xlim + 1, tick_interval))
 
-    if xticks[-1] != makespan:
+    if xticks[-1] != xlim:
         xticks.pop()
-        xticks.append(makespan)
+        xticks.append(xlim)
 
     ax.set_xticks(xticks)
