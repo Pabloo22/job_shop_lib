@@ -39,16 +39,25 @@ plt.show()
 There is also a function to create gif animations from a Dispatching Rule Solver:
 
 ```python
-from job_shop_lib.visualization import create_gif, get_default_plot_function
+from job_shop_lib.visualization import create_gif, get_plot_function
+from job_shop_lib.benchmarks import load_benchmark_instance
+from job_shop_lib.solvers import DispatchingRuleSolver, DispatchingRule
 
 plt.style.use("ggplot")
 
-solver = DispatchingRuleSolver()
-plot_func = get_default_plot_function("Solution with Most Work Remaining Rule")
-create_gif("example.gif", instance, solver, plot_function=plot_func)
+solver = DispatchingRuleSolver(DispatchingRule.MOST_WORK_REMAINING)
+plot_func = get_plot_function(title="Solution with Most Work Remaining Rule")
+ft06 = load_benchmark_instance("ft06")
+create_gif(
+    gif_path="ft06_optimized.gif",
+    instance=ft06,
+    solver=DispatchingRuleSolver(),
+    plot_function=plot_func,
+    fps=4,
+)
 ```
 
-![Example Gif](tutorial/example.gif)
+![Example Gif](tutorial/ft06_optimized.gif)
 
 Furthermore, you can represent instances as graphs:
 
