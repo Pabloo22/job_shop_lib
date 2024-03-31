@@ -97,7 +97,7 @@ def create_gantt_chart_frames(
     plot_current_time: bool = True,
 ) -> None:
     """Creates frames of the Gantt chart for the schedule being built.
-    
+
     Args:
         frames_dir:
             The directory to save the frames in.
@@ -138,7 +138,7 @@ def _save_frame(
 
 def create_gif_from_frames(frames_dir: str, gif_path: str, fps: int) -> None:
     """Creates a GIF from the frames in the given directory.
-    
+
     Args:
         frames_dir:
             The directory containing the frames to be used in the GIF.

@@ -56,7 +56,9 @@ def dispatching_rule_factory(
             not supported.
     """
     dispatching_rules = {
-        DispatchingRule.SHORTEST_PROCESSING_TIME: shortest_processing_time_rule,
+        DispatchingRule.SHORTEST_PROCESSING_TIME: (
+            shortest_processing_time_rule
+        ),
         DispatchingRule.FIRST_COME_FIRST_SERVED: first_come_first_served_rule,
         DispatchingRule.MOST_WORK_REMAINING: most_work_remaining_rule,
         DispatchingRule.RANDOM: random_operation_rule,

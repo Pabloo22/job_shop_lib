@@ -160,8 +160,8 @@ class Dispatcher:
         """Returns the list of operations that are ready to be scheduled, but
         excluding sub-optimal operations.
 
-        An operation is sub-optimal if there is another operation that could 
-        be scheduled in the same machine that would finish before the start 
+        An operation is sub-optimal if there is another operation that could
+        be scheduled in the same machine that would finish before the start
         time of the sub-optimal operation.
 
         Assumes that operations only can be scheduled in one machine.
