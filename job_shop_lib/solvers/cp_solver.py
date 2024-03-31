@@ -35,9 +35,6 @@ class CPSolver(Solver):
         self.solver = cp_model.CpSolver()
         self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
 
-    def __call__(self, instance: JobShopInstance) -> Schedule:
-        return self.solve(instance)
-
     def solve(self, instance: JobShopInstance) -> Schedule:
         """Creates the variables, constraints and objective, and solves the
         problem.

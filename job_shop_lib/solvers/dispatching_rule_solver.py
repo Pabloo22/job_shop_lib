@@ -40,6 +40,3 @@ class DispatchingRuleSolver(Solver):
         selected_operation = self.dispatching_rule(dispatcher)
         machine_id = self.machine_chooser(dispatcher, selected_operation)
         dispatcher.dispatch(selected_operation, machine_id)
-
-    def __call__(self, instance: JobShopInstance) -> Schedule:
-        return self.solve(instance)
