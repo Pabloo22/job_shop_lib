@@ -1,48 +1,14 @@
-from typing import Callable
+"""Dispatching rules for the job shop scheduling problem.
+
+This module contains functions that implement different dispatching rules for
+the job shop scheduling problem. A dispatching rule determines the order in
+which operations are selected for execution based on certain criteria such as
+shortest processing time, first come first served, etc.
+"""
+
 import random
 
 from job_shop_lib import Dispatcher, Operation
-
-
-def dispatching_rule_factory(
-    dispatching_rule: str,
-) -> Callable[[Dispatcher], Operation]:
-    dispatching_rules = {
-        "shortest_processing_time": shortest_processing_time_rule,
-        "first_come_first_served": first_come_first_served_rule,
-        "most_work_remaining": most_work_remaining_rule,
-        "spt": shortest_processing_time_rule,
-        "fcfs": first_come_first_served_rule,
-        "mwkr": most_work_remaining_rule,
-        "random": random_operation_rule,
-    }
-
-    dispatching_rule = dispatching_rule.lower()
-    if dispatching_rule not in dispatching_rules:
-        raise ValueError(
-            f"Dispatching rule {dispatching_rule} not recognized. Available "
-            f"dispatching rules: {', '.join(dispatching_rules)}."
-        )
-
-    return dispatching_rules[dispatching_rule]
-
-
-def machine_chooser_factory(
-    machine_chooser: str,
-) -> Callable[[Dispatcher, Operation], int]:
-    machine_choosers = {
-        "first": lambda _, operation: operation.machines[0],
-        "random": lambda _, operation: random.choice(operation.machines),
-    }
-
-    machine_chooser = machine_chooser.lower()
-    if machine_chooser not in machine_choosers:
-        raise ValueError(
-            f"Machine chooser {machine_chooser} not recognized. Available "
-            f"machine choosers: {', '.join(machine_choosers)}."
-        )
-
-    return machine_choosers[machine_chooser]
 
 
 def shortest_processing_time_rule(dispatcher: Dispatcher) -> Operation:

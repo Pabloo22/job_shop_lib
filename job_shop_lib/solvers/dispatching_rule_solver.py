@@ -1,7 +1,7 @@
 from typing import Callable
 
 from job_shop_lib import JobShopInstance, Dispatcher, Schedule, Operation
-from job_shop_lib.solvers.dispatching_rules import (
+from job_shop_lib.solvers.dispatching_rules_factories import (
     dispatching_rule_factory,
     machine_chooser_factory,
 )
