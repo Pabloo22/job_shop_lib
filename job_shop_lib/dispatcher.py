@@ -140,14 +140,44 @@ class Dispatcher:
                 current_time = min(current_time, start_time)
         return int(current_time)
 
-    def _available_operations(self) -> list[Operation]:
-        """Returns the list of operations that are ready to be scheduled.
+    def available_operations(
+        self, filter_bad_choices: bool = True
+    ) -> list[Operation]:
+        """Returns a list of available operations for processing, optionally
+        filtering out operations known to be bad choices.
 
-        An operation is ready to be scheduled if it is the next operation
-        to be scheduled for its job.
+        This method first gathers all possible next operations from the jobs
+        being processed. It then optionally filters these operations to exclude
+        ones that are deemed inefficient or suboptimal choices.
 
-        It is more efficient than checking all operations in the instance.
+        An operation is sub-optimal if there is another operation that could
+        be scheduled in the same machine that would finish before the start
+        time of the sub-optimal operation.
+
+        Args:
+            filter_bad_choices (bool):
+                If True, the method filters out operations if there is another
+                operation that could be scheduled in the same machine that
+                would finish before the start time of the sub-optimal
+                operation.
+                If False, no filtering is applied, and all next possible
+                operations are returned.
+
+        Returns:
+            A list of Operation objects that are available for scheduling.
+
+        Raises:
+            ValueError: If using the filter_bad_choices option and one of the
+                available operations can be scheduled in more than one machine.
         """
+        available_operations = self._available_operations()
+        if filter_bad_choices:
+            available_operations = self._filter_bad_choices(
+                available_operations
+            )
+        return available_operations
+
+    def _available_operations(self) -> list[Operation]:
         available_operations = []
         for job_id, next_position in enumerate(self.job_next_operation_index):
             if next_position == len(self.instance.jobs[job_id]):
@@ -156,17 +186,9 @@ class Dispatcher:
             available_operations.append(operation)
         return available_operations
 
-    def available_operations(self) -> list[Operation]:
-        """Returns the list of operations that are ready to be scheduled, but
-        excluding sub-optimal operations.
-
-        An operation is sub-optimal if there is another operation that could
-        be scheduled in the same machine that would finish before the start
-        time of the sub-optimal operation.
-
-        Assumes that operations only can be scheduled in one machine.
-        """
-        available_operations = self._available_operations()
+    def _filter_bad_choices(
+        self, available_operations: list[Operation]
+    ) -> list[Operation]:
         available_operations = sorted(
             available_operations,
             key=lambda op: self.compute_start_time(op, op.machine_id)
@@ -177,8 +199,8 @@ class Dispatcher:
 
         for op in available_operations:
             start_time = self.compute_start_time(op, op.machine_id)
-            is_suboptimal = end_times_per_machine[op.machine_id] <= start_time
-            if not is_suboptimal:
+            is_bad_choice = end_times_per_machine[op.machine_id] <= start_time
+            if not is_bad_choice:
                 optimized_operations.append(op)
                 end_times_per_machine[op.machine_id] = start_time + op.duration
 
