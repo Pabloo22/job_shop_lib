@@ -11,10 +11,10 @@ from job_shop_lib import (
     ScheduledOperation,
     Operation,
 )
-from job_shop_lib.solvers import NoSolutionFound
+from job_shop_lib.solvers import NoSolutionFound, Solver
 
 
-class CPSolver:
+class CPSolver(Solver):
     """A solver for the job shop scheduling problem using constraint
     programming.
 
