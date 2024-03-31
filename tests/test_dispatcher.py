@@ -86,9 +86,9 @@ def test_is_operation_ready(example_job_shop_instance: JobShopInstance):
 
 
 def test_current_time(example_job_shop_instance: JobShopInstance):
-    solver = DispatchingRuleSolver(dispatching_rule="mwkr")
+    solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
     dispatcher = Dispatcher(example_job_shop_instance)
-    current_times = [0, 0, 2, 9, 10, 10, 13, 13, 15]
+    current_times = [0, 0, 0, 1, 1, 7, 9, 10, 11]
     for i, current_time in enumerate(current_times):
         solver.step(dispatcher)
         assert (
