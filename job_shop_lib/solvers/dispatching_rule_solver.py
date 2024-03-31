@@ -1,25 +1,30 @@
 from typing import Callable
 
 from job_shop_lib import JobShopInstance, Dispatcher, Schedule, Operation
-from job_shop_lib.solvers.dispatching_rules_factories import (
+from job_shop_lib.solvers import (
+    Solver,
     dispatching_rule_factory,
     machine_chooser_factory,
+    DispatchingRule,
+    MachineChooser,
 )
 
 
-class DispatchingRuleSolver:
+class DispatchingRuleSolver(Solver):
     """Solves a job shop instance using a dispatching rule algorithm."""
 
     def __init__(
         self,
-        dispatching_rule: str | Callable[[Dispatcher], Operation] = "mwkr",
+        dispatching_rule: (
+            DispatchingRule | str | Callable[[Dispatcher], Operation]
+        ) = DispatchingRule.MOST_WORK_REMAINING,
         machine_chooser: (
-            str | Callable[[Dispatcher, Operation], int]
-        ) = "first",
+            DispatchingRule | str | Callable[[Dispatcher, Operation], int]
+        ) = MachineChooser.FIRST,
     ):
-        if isinstance(dispatching_rule, str):
+        if isinstance(dispatching_rule, str | DispatchingRule):
             dispatching_rule = dispatching_rule_factory(dispatching_rule)
-        if isinstance(machine_chooser, str):
+        if isinstance(machine_chooser, str | MachineChooser):
             machine_chooser = machine_chooser_factory(machine_chooser)
         self.dispatching_rule = dispatching_rule
         self.machine_chooser = machine_chooser
