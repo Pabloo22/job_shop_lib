@@ -23,7 +23,7 @@ from job_shop_lib import JobShopInstance
 from job_shop_lib.graphs import JobShopGraph, NodeType, Node
 
 
-def build_agent_task_graph_complete(instance: JobShopInstance) -> JobShopGraph:
+def build_complete_agent_task_graph(instance: JobShopInstance) -> JobShopGraph:
     """Builds the agent-task graph of the instance with job and global nodes.
 
     The complete agent-task graph is a generalization of the agent-task graph

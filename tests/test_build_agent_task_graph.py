@@ -1,5 +1,5 @@
 from job_shop_lib.graphs.build_agent_task_graph import (
-    build_agent_task_graph_complete,
+    build_complete_agent_task_graph,
     build_agent_task_graph_with_jobs,
     build_agent_task_graph,
 )
@@ -10,7 +10,7 @@ from job_shop_lib.benchmarks import load_all_benchmark_instances
 def test_expected_num_nodes_complete():
     benchmark_instances = load_all_benchmark_instances()
     for instance in list(benchmark_instances.values())[:10]:
-        graph = build_agent_task_graph_complete(instance)
+        graph = build_complete_agent_task_graph(instance)
         expected_num_nodes = get_expected_num_nodes_for_complete_graph(
             instance
         )
@@ -38,7 +38,7 @@ def test_expected_num_nodes():
 def test_expected_num_edges_complete():
     benchmark_instances = load_all_benchmark_instances()
     for instance in list(benchmark_instances.values())[:10]:
-        graph = build_agent_task_graph_complete(instance)
+        graph = build_complete_agent_task_graph(instance)
         expected_num_edges = get_expected_num_edges_for_complete_graph(
             instance
         )
@@ -46,7 +46,7 @@ def test_expected_num_edges_complete():
 
 
 def test_expected_num_edges_complete_example(example_job_shop_instance):
-    graph = build_agent_task_graph_complete(example_job_shop_instance)
+    graph = build_complete_agent_task_graph(example_job_shop_instance)
     expected_num_edges = get_expected_num_edges_for_complete_graph(
         example_job_shop_instance
     )

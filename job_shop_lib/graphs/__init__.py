@@ -10,7 +10,7 @@ from job_shop_lib.graphs.build_disjunctive_graph import (
 )
 from job_shop_lib.graphs.build_agent_task_graph import (
     build_agent_task_graph,
-    build_agent_task_graph_complete,
+    build_complete_agent_task_graph,
     build_agent_task_graph_with_jobs,
     add_same_job_operations_edges,
     add_machine_nodes,
@@ -36,7 +36,7 @@ __all__ = [
     "add_source_sink_nodes",
     "add_source_sink_edges",
     "build_agent_task_graph",
-    "build_agent_task_graph_complete",
+    "build_complete_agent_task_graph",
     "build_agent_task_graph_with_jobs",
     "add_same_job_operations_edges",
     "add_machine_nodes",
