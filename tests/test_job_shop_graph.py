@@ -79,3 +79,19 @@ def test_operation_nodes_addition(example_job_shop_instance):
     assert len(operation_nodes) == sum(
         len(job) for job in example_job_shop_instance.jobs
     )
+
+
+def test_get_operation_from_id(example_job_shop_instance):
+    graph = JobShopGraph(example_job_shop_instance)
+    add_source_sink_nodes(graph)
+
+    for op_id, node in enumerate(graph.nodes_by_type[NodeType.OPERATION]):
+        operation = graph.get_operation_from_id(op_id)
+        assert operation is node.operation
+        assert operation.operation_id == op_id
+
+
+if __name__ == "__main__":
+    import pytest
+
+    pytest.main(["-v", "tests/test_job_shop_graph.py"])

@@ -3,7 +3,7 @@
 import collections
 import networkx as nx
 
-from job_shop_lib import JobShopInstance
+from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.graphs import Node, NodeType
 
 
@@ -91,6 +91,10 @@ class JobShopGraph:
             for operation in job:
                 node = Node(node_type=NodeType.OPERATION, operation=operation)
                 self.add_node(node)
+
+    def get_operation_from_id(self, operation_id: int) -> Operation:
+        """Returns the operation with the given id."""
+        return self.nodes[operation_id].operation
 
     def add_node(self, node_for_adding: Node) -> None:
         """Adds a node to the graph and updates relevant class attributes.
