@@ -3,6 +3,13 @@
 from typing import Optional
 
 import gymnasium as gym
+from gymnasium import spaces
+
+from job_shop_lib import InstanceGenerator
+
+
+NUM_NODE_FEATURES = 10
+NUM_EDGE_FEATURES = 4
 
 
 class GraphJobShopEnv(gym.Env):
@@ -15,18 +22,21 @@ class GraphJobShopEnv(gym.Env):
 
     metadata = {"render.modes": ["human"]}
 
-    def __init__(self, num_machines: int, num_jobs: int, job_len: int):
-        self.num_machines = num_machines
-        self.num_jobs = num_jobs
-        self.job_len = job_len
-
-        self.action_space = gym.spaces.Discrete(num_jobs)
-        # self.observation_space = ...
+    def __init__(self, instance_generator: InstanceGenerator):
+        self.instance_generator = instance_generator
+        self.observation_space = spaces.Graph(
+            node_space=spaces.Box(low=0, high=1, shape=(NUM_NODE_FEATURES,)),
+            edge_space=spaces.Box(low=0, high=1, shape=(NUM_EDGE_FEATURES,)),
+        )
+        _, max_number_of_jobs = instance_generator.num_jobs_range
+        self.action_space = spaces.Discrete(max_number_of_jobs)
+        self.current_instance = self.instance_generator.generate()
 
     def reset(self, *, seed=None, options: Optional[dict] = None):
         super().reset(seed=seed)
+        self.current_instance = self.instance_generator.generate()
 
-    def step(self, action):
+    def step(self, action: int):
         pass
 
     def render(self):
