@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import functools
 from typing import Any
 
@@ -61,6 +62,62 @@ class JobShopInstance:
                 operation.position_in_job = position
                 operation.operation_id = operation_id
                 operation_id += 1
+
+    @classmethod
+    def from_taillard_file(
+        cls,
+        file_path: os.PathLike | str | bytes,
+        encoding: str = "utf-8",
+        comment_symbol: str = "#",
+        name: str | None = None,
+        **metadata: Any,
+    ) -> JobShopInstance:
+        """Creates a JobShopInstance from a file following Taillard's format.
+
+        Args:
+            file_path:
+                A path-like object or string representing the path to the file.
+            encoding:
+                The encoding of the file.
+            comment_symbol:
+                A string representing the comment symbol used in the file.
+                Lines starting with this symbol are ignored.
+            name:
+                A string with the name of the instance. If not provided, the
+                name of the instance is set to the name of the file.
+            **metadata:
+                Additional information about the instance.
+
+        Returns:
+            A JobShopInstance object with the operations read from the file,
+            and the name and metadata provided.
+        """
+        with open(file_path, "r", encoding=encoding) as file:
+            lines = file.readlines()
+
+        first_non_comment_line_reached = False
+        jobs = []
+        for line in lines:
+            line = line.strip()
+            if line.startswith(comment_symbol):
+                continue
+            if not first_non_comment_line_reached:
+                first_non_comment_line_reached = True
+                continue
+
+            row = list(map(int, line.split()))
+            pairs = zip(row[::2], row[1::2])
+            operations = [
+                Operation(machines=machine_id, duration=duration)
+                for machine_id, duration in pairs
+            ]
+            jobs.append(operations)
+
+        if name is None:
+            name = os.path.basename(str(file_path))
+            if "." in name:
+                name = name.split(".")[0]
+        return cls(jobs=jobs, name=name, **metadata)
 
     def to_dict(self) -> dict[str, Any]:
         """Returns a dictionary representation of the instance.
@@ -132,6 +189,11 @@ class JobShopInstance:
             f"JobShopInstance(name={self.name}, "
             f"num_jobs={self.num_jobs}, num_machines={self.num_machines})"
         )
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, JobShopInstance):
+            return False
+        return self.jobs == other.jobs
 
     @property
     def num_jobs(self) -> int:

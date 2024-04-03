@@ -1,3 +1,4 @@
+from job_shop_lib import JobShopInstance
 from job_shop_lib.benchmarks import (
     load_all_benchmark_instances,
     load_benchmark_instance,
@@ -12,6 +13,9 @@ def test_load_benchmark_instance():
 
     solution = CPSolver().solve(ft06)
     assert solution.makespan() == ft06.metadata["optimum"] == 55
+    ft06_from_file = JobShopInstance.from_taillard_file("./tests/ft06.txt")
+    assert ft06 == ft06_from_file
+    assert ft06.name == ft06_from_file.name
 
 
 def test_load_all_benchmark_instances():
