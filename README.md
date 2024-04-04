@@ -123,8 +123,6 @@ import matplotlib.pyplot as plt
 from job_shop_lib.solvers import CPSolver
 from job_shop_lib.visualization import plot_gantt_chart
 
-plt.style.use("ggplot")
-
 solver = CPSolver(max_time_in_seconds=10)
 ft06_schedule = solver(ft06)
 
@@ -151,6 +149,8 @@ We can visualize the solution with a `DispatchingRuleSolver` as a gif:
 from job_shop_lib.visualization import create_gif, get_plot_function
 from job_shop_lib.solvers import DispatchingRuleSolver, DispatchingRule
 
+plt.style.use("ggplot")
+
 mwkr_solver = DispatchingRuleSolver("most_work_remaining")
 plot_function = get_plot_function(title="Solution with Most Work Remaining Rule")
 create_gif(
@@ -165,6 +165,10 @@ create_gif(
 ![Example Gif](tutorial/ft06_optimized.gif)
 
 The dashed red line represents the current time step, which is computed as the earliest time when the next operation can start.
+
+> [!TIP]
+> You can change the style of the gantt chart with `plt.style.use("name-of-the-style")`.
+> Personally, I consider the `ggplot` style to be the most minimalistic.
 
 ### Representing Instances as Graphs
 
