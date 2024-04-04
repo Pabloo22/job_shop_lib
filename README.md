@@ -168,7 +168,7 @@ The dashed red line represents the current time step, which is computed as the e
 
 > [!TIP]
 > You can change the style of the gantt chart with `plt.style.use("name-of-the-style")`.
-> Personally, I consider the `ggplot` style to be the most minimalistic.
+> Personally, I consider the `ggplot` style to be the cleanest.
 
 ### Representing Instances as Graphs
 
