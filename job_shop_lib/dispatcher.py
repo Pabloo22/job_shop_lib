@@ -189,12 +189,13 @@ class Dispatcher:
     def _filter_bad_choices(
         self, available_operations: list[Operation]
     ) -> list[Operation]:
-        available_operations = sorted(
-            available_operations,
-            key=lambda op: self.compute_start_time(op, op.machine_id)
-            + op.duration,
-        )
         end_times_per_machine = [float("inf")] * self.instance.num_machines
+        for op in available_operations:
+            start_time = self.compute_start_time(op, op.machine_id)
+            end_times_per_machine[op.machine_id] = min(
+                end_times_per_machine[op.machine_id], start_time + op.duration
+            )
+
         optimized_operations: list[Operation] = []
 
         for op in available_operations:
