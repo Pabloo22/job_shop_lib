@@ -4,10 +4,11 @@ from typing import Callable
 import random
 
 from job_shop_lib import Dispatcher, Operation
-from job_shop_lib.solvers.dispatching_rules import (
+from job_shop_lib.solvers import (
     shortest_processing_time_rule,
     first_come_first_served_rule,
     most_work_remaining_rule,
+    most_operations_remaining_rule,
     random_operation_rule,
 )
 
@@ -21,6 +22,7 @@ class DispatchingRule(str, Enum):
     SHORTEST_PROCESSING_TIME = "shortest_processing_time"
     FIRST_COME_FIRST_SERVED = "first_come_first_served"
     MOST_WORK_REMAINING = "most_work_remaining"
+    MOST_OPERATIONS_REMAINING = "most_operations_remaining"
     RANDOM = "random"
 
 
@@ -61,6 +63,9 @@ def dispatching_rule_factory(
         ),
         DispatchingRule.FIRST_COME_FIRST_SERVED: first_come_first_served_rule,
         DispatchingRule.MOST_WORK_REMAINING: most_work_remaining_rule,
+        DispatchingRule.MOST_OPERATIONS_REMAINING: (
+            most_operations_remaining_rule
+        ),
         DispatchingRule.RANDOM: random_operation_rule,
     }
 

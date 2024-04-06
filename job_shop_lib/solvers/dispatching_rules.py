@@ -39,6 +39,17 @@ def most_work_remaining_rule(dispatcher: Dispatcher) -> Operation:
     )
 
 
+def most_operations_remaining_rule(dispatcher: Dispatcher) -> Operation:
+    """Dispatches the operation which job has the most remaining operations."""
+    job_remaining_operations = [0] * dispatcher.instance.num_jobs
+    for operation in dispatcher.uncompleted_operations():
+        job_remaining_operations[operation.job_id] += 1
+
+    return max(
+        dispatcher.available_operations(),
+        key=lambda operation: job_remaining_operations[operation.job_id],
+    )
+
 def random_operation_rule(dispatcher: Dispatcher) -> Operation:
     """Dispatches a random operation."""
     return random.choice(dispatcher.available_operations())
