@@ -50,6 +50,7 @@ def most_operations_remaining_rule(dispatcher: Dispatcher) -> Operation:
         key=lambda operation: job_remaining_operations[operation.job_id],
     )
 
+
 def random_operation_rule(dispatcher: Dispatcher) -> Operation:
     """Dispatches a random operation."""
     return random.choice(dispatcher.available_operations())
