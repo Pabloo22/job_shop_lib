@@ -11,20 +11,19 @@ from job_shop_lib import Schedule, ScheduledOperation
 _BASE_Y_POSITION = 1
 _Y_POSITION_INCREMENT = 10
 
-NUMBER_OF_X_TICKS = 15
-
 
 def plot_gantt_chart(
     schedule: Schedule,
     title: str | None = None,
     cmap_name: str = "viridis",
     xlim: int | None = None,
+    number_of_x_ticks: int = 15,
 ) -> tuple[Figure, plt.Axes]:
     """Plots a Gantt chart for the schedule."""
     fig, ax = _initialize_plot(schedule, title)
     legend_handles = _plot_machine_schedules(schedule, ax, cmap_name)
     _configure_legend(ax, legend_handles)
-    _configure_axes(schedule, ax, xlim)
+    _configure_axes(schedule, ax, xlim, number_of_x_ticks)
     return fig, ax
 
 
@@ -98,7 +97,12 @@ def _configure_legend(ax: plt.Axes, legend_handles: dict[int, Patch]):
     )
 
 
-def _configure_axes(schedule: Schedule, ax: plt.Axes, xlim: Optional[int]):
+def _configure_axes(
+    schedule: Schedule,
+    ax: plt.Axes,
+    xlim: Optional[int],
+    number_of_x_ticks: int,
+):
     """Sets the limits and labels for the axes."""
     num_machines = len(schedule.schedule)
     ax.set_ylim(0, _BASE_Y_POSITION + _Y_POSITION_INCREMENT * num_machines)
@@ -115,7 +119,7 @@ def _configure_axes(schedule: Schedule, ax: plt.Axes, xlim: Optional[int]):
     xlim = xlim if xlim is not None else makespan
     ax.set_xlim(0, xlim)
 
-    tick_interval = max(1, xlim // NUMBER_OF_X_TICKS)
+    tick_interval = max(1, xlim // number_of_x_ticks)
     xticks = list(range(0, xlim + 1, tick_interval))
 
     if xticks[-1] != xlim:
