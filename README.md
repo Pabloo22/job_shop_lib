@@ -39,7 +39,7 @@ instance = JobShopInstance(
 
 ### Load a Benchmark Instance
 
-You can load a benchmark instance from the library
+You can load a benchmark instance from the library:
 
 ```python
 from job_shop_lib.benchmarks import load_benchmark_instance
@@ -47,7 +47,7 @@ from job_shop_lib.benchmarks import load_benchmark_instance
 ft06 = load_benchmark_instance("ft06")
 ```
 
-The module `benchmarks` functions to load the instances from the file and return them as `JobShopInstance` objects without having to download them
+The module `benchmarks` contains functions to load the instances from the file and return them as `JobShopInstance` objects without having to download them
 manually. The instances are stored in [benchmark_instances.json](job_shop_lib/benchmarks/benchmark_instances.json).
 
 The contributions to this benchmark dataset are as follows:
@@ -110,10 +110,15 @@ This class can also work as an iterator to generate multiple instances:
 
 ```python
 generator = InstanceGenerator(iteration_limit=100, seed=42)
+instances = []
+for instance in generator:
+    instances.append(instance)
+
+# Or simply:
 instances = list(generator)
 ```
 
-### Solve an Instance with the OR-Tools' Constraint-Programming Solver
+### Solve an Instance with the OR-Tools' Constraint-Programming SAT Solver
 
 Every solver is a `Callable` that receives a `JobShopInstance` and returns a `Schedule` object.
 
@@ -140,6 +145,7 @@ class DispatchingRule(str, Enum):
     SHORTEST_PROCESSING_TIME = "shortest_processing_time"
     FIRST_COME_FIRST_SERVED = "first_come_first_served"
     MOST_WORK_REMAINING = "most_work_remaining"
+    MOST_OPERATION_REMAINING = "most_operation_remaining"
     RANDOM = "random"
 ```
 
@@ -174,7 +180,7 @@ The dashed red line represents the current time step, which is computed as the e
 
 One of the main purposes of this library is to provide an easy way to encode instances as graphs. This can be very useful, not only for visualization purposes but also for developing Graph Neural Network-based algorithms.
 
-A graph is represented by the `JobShopGraph` class, which internally uses the `networkx` library.
+A graph is represented by the `JobShopGraph` class, which internally stores a `networkx.DiGraph` object.
 
 ####  Disjunctive Graph
 
@@ -211,6 +217,11 @@ The `JobShopGraph` class provides easy access to the nodes, for example, to get 
              <NodeType.SOURCE: 5>: [Node(node_type=SOURCE, value=None, id=9)],
              <NodeType.SINK: 6>: [Node(node_type=SINK, value=None, id=10)]})
 ```
+
+Other attributes include:
+- `nodes`: A list of all nodes in the graph.
+- `nodes_by_machine`: A nested list mapping each machine to its associated operation nodes, aiding in machine-specific analysis.
+- `nodes_by_job`: Similar to `nodes_by_machine`, but maps jobs to their operation nodes, useful for job-specific traversal.
 
 #### Agent-Task Graph
 
