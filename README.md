@@ -2,7 +2,7 @@
 
 <img src="images/logo_with_transparent_background.png" height="150px">
 
-<h2>Job Shop Library</h2>
+<h1>Job Shop Library</h1>
 
 [![Tests](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml/badge.svg)](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml)
 ![Python versions](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
