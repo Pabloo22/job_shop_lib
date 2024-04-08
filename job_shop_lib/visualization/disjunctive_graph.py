@@ -7,7 +7,14 @@ import matplotlib
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from job_shop_lib.graphs import JobShopGraph, EdgeType, NodeType, Node
+from job_shop_lib import JobShopInstance
+from job_shop_lib.graphs import (
+    JobShopGraph,
+    EdgeType,
+    NodeType,
+    Node,
+    build_disjunctive_graph,
+)
 
 
 Layout = Callable[[nx.Graph], dict[str, tuple[float, float]]]
@@ -23,7 +30,7 @@ Layout = Callable[[nx.Graph], dict[str, tuple[float, float]]]
 # unnecessary complexity).
 # pylint: disable=too-many-arguments, too-many-locals
 def plot_disjunctive_graph(
-    job_shop_graph: JobShopGraph,
+    job_shop: JobShopGraph | JobShopInstance,
     figsize: tuple[float, float] = (6, 4),
     node_size: int = 1600,
     title: Optional[str] = None,
@@ -37,6 +44,12 @@ def plot_disjunctive_graph(
     draw_disjunctive_edges: bool = True,
 ) -> plt.Figure:
     """Returns a plot of the disjunctive graph of the instance."""
+
+    if isinstance(job_shop, JobShopInstance):
+        job_shop_graph = build_disjunctive_graph(job_shop)
+    else:
+        job_shop_graph = job_shop
+
     # Set up the plot
     # ----------------
     plt.figure(figsize=figsize)
