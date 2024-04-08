@@ -79,6 +79,7 @@ class CPSolver(Solver):
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         self.solver.parameters.log_search_progress = self.log_search_progress
+        self._operations_start = {}
         if self.max_time_in_seconds is not None:
             self.solver.parameters.max_time_in_seconds = (
                 self.max_time_in_seconds
