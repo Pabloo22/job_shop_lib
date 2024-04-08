@@ -168,7 +168,7 @@ create_gif(
 )
 ```
 
-![Example Gif](tutorial/ft06_optimized.gif)
+![Example Gif](examples/ft06_optimized.gif)
 
 The dashed red line represents the current time step, which is computed as the earliest time when the next operation can start.
 
@@ -250,7 +250,7 @@ plt.show()
 
 ![Example Agent-Task Graph](images/agent_task_graph.png)
 
-For more details, check the [tutorial](tutorial) folder.
+For more details, check the [examples](examples) folder.
 
 ## Installation
 
