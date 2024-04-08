@@ -63,8 +63,8 @@ def score_based_rule(
     """Creates a dispatching rule based on a scoring function.
 
     Args:
-        score_function: A function that takes a Dispatcher instance as input and
-            returns a list of scores for each job.
+        score_function: A function that takes a Dispatcher instance as input
+            and returns a list of scores for each job.
 
     Returns:
         A dispatching rule function that selects the operation with the highest
