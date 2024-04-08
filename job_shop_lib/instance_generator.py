@@ -145,6 +145,11 @@ class InstanceGenerator:  # pylint: disable=too-many-instance-attributes
         self._current_iteration += 1
         return self.generate()
 
+    def __len__(self) -> int:
+        if self._iteration_limit is None:
+            raise ValueError("Iteration limit is not set.")
+        return self._iteration_limit
+
     def create_random_operation(
         self, available_machines: list[int] | None = None
     ) -> Operation:
