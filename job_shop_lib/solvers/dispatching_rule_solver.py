@@ -21,7 +21,7 @@ class DispatchingRuleSolver(Solver):
         machine_chooser: (
             DispatchingRule | str | Callable[[Dispatcher, Operation], int]
         ) = MachineChooser.FIRST,
-        filter_bad_choices: bool = True,
+        **dispatcher_kwargs,
     ):
         if isinstance(dispatching_rule, str | DispatchingRule):
             dispatching_rule = dispatching_rule_factory(dispatching_rule)
@@ -29,12 +29,10 @@ class DispatchingRuleSolver(Solver):
             machine_chooser = machine_chooser_factory(machine_chooser)
         self.dispatching_rule = dispatching_rule
         self.machine_chooser = machine_chooser
-        self.filter_bad_choices = filter_bad_choices
+        self.dispatcher_kwargs = dispatcher_kwargs
 
     def solve(self, instance: JobShopInstance) -> Schedule:
-        dispatcher = Dispatcher(
-            instance, filter_bad_choices=self.filter_bad_choices
-        )
+        dispatcher = Dispatcher(instance, **self.dispatcher_kwargs)
         while not dispatcher.schedule.is_complete():
             self.step(dispatcher)
 
