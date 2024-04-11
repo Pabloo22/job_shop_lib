@@ -138,7 +138,7 @@ def create_gantt_chart_frames(
             input and return a `Figure` object.
         plot_current_time:
             Whether to plot a vertical line at the current time."""
-    dispatcher = Dispatcher(instance)
+    dispatcher = Dispatcher(instance, **solver.dispatcher_kwargs)
     schedule = dispatcher.schedule
     makespan = solver(instance).makespan()
     iteration = 0
