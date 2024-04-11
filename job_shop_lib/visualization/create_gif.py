@@ -1,13 +1,13 @@
 import os
 import pathlib
 import shutil
-from typing import Optional, Callable
+from typing import Callable
 
 import imageio
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from job_shop_lib import JobShopInstance, Dispatcher, Schedule
+from job_shop_lib import JobShopInstance, Dispatcher, Schedule, Operation
 from job_shop_lib.solvers import DispatchingRuleSolver
 from job_shop_lib.visualization.gantt_chart import plot_gantt_chart
 
@@ -17,7 +17,9 @@ def create_gif(
     gif_path: str,
     instance: JobShopInstance,
     solver: DispatchingRuleSolver,
-    plot_function: Optional[Callable[[Schedule, int], Figure]] = None,
+    plot_function: (
+        Callable[[Schedule, int, list[Operation] | None], Figure] | None
+    ) = None,
     fps: int = 1,
     remove_frames: bool = True,
     frames_dir: str | None = None,
@@ -66,8 +68,10 @@ def create_gif(
 
 
 def get_plot_function(
-    title: Optional[str] = None, cmap: str = "viridis"
-) -> Callable[[Schedule, int], Figure]:
+    title: str | None = None,
+    cmap: str = "viridis",
+    show_available_operations: bool = False,
+) -> Callable[[Schedule, int, list[Operation] | None], Figure]:
     """Returns a function that plots a Gantt chart for an unfinished schedule.
 
     Args:
@@ -80,9 +84,32 @@ def get_plot_function(
         returns a `Figure` object.
     """
 
-    def plot_function(schedule: Schedule, makespan: int) -> Figure:
-        fig, _ = plot_gantt_chart(
+    def plot_function(
+        schedule: Schedule,
+        makespan: int,
+        available_operations: list | None = None,
+    ) -> Figure:
+        fig, ax = plot_gantt_chart(
             schedule, title=title, cmap_name=cmap, xlim=makespan
+        )
+
+        if not show_available_operations or available_operations is None:
+            return fig
+
+        operations_text = "\n".join(
+            str(operation) for operation in available_operations
+        )
+        text = f"Available operations:\n{operations_text}"
+        # Print the available operations at the bottom right corner
+        # of the Gantt chart
+        fig.text(
+            1.25,
+            0.05,
+            text,
+            ha="right",
+            va="bottom",
+            transform=ax.transAxes,
+            bbox=dict(facecolor="white", alpha=0.5, boxstyle="round,pad=0.5"),
         )
         return fig
 
@@ -93,7 +120,7 @@ def create_gantt_chart_frames(
     frames_dir: str,
     instance: JobShopInstance,
     solver: DispatchingRuleSolver,
-    plot_function: Callable[[Schedule, int], Figure],
+    plot_function: Callable[[Schedule, int, list[Operation] | None], Figure],
     plot_current_time: bool = True,
 ) -> None:
     """Creates frames of the Gantt chart for the schedule being built.
@@ -119,7 +146,11 @@ def create_gantt_chart_frames(
     while not schedule.is_complete():
         solver.step(dispatcher)
         iteration += 1
-        fig = plot_function(schedule, makespan)
+        fig = plot_function(
+            schedule,
+            makespan,
+            dispatcher.available_operations(),
+        )
         current_time = (
             None if not plot_current_time else dispatcher.current_time()
         )
