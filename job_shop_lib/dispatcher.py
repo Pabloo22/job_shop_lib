@@ -1,5 +1,7 @@
 """Home of the Dispatcher class."""
 
+from collections import deque
+
 from job_shop_lib import (
     JobShopInstance,
     Schedule,
@@ -61,6 +63,38 @@ class Dispatcher:
         self.job_next_available_time = [0] * self.instance.num_jobs
         self.filter_bad_choices = filter_bad_choices
         self.focus_on_current_time_machine = focus_on_current_time_machine
+
+    def create_schedule_from_raw_solution(
+        self, raw_solution: list[list[Operation]]
+    ) -> Schedule:
+        """Creates a schedule from a raw solution.
+
+        A raw solution is a list of lists of operations, where each list
+        represents the order of operations for a machine.
+
+        Args:
+            instance:
+                The instance of the job shop problem to be solved.
+            raw_solution:
+                A list of lists of operations, where each list represents the
+                order of operations for a machine.
+
+        Returns:
+            A Schedule object representing the solution.
+        """
+        self.reset()
+        raw_solution_deques = [
+            deque(operations) for operations in raw_solution
+        ]
+        while not self.schedule.is_complete():
+            for machine_id, operations in enumerate(raw_solution_deques):
+                if not operations:
+                    continue
+                operation = operations[0]
+                if self.is_operation_ready(operation):
+                    self.dispatch(operation, machine_id)
+                    operations.popleft()
+        return self.schedule
 
     def reset(self) -> None:
         """Resets the dispatcher to its initial state."""
@@ -225,9 +259,6 @@ class Dispatcher:
             for machine_id in op.machines:
                 if working_machines[machine_id]:
                     optimized_operations.append(op)
-                    # Assumes adding to optimized if any machine is not a bad
-                    # choice, and breaks to avoid adding the same operation
-                    # multiple times.
                     break
 
         return optimized_operations

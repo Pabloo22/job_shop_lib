@@ -1,6 +1,6 @@
 import pytest
 
-from job_shop_lib import Dispatcher, JobShopInstance
+from job_shop_lib import Dispatcher, JobShopInstance, Operation
 from job_shop_lib.solvers import DispatchingRuleSolver, DispatchingRule
 from job_shop_lib.benchmarks import load_benchmark_instance
 
@@ -137,6 +137,34 @@ def test_uncompleted_operations(example_job_shop_instance: JobShopInstance):
     [rule for rule in DispatchingRule if rule in RULES_TO_TEST],
 )
 @pytest.mark.parametrize("instance", INSTANCES_TO_TEST)
+def test_create_schedule_from_raw_solution(
+    dispatching_rule: DispatchingRule,
+    instance: JobShopInstance,
+):
+    solver = DispatchingRuleSolver(dispatching_rule=dispatching_rule)
+    dispatcher = Dispatcher(
+        instance, **solver.dispatcher_kwargs
+    )
+    expected_schedule = solver(instance)
+
+    raw_solution: list[list[Operation]] = [
+        [] for _ in range(instance.num_machines)
+    ]
+    for machine_schedule in expected_schedule.schedule:
+        for scheduled_operation in machine_schedule:
+            raw_solution[scheduled_operation.machine_id].append(
+                scheduled_operation.operation
+            )
+
+    schedule = dispatcher.create_schedule_from_raw_solution(raw_solution)
+    assert schedule == expected_schedule
+
+
+@pytest.mark.parametrize(
+    "dispatching_rule",
+    [rule for rule in DispatchingRule if rule in RULES_TO_TEST],
+)
+@pytest.mark.parametrize("instance", INSTANCES_TO_TEST)
 def test_filter_bad_choices(
     dispatching_rule: DispatchingRule, instance: JobShopInstance
 ):
@@ -195,3 +223,9 @@ def test_filter_bad_choices(
         f"Instance: {instance.name}, "
         f"Dispatching rule: {dispatching_rule}"
     )
+
+
+if __name__ == "__main__":
+    # Run current file with the following command:
+    # python -m pytest tests/test_dispatcher.py
+    pytest.main(["-v", "tests/test_dispatcher.py"])
