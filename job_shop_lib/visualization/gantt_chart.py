@@ -63,7 +63,7 @@ def _plot_machine_schedules(
             )
             if scheduled_op.job_id not in legend_handles:
                 legend_handles[scheduled_op.job_id] = Patch(
-                    facecolor=color, label=f"Job {scheduled_op.job_id + 1}"
+                    facecolor=color, label=f"Job {scheduled_op.job_id}"
                 )
 
     return legend_handles
@@ -114,7 +114,7 @@ def _configure_axes(
             for i in range(num_machines)
         ]
     )
-    ax.set_yticklabels([str(i + 1) for i in range(num_machines)])
+    ax.set_yticklabels([str(i) for i in range(num_machines)])
     makespan = schedule.makespan()
     xlim = xlim if xlim is not None else makespan
     ax.set_xlim(0, xlim)
