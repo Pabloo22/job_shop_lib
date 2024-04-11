@@ -172,3 +172,9 @@ class Schedule:
                 Schedule._check_start_time(
                     scheduled_operation, scheduled_operations[i - 1]
                 )
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Schedule):
+            return False
+
+        return self.schedule == value.schedule

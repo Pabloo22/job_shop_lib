@@ -86,3 +86,12 @@ class ScheduledOperation:
             f"S-Op(operation={self.operation}, "
             f"start_time={self.start_time}, machine_id={self.machine_id})"
         )
+
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, ScheduledOperation):
+            return False
+        return (
+            self.operation is value.operation
+            and self.start_time == value.start_time
+            and self.machine_id == value.machine_id
+        )
