@@ -3,13 +3,14 @@ from enum import Enum
 from typing import Callable
 import random
 
-from job_shop_lib import Dispatcher, Operation
-from job_shop_lib.solvers import (
+from job_shop_lib import Operation
+from job_shop_lib.dispatching import (
     shortest_processing_time_rule,
     first_come_first_served_rule,
     most_work_remaining_rule,
     most_operations_remaining_rule,
     random_operation_rule,
+    Dispatcher,
 )
 
 # DispatchingRule = Callable[[Dispatcher], Operation]

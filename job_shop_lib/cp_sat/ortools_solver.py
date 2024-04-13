@@ -11,10 +11,10 @@ from job_shop_lib import (
     ScheduledOperation,
     Operation,
 )
-from job_shop_lib.solvers import NoSolutionFound
+from job_shop_lib import NoSolutionFound, BaseSolver
 
 
-class CPSolver:
+class ORToolsSolver(BaseSolver):
     """A solver for the job shop scheduling problem using constraint
     programming.
 
@@ -36,6 +36,8 @@ class CPSolver:
         self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
 
     def __call__(self, instance: JobShopInstance) -> Schedule:
+        # Re-defined here since we already add metadata to the schedule in
+        # the solve method.
         return self.solve(instance)
 
     def solve(self, instance: JobShopInstance) -> Schedule:
@@ -65,6 +67,7 @@ class CPSolver:
             "status": "optimal" if status == cp_model.OPTIMAL else "feasible",
             "elapsed_time": elapsed_time,
             "makespan": self.solver.Value(self.makespan),
+            "solved_by": "ORToolsSolver",
         }
         return self._create_schedule(instance, metadata)
 

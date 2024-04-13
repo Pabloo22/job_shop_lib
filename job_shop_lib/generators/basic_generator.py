@@ -6,7 +6,7 @@ from typing import Iterator
 from job_shop_lib import JobShopInstance, Operation
 
 
-class InstanceGenerator:  # pylint: disable=too-many-instance-attributes
+class BasicGenerator:  # pylint: disable=too-many-instance-attributes
     """Generates instances for job shop problems.
 
     This class is designed to be versatile, enabling the creation of various

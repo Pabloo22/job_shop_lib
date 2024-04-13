@@ -9,7 +9,8 @@ shortest processing time, first come first served, etc.
 from typing import Callable
 import random
 
-from job_shop_lib import Dispatcher, Operation
+from job_shop_lib import Operation
+from job_shop_lib.dispatching import Dispatcher
 
 
 def shortest_processing_time_rule(dispatcher: Dispatcher) -> Operation:

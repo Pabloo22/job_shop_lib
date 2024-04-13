@@ -7,8 +7,8 @@ import imageio
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from job_shop_lib import JobShopInstance, Dispatcher, Schedule, Operation
-from job_shop_lib.solvers import DispatchingRuleSolver
+from job_shop_lib import JobShopInstance, Schedule, Operation
+from job_shop_lib.dispatching import DispatchingRuleSolver, Dispatcher
 from job_shop_lib.visualization.gantt_chart import plot_gantt_chart
 
 

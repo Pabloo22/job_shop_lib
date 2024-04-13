@@ -1,8 +1,12 @@
 import pytest
 
-from job_shop_lib import Dispatcher, JobShopInstance, Operation
-from job_shop_lib.solvers import DispatchingRuleSolver, DispatchingRule
-from job_shop_lib.benchmarks import load_benchmark_instance
+from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib.dispatching import (
+    DispatchingRuleSolver,
+    DispatchingRule,
+    Dispatcher,
+)
+from job_shop_lib.benchmarking import load_benchmark_instance
 
 
 RULES_TO_TEST = [
@@ -142,9 +146,7 @@ def test_create_schedule_from_raw_solution(
     instance: JobShopInstance,
 ):
     solver = DispatchingRuleSolver(dispatching_rule=dispatching_rule)
-    dispatcher = Dispatcher(
-        instance, **solver.dispatcher_kwargs
-    )
+    dispatcher = Dispatcher(instance, **solver.dispatcher_kwargs)
     expected_schedule = solver(instance)
 
     raw_solution: list[list[Operation]] = [
@@ -228,4 +230,4 @@ def test_filter_bad_choices(
 if __name__ == "__main__":
     # Run current file with the following command:
     # python -m pytest tests/test_dispatcher.py
-    pytest.main(["-v", "tests/test_dispatcher.py"])
+    pytest.main(["-v", "tests/dispatching/test_dispatcher.py"])

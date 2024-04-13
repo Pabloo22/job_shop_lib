@@ -1,10 +1,11 @@
 import pytest
 
-from job_shop_lib.solvers import CPSolver, NoSolutionFound
+from job_shop_lib import NoSolutionFound
+from job_shop_lib.cp_sat import ORToolsSolver
 
 
 def test_solve(example_job_shop_instance):
-    solver = CPSolver()
+    solver = ORToolsSolver()
     schedule = solver.solve(example_job_shop_instance)
     assert schedule.makespan() == schedule.metadata["makespan"]
     assert schedule.metadata["makespan"] == 11
@@ -13,7 +14,7 @@ def test_solve(example_job_shop_instance):
 
 
 def test_solve_with_time_limit(example_job_shop_instance):
-    solver = CPSolver(max_time_in_seconds=0.000000001)
+    solver = ORToolsSolver(max_time_in_seconds=0.000000001)
 
     with pytest.raises(NoSolutionFound):
         solver(example_job_shop_instance)

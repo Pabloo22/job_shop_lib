@@ -35,12 +35,16 @@ class Dispatcher:
             sub-optimal if there is another operation that could be scheduled
             in the same machine that would finish before the start time of
             the sub-optimal operation.
+        focus_on_current_time_machine:
+            If True, the dispatcher will focus on the machine that is currently
+            processing an operation. This is useful for dispatching operations
+            in a way that is more similar to the way humans would do it.
     """
 
     def __init__(
         self,
         instance: JobShopInstance,
-        filter_bad_choices: bool = True,
+        filter_dominated_operations: bool = True,
         focus_on_current_time_machine: bool = False,
     ) -> None:
         """Initializes the object with the given instance.
@@ -58,11 +62,27 @@ class Dispatcher:
 
         self.instance = instance
         self.schedule = Schedule(self.instance)
-        self.machine_next_available_time = [0] * self.instance.num_machines
-        self.job_next_operation_index = [0] * self.instance.num_jobs
-        self.job_next_available_time = [0] * self.instance.num_jobs
-        self.filter_bad_choices = filter_bad_choices
+        self._machine_next_available_time = [0] * self.instance.num_machines
+        self._job_next_operation_index = [0] * self.instance.num_jobs
+        self._job_next_available_time = [0] * self.instance.num_jobs
+        self.filter_dominated_operations = filter_dominated_operations
         self.focus_on_current_time_machine = focus_on_current_time_machine
+
+    @property
+    def machine_next_available_time(self) -> list[int]:
+        """Returns the next available time for each machine."""
+        return self._machine_next_available_time
+
+    @property
+    def job_next_operation_index(self) -> list[int]:
+        """Returns the index of the next operation to be scheduled for each
+        job."""
+        return self._job_next_operation_index
+
+    @property
+    def job_next_available_time(self) -> list[int]:
+        """Returns the next available time for each job."""
+        return self._job_next_available_time
 
     def create_schedule_from_raw_solution(
         self, raw_solution: list[list[Operation]]
@@ -99,9 +119,9 @@ class Dispatcher:
     def reset(self) -> None:
         """Resets the dispatcher to its initial state."""
         self.schedule.reset()
-        self.machine_next_available_time = [0] * self.instance.num_machines
-        self.job_next_operation_index = [0] * self.instance.num_jobs
-        self.job_next_available_time = [0] * self.instance.num_jobs
+        self._machine_next_available_time = [0] * self.instance.num_machines
+        self._job_next_operation_index = [0] * self.instance.num_jobs
+        self._job_next_available_time = [0] * self.instance.num_jobs
 
     def dispatch(self, operation: Operation, machine_id: int) -> None:
         """Schedules the given operation on the given machine.
@@ -124,7 +144,7 @@ class Dispatcher:
         if not self.is_operation_ready(operation):
             raise ValueError("Operation is not ready to be scheduled.")
 
-        start_time = self.compute_start_time(operation, machine_id)
+        start_time = self.start_time(operation, machine_id)
 
         scheduled_operation = ScheduledOperation(
             operation, start_time, machine_id
@@ -147,7 +167,7 @@ class Dispatcher:
             == operation.position_in_job
         )
 
-    def compute_start_time(self, operation: Operation, machine_id: int) -> int:
+    def start_time(self, operation: Operation, machine_id: int) -> int:
         """Computes the start time for the given operation on the given
         machine.
 
@@ -188,6 +208,17 @@ class Dispatcher:
         available_operations = self.available_operations()
         return self._min_start_time(available_operations)
 
+    def _min_start_time(self, available_operations: list[Operation]) -> int:
+        """Returns the minimum start time of the available operations."""
+        if not available_operations:
+            return self.schedule.makespan()
+        min_start_time = float("inf")
+        for op in available_operations:
+            for machine_id in op.machines:
+                start_time = self.start_time(op, machine_id)
+                min_start_time = min(min_start_time, start_time)
+        return int(min_start_time)
+
     def available_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing, optionally
         filtering out operations known to be bad choices.
@@ -212,8 +243,8 @@ class Dispatcher:
             available_operations = self._focus_on_current_time_machine(
                 available_operations
             )
-        if self.filter_bad_choices:
-            available_operations = self._filter_clearly_suboptimal_choices(
+        if self.filter_dominated_operations:
+            available_operations = self._filter_dominated_operations(
                 available_operations
             )
         return available_operations
@@ -227,10 +258,10 @@ class Dispatcher:
             available_operations.append(operation)
         return available_operations
 
-    def _filter_clearly_suboptimal_choices(
+    def _filter_dominated_operations(
         self, available_operations: list[Operation]
     ) -> list[Operation]:
-        end_times_per_machine = self._compute_end_times_per_machine(
+        end_times_per_machine = self._end_times_per_machine(
             available_operations
         )
 
@@ -239,7 +270,7 @@ class Dispatcher:
             if op.duration == 0:
                 return [op]
             for machine_id in op.machines:
-                start_time = self.compute_start_time(op, machine_id)
+                start_time = self.start_time(op, machine_id)
                 is_bad_choice = start_time >= end_times_per_machine[machine_id]
                 if not is_bad_choice:
                     optimized_operations.append(op)
@@ -263,13 +294,13 @@ class Dispatcher:
 
         return optimized_operations
 
-    def _compute_end_times_per_machine(
+    def _end_times_per_machine(
         self, available_operations: list[Operation]
     ) -> list[int | float]:
         end_times_per_machine = [float("inf")] * self.instance.num_machines
         for op in available_operations:
             for machine_id in op.machines:
-                start_time = self.compute_start_time(op, machine_id)
+                start_time = self.start_time(op, machine_id)
                 end_times_per_machine[machine_id] = min(
                     end_times_per_machine[machine_id], start_time + op.duration
                 )
@@ -286,20 +317,9 @@ class Dispatcher:
         current_time = self._min_start_time(available_operations)
         for op in available_operations:
             for machine_id in op.machines:
-                if self.compute_start_time(op, machine_id) == current_time:
+                if self.start_time(op, machine_id) == current_time:
                     working_machines[machine_id] = True
         return working_machines
-
-    def _min_start_time(self, available_operations: list[Operation]) -> int:
-        """Returns the minimum start time of the available operations."""
-        if not available_operations:
-            return self.schedule.makespan()
-        min_start_time = float("inf")
-        for op in available_operations:
-            for machine_id in op.machines:
-                start_time = self.compute_start_time(op, machine_id)
-                min_start_time = min(min_start_time, start_time)
-        return int(min_start_time)
 
     def uncompleted_operations(self) -> list[Operation]:
         """Returns the list of operations that have not been scheduled.

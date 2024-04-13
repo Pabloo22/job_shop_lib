@@ -1,15 +1,16 @@
 from typing import Callable
 
-from job_shop_lib import JobShopInstance, Dispatcher, Schedule, Operation
-from job_shop_lib.solvers import (
+from job_shop_lib import JobShopInstance, Schedule, Operation, BaseSolver
+from job_shop_lib.dispatching import (
     dispatching_rule_factory,
     machine_chooser_factory,
     DispatchingRule,
     MachineChooser,
+    Dispatcher,
 )
 
 
-class DispatchingRuleSolver:
+class DispatchingRuleSolver(BaseSolver):
     """Solves a job shop instance using a dispatching rule algorithm."""
 
     def __init__(
@@ -29,9 +30,6 @@ class DispatchingRuleSolver:
         self.dispatching_rule = dispatching_rule
         self.machine_chooser = machine_chooser
         self.dispatcher_kwargs = dispatcher_kwargs
-
-    def __call__(self, instance: JobShopInstance) -> Schedule:
-        return self.solve(instance)
 
     def solve(self, instance: JobShopInstance) -> Schedule:
         """Returns a schedule for the given job shop instance using the
@@ -57,7 +55,7 @@ class DispatchingRuleSolver:
 
 if __name__ == "__main__":
     import cProfile
-    from job_shop_lib.benchmarks import load_benchmark_instance
+    from job_shop_lib.benchmarking import load_benchmark_instance
 
     ta_instances = []
     for i in range(1, 81):

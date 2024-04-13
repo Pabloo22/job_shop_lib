@@ -134,7 +134,8 @@ def load_benchmark_json() -> dict[str, dict[str, Any]]:
         The dictionary containing the benchmark instances.
     """
     benchmark_file = (
-        resources.files("job_shop_lib.benchmarks") / "benchmark_instances.json"
+        resources.files("job_shop_lib.benchmarking")
+        / "benchmark_instances.json"
     )
 
     with benchmark_file.open("r", encoding="utf-8") as f:

@@ -1,10 +1,10 @@
 import pytest
-from job_shop_lib import InstanceGenerator
+from job_shop_lib.generators import BasicGenerator
 
 
 def test_generate():
     """Test generation of job shop instances"""
-    generator = InstanceGenerator(
+    generator = BasicGenerator(
         duration_range=(5, 10), seed=42, num_jobs=5, num_machines=5
     )
     instance = generator.generate()
@@ -20,13 +20,13 @@ def test_generate():
 
 @pytest.mark.parametrize("limit", [1, 5, 10, 20])
 def test_iteration_limit(limit):
-    generator = InstanceGenerator(iteration_limit=limit, seed=42)
+    generator = BasicGenerator(iteration_limit=limit, seed=42)
     instances = list(generator)
     assert len(instances) == limit
 
 
 def test_different_names():
-    generator = InstanceGenerator()
+    generator = BasicGenerator()
     instance1 = generator.generate()
     instance2 = generator.generate()
     assert instance1.name != instance2.name
@@ -35,7 +35,7 @@ def test_different_names():
 
 
 def test_machines_per_operation():
-    generator = InstanceGenerator(machines_per_operation=(2, 3), seed=42)
+    generator = BasicGenerator(machines_per_operation=(2, 3), seed=42)
 
     instance = generator.generate()
     for job in instance.jobs:

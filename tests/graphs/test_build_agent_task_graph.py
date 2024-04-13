@@ -4,7 +4,7 @@ from job_shop_lib.graphs.build_agent_task_graph import (
     build_agent_task_graph,
 )
 from job_shop_lib import JobShopInstance
-from job_shop_lib.benchmarks import load_all_benchmark_instances
+from job_shop_lib.benchmarking import load_all_benchmark_instances
 
 
 def test_expected_num_nodes_complete():
