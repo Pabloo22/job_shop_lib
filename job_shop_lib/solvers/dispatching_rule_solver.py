@@ -2,7 +2,6 @@ from typing import Callable
 
 from job_shop_lib import JobShopInstance, Dispatcher, Schedule, Operation
 from job_shop_lib.solvers import (
-    Solver,
     dispatching_rule_factory,
     machine_chooser_factory,
     DispatchingRule,
@@ -10,7 +9,7 @@ from job_shop_lib.solvers import (
 )
 
 
-class DispatchingRuleSolver(Solver):
+class DispatchingRuleSolver:
     """Solves a job shop instance using a dispatching rule algorithm."""
 
     def __init__(
@@ -31,7 +30,12 @@ class DispatchingRuleSolver(Solver):
         self.machine_chooser = machine_chooser
         self.dispatcher_kwargs = dispatcher_kwargs
 
+    def __call__(self, instance: JobShopInstance) -> Schedule:
+        return self.solve(instance)
+
     def solve(self, instance: JobShopInstance) -> Schedule:
+        """Returns a schedule for the given job shop instance using the
+        dispatching rule algorithm."""
         dispatcher = Dispatcher(instance, **self.dispatcher_kwargs)
         while not dispatcher.schedule.is_complete():
             self.step(dispatcher)

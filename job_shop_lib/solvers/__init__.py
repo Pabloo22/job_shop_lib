@@ -1,5 +1,5 @@
-from job_shop_lib.solvers.exceptions import NoSolutionFound
 from job_shop_lib.solvers.solver import Solver
+from job_shop_lib.solvers.exceptions import NoSolutionFound
 from job_shop_lib.solvers.cp_solver import CPSolver
 from job_shop_lib.solvers.dispatching_rules import (
     shortest_processing_time_rule,

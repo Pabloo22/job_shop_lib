@@ -11,10 +11,10 @@ from job_shop_lib import (
     ScheduledOperation,
     Operation,
 )
-from job_shop_lib.solvers import NoSolutionFound, Solver
+from job_shop_lib.solvers import NoSolutionFound
 
 
-class CPSolver(Solver):
+class CPSolver:
     """A solver for the job shop scheduling problem using constraint
     programming.
 
@@ -34,6 +34,9 @@ class CPSolver(Solver):
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
+
+    def __call__(self, instance: JobShopInstance) -> Schedule:
+        return self.solve(instance)
 
     def solve(self, instance: JobShopInstance) -> Schedule:
         """Creates the variables, constraints and objective, and solves the
