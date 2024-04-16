@@ -1,3 +1,9 @@
+"""Contains functions to prune (filter) operations.
+
+This functions are used by the `Dispatcher` class to reduce the
+amount of available operations to choose from.
+"""
+
 from job_shop_lib import Operation
 from job_shop_lib.dispatching import Dispatcher
 
@@ -6,7 +12,7 @@ def prune_dominated_operations(
     dispatcher: Dispatcher, operations: list[Operation]
 ) -> list[Operation]:
     """Filters out all the operations that are dominated.
-    
+
     An operation is dominated if there is another operation that ends before
     it starts on the same machine.
     """
