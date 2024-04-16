@@ -354,8 +354,8 @@ class Dispatcher:
         self,
         pruning_strategies: list[PruningMethod | str],
     ) -> Callable[[list[Operation]], list[Operation]]:
-        """Creates and returns a composite pruning strategy function based on the
-        specified list of pruning strategies.
+        """Creates and returns a composite pruning strategy function based on
+        the specified list of pruning strategies.
 
         The composite pruning strategy function filters out operations based on
         the specified list of pruning strategies.
@@ -367,8 +367,8 @@ class Dispatcher:
 
         Returns:
             A function that takes a Dispatcher instance and a list of Operation
-            instances as input and returns a list of Operation instances based on
-            the specified list of pruning strategies.
+            instances as input and returns a list of Operation instances based
+            on the specified list of pruning strategies.
 
         Raises:
             ValueError: If any of the pruning strategies in the list are not
