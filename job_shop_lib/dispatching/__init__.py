@@ -1,14 +1,4 @@
-from job_shop_lib.dispatching.pruning_strategies import (
-    prune_dominated_operations,
-    prune_non_immediate_machines,
-)
-
-from job_shop_lib.dispatching.pruning_strategies_factories import (
-    PruningStrategy,
-    pruning_strategy_factory,
-    create_composite_pruning_strategy,
-)
-from job_shop_lib.dispatching.dispatcher import Dispatcher
+from job_shop_lib.dispatching.dispatcher import Dispatcher, PruningMethod
 from job_shop_lib.dispatching.dispatching_rules import (
     shortest_processing_time_rule,
     first_come_first_served_rule,
@@ -39,9 +29,5 @@ __all__ = [
     "MachineChooser",
     "Dispatcher",
     "DispatchingRuleSolver",
-    "PruningStrategy",
-    "prune_dominated_operations",
-    "prune_non_immediate_machines",
-    "pruning_strategy_factory",
-    "create_composite_pruning_strategy",
+    "PruningMethod",
 ]
