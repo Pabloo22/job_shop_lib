@@ -146,7 +146,6 @@ def test_create_schedule_from_raw_solution(
     instance: JobShopInstance,
 ):
     solver = DispatchingRuleSolver(dispatching_rule=dispatching_rule)
-    dispatcher = Dispatcher(instance, **solver.dispatcher_kwargs)
     expected_schedule = solver(instance)
 
     raw_solution: list[list[Operation]] = [
@@ -158,7 +157,9 @@ def test_create_schedule_from_raw_solution(
                 scheduled_operation.operation
             )
 
-    schedule = dispatcher.create_schedule_from_raw_solution(raw_solution)
+    schedule = Dispatcher.create_schedule_from_raw_solution(
+        instance, raw_solution
+    )
     assert schedule == expected_schedule
 
 
@@ -209,10 +210,10 @@ def test_filter_bad_choices(
     You can see the plots of the schedules in the `examples` folder.
     """
     optimized_solver = DispatchingRuleSolver(
-        dispatching_rule=dispatching_rule, filter_bad_choices=True
+        dispatching_rule=dispatching_rule
     )
     non_optimized_solver = DispatchingRuleSolver(
-        dispatching_rule=dispatching_rule, filter_bad_choices=False
+        dispatching_rule=dispatching_rule, pruning_methods=[]
     )
 
     optimized_schedule = optimized_solver.solve(instance)

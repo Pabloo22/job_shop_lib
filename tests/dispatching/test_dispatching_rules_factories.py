@@ -1,6 +1,6 @@
 import pytest
 
-from job_shop_lib.solvers import (
+from job_shop_lib.dispatching import (
     dispatching_rule_factory,
     shortest_processing_time_rule,
     first_come_first_served_rule,
