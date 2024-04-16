@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "job-shop-lib"
 version = "0.1.0"
-description = "A framework to model and solve the Job Shop Scheduling Problem with a special focus on graph representations."
+description = "An easy-to-use and modular Python library for the Job Shop Scheduling Problem (JSSP)"
 authors = ["Pabloo22 <pablete.arino@gmail.com>"]
 license = "MIT"
 readme = "README.md"
@@ -16,9 +16,6 @@ pyarrow = "^15.0.0"  # An optional pandas' dependency that will be required in t
 networkx = "^3.2.1"
 imageio = "^2.34.0"
 pygraphviz = {version = "^1.12", optional = true}
-torch = {version = "^2.2.1", optional = true}
-stable-baselines3 = {version = "^2.2.1", optional = true}
-torch-geometric = {version = "^2.5.1", optional = true}
 
 [tool.poetry.group.test]
 optional = true
@@ -46,7 +43,6 @@ pandas = "^2.2.1"
 
 [tool.poetry.extras]
 pygraphviz = ["pygraphviz"]
-rl_environment = ["torch", "stable-baselines3", "torch-geometric"]
 
 [build-system]
 requires = ["poetry-core"]
