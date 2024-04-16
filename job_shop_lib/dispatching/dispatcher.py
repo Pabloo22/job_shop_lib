@@ -8,6 +8,10 @@ from job_shop_lib import (
     ScheduledOperation,
     Operation,
 )
+from job_shop_lib.dispatching import (
+    PruningStrategy,
+    create_composite_pruning_strategy,
+)
 
 
 class Dispatcher:
@@ -29,35 +33,27 @@ class Dispatcher:
             The index of the next operation to be scheduled for each job.
         job_next_available_time:
             The next available time for each job.
-        filter_bad_choices:
-            If True, the dispatcher will filter out operations that are
-            sub-optimal choices from the available operations. An operation is
-            sub-optimal if there is another operation that could be scheduled
-            in the same machine that would finish before the start time of
-            the sub-optimal operation.
-        focus_on_current_time_machine:
-            If True, the dispatcher will focus on the machine that is currently
-            processing an operation. This is useful for dispatching operations
-            in a way that is more similar to the way humans would do it.
+        pruning_strategy:
+            The strategy to be used to filter out operations from the list of
+            available operations.
     """
 
     def __init__(
         self,
         instance: JobShopInstance,
-        filter_dominated_operations: bool = True,
-        focus_on_current_time_machine: bool = False,
+        pruning_strategies: list[str] | None = None,
     ) -> None:
         """Initializes the object with the given instance.
 
         Args:
             instance:
                 The instance of the job shop problem to be solved.
-            filter_bad_choices:
-                If True, the dispatcher will filter out operations that are
-                sub-optimal choices from the available operations. An operation
-                is sub-optimal if there is another operation that could be
-                scheduled in the same machine that would finish before the
-                start time of the sub-optimal operation.
+            pruning_strategies:
+                A list of pruning strategies to be used to filter out
+                operations from the list of available operations. Supported
+                values are 'dominated_operations' and 'non_immediate_machines'.
+                Defaults to [PruningStrategy.DOMINATED_OPERATIONS]. To disable
+                pruning, pass an empty list.
         """
 
         self.instance = instance
@@ -65,8 +61,13 @@ class Dispatcher:
         self._machine_next_available_time = [0] * self.instance.num_machines
         self._job_next_operation_index = [0] * self.instance.num_jobs
         self._job_next_available_time = [0] * self.instance.num_jobs
-        self.filter_dominated_operations = filter_dominated_operations
-        self.focus_on_current_time_machine = focus_on_current_time_machine
+
+        if pruning_strategies is None:
+            pruning_strategies = [PruningStrategy.DOMINATED_OPERATIONS]
+
+        self.pruning_strategy = create_composite_pruning_strategy(
+            pruning_strategies
+        )
 
     @property
     def machine_next_available_time(self) -> list[int]:
@@ -206,9 +207,9 @@ class Dispatcher:
         operations.
         """
         available_operations = self.available_operations()
-        return self._min_start_time(available_operations)
+        return self.min_start_time(available_operations)
 
-    def _min_start_time(self, available_operations: list[Operation]) -> int:
+    def min_start_time(self, available_operations: list[Operation]) -> int:
         """Returns the minimum start time of the available operations."""
         if not available_operations:
             return self.schedule.makespan()
@@ -239,14 +240,9 @@ class Dispatcher:
                 available operations can be scheduled in more than one machine.
         """
         available_operations = self._available_operations()
-        if self.focus_on_current_time_machine:
-            available_operations = self._focus_on_current_time_machine(
-                available_operations
-            )
-        if self.filter_dominated_operations:
-            available_operations = self._filter_dominated_operations(
-                available_operations
-            )
+        available_operations = self.pruning_strategy(
+            self, available_operations
+        )
         return available_operations
 
     def _available_operations(self) -> list[Operation]:
@@ -257,42 +253,6 @@ class Dispatcher:
             operation = self.instance.jobs[job_id][next_position]
             available_operations.append(operation)
         return available_operations
-
-    def _filter_dominated_operations(
-        self, available_operations: list[Operation]
-    ) -> list[Operation]:
-        end_times_per_machine = self._end_times_per_machine(
-            available_operations
-        )
-
-        optimized_operations: list[Operation] = []
-        for op in available_operations:
-            if op.duration == 0:
-                return [op]
-            for machine_id in op.machines:
-                start_time = self.start_time(op, machine_id)
-                is_bad_choice = start_time >= end_times_per_machine[machine_id]
-                if not is_bad_choice:
-                    optimized_operations.append(op)
-                    # Assumes adding to optimized if any machine is not a bad
-                    # choice, and breaks to avoid adding the same operation
-                    # multiple times.
-                    break
-
-        return optimized_operations
-
-    def _focus_on_current_time_machine(
-        self, available_operations: list[Operation]
-    ) -> list[Operation]:
-        working_machines = self._working_machines(available_operations)
-        optimized_operations: list[Operation] = []
-        for op in available_operations:
-            for machine_id in op.machines:
-                if working_machines[machine_id]:
-                    optimized_operations.append(op)
-                    break
-
-        return optimized_operations
 
     def _end_times_per_machine(
         self, available_operations: list[Operation]
@@ -305,21 +265,6 @@ class Dispatcher:
                     end_times_per_machine[machine_id], start_time + op.duration
                 )
         return end_times_per_machine
-
-    def _working_machines(
-        self, available_operations: list[Operation]
-    ) -> list[bool]:
-        """Returns the machine ids of the machines that have at least one
-        operation with the lowest start time (i.e. the start time)."""
-        working_machines = [False] * self.instance.num_machines
-        # We can't use the current_time directly because it will cause
-        # an infinite loop.
-        current_time = self._min_start_time(available_operations)
-        for op in available_operations:
-            for machine_id in op.machines:
-                if self.start_time(op, machine_id) == current_time:
-                    working_machines[machine_id] = True
-        return working_machines
 
     def uncompleted_operations(self) -> list[Operation]:
         """Returns the list of operations that have not been scheduled.
