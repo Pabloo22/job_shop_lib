@@ -85,8 +85,9 @@ class Dispatcher:
         """Returns the next available time for each job."""
         return self._job_next_available_time
 
+    @classmethod
     def create_schedule_from_raw_solution(
-        self, raw_solution: list[list[Operation]]
+        cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
     ) -> Schedule:
         """Creates a schedule from a raw solution.
 
@@ -103,19 +104,20 @@ class Dispatcher:
         Returns:
             A Schedule object representing the solution.
         """
-        self.reset()
+        dispatcher = cls(instance, pruning_strategies=[])
+        dispatcher.reset()
         raw_solution_deques = [
             deque(operations) for operations in raw_solution
         ]
-        while not self.schedule.is_complete():
+        while not dispatcher.schedule.is_complete():
             for machine_id, operations in enumerate(raw_solution_deques):
                 if not operations:
                     continue
                 operation = operations[0]
-                if self.is_operation_ready(operation):
-                    self.dispatch(operation, machine_id)
+                if dispatcher.is_operation_ready(operation):
+                    dispatcher.dispatch(operation, machine_id)
                     operations.popleft()
-        return self.schedule
+        return dispatcher.schedule
 
     def reset(self) -> None:
         """Resets the dispatcher to its initial state."""
