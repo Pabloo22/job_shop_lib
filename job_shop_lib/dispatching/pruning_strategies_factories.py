@@ -20,6 +20,46 @@ class PruningStrategy(str, Enum):
     NON_IMMEDIATE_MACHINES = "non_immediate_machines"
 
 
+def create_composite_pruning_strategy(
+    pruning_strategies: list[PruningStrategy | str],
+) -> Callable[[Dispatcher, list[Operation]], list[Operation]]:
+    """Creates and returns a composite pruning strategy function based on the
+    specified list of pruning strategies.
+
+    The composite pruning strategy function filters out operations based on
+    the specified list of pruning strategies.
+
+    Args:
+        pruning_strategies:
+            A list of pruning strategies to be used. Supported values are
+            'dominated_operations' and 'non_immediate_machines'.
+
+    Returns:
+        A function that takes a Dispatcher instance and a list of Operation
+        instances as input and returns a list of Operation instances based on
+        the specified list of pruning strategies.
+
+    Raises:
+        ValueError: If any of the pruning strategies in the list are not
+            recognized or are not supported.
+    """
+    pruning_strategy_functions = [
+        pruning_strategy_factory(pruning_strategy)
+        for pruning_strategy in pruning_strategies
+    ]
+
+    def composite_pruning_strategy(
+        dispatcher: Dispatcher, operations: list[Operation]
+    ) -> list[Operation]:
+        pruned_operations = operations
+        for pruning_strategy in pruning_strategy_functions:
+            pruned_operations = pruning_strategy(dispatcher, pruned_operations)
+
+        return pruned_operations
+
+    return composite_pruning_strategy
+
+
 def pruning_strategy_factory(
     pruning_strategy: str | PruningStrategy,
 ) -> Callable[[Dispatcher, list[Operation]], list[Operation]]:

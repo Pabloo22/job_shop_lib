@@ -6,6 +6,7 @@ from job_shop_lib.dispatching.pruning_strategies import (
 from job_shop_lib.dispatching.pruning_strategies_factories import (
     PruningStrategy,
     pruning_strategy_factory,
+    create_composite_pruning_strategy,
 )
 from job_shop_lib.dispatching.dispatcher import Dispatcher
 from job_shop_lib.dispatching.dispatching_rules import (
@@ -42,4 +43,5 @@ __all__ = [
     "prune_dominated_operations",
     "prune_non_immediate_machines",
     "pruning_strategy_factory",
+    "create_composite_pruning_strategy",
 ]
