@@ -1,6 +1,6 @@
 import pytest
 
-from job_shop_lib import NoSolutionFound
+from job_shop_lib import NoSolutionFoundError
 from job_shop_lib.cp_sat import ORToolsSolver
 
 
@@ -16,5 +16,5 @@ def test_solve(example_job_shop_instance):
 def test_solve_with_time_limit(example_job_shop_instance):
     solver = ORToolsSolver(max_time_in_seconds=0.000000001)
 
-    with pytest.raises(NoSolutionFound):
+    with pytest.raises(NoSolutionFoundError):
         solver(example_job_shop_instance)

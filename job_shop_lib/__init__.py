@@ -3,7 +3,7 @@ from job_shop_lib.job_shop_instance import JobShopInstance
 from job_shop_lib.scheduled_operation import ScheduledOperation
 from job_shop_lib.schedule import Schedule
 from job_shop_lib.base_solver import BaseSolver, Solver
-from job_shop_lib.exceptions import JobShopLibError, NoSolutionFound
+from job_shop_lib.exceptions import JobShopLibError, NoSolutionFoundError
 
 __all__ = [
     "Operation",
@@ -13,5 +13,5 @@ __all__ = [
     "Solver",
     "BaseSolver",
     "JobShopLibError",
-    "NoSolutionFound",
+    "NoSolutionFoundError",
 ]

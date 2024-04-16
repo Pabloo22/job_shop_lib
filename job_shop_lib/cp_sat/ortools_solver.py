@@ -11,7 +11,7 @@ from job_shop_lib import (
     ScheduledOperation,
     Operation,
 )
-from job_shop_lib import NoSolutionFound, BaseSolver
+from job_shop_lib import NoSolutionFoundError, BaseSolver
 
 
 class ORToolsSolver(BaseSolver):
@@ -55,7 +55,7 @@ class ORToolsSolver(BaseSolver):
         elapsed_time = time.perf_counter() - start_time
 
         if status not in {cp_model.OPTIMAL, cp_model.FEASIBLE}:
-            raise NoSolutionFound(
+            raise NoSolutionFoundError(
                 f"No solution could be found for the given problem. "
                 f"Elapsed time: {elapsed_time} seconds."
             )

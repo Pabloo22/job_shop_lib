@@ -13,7 +13,7 @@ class JobShopLibError(Exception):
     """
 
 
-class NoSolutionFound(JobShopLibError):
+class NoSolutionFoundError(JobShopLibError):
     """Exception raised when no solution is found by a solver.
 
     This exception is raised by a solver when it is unable to find a
