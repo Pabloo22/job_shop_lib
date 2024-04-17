@@ -26,13 +26,10 @@ You can create a Job Shop Instance by defining the jobs and operations. An opera
 ```python
 from job_shop_lib import JobShopInstance, Operation
 
-CPU = 0
-GPU = 1
-DATA_CENTER = 2
 
-job_1 = [Operation(CPU, 1), Operation(GPU, 1), Operation(DATA_CENTER, 7)]
-job_2 = [Operation(GPU, 5), Operation(DATA_CENTER, 1), Operation(CPU, 1)]
-job_3 = [Operation(DATA_CENTER, 1), Operation(CPU, 3), Operation(GPU, 2)]
+job_1 = [Operation(machines=0, duration=1), Operation(1, 1), Operation(2, 7)]
+job_2 = [Operation(1, 5), Operation(2, 1), Operation(0, 1)]
+job_3 = [Operation(2, 1), Operation(0, 3), Operation(1, 2)]
 
 jobs = [job_1, job_2, job_3]
 
@@ -50,7 +47,7 @@ instance = JobShopInstance(
 You can load a benchmark instance from the library:
 
 ```python
-from job_shop_lib.benchmarks import load_benchmark_instance
+from job_shop_lib.benchmarking import load_benchmark_instance
 
 ft06 = load_benchmark_instance("ft06")
 ```
@@ -108,7 +105,9 @@ It includes the following information:
 You can also generate a random instance with the `InstanceGenerator` class.
 
 ```python
-generator = InstanceGenerator(
+from job_shop_lib.generators import BasicGenerator
+
+generator = BasicGenerator(
     duration_range=(5, 10), seed=42, num_jobs=5, num_machines=5
 )
 random_instance = generator.generate()
@@ -133,10 +132,10 @@ Every solver is a `Callable` that receives a `JobShopInstance` and returns a `Sc
 ```python
 import matplotlib.pyplot as plt
 
-from job_shop_lib.solvers import CPSolver
+from job_shop_lib.cp_sat import ORToolsSolver
 from job_shop_lib.visualization import plot_gantt_chart
 
-solver = CPSolver(max_time_in_seconds=10)
+solver = ORToolsSolver(max_time_in_seconds=10)
 ft06_schedule = solver(ft06)
 
 fig, ax = plot_gantt_chart(ft06_schedule)
@@ -197,11 +196,9 @@ The disjunctive graph is created by first adding nodes representing each operati
 Additionally, the graph includes **disjunctive edges** between operations that use the same machine but belong to different jobs. These edges are bidirectional, indicating that either of the connected operations can be performed first. The disjunctive edges thus represent the scheduling choices available: the order in which operations sharing a machine can be processed. Solving the Job Shop Scheduling problem involves choosing a direction for each disjunctive edge such that the overall processing time is minimized.
 
 ```python
-from job_shop_lib.graphs import build_disjunctive_graph
 from job_shop_lib.visualization import plot_disjunctive_graph
 
-disjunctive_graph = build_disjunctive_graph(instance)
-fig = plot_disjunctive_graph(disjunctive_graph)
+fig = plot_disjunctive_graph(instance)
 plt.show()
 ```
 
@@ -211,7 +208,11 @@ plt.show()
 The `JobShopGraph` class provides easy access to the nodes, for example, to get all the nodes of a specific type:
 
 ```python
- >>> graph.nodes_by_type
+from job_shop_lib.graphs import build_disjunctive_graph
+
+disjunctive_graph = build_disjunctive_graph(instance)
+
+ >>> disjunctive_graph.nodes_by_type
  defaultdict(list,
             {<NodeType.OPERATION: 1>: [Node(node_type=OPERATION, value=O(m=0, d=1, j=0, p=0), id=0),
               Node(node_type=OPERATION, value=O(m=1, d=1, j=0, p=1), id=1),
@@ -256,7 +257,7 @@ fig = plot_agent_task_graph(complete_agent_task_graph)
 plt.show()
 ```
 
-![Example Agent-Task Graph](images/agent_task_graph.png)
+![Example Agent-Task Graph](examples/agent_task_graph.png)
 
 For more details, check the [examples](examples) folder.
 
