@@ -15,9 +15,19 @@
 
 An easy-to-use and modular Python library for the Job Shop Scheduling Problem (JSSP) with a special focus on graph representations.
 
-It provides intuitive data structures to represent instances and solutions, as well as solvers and visualization tools:
+It provides intuitive data structures to represent instances and solutions, as well as solvers and visualization tools.
 
-## Quick Start
+See the [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing) Google Colab notebook for a quick start guide! 
+
+## Installation
+
+You can install the library from PyPI:
+
+```bash
+pip install job-shop-lib
+```
+
+## Quick Start :rocket:
 
 ### Create a Job Shop Instance
 
@@ -57,40 +67,22 @@ manually. The instances are stored in [benchmark_instances.json](job_shop_lib/be
 
 The contributions to this benchmark dataset are as follows:
 
-- `abz5-9`: This subset, comprising five instances, was introduced by Adams et
-    al. (1988).
+- `abz5-9`: by Adams et al. (1988).
 
-- `ft06`, `ft10`, `ft20`: These three instances are attributed to the work of
-    Fisher and Thompson, as detailed in their 1963 work.
+- `ft06`, `ft10`, `ft20`: by Fisher and Thompson (1963).
 
-- `la01-40`: A collection of forty instances, this group was contributed by
-    Lawrence, as referenced in his 1984 report.
+- `la01-40`: by Lawrence (1984)
 
-- `orb01-10`: Ten instances in this category were provided by Applegate and
-    Cook, as seen in their 1991 study.
+- `orb01-10`: by Applegate and Cook (1991).
 
-- `swb01-20`: This segment, encompassing twenty instances, was contributed by
-    Storer et al., as per their 1992 article.
+- `swb01-20`: by Storer et al. (1992).
 
-- `yn1-4`: Yamada and Nakano are credited with the addition of four instances
-    in this group, as found in their 1992 paper.
+- `yn1-4`: by Yamada and Nakano (1992).
 
-- `ta01-80`: The largest contribution, consisting of eighty instances, was
-    made by Taillard, as documented in his 1993 paper.
+- `ta01-80`: by Taillard (1993).
 
 The metadata from these instances has been updated using data from:
-
-Thomas Weise. jsspInstancesAndResults. Accessed in January 2024.
-Available at: https://github.com/thomasWeise/jsspInstancesAndResults
-
-It includes the following information:
-  - "optimum" (`int` | `None`): The optimal makespan for the instance.
-  - "lower_bound" (`int`): The best lower bound known for the makespan. If
-      optimality is known, it is equal to the optimum.
-  - "upper_bound" (`int`): The best upper bound known for the makespan. If
-      optimality is known, it is equal to the optimum.
-  - "reference" (`str`): The paper or source where the instance was first
-      introduced.
+https://github.com/thomasWeise/jsspInstancesAndResults
 
 ```python
 >>> ft06.metadata
@@ -102,7 +94,7 @@ It includes the following information:
 
 ### Generate a Random Instance
 
-You can also generate a random instance with the `InstanceGenerator` class.
+You can also generate a random instance with the `BasicGenerator` class.
 
 ```python
 from job_shop_lib.generators import BasicGenerator
@@ -116,7 +108,7 @@ random_instance = generator.generate()
 This class can also work as an iterator to generate multiple instances:
 
 ```python
-generator = InstanceGenerator(iteration_limit=100, seed=42)
+generator = BasicGenerator(iteration_limit=100, seed=42)
 instances = []
 for instance in generator:
     instances.append(instance)
@@ -205,6 +197,9 @@ plt.show()
 ![Example Disjunctive Graph](images/example_disjunctive_graph.png)
 
 
+> [!WARNING]
+> This plot function requires having the optional dependency [PyGraphViz](https://pygraphviz.github.io/) installed.
+
 The `JobShopGraph` class provides easy access to the nodes, for example, to get all the nodes of a specific type:
 
 ```python
@@ -266,13 +261,9 @@ plt.show()
 
 For more details, check the [examples](examples) folder.
 
-## Installation
+## Installation for development
 
-In the future, the library will be available on PyPI. For now, you can install it from the source code.
-
-### For development
-
-#### With Poetry
+### With Poetry
 
 1. Clone the repository.
 
@@ -293,7 +284,7 @@ or equivalently:
 make poetry_install_all 
 ```
 
-#### With PyPI
+### With PyPI
 
 If you don't want to use Poetry, you can install the library directly from the source code:
 
