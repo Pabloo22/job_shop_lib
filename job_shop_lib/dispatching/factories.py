@@ -1,6 +1,6 @@
 from enum import Enum
 
-from typing import Callable
+from collections.abc import Callable, Sequence
 import random
 
 from job_shop_lib import Operation
@@ -13,21 +13,8 @@ from job_shop_lib.dispatching import (
     Dispatcher,
     prune_dominated_operations,
     prune_non_immediate_machines,
+    create_composite_pruning_function,
 )
-
-# DispatchingRule = Callable[[Dispatcher], Operation]
-# MachineChooser = Callable[[Dispatcher, Operation], int]
-
-
-class PruningFunction(str, Enum):
-    """Enumeration of pruning functions.
-
-    A pruning function is used by the `Dispatcher` class to reduce the
-    amount of available operations to choose from.
-    """
-
-    DOMINATED_OPERATIONS = "dominated_operations"
-    NON_IMMEDIATE_MACHINES = "non_immediate_machines"
 
 
 class DispatchingRule(str, Enum):
@@ -45,6 +32,17 @@ class MachineChooser(str, Enum):
 
     FIRST = "first"
     RANDOM = "random"
+
+
+class PruningFunction(str, Enum):
+    """Enumeration of pruning functions.
+
+    A pruning function is used by the `Dispatcher` class to reduce the
+    amount of available operations to choose from.
+    """
+
+    DOMINATED_OPERATIONS = "dominated_operations"
+    NON_IMMEDIATE_MACHINES = "non_immediate_machines"
 
 
 def dispatching_rule_factory(
@@ -134,23 +132,57 @@ def machine_chooser_factory(
     return machine_choosers[machine_chooser]
 
 
-def pruning_strategy_factory(
-    pruning_strategy: str | PruningFunction,
+def composite_pruning_function_factory(
+    pruning_function_names: Sequence[str | PruningFunction],
 ) -> Callable[[Dispatcher, list[Operation]], list[Operation]]:
-    """Creates and returns a pruning strategy function based on the specified
-    pruning strategy name.
-    The pruning strategy function filters out operations based on certain
-    criteria such as dominated operations, non-immediate machines, etc.
+    """Creates and returns a composite pruning function based on the
+    specified list of pruning strategies.
+
+    The composite pruning function filters out operations based on
+    the specified list of pruning strategies.
+
     Args:
-        pruning_strategy:
-            The name of the pruning strategy to be used. Supported values are
+        pruning_functions:
+            A list of pruning strategies to be used. Supported values are
             'dominated_operations' and 'non_immediate_machines'.
+
     Returns:
         A function that takes a Dispatcher instance and a list of Operation
         instances as input and returns a list of Operation instances based on
-        the specified pruning strategy.
+        the specified list of pruning strategies.
+
     Raises:
-        ValueError: If the pruning_strategy argument is not recognized or is
+        ValueError: If any of the pruning strategies in the list are not
+            recognized or are not supported.
+    """
+
+    pruning_functions = [
+        pruning_function_factory(name) for name in pruning_function_names
+    ]
+    return create_composite_pruning_function(pruning_functions)
+
+
+def pruning_function_factory(
+    pruning_function_name: str | PruningFunction,
+) -> Callable[[Dispatcher, list[Operation]], list[Operation]]:
+    """Creates and returns a pruning function based on the specified
+    pruning strategy name.
+
+    The pruning function filters out operations based on certain
+    criteria such as dominated operations, non-immediate machines, etc.
+
+    Args:
+        pruning_function:
+            The name of the pruning function to be used. Supported values are
+            'dominated_operations' and 'non_immediate_machines'.
+
+    Returns:
+        A function that takes a Dispatcher instance and a list of Operation
+        instances as input and returns a list of Operation instances based on
+        the specified pruning function.
+
+    Raises:
+        ValueError: If the pruning_function argument is not recognized or is
             not supported.
     """
     pruning_strategies = {
@@ -158,10 +190,10 @@ def pruning_strategy_factory(
         PruningFunction.NON_IMMEDIATE_MACHINES: prune_non_immediate_machines,
     }
 
-    if pruning_strategy not in pruning_strategies:
+    if pruning_function_name not in pruning_strategies:
         raise ValueError(
-            f"Unsupported pruning strategy '{pruning_strategy}'. "
+            f"Unsupported pruning function '{pruning_function_name}'. "
             f"Supported values are {', '.join(pruning_strategies.keys())}."
         )
 
-    return pruning_strategies[pruning_strategy]  # type: ignore[index]
+    return pruning_strategies[pruning_function_name]  # type: ignore[index]
