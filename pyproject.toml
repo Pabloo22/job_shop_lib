@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "job-shop-lib"
-version = "0.1.0"
+version = "0.1.2"
 description = "An easy-to-use and modular Python library for the Job Shop Scheduling Problem (JSSP)"
 authors = ["Pabloo22 <pablete.arino@gmail.com>"]
 license = "MIT"
@@ -10,11 +10,11 @@ include = ["benchmarks/benchmark_instances.json"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-ortools = "^9.8.3296"
-matplotlib = "^3.8.3"
-pyarrow = "^15.0.0"  # An optional pandas' dependency that will be required in the future
-networkx = "^3.2.1"
-imageio = "^2.34.0"
+ortools = "^9"
+matplotlib = "^3"
+pyarrow = "^14.0.0"  # An optional pandas' dependency that will be required in the future
+networkx = "^3"
+imageio = "^2"
 pygraphviz = {version = "^1.12", optional = true}
 
 [tool.poetry.group.test]
