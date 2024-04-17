@@ -257,7 +257,12 @@ fig = plot_agent_task_graph(complete_agent_task_graph)
 plt.show()
 ```
 
-![Example Agent-Task Graph](examples/agent_task_graph.png)
+<div align="center">
+<img src="examples/agent_task_graph.png" width="300">
+</div>
+<br>
+
+----
 
 For more details, check the [examples](examples) folder.
 
