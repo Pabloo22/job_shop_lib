@@ -11,10 +11,23 @@ from job_shop_lib.dispatching import (
     most_operations_remaining_rule,
     random_operation_rule,
     Dispatcher,
+    prune_dominated_operations,
+    prune_non_immediate_machines,
 )
 
 # DispatchingRule = Callable[[Dispatcher], Operation]
 # MachineChooser = Callable[[Dispatcher, Operation], int]
+
+
+class PruningFunction(str, Enum):
+    """Enumeration of pruning functions.
+
+    A pruning function is used by the `Dispatcher` class to reduce the
+    amount of available operations to choose from.
+    """
+
+    DOMINATED_OPERATIONS = "dominated_operations"
+    NON_IMMEDIATE_MACHINES = "non_immediate_machines"
 
 
 class DispatchingRule(str, Enum):
@@ -119,3 +132,36 @@ def machine_chooser_factory(
         )
 
     return machine_choosers[machine_chooser]
+
+
+def pruning_strategy_factory(
+    pruning_strategy: str | PruningFunction,
+) -> Callable[[Dispatcher, list[Operation]], list[Operation]]:
+    """Creates and returns a pruning strategy function based on the specified
+    pruning strategy name.
+    The pruning strategy function filters out operations based on certain
+    criteria such as dominated operations, non-immediate machines, etc.
+    Args:
+        pruning_strategy:
+            The name of the pruning strategy to be used. Supported values are
+            'dominated_operations' and 'non_immediate_machines'.
+    Returns:
+        A function that takes a Dispatcher instance and a list of Operation
+        instances as input and returns a list of Operation instances based on
+        the specified pruning strategy.
+    Raises:
+        ValueError: If the pruning_strategy argument is not recognized or is
+            not supported.
+    """
+    pruning_strategies = {
+        PruningFunction.DOMINATED_OPERATIONS: prune_dominated_operations,
+        PruningFunction.NON_IMMEDIATE_MACHINES: prune_non_immediate_machines,
+    }
+
+    if pruning_strategy not in pruning_strategies:
+        raise ValueError(
+            f"Unsupported pruning strategy '{pruning_strategy}'. "
+            f"Supported values are {', '.join(pruning_strategies.keys())}."
+        )
+
+    return pruning_strategies[pruning_strategy]  # type: ignore[index]

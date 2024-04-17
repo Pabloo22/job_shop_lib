@@ -1,6 +1,7 @@
 """Home of the Dispatcher class."""
 
-from enum import Enum
+from __future__ import annotations
+
 from typing import Callable
 from collections import deque
 
@@ -10,13 +11,6 @@ from job_shop_lib import (
     ScheduledOperation,
     Operation,
 )
-
-
-class PruningMethod(str, Enum):
-    """Enumeration of pruning strategies."""
-
-    DOMINATED_OPERATIONS = "dominated_operations"
-    NON_IMMEDIATE_MACHINES = "non_immediate_machines"
 
 
 class Dispatcher:
@@ -49,13 +43,15 @@ class Dispatcher:
         "_machine_next_available_time",
         "_job_next_operation_index",
         "_job_next_available_time",
-        "_pruning_pipeline",
+        "pruning_function",
     )
 
     def __init__(
         self,
         instance: JobShopInstance,
-        pruning_methods: list[str] | None = None,
+        pruning_function: (
+            Callable[[Dispatcher, list[Operation]], list[Operation]] | None
+        ) = None,
     ) -> None:
         """Initializes the object with the given instance.
 
@@ -75,13 +71,7 @@ class Dispatcher:
         self._machine_next_available_time = [0] * self.instance.num_machines
         self._job_next_operation_index = [0] * self.instance.num_jobs
         self._job_next_available_time = [0] * self.instance.num_jobs
-
-        if pruning_methods is None:
-            pruning_methods = [PruningMethod.DOMINATED_OPERATIONS]
-
-        self._pruning_pipeline = self.create_composite_pruning_pipeline(
-            pruning_methods
-        )
+        self.pruning_function = pruning_function
 
     @property
     def machine_next_available_time(self) -> list[int]:
@@ -118,7 +108,7 @@ class Dispatcher:
         Returns:
             A Schedule object representing the solution.
         """
-        dispatcher = cls(instance, pruning_methods=[])
+        dispatcher = cls(instance)
         dispatcher.reset()
         raw_solution_deques = [
             deque(operations) for operations in raw_solution
@@ -269,7 +259,10 @@ class Dispatcher:
                 available operations can be scheduled in more than one machine.
         """
         available_operations = self._available_operations()
-        available_operations = self._pruning_pipeline(available_operations)
+        if self.pruning_function is not None:
+            available_operations = self.pruning_function(
+                self, available_operations
+            )
         return available_operations
 
     def _available_operations(self) -> list[Operation]:
@@ -280,153 +273,3 @@ class Dispatcher:
             operation = self.instance.jobs[job_id][next_position]
             available_operations.append(operation)
         return available_operations
-
-    def prune_dominated_operations(
-        self, operations: list[Operation]
-    ) -> list[Operation]:
-        """Filters out all the operations that are dominated.
-
-        An operation is dominated if there is another operation that ends
-        before it starts on the same machine.
-        """
-
-        min_machine_end_times = self._get_min_machine_end_times(operations)
-
-        non_dominated_operations: list[Operation] = []
-        for operation in operations:
-            # One benchmark instance has an operation with duration 0
-            if operation.duration == 0:
-                return [operation]
-            for machine_id in operation.machines:
-                start_time = self.start_time(operation, machine_id)
-                is_dominated = start_time >= min_machine_end_times[machine_id]
-                if not is_dominated:
-                    non_dominated_operations.append(operation)
-                    break
-
-        return non_dominated_operations
-
-    def prune_non_immediate_machines(
-        self, operations: list[Operation]
-    ) -> list[Operation]:
-        """Filters out all the operations associated with machines which
-        earliest operation is not the current time."""
-
-        is_immediate_machine = self._get_immediate_machines(operations)
-        non_dominated_operations: list[Operation] = []
-        for operation in operations:
-            if any(
-                is_immediate_machine[machine_id]
-                for machine_id in operation.machines
-            ):
-                non_dominated_operations.append(operation)
-
-        return non_dominated_operations
-
-    def _get_min_machine_end_times(
-        self, available_operations: list[Operation]
-    ) -> list[int | float]:
-        end_times_per_machine = [float("inf")] * self.instance.num_machines
-        for op in available_operations:
-            for machine_id in op.machines:
-                start_time = self.start_time(op, machine_id)
-                end_times_per_machine[machine_id] = min(
-                    end_times_per_machine[machine_id], start_time + op.duration
-                )
-        return end_times_per_machine
-
-    def _get_immediate_machines(
-        self, available_operations: list[Operation]
-    ) -> list[bool]:
-        """Returns the machine ids of the machines that have at least one
-        operation with the lowest start time (i.e. the start time)."""
-        working_machines = [False] * self.instance.num_machines
-        # We can't use the current_time directly because it will cause
-        # an infinite loop.
-        current_time = self.min_start_time(available_operations)
-        for operation in available_operations:
-            for machine_id in operation.machines:
-                if self.start_time(operation, machine_id) == current_time:
-                    working_machines[machine_id] = True
-        return working_machines
-
-    def create_composite_pruning_pipeline(
-        self,
-        pruning_strategies: list[PruningMethod | str],
-    ) -> Callable[[list[Operation]], list[Operation]]:
-        """Creates and returns a composite pruning strategy function based on
-        the specified list of pruning strategies.
-
-        The composite pruning strategy function filters out operations based on
-        the specified list of pruning strategies.
-
-        Args:
-            pruning_strategies:
-                A list of pruning strategies to be used. Supported values are
-                'dominated_operations' and 'non_immediate_machines'.
-
-        Returns:
-            A function that takes a Dispatcher instance and a list of Operation
-            instances as input and returns a list of Operation instances based
-            on the specified list of pruning strategies.
-
-        Raises:
-            ValueError: If any of the pruning strategies in the list are not
-                recognized or are not supported.
-        """
-        pruning_strategy_functions = [
-            self.pruning_strategy_factory(pruning_strategy)
-            for pruning_strategy in pruning_strategies
-        ]
-
-        def composite_pruning_strategy(
-            operations: list[Operation],
-        ) -> list[Operation]:
-            pruned_operations = operations
-            for pruning_strategy in pruning_strategy_functions:
-                pruned_operations = pruning_strategy(pruned_operations)
-
-            return pruned_operations
-
-        return composite_pruning_strategy
-
-    def pruning_strategy_factory(
-        self,
-        pruning_strategy: str | PruningMethod,
-    ) -> Callable[[list[Operation]], list[Operation]]:
-        """Creates and returns a pruning strategy function based on the
-        specified pruning strategy name.
-
-        The pruning strategy function filters out operations based on certain
-        criteria such as dominated operations, non-immediate machines, etc.
-
-        Args:
-            pruning_strategy:
-                The name of the pruning strategy to be used. Supported values
-                are 'dominated_operations' and 'non_immediate_machines'.
-
-        Returns:
-            A function that takes a Dispatcher instance and a list of
-            `Operation` instances as input and returns a list of `Operation`
-            instances based on the specified pruning strategy.
-
-        Raises:
-            ValueError: If the pruning_strategy argument is not recognized or
-                is not supported.
-        """
-        pruning_strategies = {
-            PruningMethod.DOMINATED_OPERATIONS: (
-                self.prune_dominated_operations
-            ),
-            PruningMethod.NON_IMMEDIATE_MACHINES: (
-                self.prune_non_immediate_machines
-            ),
-        }
-
-        if pruning_strategy not in pruning_strategies:
-            raise ValueError(
-                f"Unsupported pruning strategy '{pruning_strategy}'. "
-                f"Supported values are {', '.join(pruning_strategies.keys())}."
-            )
-
-        return pruning_strategies[pruning_strategy]  # type: ignore[index]
