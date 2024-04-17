@@ -50,7 +50,7 @@ def create_gif(
             Whether to plot a vertical line at the current time.
     """
     if plot_function is None:
-        plot_function = get_plot_function()
+        plot_function = plot_gantt_chart_wrapper()
 
     if frames_dir is None:
         # Use the name of the GIF file as the directory name
@@ -67,7 +67,7 @@ def create_gif(
         shutil.rmtree(frames_dir)
 
 
-def get_plot_function(
+def plot_gantt_chart_wrapper(
     title: str | None = None,
     cmap: str = "viridis",
     show_available_operations: bool = False,
