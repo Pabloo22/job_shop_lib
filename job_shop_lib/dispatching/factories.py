@@ -1,3 +1,10 @@
+"""Contains factory functions for creating dispatching rules, machine choosers,
+and pruning functions for the job shop scheduling problem.
+
+The factory functions create and return the appropriate functions based on the
+specified names or enums.
+"""
+
 from enum import Enum
 
 from collections.abc import Callable, Sequence

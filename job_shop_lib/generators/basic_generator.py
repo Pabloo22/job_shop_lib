@@ -1,4 +1,4 @@
-"""Home of the `InstanceGenerator` class."""
+"""Home of the `BasicGenerator` class."""
 
 import random
 from typing import Iterator

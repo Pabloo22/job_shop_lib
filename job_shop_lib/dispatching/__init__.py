@@ -1,3 +1,6 @@
+"""Package containing all the functionality to solve the Job Shop Scheduling
+Problem step-by-step."""
+
 from job_shop_lib.dispatching.dispatcher import Dispatcher
 from job_shop_lib.dispatching.dispatching_rules import (
     shortest_processing_time_rule,

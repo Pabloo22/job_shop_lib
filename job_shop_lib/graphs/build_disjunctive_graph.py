@@ -1,3 +1,21 @@
+"""Module for building the disjunctive graph of a job shop instance.
+
+The disjunctive graph is created by first adding nodes representing each
+operation in the jobs, along with two special nodes: a source $S$ and a sink
+$T$. Each operation node is linked to the next operation in its job sequence
+by **conjunctive edges**, forming a path from the source to the sink. These
+edges represent the order in which operations of a single job must be
+performed.
+
+Additionally, the graph includes **disjunctive edges** between operations
+that use the same machine but belong to different jobs. These edges are
+bidirectional, indicating that either of the connected operations can be
+performed first. The disjunctive edges thus represent the scheduling choices
+available: the order in which operations sharing a machine can be processed.
+Solving the Job Shop Scheduling problem involves choosing a direction for
+each disjunctive edge such that the overall processing time is minimized.
+"""
+
 import itertools
 
 from job_shop_lib import JobShopInstance

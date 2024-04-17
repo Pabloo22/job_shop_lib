@@ -1,3 +1,5 @@
+"""Module for plotting static Gantt charts for job shop schedules."""
+
 from typing import Optional
 
 from matplotlib.figure import Figure
@@ -19,7 +21,23 @@ def plot_gantt_chart(
     xlim: int | None = None,
     number_of_x_ticks: int = 15,
 ) -> tuple[Figure, plt.Axes]:
-    """Plots a Gantt chart for the schedule."""
+    """Plots a Gantt chart for the schedule.
+
+    Args:
+        schedule:
+            The schedule to plot.
+        title:
+            The title of the plot. If not provided, the title:
+            `f"Gantt Chart for {schedule.instance.name} instance"`
+            is used.
+        cmap_name:
+            The name of the colormap to use. Default is "viridis".
+        xlim:
+            The maximum value for the x-axis. If not provided, the makespan of
+            the schedule is used.
+        number_of_x_ticks:
+            The number of ticks to use in the x-axis.
+    """
     fig, ax = _initialize_plot(schedule, title)
     legend_handles = _plot_machine_schedules(schedule, ax, cmap_name)
     _configure_legend(ax, legend_handles)

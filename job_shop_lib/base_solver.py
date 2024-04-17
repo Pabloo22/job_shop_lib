@@ -1,4 +1,4 @@
-"""Type hint for all solvers."""
+"""Type hint and base class for all solvers."""
 
 import abc
 from typing import Callable
@@ -28,7 +28,7 @@ class BaseSolver(abc.ABC):
     def solve(self, instance: JobShopInstance) -> Schedule:
         """Solves the given job shop instance and returns the schedule."""
 
-    def __call__(self, instance: JobShopInstance,) -> Schedule:
+    def __call__(self, instance: JobShopInstance) -> Schedule:
         time_start = time.perf_counter()
         schedule = self.solve(instance)
         elapsed_time = time_start - time.perf_counter()

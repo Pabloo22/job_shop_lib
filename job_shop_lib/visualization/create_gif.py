@@ -1,3 +1,6 @@
+"""Module for creating a GIF of the schedule being built by a
+dispatching rule solver."""
+
 import os
 import pathlib
 import shutil
@@ -12,6 +15,8 @@ from job_shop_lib.dispatching import DispatchingRuleSolver, Dispatcher
 from job_shop_lib.visualization.gantt_chart import plot_gantt_chart
 
 
+# Most of the arguments are optional with default values. There is no way to
+# reduce the number of arguments without losing functionality.
 # pylint: disable=too-many-arguments
 def create_gif(
     gif_path: str,

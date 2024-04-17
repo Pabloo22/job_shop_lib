@@ -1,4 +1,4 @@
-"""Home of the Dispatcher class."""
+"""Home of the `Dispatcher` class."""
 
 from __future__ import annotations
 
@@ -26,13 +26,7 @@ class Dispatcher:
             The instance of the job shop problem to be scheduled.
         schedule:
             The schedule of operations on machines.
-        machine_next_available_time:
-            The next available time for each machine.
-        job_next_operation_index:
-            The index of the next operation to be scheduled for each job.
-        job_next_available_time:
-            The next available time for each job.
-        pruning_pipeline:
+        pruning_function:
             The pipeline of pruning methods to be used to filter out
             operations from the list of available operations.
     """

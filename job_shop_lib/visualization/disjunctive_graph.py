@@ -1,3 +1,5 @@
+"""Module for visualizing the disjunctive graph of a job shop instance."""
+
 import functools
 from typing import Optional, Callable
 import warnings
@@ -20,7 +22,8 @@ from job_shop_lib.graphs import (
 Layout = Callable[[nx.Graph], dict[str, tuple[float, float]]]
 
 
-# This function needs a function extraction refactoring (see `plot_gantt_chart`
+# This function could be improved by a function extraction refactoring
+# (see `plot_gantt_chart`
 # function as a reference in how to do it). That would solve the
 # "too many locals" warning. However, this refactoring is not a priority at
 # the moment. To compensate, sections are separated by comments.

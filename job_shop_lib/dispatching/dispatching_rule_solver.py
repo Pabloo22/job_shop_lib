@@ -1,3 +1,5 @@
+"""Home of the `DispatchingRuleSolver` class."""
+
 from collections.abc import Callable
 
 from job_shop_lib import JobShopInstance, Schedule, Operation, BaseSolver
@@ -13,7 +15,20 @@ from job_shop_lib.dispatching import (
 
 
 class DispatchingRuleSolver(BaseSolver):
-    """Solves a job shop instance using a dispatching rule algorithm."""
+    """Solves a job shop instance using a dispatching rule.
+
+    Attributes:
+        dispatching_rule:
+            The dispatching rule to use. It is a callable that takes a
+            dispatcher and returns the operation to be dispatched next.
+        machine_chooser:
+            Used to choose the machine where the operation will be dispatched
+            to. It is only used if the operation can be dispatched to multiple
+            machines.
+        pruning_function:
+            The pruning function to use. It is used to initialize the
+            dispatcher object internally when calling the solve method.
+    """
 
     def __init__(
         self,
@@ -29,6 +44,27 @@ class DispatchingRuleSolver(BaseSolver):
             | None
         ) = PruningFunction.DOMINATED_OPERATIONS,
     ):
+        """Initializes the solver with the given dispatching rule, machine
+        chooser and pruning function.
+
+        Args:
+            dispatching_rule:
+                The dispatching rule to use. It can be a string with the name
+                of the dispatching rule, a DispatchingRule enum member, or a
+                callable that takes a dispatcher and returns the operation to
+                be dispatched next.
+            machine_chooser:
+                The machine chooser to use. It can be a string with the name
+                of the machine chooser, a MachineChooser enum member, or a
+                callable that takes a dispatcher and an operation and returns
+                the machine id where the operation will be dispatched.
+            pruning_function:
+                The pruning function to use. It can be a string with the name
+                of the pruning function, a PruningFunction enum member, or a
+                callable that takes a dispatcher and a list of operations and
+                returns a list of operations that should be considered for
+                dispatching.
+        """
         if isinstance(dispatching_rule, str):
             dispatching_rule = dispatching_rule_factory(dispatching_rule)
         if isinstance(machine_chooser, str):
