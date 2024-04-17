@@ -4,8 +4,44 @@ This functions are used by the `Dispatcher` class to reduce the
 amount of available operations to choose from.
 """
 
+from collections.abc import Callable, Iterable
+
 from job_shop_lib import Operation
 from job_shop_lib.dispatching import Dispatcher
+
+
+def create_composite_pruning_function(
+    pruning_functions: Iterable[
+        Callable[[Dispatcher, list[Operation]], list[Operation]]
+    ],
+) -> Callable[[Dispatcher, list[Operation]], list[Operation]]:
+    """Creates and returns a composite pruning strategy function based on the
+    specified list of pruning strategies.
+    The composite pruning strategy function filters out operations based on
+    the specified list of pruning strategies.
+    Args:
+        pruning_strategies:
+            A list of pruning strategies to be used. Supported values are
+            'dominated_operations' and 'non_immediate_machines'.
+    Returns:
+        A function that takes a Dispatcher instance and a list of Operation
+        instances as input and returns a list of Operation instances based on
+        the specified list of pruning strategies.
+    Raises:
+        ValueError: If any of the pruning strategies in the list are not
+            recognized or are not supported.
+    """
+
+    def composite_pruning_function(
+        dispatcher: Dispatcher, operations: list[Operation]
+    ) -> list[Operation]:
+        pruned_operations = operations
+        for pruning_function in pruning_functions:
+            pruned_operations = pruning_function(dispatcher, pruned_operations)
+
+        return pruned_operations
+
+    return composite_pruning_function
 
 
 def prune_dominated_operations(
