@@ -104,7 +104,9 @@ def test_is_operation_ready(example_job_shop_instance: JobShopInstance):
 
 def test_current_time(example_job_shop_instance: JobShopInstance):
     solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
-    dispatcher = Dispatcher(example_job_shop_instance)
+    dispatcher = Dispatcher(
+        example_job_shop_instance, pruning_function=solver.pruning_function
+    )
     current_times = [0, 0, 0, 1, 1, 7, 7, 10, 11]
     for i, current_time in enumerate(current_times):
         solver.step(dispatcher)
@@ -209,11 +211,9 @@ def test_filter_bad_choices(
 
     You can see the plots of the schedules in the `examples` folder.
     """
-    optimized_solver = DispatchingRuleSolver(
-        dispatching_rule=dispatching_rule
-    )
+    optimized_solver = DispatchingRuleSolver(dispatching_rule=dispatching_rule)
     non_optimized_solver = DispatchingRuleSolver(
-        dispatching_rule=dispatching_rule, pruning_methods=[]
+        dispatching_rule=dispatching_rule, pruning_function=None
     )
 
     optimized_schedule = optimized_solver.solve(instance)

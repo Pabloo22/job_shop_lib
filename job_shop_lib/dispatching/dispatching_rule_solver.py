@@ -1,12 +1,14 @@
-from typing import Callable
+from collections.abc import Callable
 
 from job_shop_lib import JobShopInstance, Schedule, Operation, BaseSolver
 from job_shop_lib.dispatching import (
     dispatching_rule_factory,
     machine_chooser_factory,
+    pruning_function_factory,
     DispatchingRule,
     MachineChooser,
     Dispatcher,
+    PruningFunction,
 )
 
 
@@ -16,25 +18,34 @@ class DispatchingRuleSolver(BaseSolver):
     def __init__(
         self,
         dispatching_rule: (
-            DispatchingRule | str | Callable[[Dispatcher], Operation]
+            str | Callable[[Dispatcher], Operation]
         ) = DispatchingRule.MOST_WORK_REMAINING,
         machine_chooser: (
-            DispatchingRule | str | Callable[[Dispatcher, Operation], int]
+            str | Callable[[Dispatcher, Operation], int]
         ) = MachineChooser.FIRST,
-        **dispatcher_kwargs,
+        pruning_function: (
+            str
+            | Callable[[Dispatcher, list[Operation]], list[Operation]]
+            | None
+        ) = PruningFunction.DOMINATED_OPERATIONS,
     ):
-        if isinstance(dispatching_rule, str | DispatchingRule):
+        if isinstance(dispatching_rule, str):
             dispatching_rule = dispatching_rule_factory(dispatching_rule)
-        if isinstance(machine_chooser, str | MachineChooser):
+        if isinstance(machine_chooser, str):
             machine_chooser = machine_chooser_factory(machine_chooser)
+        if isinstance(pruning_function, str):
+            pruning_function = pruning_function_factory(pruning_function)
+
         self.dispatching_rule = dispatching_rule
         self.machine_chooser = machine_chooser
-        self.dispatcher_kwargs = dispatcher_kwargs
+        self.pruning_function = pruning_function
 
     def solve(self, instance: JobShopInstance) -> Schedule:
         """Returns a schedule for the given job shop instance using the
         dispatching rule algorithm."""
-        dispatcher = Dispatcher(instance, **self.dispatcher_kwargs)
+        dispatcher = Dispatcher(
+            instance, pruning_function=self.pruning_function
+        )
         while not dispatcher.schedule.is_complete():
             self.step(dispatcher)
 

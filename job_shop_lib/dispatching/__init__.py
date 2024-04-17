@@ -9,18 +9,20 @@ from job_shop_lib.dispatching.dispatching_rules import (
 from job_shop_lib.dispatching.pruning_functions import (
     prune_dominated_operations,
     prune_non_immediate_machines,
+    create_composite_pruning_function,
 )
 from job_shop_lib.dispatching.factories import (
+    PruningFunction,
     DispatchingRule,
     MachineChooser,
     dispatching_rule_factory,
     machine_chooser_factory,
+    pruning_function_factory,
+    composite_pruning_function_factory,
 )
 from job_shop_lib.dispatching.dispatching_rule_solver import (
     DispatchingRuleSolver,
 )
-
-
 
 
 __all__ = [
@@ -37,4 +39,8 @@ __all__ = [
     "DispatchingRuleSolver",
     "prune_dominated_operations",
     "prune_non_immediate_machines",
+    "create_composite_pruning_function",
+    "PruningFunction",
+    "pruning_function_factory",
+    "composite_pruning_function_factory",
 ]
