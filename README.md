@@ -11,8 +11,6 @@
 
 </div>
 
-
-
 An easy-to-use and modular Python library for the Job Shop Scheduling Problem (JSSP) with a special focus on graph representations.
 
 It provides intuitive data structures to represent instances and solutions, as well as solvers and visualization tools.
@@ -152,7 +150,7 @@ We can visualize the solution with a `DispatchingRuleSolver` as a gif:
 
 ```python
 from job_shop_lib.visualization import create_gif, get_plot_function
-from job_shop_lib.solvers import DispatchingRuleSolver, DispatchingRule
+from job_shop_lib.dispatching import DispatchingRuleSolver, DispatchingRule
 
 plt.style.use("ggplot")
 
