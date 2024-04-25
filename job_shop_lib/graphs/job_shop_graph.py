@@ -95,6 +95,21 @@ class JobShopGraph:
         """Number of edges in the graph."""
         return self.graph.number_of_edges()
 
+    @property
+    def num_operation_nodes(self) -> int:
+        """Number of operation nodes in the graph."""
+        return len(self.nodes_by_type[NodeType.OPERATION])
+
+    @property
+    def num_machine_nodes(self) -> int:
+        """Number of machine nodes in the graph."""
+        return len(self.nodes_by_type[NodeType.MACHINE])
+
+    @property
+    def num_job_nodes(self) -> int:
+        """Number of job nodes in the graph."""
+        return len(self.nodes_by_type[NodeType.JOB])
+
     def _add_operation_nodes(self) -> None:
         """Adds operation nodes to the graph."""
         for job in self.instance.jobs:
