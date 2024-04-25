@@ -85,6 +85,16 @@ class JobShopGraph:
 
         self._add_operation_nodes()
 
+    @property
+    def num_nodes(self) -> int:
+        """Number of nodes in the graph."""
+        return len(self.nodes)
+
+    @property
+    def num_edges(self) -> int:
+        """Number of edges in the graph."""
+        return self.graph.number_of_edges()
+
     def _add_operation_nodes(self) -> None:
         """Adds operation nodes to the graph."""
         for job in self.instance.jobs:
