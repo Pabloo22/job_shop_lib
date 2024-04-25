@@ -1,6 +1,6 @@
 """Home of the `Node` class."""
 
-from job_shop_lib import Operation
+from job_shop_lib import Operation, JobShopLibError
 from job_shop_lib.graphs.constants import NodeType
 
 
@@ -35,7 +35,7 @@ class Node:
     print(graph[1])  # "some value"
     ```
 
-    Args:
+    Attributes:
         node_type:
             The type of the node. It can be one of the following:
             - NodeType.OPERATION
@@ -43,15 +43,6 @@ class Node:
             - NodeType.JOB
             - NodeType.GLOBAL
             ...
-        operation:
-            The operation of the node. It should be provided if the node_type
-            is NodeType.OPERATION.
-        machine_id:
-            The id of the machine of the node. It should be provided if the
-            node_type is NodeType.MACHINE.
-        job_id:
-            The id of the job of the node. It should be provided if the
-            node_type is NodeType.JOB.
     """
 
     __slots__ = "node_type", "_node_id", "_operation", "_machine_id", "_job_id"
@@ -63,14 +54,42 @@ class Node:
         machine_id: int | None = None,
         job_id: int | None = None,
     ):
+        """Initializes the node with the given attributes.
+
+        Args:
+            node_type:
+                The type of the node. It can be one of the following:
+                - NodeType.OPERATION
+                - NodeType.MACHINE
+                - NodeType.JOB
+                - NodeType.GLOBAL
+                ...
+            operation:
+                The operation of the node. It should be provided if the
+                `node_type` is NodeType.OPERATION.
+            machine_id:
+                The id of the machine of the node. It should be provided if the
+                node_type is NodeType.MACHINE.
+            job_id:
+                The id of the job of the node. It should be provided if the
+                node_type is NodeType.JOB.
+
+        Raises:
+            JobShopLibError:
+                If the node_type is OPERATION and operation is None.
+            JobShopLibError:
+                If the node_type is MACHINE and machine_id is None.
+            JobShopLibError:
+                If the node_type is JOB and job_id is None.
+        """
         if node_type == NodeType.OPERATION and operation is None:
-            raise ValueError("Operation node must have an operation.")
+            raise JobShopLibError("Operation node must have an operation.")
 
         if node_type == NodeType.MACHINE and machine_id is None:
-            raise ValueError("Machine node must have a machine_id.")
+            raise JobShopLibError("Machine node must have a machine_id.")
 
         if node_type == NodeType.JOB and job_id is None:
-            raise ValueError("Job node must have a job_id.")
+            raise JobShopLibError("Job node must have a job_id.")
 
         self.node_type = node_type
         self._node_id: int | None = None
@@ -83,7 +102,7 @@ class Node:
     def node_id(self) -> int:
         """Returns a unique identifier for the node."""
         if self._node_id is None:
-            raise ValueError("Node has not been assigned an id.")
+            raise JobShopLibError("Node has not been assigned an id.")
         return self._node_id
 
     @node_id.setter
@@ -97,7 +116,7 @@ class Node:
         This property is mandatory for nodes of type `OPERATION`.
         """
         if self._operation is None:
-            raise ValueError("Node has no operation.")
+            raise JobShopLibError("Node has no operation.")
         return self._operation
 
     @property
@@ -107,7 +126,7 @@ class Node:
         This property is mandatory for nodes of type `MACHINE`.
         """
         if self._machine_id is None:
-            raise ValueError("Node has no `machine_id`.")
+            raise JobShopLibError("Node has no `machine_id`.")
         return self._machine_id
 
     @property
@@ -117,7 +136,7 @@ class Node:
         This property is mandatory for nodes of type `JOB`.
         """
         if self._job_id is None:
-            raise ValueError("Node has no `job_id`.")
+            raise JobShopLibError("Node has no `job_id`.")
         return self._job_id
 
     def __hash__(self) -> int:
