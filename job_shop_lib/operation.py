@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from job_shop_lib import JobShopLibError
 
+
 class Operation:
     """Stores machine and duration information for a job operation.
 
