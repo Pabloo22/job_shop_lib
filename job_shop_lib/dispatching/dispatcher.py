@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+
+from typing import TypedDict
 from collections.abc import Callable
 from collections import deque
+from functools import wraps
 
 from job_shop_lib import (
     JobShopInstance,
@@ -11,6 +14,32 @@ from job_shop_lib import (
     ScheduledOperation,
     Operation,
 )
+
+
+def _dispatcher_cache(method):
+    """Decorator to cache results of a method based on its name."""
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        # pylint: disable=protected-access
+        cache_key = method.__name__
+        cached_result = self._cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+
+        result = method(self, *args, **kwargs)
+        self._cache[cache_key] = result
+        return result
+
+    return wrapper
+
+
+class Cache(TypedDict):
+    """A dictionary to store cached values."""
+
+    current_time: int | None
+    uncompleted_operations: list[Operation] | None
+    available_operations: list[Operation] | None
 
 
 class Dispatcher:
@@ -38,6 +67,7 @@ class Dispatcher:
         "_job_next_operation_index",
         "_job_next_available_time",
         "pruning_function",
+        "_cache",
     )
 
     def __init__(
@@ -66,6 +96,12 @@ class Dispatcher:
         self._job_next_operation_index = [0] * self.instance.num_jobs
         self._job_next_available_time = [0] * self.instance.num_jobs
         self.pruning_function = pruning_function
+
+        self._cache: Cache = {
+            "current_time": None,
+            "uncompleted_operations": None,
+            "available_operations": None,
+        }
 
     @property
     def machine_next_available_time(self) -> list[int]:
@@ -123,6 +159,11 @@ class Dispatcher:
         self._machine_next_available_time = [0] * self.instance.num_machines
         self._job_next_operation_index = [0] * self.instance.num_jobs
         self._job_next_available_time = [0] * self.instance.num_jobs
+        self._cache = {
+            "current_time": None,
+            "uncompleted_operations": None,
+            "available_operations": None,
+        }
 
     def dispatch(self, operation: Operation, machine_id: int) -> None:
         """Schedules the given operation on the given machine.
@@ -200,14 +241,28 @@ class Dispatcher:
         self.job_next_operation_index[job_id] += 1
         self.job_next_available_time[job_id] = end_time
 
+        self._cache = {
+            "current_time": None,
+            "uncompleted_operations": None,
+            "available_operations": None,
+        }
+
+    @_dispatcher_cache
     def current_time(self) -> int:
         """Returns the current time of the schedule.
 
         The current time is the minimum start time of the available
         operations.
         """
+        cached_value = self._cache.get("current_time")
+        if cached_value is not None:
+            return cached_value
+
         available_operations = self.available_operations()
-        return self.min_start_time(available_operations)
+        current_time = self.min_start_time(available_operations)
+
+        self._cache["current_time"] = current_time
+        return current_time
 
     def min_start_time(self, operations: list[Operation]) -> int:
         """Returns the minimum start time of the available operations."""
@@ -220,6 +275,7 @@ class Dispatcher:
                 min_start_time = min(min_start_time, start_time)
         return int(min_start_time)
 
+    @_dispatcher_cache
     def uncompleted_operations(self) -> list[Operation]:
         """Returns the list of operations that have not been scheduled.
 
@@ -231,8 +287,11 @@ class Dispatcher:
         for job_id, next_position in enumerate(self.job_next_operation_index):
             operations = self.instance.jobs[job_id][next_position:]
             uncompleted_operations.extend(operations)
+
+        self._cache["uncompleted_operations"] = uncompleted_operations
         return uncompleted_operations
 
+    @_dispatcher_cache
     def available_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing, optionally
         filtering out operations known to be bad choices.
@@ -252,11 +311,14 @@ class Dispatcher:
             ValueError: If using the filter_bad_choices option and one of the
                 available operations can be scheduled in more than one machine.
         """
+
         available_operations = self._available_operations()
         if self.pruning_function is not None:
             available_operations = self.pruning_function(
                 self, available_operations
             )
+
+        self._cache["available_operations"] = available_operations
         return available_operations
 
     def _available_operations(self) -> list[Operation]:

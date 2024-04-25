@@ -102,6 +102,48 @@ def test_is_operation_ready(example_job_shop_instance: JobShopInstance):
     assert dispatcher.is_operation_ready(job_3[2])
 
 
+def test_cache(example_job_shop_instance: JobShopInstance):
+    # pylint: disable=protected-access
+    dispatcher = Dispatcher(example_job_shop_instance)
+
+    # Check that every key in the _cache matches a method name in the
+    # Dispatcher class.
+    assert len(dispatcher._cache) == 3
+    for key in dispatcher._cache:
+        assert hasattr(dispatcher, key), f"Missing method: {key}"
+
+    assert dispatcher._cache["current_time"] is None
+    assert dispatcher.current_time() == dispatcher.current_time()
+    assert dispatcher._cache["current_time"] == 0
+
+    assert (
+        dispatcher.available_operations() == dispatcher.available_operations()
+    )
+    assert (
+        dispatcher.uncompleted_operations()
+        == dispatcher.uncompleted_operations()
+    )
+    job_1 = example_job_shop_instance.jobs[0]
+    job_3 = example_job_shop_instance.jobs[2]
+
+    machine_1 = 0
+    machine_2 = 1
+    machine_3 = 2
+
+    dispatcher.dispatch(job_1[0], machine_1)
+    assert dispatcher._cache["available_operations"] is None
+    assert (
+        dispatcher.available_operations() == dispatcher.available_operations()
+    )
+    assert dispatcher._cache["available_operations"] is not None
+    dispatcher.dispatch(job_1[1], machine_2)
+    dispatcher.dispatch(job_3[0], machine_3)
+    assert (
+        dispatcher.uncompleted_operations()
+        == dispatcher.uncompleted_operations()
+    )
+
+
 def test_current_time(example_job_shop_instance: JobShopInstance):
     solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
     dispatcher = Dispatcher(
