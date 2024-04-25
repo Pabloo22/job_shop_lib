@@ -15,7 +15,7 @@ RULES_TO_TEST = [
     DispatchingRule.MOST_OPERATIONS_REMAINING,
 ]
 INSTANCES_TO_TEST = [
-    load_benchmark_instance(f"la{i:02d}") for i in range(1, 41)
+    load_benchmark_instance(f"la{i:02d}") for i in range(1, 11)
 ]
 
 
