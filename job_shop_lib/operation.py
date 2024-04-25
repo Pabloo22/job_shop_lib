@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from job_shop_lib import JobShopLibError
 
 class Operation:
     """Stores machine and duration information for a job operation.
@@ -51,14 +52,14 @@ class Operation:
             ValueError: If the operation has multiple machines in its list.
         """
         if len(self.machines) > 1:
-            raise ValueError("Operation has multiple machines.")
+            raise JobShopLibError("Operation has multiple machines.")
         return self.machines[0]
 
     @property
     def job_id(self) -> int:
         """Returns the id of the job that the operation belongs to."""
         if self._job_id is None:
-            raise ValueError("Operation has no job_id.")
+            raise JobShopLibError("Operation has no job_id.")
         return self._job_id
 
     @job_id.setter
@@ -74,7 +75,7 @@ class Operation:
             ValueError: If the operation has no position_in_job.
         """
         if self._position_in_job is None:
-            raise ValueError("Operation has no position_in_job.")
+            raise JobShopLibError("Operation has no position_in_job.")
         return self._position_in_job
 
     @position_in_job.setter
@@ -95,7 +96,7 @@ class Operation:
             ValueError: If the operation has no id.
         """
         if self._operation_id is None:
-            raise ValueError("Operation has no id.")
+            raise JobShopLibError("Operation has no id.")
         return self._operation_id
 
     @operation_id.setter
