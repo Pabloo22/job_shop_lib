@@ -110,7 +110,7 @@ if __name__ == "__main__":
     solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
     # cProfile.run("for instance in ta_instances: solver.solve(instance)")
     start = time.perf_counter()
-    for instance in ta_instances:
-        solver.solve(instance)
+    for instance_ in ta_instances:
+        solver.solve(instance_)
     end = time.perf_counter()
     print(f"Elapsed time: {end - start:.2f} seconds.")

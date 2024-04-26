@@ -17,7 +17,16 @@ from job_shop_lib import (
 
 
 def _dispatcher_cache(method):
-    """Decorator to cache results of a method based on its name."""
+    """Decorator to cache results of a method based on its name.
+
+    This decorator assumes that the class has an attribute called `_cache`
+    that is a dictionary. It caches the result of the method based on its
+    name. If the result is already cached, it returns the cached result
+    instead of recomputing it.
+
+    The decorator is useful since the dispatcher class can clear the cache
+    when the state of the dispatcher changes.
+    """
 
     @wraps(method)
     def wrapper(self: Dispatcher, *args, **kwargs):
