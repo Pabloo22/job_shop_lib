@@ -101,11 +101,16 @@ class DispatchingRuleSolver(BaseSolver):
 
 
 if __name__ == "__main__":
-    import cProfile
+    import time
     from job_shop_lib.benchmarking import load_benchmark_instance
 
     ta_instances = []
     for i in range(1, 81):
         ta_instances.append(load_benchmark_instance(f"ta{i:02d}"))
     solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
-    cProfile.run("for instance in ta_instances: solver.solve(instance)")
+    # cProfile.run("for instance in ta_instances: solver.solve(instance)")
+    start = time.perf_counter()
+    for instance in ta_instances:
+        solver.solve(instance)
+    end = time.perf_counter()
+    print(f"Elapsed time: {end - start:.2f} seconds.")

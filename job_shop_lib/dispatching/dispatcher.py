@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 
-from typing import TypedDict
+from typing import Any
 from collections.abc import Callable
 from collections import deque
 from functools import wraps
@@ -20,7 +20,7 @@ def _dispatcher_cache(method):
     """Decorator to cache results of a method based on its name."""
 
     @wraps(method)
-    def wrapper(self, *args, **kwargs):
+    def wrapper(self: Dispatcher, *args, **kwargs):
         # pylint: disable=protected-access
         cache_key = method.__name__
         cached_result = self._cache.get(cache_key)
@@ -32,14 +32,6 @@ def _dispatcher_cache(method):
         return result
 
     return wrapper
-
-
-class Cache(TypedDict):
-    """A dictionary to store cached values."""
-
-    current_time: int | None
-    uncompleted_operations: list[Operation] | None
-    available_operations: list[Operation] | None
 
 
 class Dispatcher:
@@ -97,11 +89,7 @@ class Dispatcher:
         self._job_next_available_time = [0] * self.instance.num_jobs
         self.pruning_function = pruning_function
 
-        self._cache: Cache = {
-            "current_time": None,
-            "uncompleted_operations": None,
-            "available_operations": None,
-        }
+        self._cache: dict[str, Any] = {}
 
     @property
     def machine_next_available_time(self) -> list[int]:
@@ -205,7 +193,7 @@ class Dispatcher:
                 The operation to be checked.
         """
         return (
-            self.job_next_operation_index[operation.job_id]
+            self._job_next_operation_index[operation.job_id]
             == operation.position_in_job
         )
 
@@ -225,8 +213,8 @@ class Dispatcher:
                 scheduled.
         """
         return max(
-            self.machine_next_available_time[machine_id],
-            self.job_next_available_time[operation.job_id],
+            self._machine_next_available_time[machine_id],
+            self._job_next_available_time[operation.job_id],
         )
 
     def _update_tracking_attributes(
@@ -237,15 +225,10 @@ class Dispatcher:
         machine_id = scheduled_operation.machine_id
         end_time = scheduled_operation.end_time
 
-        self.machine_next_available_time[machine_id] = end_time
-        self.job_next_operation_index[job_id] += 1
-        self.job_next_available_time[job_id] = end_time
-
-        self._cache = {
-            "current_time": None,
-            "uncompleted_operations": None,
-            "available_operations": None,
-        }
+        self._machine_next_available_time[machine_id] = end_time
+        self._job_next_operation_index[job_id] += 1
+        self._job_next_available_time[job_id] = end_time
+        self._cache = {}
 
     @_dispatcher_cache
     def current_time(self) -> int:
@@ -254,10 +237,6 @@ class Dispatcher:
         The current time is the minimum start time of the available
         operations.
         """
-        cached_value = self._cache.get("current_time")
-        if cached_value is not None:
-            return cached_value
-
         available_operations = self.available_operations()
         current_time = self.min_start_time(available_operations)
         return current_time
@@ -282,7 +261,7 @@ class Dispatcher:
         It is more efficient than checking all operations in the instance.
         """
         uncompleted_operations = []
-        for job_id, next_position in enumerate(self.job_next_operation_index):
+        for job_id, next_position in enumerate(self._job_next_operation_index):
             operations = self.instance.jobs[job_id][next_position:]
             uncompleted_operations.extend(operations)
         return uncompleted_operations
@@ -317,7 +296,7 @@ class Dispatcher:
 
     def _available_operations(self) -> list[Operation]:
         available_operations = []
-        for job_id, next_position in enumerate(self.job_next_operation_index):
+        for job_id, next_position in enumerate(self._job_next_operation_index):
             if next_position == len(self.instance.jobs[job_id]):
                 continue
             operation = self.instance.jobs[job_id][next_position]
