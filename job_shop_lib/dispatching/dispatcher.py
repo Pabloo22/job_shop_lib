@@ -260,8 +260,6 @@ class Dispatcher:
 
         available_operations = self.available_operations()
         current_time = self.min_start_time(available_operations)
-
-        self._cache["current_time"] = current_time
         return current_time
 
     def min_start_time(self, operations: list[Operation]) -> int:
@@ -287,8 +285,6 @@ class Dispatcher:
         for job_id, next_position in enumerate(self.job_next_operation_index):
             operations = self.instance.jobs[job_id][next_position:]
             uncompleted_operations.extend(operations)
-
-        self._cache["uncompleted_operations"] = uncompleted_operations
         return uncompleted_operations
 
     @_dispatcher_cache
@@ -317,8 +313,6 @@ class Dispatcher:
             available_operations = self.pruning_function(
                 self, available_operations
             )
-
-        self._cache["available_operations"] = available_operations
         return available_operations
 
     def _available_operations(self) -> list[Operation]:
