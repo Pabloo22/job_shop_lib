@@ -14,6 +14,14 @@ def test_initialization(example_job_shop_instance):
     assert len(graph.nodes) == graph.instance.num_operations
 
 
+def test_nodes(example_job_shop_instance):
+    graph = JobShopGraph(example_job_shop_instance)
+    add_source_sink_nodes(graph)
+    assert graph.nodes == [
+        data["node"] for _, data in graph.graph.nodes(data=True)
+    ]
+
+
 def test_node_ids(example_job_shop_instance):
     graph = JobShopGraph(example_job_shop_instance)
     add_source_sink_nodes(graph)
@@ -84,4 +92,4 @@ def test_operation_nodes_addition(example_job_shop_instance):
 if __name__ == "__main__":
     import pytest
 
-    pytest.main(["-v", "tests/test_job_shop_graph.py"])
+    pytest.main(["-v", "tests/graphs/test_job_shop_graph.py"])
