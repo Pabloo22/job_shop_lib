@@ -156,11 +156,7 @@ class Dispatcher:
         self._machine_next_available_time = [0] * self.instance.num_machines
         self._job_next_operation_index = [0] * self.instance.num_jobs
         self._job_next_available_time = [0] * self.instance.num_jobs
-        self._cache = {
-            "current_time": None,
-            "uncompleted_operations": None,
-            "available_operations": None,
-        }
+        self._cache = {}
 
     def dispatch(self, operation: Operation, machine_id: int) -> None:
         """Schedules the given operation on the given machine.
@@ -206,7 +202,9 @@ class Dispatcher:
             == operation.position_in_job
         )
 
-    def start_time(self, operation: Operation, machine_id: int) -> int:
+    def start_time(
+        self, operation: Operation, machine_id: int | None = None
+    ) -> int:
         """Computes the start time for the given operation on the given
         machine.
 
@@ -219,8 +217,20 @@ class Dispatcher:
                 The operation to be scheduled.
             machine_id:
                 The id of the machine on which the operation is to be
-                scheduled.
+                scheduled. If None, the start time is computed based on the
+                next available time for the operation on any machine.
         """
+        if machine_id is None:
+            min_start_time = float("inf")
+            job_id = operation.job_id
+            for _machine_id in operation.machines:
+                start_time = max(
+                    self._machine_next_available_time[_machine_id],
+                    self._job_next_available_time[job_id],
+                )
+                min_start_time = min(min_start_time, start_time)
+            return int(min_start_time)
+
         return max(
             self._machine_next_available_time[machine_id],
             self._job_next_available_time[operation.job_id],
@@ -278,22 +288,14 @@ class Dispatcher:
     @_dispatcher_cache
     def available_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing, optionally
-        filtering out operations known to be bad choices.
+        filtering out operations using the pruning function.
 
         This method first gathers all possible next operations from the jobs
-        being processed. It then optionally filters these operations to exclude
-        ones that are deemed inefficient or suboptimal choices.
-
-        An operation is sub-optimal if there is another operation that could
-        be scheduled in the same machine that would finish before the start
-        time of the sub-optimal operation.
+        being processed. It then optionally filters these operations using the
+        pruning function.
 
         Returns:
             A list of Operation objects that are available for scheduling.
-
-        Raises:
-            ValueError: If using the filter_bad_choices option and one of the
-                available operations can be scheduled in more than one machine.
         """
 
         available_operations = self._available_operations()
