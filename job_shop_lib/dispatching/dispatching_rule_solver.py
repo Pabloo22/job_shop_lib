@@ -76,12 +76,15 @@ class DispatchingRuleSolver(BaseSolver):
         self.machine_chooser = machine_chooser
         self.pruning_function = pruning_function
 
-    def solve(self, instance: JobShopInstance) -> Schedule:
+    def solve(
+        self, instance: JobShopInstance, dispatcher: Dispatcher | None = None
+    ) -> Schedule:
         """Returns a schedule for the given job shop instance using the
         dispatching rule algorithm."""
-        dispatcher = Dispatcher(
-            instance, pruning_function=self.pruning_function
-        )
+        if dispatcher is None:
+            dispatcher = Dispatcher(
+                instance, pruning_function=self.pruning_function
+            )
         while not dispatcher.schedule.is_complete():
             self.step(dispatcher)
 
