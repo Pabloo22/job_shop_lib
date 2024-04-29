@@ -160,7 +160,8 @@ class JobShopGraph:
             **attr: Additional attributes to be added to the edge.
 
         Raises:
-            JobShopLibError: If `u_of_edge` or `v_of_edge` are not in the graph.
+            JobShopLibError: If `u_of_edge` or `v_of_edge` are not in the
+                graph.
         """
         if isinstance(u_of_edge, Node):
             u_of_edge = u_of_edge.node_id
