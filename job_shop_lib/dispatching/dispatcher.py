@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-
+import abc
 from typing import Any
 from collections.abc import Callable
 from collections import deque
@@ -14,6 +14,25 @@ from job_shop_lib import (
     ScheduledOperation,
     Operation,
 )
+
+
+# Added here to avoid circular imports
+class DispatcherObserver(abc.ABC):
+    """Interface for classes that observe the dispatcher."""
+
+    def __init__(self, dispatcher: Dispatcher):
+        """Initializes the observer with the dispatcher and subscribes to
+        it."""
+        self.dispatcher = dispatcher
+        self.dispatcher.subscribe(self)
+
+    @abc.abstractmethod
+    def update(self, scheduled_operation: ScheduledOperation):
+        """Called when an operation is scheduled on a machine."""
+
+    @abc.abstractmethod
+    def reset(self):
+        """Called when the dispatcher is reset."""
 
 
 def _dispatcher_cache(method):
@@ -43,6 +62,7 @@ def _dispatcher_cache(method):
     return wrapper
 
 
+# pylint: disable=too-many-instance-attributes
 class Dispatcher:
     """Handles the logic of scheduling operations on machines.
 
@@ -59,6 +79,8 @@ class Dispatcher:
         pruning_function:
             The pipeline of pruning methods to be used to filter out
             operations from the list of available operations.
+        subscribers:
+            A list of observers that are subscribed to the dispatcher.
     """
 
     __slots__ = (
@@ -68,6 +90,7 @@ class Dispatcher:
         "_job_next_operation_index",
         "_job_next_available_time",
         "pruning_function",
+        "subscribers",
         "_cache",
     )
 
@@ -93,11 +116,12 @@ class Dispatcher:
 
         self.instance = instance
         self.schedule = Schedule(self.instance)
+        self.pruning_function = pruning_function
+
         self._machine_next_available_time = [0] * self.instance.num_machines
         self._job_next_operation_index = [0] * self.instance.num_jobs
         self._job_next_available_time = [0] * self.instance.num_jobs
-        self.pruning_function = pruning_function
-
+        self.subscribers: list[DispatcherObserver] = []
         self._cache: dict[str, Any] = {}
 
     @property
@@ -150,6 +174,14 @@ class Dispatcher:
                     operations.popleft()
         return dispatcher.schedule
 
+    def subscribe(self, observer: DispatcherObserver):
+        """Subscribes an observer to the dispatcher."""
+        self.subscribers.append(observer)
+
+    def unsubscribe(self, observer: DispatcherObserver):
+        """Unsubscribes an observer from the dispatcher."""
+        self.subscribers.remove(observer)
+
     def reset(self) -> None:
         """Resets the dispatcher to its initial state."""
         self.schedule.reset()
@@ -157,6 +189,8 @@ class Dispatcher:
         self._job_next_operation_index = [0] * self.instance.num_jobs
         self._job_next_available_time = [0] * self.instance.num_jobs
         self._cache = {}
+        for subscriber in self.subscribers:
+            subscriber.reset()
 
     def dispatch(self, operation: Operation, machine_id: int) -> None:
         """Schedules the given operation on the given machine.
@@ -187,6 +221,10 @@ class Dispatcher:
         self.schedule.add(scheduled_operation)
         self._update_tracking_attributes(scheduled_operation)
 
+        # Notify subscribers
+        for subscriber in self.subscribers:
+            subscriber.update(scheduled_operation)
+
     def is_operation_ready(self, operation: Operation) -> bool:
         """Returns True if the given operation is ready to be scheduled.
 
@@ -203,7 +241,9 @@ class Dispatcher:
         )
 
     def start_time(
-        self, operation: Operation, machine_id: int | None = None
+        self,
+        operation: Operation,
+        machine_id: int,
     ) -> int:
         """Computes the start time for the given operation on the given
         machine.
@@ -220,17 +260,6 @@ class Dispatcher:
                 scheduled. If None, the start time is computed based on the
                 next available time for the operation on any machine.
         """
-        if machine_id is None:
-            min_start_time = float("inf")
-            job_id = operation.job_id
-            for _machine_id in operation.machines:
-                start_time = max(
-                    self._machine_next_available_time[_machine_id],
-                    self._job_next_available_time[job_id],
-                )
-                min_start_time = min(min_start_time, start_time)
-            return int(min_start_time)
-
         return max(
             self._machine_next_available_time[machine_id],
             self._job_next_available_time[operation.job_id],
