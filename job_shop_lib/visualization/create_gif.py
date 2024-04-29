@@ -4,14 +4,18 @@ dispatching rule solver."""
 import os
 import pathlib
 import shutil
-from typing import Callable
+from collections.abc import Callable
 
 import imageio
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
 from job_shop_lib import JobShopInstance, Schedule, Operation
-from job_shop_lib.dispatching import DispatchingRuleSolver, Dispatcher
+from job_shop_lib.dispatching import (
+    DispatchingRuleSolver,
+    Dispatcher,
+    HistoryTracker,
+)
 from job_shop_lib.visualization.gantt_chart import plot_gantt_chart
 
 
@@ -114,7 +118,11 @@ def plot_gantt_chart_wrapper(
             ha="right",
             va="bottom",
             transform=ax.transAxes,
-            bbox=dict(facecolor="white", alpha=0.5, boxstyle="round,pad=0.5"),
+            bbox={
+                "facecolor": "white",
+                "alpha": 0.5,
+                "boxstyle": "round,pad=0.5",
+            },
         )
         return fig
 
@@ -144,22 +152,23 @@ def create_gantt_chart_frames(
         plot_current_time:
             Whether to plot a vertical line at the current time."""
     dispatcher = Dispatcher(instance, pruning_function=solver.pruning_function)
-    schedule = dispatcher.schedule
-    makespan = solver(instance).makespan()
-    iteration = 0
-
-    while not schedule.is_complete():
-        solver.step(dispatcher)
-        iteration += 1
+    history_tracker = HistoryTracker(dispatcher)
+    makespan = solver.solve(instance, dispatcher).makespan()
+    dispatcher.unsubscribe(history_tracker)
+    dispatcher.reset()
+    for i, scheduled_operation in enumerate(history_tracker.history, start=1):
+        dispatcher.dispatch(
+            scheduled_operation.operation, scheduled_operation.machine_id
+        )
         fig = plot_function(
-            schedule,
+            dispatcher.schedule,
             makespan,
             dispatcher.available_operations(),
         )
         current_time = (
             None if not plot_current_time else dispatcher.current_time()
         )
-        _save_frame(fig, frames_dir, iteration, current_time)
+        _save_frame(fig, frames_dir, i, current_time)
 
 
 def _save_frame(
