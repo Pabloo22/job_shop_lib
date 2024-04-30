@@ -34,6 +34,9 @@ class DispatcherObserver(abc.ABC):
     def reset(self):
         """Called when the dispatcher is reset."""
 
+    def __str__(self) -> str:
+        return self.__class__.__name__
+
 
 def _dispatcher_cache(method):
     """Decorator to cache results of a method based on its name.
