@@ -80,8 +80,8 @@ class Dispatcher:
         schedule:
             The schedule of operations on machines.
         pruning_function:
-            The pipeline of pruning methods to be used to filter out
-            operations from the list of available operations.
+            A function that filters out operations that are not ready to be
+            scheduled.
         subscribers:
             A list of observers that are subscribed to the dispatcher.
     """
@@ -109,12 +109,11 @@ class Dispatcher:
         Args:
             instance:
                 The instance of the job shop problem to be solved.
-            pruning_strategies:
-                A list of pruning strategies to be used to filter out
-                operations from the list of available operations. Supported
-                values are 'dominated_operations' and 'non_immediate_machines'.
-                Defaults to [PruningStrategy.DOMINATED_OPERATIONS]. To disable
-                pruning, pass an empty list.
+            pruning_function:
+                A function that filters out operations that are not ready to
+                be scheduled. The function should take the dispatcher and a
+                list of operations as input and return a list of operations
+                that are ready to be scheduled. If `None`, no pruning is done.
         """
 
         self.instance = instance
