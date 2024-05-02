@@ -1,6 +1,11 @@
 """Home of the `Schedule` class."""
 
-from job_shop_lib import ScheduledOperation, JobShopInstance
+from __future__ import annotations
+
+from typing import Any
+from collections import deque
+
+from job_shop_lib import ScheduledOperation, JobShopInstance, JobShopLibError
 
 
 class Schedule:
@@ -70,6 +75,96 @@ class Schedule:
     def num_scheduled_operations(self) -> int:
         """Returns the number of operations that have been scheduled."""
         return sum(len(machine_schedule) for machine_schedule in self.schedule)
+
+    def to_dict(self) -> dict:
+        """Returns a dictionary representation of the schedule.
+
+        This representation is useful for saving the instance to a JSON file.
+
+        Returns:
+            A dictionary representation of the schedule with the following
+            keys:
+                - "instance": A dictionary representation of the instance.
+                - "job_sequences": A list of lists of job ids. Each list of job
+                    ids represents the order of operations on the machine. The
+                    machine that the list corresponds to is determined by the
+                    index of the list.
+                - "metadata": A dictionary with additional information about
+                    the schedule.
+        """
+        job_sequences: list[list[int]] = []
+        for machine_schedule in self.schedule:
+            job_sequences.append(
+                [operation.job_id for operation in machine_schedule]
+            )
+
+        return {
+            "instance": self.instance.to_dict(),
+            "job_sequences": job_sequences,
+            "metadata": self.metadata,
+        }
+
+    @staticmethod
+    def from_dict(
+        instance: dict[str, Any] | JobShopInstance,
+        job_sequences: list[list[int]],
+        metadata: dict[str, Any] | None = None,
+    ) -> Schedule:
+        """Creates a schedule from a dictionary representation."""
+        if isinstance(instance, dict):
+            instance = JobShopInstance.from_matrices(**instance)
+        schedule = Schedule.from_job_sequences(instance, job_sequences)
+        schedule.metadata = metadata if metadata is not None else {}
+        return schedule
+
+    @staticmethod
+    def from_job_sequences(
+        instance: JobShopInstance,
+        job_sequences: list[list[int]],
+    ) -> Schedule:
+        """Creates an active schedule from a list of job sequences.
+
+        An active schedule is the optimal schedule for the given job sequences.
+        In other words, it is not possible to construct another schedule,
+        through changes in the order of processing on the machines, with at
+        least one operation finishing earlier and no operation finishing later.
+
+        Args:
+            instance:
+                The `JobShopInstance` object that the schedule is for.
+            job_sequences:
+                A list of lists of job ids. Each list of job ids represents the
+                order of operations on the machine. The machine that the list
+                corresponds to is determined by the index of the list.
+
+        Returns:
+            A `Schedule` object with the given job sequences.
+        """
+        from job_shop_lib.dispatching import Dispatcher
+
+        dispatcher = Dispatcher(instance)
+        dispatcher.reset()
+        raw_solution_deques = [deque(job_ids) for job_ids in job_sequences]
+
+        while not dispatcher.schedule.is_complete():
+            at_least_one_operation_scheduled = False
+            for machine_id, job_ids in enumerate(raw_solution_deques):
+                if not job_ids:
+                    continue
+                job_id = job_ids[0]
+                operation_index = dispatcher.job_next_operation_index[job_id]
+                operation = instance.jobs[job_id][operation_index]
+                is_ready = dispatcher.is_operation_ready(operation)
+                if is_ready and machine_id in operation.machines:
+                    dispatcher.dispatch(operation, machine_id)
+                    job_ids.popleft()
+                    at_least_one_operation_scheduled = True
+
+            if not at_least_one_operation_scheduled:
+                raise JobShopLibError(
+                    "Invalid job sequences. No valid operation to schedule."
+                )
+        return dispatcher.schedule
 
     def reset(self):
         """Resets the schedule to an empty state."""
