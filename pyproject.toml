@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "job-shop-lib"
-version = "0.2.1"
+version = "0.3.0"
 description = "An easy-to-use and modular Python library for the Job Shop Scheduling Problem (JSSP)"
 authors = ["Pabloo22 <pablete.arino@gmail.com>"]
 license = "MIT"
