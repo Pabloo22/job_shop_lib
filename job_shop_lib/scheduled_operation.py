@@ -1,6 +1,8 @@
 """Home of the `ScheduledOperation` class."""
 
-from job_shop_lib import Operation
+from warnings import warn
+
+from job_shop_lib import Operation, JobShopLibError
 
 
 class ScheduledOperation:
@@ -47,7 +49,7 @@ class ScheduledOperation:
     @machine_id.setter
     def machine_id(self, value: int):
         if value not in self.operation.machines:
-            raise ValueError(
+            raise JobShopLibError(
                 f"Operation cannot be scheduled on machine {value}. "
                 f"Valid machines are {self.operation.machines}."
             )
@@ -62,18 +64,28 @@ class ScheduledOperation:
         """
 
         if self.operation.job_id is None:
-            raise ValueError("Operation has no job_id.")
+            raise JobShopLibError("Operation has no job_id.")
         return self.operation.job_id
 
     @property
     def position(self) -> int:
+        """Deprecated. Use `position_in_job` instead."""
+        warn(
+            "The `position` attribute is deprecated. Use `position_in_job` "
+            "instead. It will be removed in version 1.0.0.",
+            DeprecationWarning,
+        )
+        return self.position_in_job
+
+    @property
+    def position_in_job(self) -> int:
         """Returns the position (starting at zero) of the operation in the job.
 
         Raises:
             ValueError: If the operation has no position_in_job.
         """
         if self.operation.position_in_job is None:
-            raise ValueError("Operation has no position.")
+            raise JobShopLibError("Operation has no position.")
         return self.operation.position_in_job
 
     @property
@@ -91,7 +103,7 @@ class ScheduledOperation:
         if not isinstance(value, ScheduledOperation):
             return False
         return (
-            self.operation is value.operation
+            self.operation == value.operation
             and self.start_time == value.start_time
             and self.machine_id == value.machine_id
         )
