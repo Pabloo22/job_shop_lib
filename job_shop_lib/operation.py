@@ -107,10 +107,10 @@ class Operation:
     def __hash__(self) -> int:
         return hash(self.operation_id)
 
-    def __eq__(self, __value: object) -> bool:
-        if isinstance(__value, Operation):
-            return self.operation_id == __value.operation_id
-        return False
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Operation):
+            return False
+        return self.__slots__ == value.__slots__
 
     def __repr__(self) -> str:
         machines = (
