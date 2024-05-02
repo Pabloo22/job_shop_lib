@@ -1,5 +1,5 @@
 import pytest
-from job_shop_lib import ScheduledOperation, Operation
+from job_shop_lib import ScheduledOperation, Operation, JobShopLibError
 
 
 def test_scheduled_operation_initialization():
@@ -26,7 +26,7 @@ def test_machine_id_setter_failure():
     scheduled_operation = ScheduledOperation(
         operation, start_time=10, machine_id=1
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(JobShopLibError):
         scheduled_operation.machine_id = 3  # Invalid machine
 
 
