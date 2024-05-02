@@ -37,6 +37,9 @@ class DispatcherObserver(abc.ABC):
     def __str__(self) -> str:
         return self.__class__.__name__
 
+    def __repr__(self) -> str:
+        return str(self)
+
 
 def _dispatcher_cache(method):
     """Decorator to cache results of a method based on its name.
@@ -125,6 +128,12 @@ class Dispatcher:
         self._job_next_available_time = [0] * self.instance.num_jobs
         self.subscribers: list[DispatcherObserver] = []
         self._cache: dict[str, Any] = {}
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.instance})"
+
+    def __repr__(self) -> str:
+        return str(self)
 
     @property
     def machine_next_available_time(self) -> list[int]:
