@@ -7,6 +7,7 @@ from typing import Any
 from collections.abc import Callable
 from collections import deque
 from functools import wraps
+from warnings import warn
 
 from job_shop_lib import (
     JobShopInstance,
@@ -155,21 +156,13 @@ class Dispatcher:
     def create_schedule_from_raw_solution(
         cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
     ) -> Schedule:
-        """Creates a schedule from a raw solution.
-
-        A raw solution is a list of lists of operations, where each list
-        represents the order of operations for a machine.
-
-        Args:
-            instance:
-                The instance of the job shop problem to be solved.
-            raw_solution:
-                A list of lists of operations, where each list represents the
-                order of operations for a machine.
-
-        Returns:
-            A Schedule object representing the solution.
-        """
+        """Deprecated method, use `Schedule.from_job_sequences` instead."""
+        warn(
+            "Dispatcher.create_schedule_from_raw_solution is deprecated. "
+            "Use Schedule.from_job_sequences instead. It will be removed in "
+            "version 1.0.0.",
+            DeprecationWarning,
+        )
         dispatcher = cls(instance)
         dispatcher.reset()
         raw_solution_deques = [
