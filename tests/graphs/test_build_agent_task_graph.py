@@ -14,7 +14,7 @@ def test_expected_num_nodes_complete():
         expected_num_nodes = get_expected_num_nodes_for_complete_graph(
             instance
         )
-        assert graph.num_nodes == expected_num_nodes
+        assert len(graph.nodes) == expected_num_nodes
 
 
 def test_expected_num_nodes_with_jobs():
@@ -24,7 +24,7 @@ def test_expected_num_nodes_with_jobs():
         expected_num_nodes = get_expected_num_nodes_for_graph_with_jobs(
             instance
         )
-        assert graph.num_nodes == expected_num_nodes
+        assert len(graph.nodes) == expected_num_nodes
 
 
 def test_expected_num_nodes():
@@ -32,7 +32,7 @@ def test_expected_num_nodes():
     for instance in list(benchmark_instances.values())[:10]:
         graph = build_agent_task_graph(instance)
         expected_num_nodes = get_expected_num_nodes(instance)
-        assert graph.num_nodes == expected_num_nodes
+        assert len(graph.nodes) == expected_num_nodes
 
 
 def test_expected_num_edges_complete():

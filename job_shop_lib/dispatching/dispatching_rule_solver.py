@@ -76,12 +76,15 @@ class DispatchingRuleSolver(BaseSolver):
         self.machine_chooser = machine_chooser
         self.pruning_function = pruning_function
 
-    def solve(self, instance: JobShopInstance) -> Schedule:
+    def solve(
+        self, instance: JobShopInstance, dispatcher: Dispatcher | None = None
+    ) -> Schedule:
         """Returns a schedule for the given job shop instance using the
         dispatching rule algorithm."""
-        dispatcher = Dispatcher(
-            instance, pruning_function=self.pruning_function
-        )
+        if dispatcher is None:
+            dispatcher = Dispatcher(
+                instance, pruning_function=self.pruning_function
+            )
         while not dispatcher.schedule.is_complete():
             self.step(dispatcher)
 
@@ -101,11 +104,16 @@ class DispatchingRuleSolver(BaseSolver):
 
 
 if __name__ == "__main__":
-    import cProfile
+    import time
     from job_shop_lib.benchmarking import load_benchmark_instance
 
     ta_instances = []
     for i in range(1, 81):
         ta_instances.append(load_benchmark_instance(f"ta{i:02d}"))
     solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
-    cProfile.run("for instance in ta_instances: solver.solve(instance)")
+    # cProfile.run("for instance in ta_instances: solver.solve(instance)")
+    start = time.perf_counter()
+    for instance_ in ta_instances:
+        solver.solve(instance_)
+    end = time.perf_counter()
+    print(f"Elapsed time: {end - start:.2f} seconds.")

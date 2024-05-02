@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import abc
+from typing import Any
 from collections.abc import Callable
 from collections import deque
+from functools import wraps
 
 from job_shop_lib import (
     JobShopInstance,
@@ -13,6 +16,59 @@ from job_shop_lib import (
 )
 
 
+# Added here to avoid circular imports
+class DispatcherObserver(abc.ABC):
+    """Interface for classes that observe the dispatcher."""
+
+    def __init__(self, dispatcher: Dispatcher):
+        """Initializes the observer with the dispatcher and subscribes to
+        it."""
+        self.dispatcher = dispatcher
+        self.dispatcher.subscribe(self)
+
+    @abc.abstractmethod
+    def update(self, scheduled_operation: ScheduledOperation):
+        """Called when an operation is scheduled on a machine."""
+
+    @abc.abstractmethod
+    def reset(self):
+        """Called when the dispatcher is reset."""
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
+
+    def __repr__(self) -> str:
+        return str(self)
+
+
+def _dispatcher_cache(method):
+    """Decorator to cache results of a method based on its name.
+
+    This decorator assumes that the class has an attribute called `_cache`
+    that is a dictionary. It caches the result of the method based on its
+    name. If the result is already cached, it returns the cached result
+    instead of recomputing it.
+
+    The decorator is useful since the dispatcher class can clear the cache
+    when the state of the dispatcher changes.
+    """
+
+    @wraps(method)
+    def wrapper(self: Dispatcher, *args, **kwargs):
+        # pylint: disable=protected-access
+        cache_key = method.__name__
+        cached_result = self._cache.get(cache_key)
+        if cached_result is not None:
+            return cached_result
+
+        result = method(self, *args, **kwargs)
+        self._cache[cache_key] = result
+        return result
+
+    return wrapper
+
+
+# pylint: disable=too-many-instance-attributes
 class Dispatcher:
     """Handles the logic of scheduling operations on machines.
 
@@ -27,8 +83,10 @@ class Dispatcher:
         schedule:
             The schedule of operations on machines.
         pruning_function:
-            The pipeline of pruning methods to be used to filter out
-            operations from the list of available operations.
+            A function that filters out operations that are not ready to be
+            scheduled.
+        subscribers:
+            A list of observers that are subscribed to the dispatcher.
     """
 
     __slots__ = (
@@ -38,6 +96,8 @@ class Dispatcher:
         "_job_next_operation_index",
         "_job_next_available_time",
         "pruning_function",
+        "subscribers",
+        "_cache",
     )
 
     def __init__(
@@ -52,20 +112,28 @@ class Dispatcher:
         Args:
             instance:
                 The instance of the job shop problem to be solved.
-            pruning_strategies:
-                A list of pruning strategies to be used to filter out
-                operations from the list of available operations. Supported
-                values are 'dominated_operations' and 'non_immediate_machines'.
-                Defaults to [PruningStrategy.DOMINATED_OPERATIONS]. To disable
-                pruning, pass an empty list.
+            pruning_function:
+                A function that filters out operations that are not ready to
+                be scheduled. The function should take the dispatcher and a
+                list of operations as input and return a list of operations
+                that are ready to be scheduled. If `None`, no pruning is done.
         """
 
         self.instance = instance
         self.schedule = Schedule(self.instance)
+        self.pruning_function = pruning_function
+
         self._machine_next_available_time = [0] * self.instance.num_machines
         self._job_next_operation_index = [0] * self.instance.num_jobs
         self._job_next_available_time = [0] * self.instance.num_jobs
-        self.pruning_function = pruning_function
+        self.subscribers: list[DispatcherObserver] = []
+        self._cache: dict[str, Any] = {}
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.instance})"
+
+    def __repr__(self) -> str:
+        return str(self)
 
     @property
     def machine_next_available_time(self) -> list[int]:
@@ -117,12 +185,23 @@ class Dispatcher:
                     operations.popleft()
         return dispatcher.schedule
 
+    def subscribe(self, observer: DispatcherObserver):
+        """Subscribes an observer to the dispatcher."""
+        self.subscribers.append(observer)
+
+    def unsubscribe(self, observer: DispatcherObserver):
+        """Unsubscribes an observer from the dispatcher."""
+        self.subscribers.remove(observer)
+
     def reset(self) -> None:
         """Resets the dispatcher to its initial state."""
         self.schedule.reset()
         self._machine_next_available_time = [0] * self.instance.num_machines
         self._job_next_operation_index = [0] * self.instance.num_jobs
         self._job_next_available_time = [0] * self.instance.num_jobs
+        self._cache = {}
+        for subscriber in self.subscribers:
+            subscriber.reset()
 
     def dispatch(self, operation: Operation, machine_id: int) -> None:
         """Schedules the given operation on the given machine.
@@ -153,6 +232,10 @@ class Dispatcher:
         self.schedule.add(scheduled_operation)
         self._update_tracking_attributes(scheduled_operation)
 
+        # Notify subscribers
+        for subscriber in self.subscribers:
+            subscriber.update(scheduled_operation)
+
     def is_operation_ready(self, operation: Operation) -> bool:
         """Returns True if the given operation is ready to be scheduled.
 
@@ -164,11 +247,15 @@ class Dispatcher:
                 The operation to be checked.
         """
         return (
-            self.job_next_operation_index[operation.job_id]
+            self._job_next_operation_index[operation.job_id]
             == operation.position_in_job
         )
 
-    def start_time(self, operation: Operation, machine_id: int) -> int:
+    def start_time(
+        self,
+        operation: Operation,
+        machine_id: int,
+    ) -> int:
         """Computes the start time for the given operation on the given
         machine.
 
@@ -181,11 +268,12 @@ class Dispatcher:
                 The operation to be scheduled.
             machine_id:
                 The id of the machine on which the operation is to be
-                scheduled.
+                scheduled. If None, the start time is computed based on the
+                next available time for the operation on any machine.
         """
         return max(
-            self.machine_next_available_time[machine_id],
-            self.job_next_available_time[operation.job_id],
+            self._machine_next_available_time[machine_id],
+            self._job_next_available_time[operation.job_id],
         )
 
     def _update_tracking_attributes(
@@ -196,10 +284,12 @@ class Dispatcher:
         machine_id = scheduled_operation.machine_id
         end_time = scheduled_operation.end_time
 
-        self.machine_next_available_time[machine_id] = end_time
-        self.job_next_operation_index[job_id] += 1
-        self.job_next_available_time[job_id] = end_time
+        self._machine_next_available_time[machine_id] = end_time
+        self._job_next_operation_index[job_id] += 1
+        self._job_next_available_time[job_id] = end_time
+        self._cache = {}
 
+    @_dispatcher_cache
     def current_time(self) -> int:
         """Returns the current time of the schedule.
 
@@ -207,7 +297,8 @@ class Dispatcher:
         operations.
         """
         available_operations = self.available_operations()
-        return self.min_start_time(available_operations)
+        current_time = self.min_start_time(available_operations)
+        return current_time
 
     def min_start_time(self, operations: list[Operation]) -> int:
         """Returns the minimum start time of the available operations."""
@@ -220,6 +311,7 @@ class Dispatcher:
                 min_start_time = min(min_start_time, start_time)
         return int(min_start_time)
 
+    @_dispatcher_cache
     def uncompleted_operations(self) -> list[Operation]:
         """Returns the list of operations that have not been scheduled.
 
@@ -228,30 +320,24 @@ class Dispatcher:
         It is more efficient than checking all operations in the instance.
         """
         uncompleted_operations = []
-        for job_id, next_position in enumerate(self.job_next_operation_index):
+        for job_id, next_position in enumerate(self._job_next_operation_index):
             operations = self.instance.jobs[job_id][next_position:]
             uncompleted_operations.extend(operations)
         return uncompleted_operations
 
+    @_dispatcher_cache
     def available_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing, optionally
-        filtering out operations known to be bad choices.
+        filtering out operations using the pruning function.
 
         This method first gathers all possible next operations from the jobs
-        being processed. It then optionally filters these operations to exclude
-        ones that are deemed inefficient or suboptimal choices.
-
-        An operation is sub-optimal if there is another operation that could
-        be scheduled in the same machine that would finish before the start
-        time of the sub-optimal operation.
+        being processed. It then optionally filters these operations using the
+        pruning function.
 
         Returns:
             A list of Operation objects that are available for scheduling.
-
-        Raises:
-            ValueError: If using the filter_bad_choices option and one of the
-                available operations can be scheduled in more than one machine.
         """
+
         available_operations = self._available_operations()
         if self.pruning_function is not None:
             available_operations = self.pruning_function(
@@ -261,7 +347,7 @@ class Dispatcher:
 
     def _available_operations(self) -> list[Operation]:
         available_operations = []
-        for job_id, next_position in enumerate(self.job_next_operation_index):
+        for job_id, next_position in enumerate(self._job_next_operation_index):
             if next_position == len(self.instance.jobs[job_id]):
                 continue
             operation = self.instance.jobs[job_id][next_position]

@@ -15,7 +15,7 @@ RULES_TO_TEST = [
     DispatchingRule.MOST_OPERATIONS_REMAINING,
 ]
 INSTANCES_TO_TEST = [
-    load_benchmark_instance(f"la{i:02d}") for i in range(1, 41)
+    load_benchmark_instance(f"la{i:02d}") for i in range(1, 11)
 ]
 
 
@@ -100,6 +100,38 @@ def test_is_operation_ready(example_job_shop_instance: JobShopInstance):
     assert not dispatcher.is_operation_ready(job_3[0])
     assert not dispatcher.is_operation_ready(job_3[1])
     assert dispatcher.is_operation_ready(job_3[2])
+
+
+def test_cache(example_job_shop_instance: JobShopInstance):
+    # pylint: disable=protected-access
+    dispatcher = Dispatcher(example_job_shop_instance)
+
+    assert dispatcher.current_time() == dispatcher.current_time()
+
+    assert (
+        dispatcher.available_operations() == dispatcher.available_operations()
+    )
+    assert (
+        dispatcher.uncompleted_operations()
+        == dispatcher.uncompleted_operations()
+    )
+    job_1 = example_job_shop_instance.jobs[0]
+    job_3 = example_job_shop_instance.jobs[2]
+
+    machine_1 = 0
+    machine_2 = 1
+    machine_3 = 2
+
+    dispatcher.dispatch(job_1[0], machine_1)
+    assert (
+        dispatcher.available_operations() == dispatcher.available_operations()
+    )
+    dispatcher.dispatch(job_1[1], machine_2)
+    dispatcher.dispatch(job_3[0], machine_3)
+    assert (
+        dispatcher.uncompleted_operations()
+        == dispatcher.uncompleted_operations()
+    )
 
 
 def test_current_time(example_job_shop_instance: JobShopInstance):

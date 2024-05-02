@@ -3,13 +3,14 @@
 import collections
 import networkx as nx
 
-from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib import JobShopInstance, JobShopLibError
 from job_shop_lib.graphs import Node, NodeType
 
 
 NODE_ATTR = "node"
 
 
+# pylint: disable=too-many-instance-attributes
 class JobShopGraph:
     """Data structure to represent a `JobShopInstance` as a graph.
 
@@ -30,29 +31,7 @@ class JobShopGraph:
             The directed graph representing the job shop, where nodes are
                 operations, machines, jobs, or abstract concepts like global,
                 source, and sink, with edges indicating dependencies.
-        nodes:
-            A list of all nodes, encapsulated by the `Node` class, in the
-                graph.
-        nodes_by_type:
-            A dictionary categorizing nodes by their `NodeType`,
-                facilitating access to nodes of a particular type.
-        nodes_by_machine:
-            A nested list mapping each machine to its associated
-                operation nodes, aiding in machine-specific analysis.
-        nodes_by_job:
-            Similar to `nodes_by_machine`, but maps jobs to their
-                operation nodes, useful for job-specific traversal.
     """
-
-    __slots__ = (
-        "instance",
-        "graph",
-        "nodes",
-        "nodes_by_type",
-        "nodes_by_machine",
-        "nodes_by_job",
-        "_next_node_id",
-    )
 
     def __init__(self, instance: JobShopInstance):
         """Initializes the graph with the given instance.
@@ -67,33 +46,61 @@ class JobShopGraph:
         self.graph = nx.DiGraph()
         self.instance = instance
 
-        self.nodes: list[Node] = []
-
-        self.nodes_by_type: dict[NodeType, list[Node]] = (
+        self._nodes: list[Node] = []
+        self._nodes_by_type: dict[NodeType, list[Node]] = (
             collections.defaultdict(list)
         )
-
-        self.nodes_by_machine: list[list[Node]] = [
+        self._nodes_by_machine: list[list[Node]] = [
             [] for _ in range(instance.num_machines)
         ]
-
-        self.nodes_by_job: list[list[Node]] = [
+        self._nodes_by_job: list[list[Node]] = [
             [] for _ in range(instance.num_jobs)
         ]
-
         self._next_node_id = 0
-
+        self.removed_nodes: list[bool] = []
         self._add_operation_nodes()
 
     @property
-    def num_nodes(self) -> int:
-        """Number of nodes in the graph."""
-        return len(self.nodes)
+    def nodes(self) -> list[Node]:
+        """List of all nodes added to the graph.
+
+        It may contain nodes that have been removed from the graph.
+        """
+        return self._nodes
+
+    @property
+    def nodes_by_type(self) -> dict[NodeType, list[Node]]:
+        """Dictionary mapping node types to lists of nodes.
+
+        It may contain nodes that have been removed from the graph.
+        """
+        return self._nodes_by_type
+
+    @property
+    def nodes_by_machine(self) -> list[list[Node]]:
+        """List of lists mapping machine ids to operation nodes.
+
+        It may contain nodes that have been removed from the graph.
+        """
+        return self._nodes_by_machine
+
+    @property
+    def nodes_by_job(self) -> list[list[Node]]:
+        """List of lists mapping job ids to operation nodes.
+
+        It may contain nodes that have been removed from the graph.
+        """
+        return self._nodes_by_job
 
     @property
     def num_edges(self) -> int:
         """Number of edges in the graph."""
         return self.graph.number_of_edges()
+
+    @property
+    def num_job_nodes(self) -> int:
+        """Number of job nodes in the graph."""
+        return len(self._nodes_by_type[NodeType.JOB])
 
     def _add_operation_nodes(self) -> None:
         """Adds operation nodes to the graph."""
@@ -101,10 +108,6 @@ class JobShopGraph:
             for operation in job:
                 node = Node(node_type=NodeType.OPERATION, operation=operation)
                 self.add_node(node)
-
-    def get_operation_from_id(self, operation_id: int) -> Operation:
-        """Returns the operation with the given id."""
-        return self.nodes[operation_id].operation
 
     def add_node(self, node_for_adding: Node) -> None:
         """Adds a node to the graph and updates relevant class attributes.
@@ -131,15 +134,16 @@ class JobShopGraph:
         self.graph.add_node(
             node_for_adding.node_id, **{NODE_ATTR: node_for_adding}
         )
-        self.nodes_by_type[node_for_adding.node_type].append(node_for_adding)
-        self.nodes.append(node_for_adding)
+        self._nodes_by_type[node_for_adding.node_type].append(node_for_adding)
+        self._nodes.append(node_for_adding)
         self._next_node_id += 1
+        self.removed_nodes.append(False)
 
         if node_for_adding.node_type == NodeType.OPERATION:
             operation = node_for_adding.operation
-            self.nodes_by_job[operation.job_id].append(node_for_adding)
+            self._nodes_by_job[operation.job_id].append(node_for_adding)
             for machine_id in operation.machines:
-                self.nodes_by_machine[machine_id].append(node_for_adding)
+                self._nodes_by_machine[machine_id].append(node_for_adding)
 
     def add_edge(
         self, u_of_edge: Node | int, v_of_edge: Node | int, **attr
@@ -156,14 +160,43 @@ class JobShopGraph:
             **attr: Additional attributes to be added to the edge.
 
         Raises:
-            ValueError: If `u_of_edge` or `v_of_edge` are not in the graph.
+            JobShopLibError: If `u_of_edge` or `v_of_edge` are not in the
+                graph.
         """
         if isinstance(u_of_edge, Node):
             u_of_edge = u_of_edge.node_id
         if isinstance(v_of_edge, Node):
             v_of_edge = v_of_edge.node_id
         if u_of_edge not in self.graph or v_of_edge not in self.graph:
-            raise ValueError(
+            raise JobShopLibError(
                 "`u_of_edge` and `v_of_edge` must be in the graph."
             )
         self.graph.add_edge(u_of_edge, v_of_edge, **attr)
+
+    def remove_node(self, node_id: int) -> None:
+        """Removes a node from the graph and the isolated nodes that result
+        from the removal.
+
+        Args:
+            node_id: The id of the node to remove.
+        """
+        self.graph.remove_node(node_id)
+        self.removed_nodes[node_id] = True
+
+        isolated_nodes = list(nx.isolates(self.graph))
+        for isolated_node in isolated_nodes:
+            self.removed_nodes[isolated_node] = True
+
+        self.graph.remove_nodes_from(isolated_nodes)
+
+    def is_removed(self, node: int | Node) -> bool:
+        """Returns whether the node is removed from the graph.
+
+        Args:
+            node: The node to check. If it is a `Node`, its `node_id` is used
+                as the node to check. Otherwise, it is assumed to be the
+                `node_id` of the node to check.
+        """
+        if isinstance(node, Node):
+            node = node.node_id
+        return self.removed_nodes[node]

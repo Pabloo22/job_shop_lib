@@ -8,6 +8,7 @@ import copy
 import matplotlib
 import matplotlib.pyplot as plt
 import networkx as nx
+from networkx.drawing.nx_agraph import graphviz_layout
 
 from job_shop_lib import JobShopInstance
 from job_shop_lib.graphs import (
@@ -65,20 +66,9 @@ def plot_disjunctive_graph(
     # Set up the layout
     # -----------------
     if layout is None:
-        try:
-            from networkx.drawing.nx_agraph import (
-                graphviz_layout,
-            )
-
-            layout = functools.partial(
-                graphviz_layout, prog="dot", args="-Grankdir=LR"
-            )
-        except ImportError:
-            warnings.warn(
-                "Could not import graphviz_layout. "
-                + "Using spring_layout instead."
-            )
-            layout = nx.spring_layout
+        layout = functools.partial(
+            graphviz_layout, prog="dot", args="-Grankdir=LR"
+        )
 
     temp_graph = copy.deepcopy(job_shop_graph.graph)
     # Remove disjunctive edges to get a better layout
@@ -89,11 +79,23 @@ def plot_disjunctive_graph(
             if d["type"] == EdgeType.DISJUNCTIVE
         ]
     )
-    pos = layout(temp_graph)  # type: ignore
+
+    try:
+        pos = layout(temp_graph)
+    except ImportError:
+        warnings.warn(
+            "Default layout requires pygraphviz http://pygraphviz.github.io/. "
+            "Using spring layout instead.",
+        )
+        pos = nx.spring_layout(temp_graph)
 
     # Draw nodes
     # ----------
-    node_colors = [_get_node_color(node) for node in job_shop_graph.nodes]
+    node_colors = [
+        _get_node_color(node)
+        for node in job_shop_graph.nodes
+        if not job_shop_graph.is_removed(node.node_id)
+    ]
 
     nx.draw_networkx_nodes(
         job_shop_graph.graph,
@@ -147,6 +149,8 @@ def plot_disjunctive_graph(
     sink_node = job_shop_graph.nodes_by_type[NodeType.SINK][0]
     labels[sink_node] = "T"
     for operation_node in operation_nodes:
+        if job_shop_graph.is_removed(operation_node.node_id):
+            continue
         labels[operation_node] = (
             f"m={operation_node.operation.machine_id}\n"
             f"d={operation_node.operation.duration}"
