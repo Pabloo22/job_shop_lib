@@ -16,6 +16,7 @@ pyarrow = "^15.0.0"  # An optional pandas' dependency that will be required in t
 networkx = "^3"
 imageio = "^2"
 pygraphviz = {version = "^1.12", optional = true}
+numpy = "^1.26.4"
 
 [tool.poetry.group.test]
 optional = true
@@ -38,7 +39,6 @@ optional = true
 [tool.poetry.group.notebooks.dependencies]
 ipykernel = "^6.29.2"
 nbconvert = "^7.16.0"
-numpy = "^1.26.4"
 pandas = "^2.2.1"
 
 [tool.poetry.extras]
