@@ -152,32 +152,6 @@ class Dispatcher:
         """Returns the next available time for each job."""
         return self._job_next_available_time
 
-    @classmethod
-    def create_schedule_from_raw_solution(
-        cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
-    ) -> Schedule:
-        """Deprecated method, use `Schedule.from_job_sequences` instead."""
-        warn(
-            "Dispatcher.create_schedule_from_raw_solution is deprecated. "
-            "Use Schedule.from_job_sequences instead. It will be removed in "
-            "version 1.0.0.",
-            DeprecationWarning,
-        )
-        dispatcher = cls(instance)
-        dispatcher.reset()
-        raw_solution_deques = [
-            deque(operations) for operations in raw_solution
-        ]
-        while not dispatcher.schedule.is_complete():
-            for machine_id, operations in enumerate(raw_solution_deques):
-                if not operations:
-                    continue
-                operation = operations[0]
-                if dispatcher.is_operation_ready(operation):
-                    dispatcher.dispatch(operation, machine_id)
-                    operations.popleft()
-        return dispatcher.schedule
-
     def subscribe(self, observer: DispatcherObserver):
         """Subscribes an observer to the dispatcher."""
         self.subscribers.append(observer)
@@ -305,20 +279,6 @@ class Dispatcher:
         return int(min_start_time)
 
     @_dispatcher_cache
-    def uncompleted_operations(self) -> list[Operation]:
-        """Returns the list of operations that have not been scheduled.
-
-        An operation is uncompleted if it has not been scheduled yet.
-
-        It is more efficient than checking all operations in the instance.
-        """
-        uncompleted_operations = []
-        for job_id, next_position in enumerate(self._job_next_operation_index):
-            operations = self.instance.jobs[job_id][next_position:]
-            uncompleted_operations.extend(operations)
-        return uncompleted_operations
-
-    @_dispatcher_cache
     def available_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing, optionally
         filtering out operations using the pruning function.
@@ -346,3 +306,74 @@ class Dispatcher:
             operation = self.instance.jobs[job_id][next_position]
             available_operations.append(operation)
         return available_operations
+
+    @_dispatcher_cache
+    def unscheduled_operations(self) -> list[Operation]:
+        """Returns the list of operations that have not been scheduled."""
+        uncompleted_operations = []
+        for job_id, next_position in enumerate(self._job_next_operation_index):
+            operations = self.instance.jobs[job_id][next_position:]
+            uncompleted_operations.extend(operations)
+        return uncompleted_operations
+
+    @_dispatcher_cache
+    def available_machines(self) -> list[int]:
+        """Returns the list of available machines."""
+        available_operations = self.available_operations()
+        available_machines = set()
+        for operation in available_operations:
+            available_machines.update(operation.machines)
+        return list(available_machines)
+
+    @_dispatcher_cache
+    def available_jobs(self) -> list[int]:
+        """Returns the list of available jobs."""
+        available_operations = self.available_operations()
+        available_jobs = set()
+        for operation in available_operations:
+            available_jobs.add(operation.job_id)
+        return list(available_jobs)
+
+    @classmethod
+    def create_schedule_from_raw_solution(
+        cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
+    ) -> Schedule:
+        """Deprecated method, use `Schedule.from_job_sequences` instead."""
+        warn(
+            "Dispatcher.create_schedule_from_raw_solution is deprecated. "
+            "Use Schedule.from_job_sequences instead. It will be removed in "
+            "version 1.0.0.",
+            DeprecationWarning,
+        )
+        dispatcher = cls(instance)
+        dispatcher.reset()
+        raw_solution_deques = [
+            deque(operations) for operations in raw_solution
+        ]
+        while not dispatcher.schedule.is_complete():
+            for machine_id, operations in enumerate(raw_solution_deques):
+                if not operations:
+                    continue
+                operation = operations[0]
+                if dispatcher.is_operation_ready(operation):
+                    dispatcher.dispatch(operation, machine_id)
+                    operations.popleft()
+        return dispatcher.schedule
+
+    def uncompleted_operations(self) -> list[Operation]:
+        """Returns the list of operations that have not been scheduled.
+
+        An operation is uncompleted if it has not been scheduled yet.
+
+        It is more efficient than checking all operations in the instance.
+
+        This method is deprecated. Use `Dispatcher.unscheduled_operations`
+        instead.
+        """
+        warn(
+            "Dispatcher.uncompleted_operations is deprecated. Use "
+            "Dispatcher.unscheduled_operations instead. It will be removed in "
+            "version 1.0.0.",
+            DeprecationWarning,
+        )
+        return self.unscheduled_operations()
