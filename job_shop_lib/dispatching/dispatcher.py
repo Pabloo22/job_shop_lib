@@ -310,11 +310,20 @@ class Dispatcher:
     @_dispatcher_cache
     def unscheduled_operations(self) -> list[Operation]:
         """Returns the list of operations that have not been scheduled."""
-        uncompleted_operations = []
+        unscheduled_operations = []
         for job_id, next_position in enumerate(self._job_next_operation_index):
             operations = self.instance.jobs[job_id][next_position:]
-            uncompleted_operations.extend(operations)
-        return uncompleted_operations
+            unscheduled_operations.extend(operations)
+        return unscheduled_operations
+
+    @_dispatcher_cache
+    def scheduled_operations(self) -> list[Operation]:
+        """Returns the list of operations that have been scheduled."""
+        scheduled_operations = []
+        for job_id, next_position in enumerate(self._job_next_operation_index):
+            operations = self.instance.jobs[job_id][:next_position]
+            scheduled_operations.extend(operations)
+        return scheduled_operations
 
     @_dispatcher_cache
     def available_machines(self) -> list[int]:
