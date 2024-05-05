@@ -11,33 +11,15 @@ from job_shop_lib.dispatching import Dispatcher, DispatcherObserver
 class FeatureObserver(DispatcherObserver):
     """Base class for node feature extractors."""
 
-    def __init__(
-        self, dispatcher: Dispatcher, graph: JobShopGraph | None = None
-    ):
+    def __init__(self, dispatcher: Dispatcher, graph: JobShopGraph):
         if graph is not None and dispatcher.instance is not graph.instance:
             raise JobShopLibError(
                 "The dispatcher and the graph must have the same instance."
             )
         super().__init__(dispatcher)
-        self._graph = graph
+        self.graph = graph
         self.node_features: dict[NodeType, np.ndarray] = {}
         self.initialize_features()
-
-    @property
-    def graph(self) -> JobShopGraph:
-        """The graph that the features are extracted from."""
-        if self._graph is None:
-            raise JobShopLibError("The graph has not been set.")
-        return self._graph
-
-    @graph.setter
-    def graph(self, value: JobShopGraph):
-        """Sets the graph that the features are extracted from."""
-        if self.dispatcher.instance is not value.instance:
-            raise JobShopLibError(
-                "The dispatcher and the graph must have the same instance."
-            )
-        self._graph = value
 
     @abstractmethod
     def initialize_features(self):
