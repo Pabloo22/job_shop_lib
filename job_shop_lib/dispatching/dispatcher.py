@@ -329,10 +329,32 @@ class Dispatcher:
     def available_jobs(self) -> list[int]:
         """Returns the list of available jobs."""
         available_operations = self.available_operations()
-        available_jobs = set()
-        for operation in available_operations:
-            available_jobs.add(operation.job_id)
+        available_jobs = set(
+            operation.job_id for operation in available_operations
+        )
         return list(available_jobs)
+
+    def earliest_start_time(self, operation: Operation) -> int:
+        """Calculates the earliest start time for a given operation based on
+        machine and job constraints.
+
+        This method is different from the `start_time` method in that it
+        takes into account every machine that can process the operation, not
+        just the one that will process it.
+
+        Args:
+            operation:
+                The operation for which to calculate the earliest start time.
+
+        Returns:
+            The earliest start time for the operation.
+        """
+        machine_earliest_start_time = min(
+            self._machine_next_available_time[machine_id]
+            for machine_id in operation.machines
+        )
+        job_start_time = self._job_next_available_time[operation.job_id]
+        return max(machine_earliest_start_time, job_start_time)
 
     @classmethod
     def create_schedule_from_raw_solution(
