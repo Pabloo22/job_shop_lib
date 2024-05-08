@@ -21,9 +21,13 @@ class EarliestStartTimeObserver(FeatureObserver):
     def initialize_features(self):
         """Updates the features based on the current state of the
         dispatcher."""
-        self._update_operation_features()
-        self._update_machine_features()
-        self._update_job_features()
+        mapping = {
+            FeatureType.OPERATIONS: self._update_operation_features,
+            FeatureType.MACHINES: self._update_machine_features,
+            FeatureType.JOBS: self._update_job_features,
+        }
+        for feature_type in self.features:
+            mapping[feature_type]()
 
     def _update_operation_features(self):
         for operation in self.dispatcher.unscheduled_operations():
