@@ -1,7 +1,5 @@
 """A Feature Extractor computes features from a graph and a dispatcher."""
 
-from abc import abstractmethod
-
 import enum
 
 import numpy as np
@@ -57,7 +55,6 @@ class FeatureObserver(DispatcherObserver):
         }
         self.initialize_features()
 
-    @abstractmethod
     def initialize_features(self):
         """Creates the features for the nodes in the graph."""
 
