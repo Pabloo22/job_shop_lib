@@ -1,39 +1,41 @@
 """Home of the `CompositeFeatureObserver` class."""
 
+from collections import defaultdict
 import numpy as np
 
-from job_shop_lib import JobShopLibError
-from job_shop_lib.graphs import NodeType
-from job_shop_lib.dispatching.feature_extraction import FeatureObserver
+from job_shop_lib.dispatching import Dispatcher
+from job_shop_lib.dispatching.feature_extraction import (
+    FeatureObserver,
+    FeatureType,
+)
 
 
 class CompositeFeatureObserver(FeatureObserver):
-    """Feature creator that combines multiple feature creators."""
+    """Aggregates features from other FeatureObserver instances subscribed to
+    the same `Dispatcher` by concatenating their feature matrices along the
+    first axis (horizontal concatenation)."""
+
+    def __init__(
+        self,
+        dispatcher: Dispatcher,
+        feature_observers: list[FeatureObserver] | None = None,
+    ):
+        if feature_observers is None:
+            feature_observers = [
+                observer
+                for observer in dispatcher.subscribers
+                if isinstance(observer, FeatureObserver)
+            ]
+        self.feature_observers = feature_observers
+        super().__init__(dispatcher)
 
     def initialize_features(self):
-        trackers = self._get_trackers()
-        node_features: dict[NodeType, list[np.ndarray]] = {
-            node_type: [] for node_type in self.graph.nodes_by_type
-        }
-        for tracker in trackers:
-            for node_type, features in tracker.node_features.items():
-                if features.size > 0:
-                    node_features[node_type].append(features)
+        features: dict[FeatureType, list[np.ndarray]] = defaultdict(list)
+        for tracker in self.feature_observers:
+            for feature_type, feature_matrix in tracker.features.items():
+                features[feature_type].append(feature_matrix)
 
-        self.node_features = {
-            node_type: np.concatenate(features, axis=1)
-            for node_type, features in node_features.items()
+        self.features = {
+            feature_type: np.concatenate(features, axis=1)
+            for feature_type, features in features.items()
         }
-
-    def _get_trackers(self) -> list[FeatureObserver]:
-        trackers = [
-            subscriber
-            for subscriber in self.dispatcher.subscribers
-            if isinstance(subscriber, FeatureObserver)
-        ]
-        if trackers[-1] is not self:
-            raise JobShopLibError(
-                "The last subscriber must be the CompositeFeatureObserver."
-            )
-        trackers.pop()
-        return trackers
