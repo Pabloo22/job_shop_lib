@@ -1,4 +1,4 @@
-"""A Feature Extractor computes features from a graph and a dispatcher."""
+"""Home of the `FeatureObserver` class and `FeatureType` enum."""
 
 import enum
 
@@ -8,7 +8,7 @@ from job_shop_lib.dispatching import Dispatcher, DispatcherObserver
 
 
 class FeatureType(str, enum.Enum):
-    """Types of features that can be extracted from a graph."""
+    """Types of features that can be extracted."""
 
     OPERATIONS = "operations"
     MACHINES = "machines"
@@ -56,12 +56,28 @@ class FeatureObserver(DispatcherObserver):
         self.initialize_features()
 
     def initialize_features(self):
-        """Creates the features for the nodes in the graph."""
+        """Initializes the features based on the current state of the
+        dispatcher."""
 
     def update(self, scheduled_operation: ScheduledOperation):
-        """Updates the features of the nodes in the graph."""
+        """Updates the features based on the scheduled operation.
+
+        Args:
+            scheduled_operation:
+                The operation that has been scheduled.
+        """
         self.initialize_features()
 
     def reset(self):
-        """Resets the node features to their initial values."""
+        """Sets features to zero and calls to `initialize_features`.
+
+        This method should not be overridden by subclasses.
+        """
+        self.features = {
+            feature_type: np.zeros(
+                self.feature_dimensions[feature_type],
+                dtype=np.float32,
+            )
+            for feature_type in self.features
+        }
         self.initialize_features()

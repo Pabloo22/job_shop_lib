@@ -26,8 +26,6 @@ class EarliestStartTimeObserver(FeatureObserver):
         self._update_job_features()
 
     def _update_operation_features(self):
-        """Updates the earliest start time for operation nodes."""
-
         for operation in self.dispatcher.unscheduled_operations():
             start_time = self.dispatcher.earliest_start_time(operation)
             adjusted_start_time = start_time - self.dispatcher.current_time()
@@ -36,7 +34,6 @@ class EarliestStartTimeObserver(FeatureObserver):
             ] = adjusted_start_time
 
     def _update_machine_features(self):
-        """Updates the earliest start time for machine nodes."""
         for machine_id, start_time in enumerate(
             self.dispatcher.machine_next_available_time
         ):
@@ -45,7 +42,6 @@ class EarliestStartTimeObserver(FeatureObserver):
             )
 
     def _update_job_features(self):
-        """Updates the earliest start time for job nodes."""
         for job_id, start_time in enumerate(
             self.dispatcher.job_next_available_time
         ):
