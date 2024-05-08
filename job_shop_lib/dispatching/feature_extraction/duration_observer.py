@@ -2,9 +2,12 @@
 
 import numpy as np
 
+from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib import ScheduledOperation
-from job_shop_lib.graphs import NodeType
-from job_shop_lib.dispatching.feature_extraction import FeatureObserver
+from job_shop_lib.dispatching.feature_extraction import (
+    FeatureObserver,
+    FeatureType,
+)
 
 
 class DurationObserver(FeatureObserver):
@@ -12,64 +15,65 @@ class DurationObserver(FeatureObserver):
     and the cumulative duration of upcoming operations for job and machine
     nodes."""
 
+    def __init__(
+        self,
+        dispatcher: Dispatcher,
+        feature_types: list[FeatureType] | FeatureType | None = None,
+    ):
+        super().__init__(dispatcher, feature_types, feature_size=1)
+
     def initialize_features(self):
         """Initializes or resets the duration features for all nodes."""
         mapping = {
-            NodeType.OPERATION: self._initialize_operation_durations,
-            NodeType.MACHINE: self._initialize_machine_durations,
-            NodeType.JOB: self._initialize_job_durations,
+            FeatureType.OPERATIONS: self._initialize_operation_durations,
+            FeatureType.MACHINES: self._initialize_machine_durations,
+            FeatureType.JOBS: self._initialize_job_durations,
         }
-        self.node_features = {}
-        for node_type in NodeType:
-            self.node_features[node_type] = np.zeros(
-                (len(self.graph.nodes_by_type[node_type]), 1),
-                dtype=np.float32,
-            )
-            if node_type in mapping:
-                mapping[node_type]()
+        for feature_type in self.features:
+            mapping[feature_type]()
+
+    def update(self, scheduled_operation: ScheduledOperation):
+        """Updates the duration features of the nodes in the graph."""
+        mapping = {
+            FeatureType.OPERATIONS: self._update_operation_durations,
+            FeatureType.MACHINES: self._update_machine_durations,
+            FeatureType.JOBS: self._update_job_durations,
+        }
+        for feature_type in self.features:
+            mapping[feature_type](scheduled_operation)
 
     def _initialize_operation_durations(self):
         """Sets the duration of each operation node."""
         duration_matrix = self.dispatcher.instance.durations_matrix
         operation_durations = np.array(duration_matrix).reshape(-1, 1)
-        self.node_features[NodeType.OPERATION] = operation_durations
+        self.features[FeatureType.OPERATIONS] = operation_durations
 
     def _initialize_machine_durations(self):
         """Sets the cumulative duration of upcoming operations for each
         machine node."""
         machine_durations = self.dispatcher.instance.machine_loads
-        for machine_node in self.graph.nodes_by_type[NodeType.MACHINE]:
-            machine_id = machine_node.machine_id
-            self.node_features[NodeType.MACHINE][machine_id, 0] = (
-                machine_durations[machine_id]
-            )
+        for machine_id, machine_load in enumerate(machine_durations):
+            self.features[FeatureType.MACHINES][machine_id, 0] = machine_load
 
     def _initialize_job_durations(self):
         """Sets the cumulative duration of upcoming operations for each job
         node."""
         job_durations = self.dispatcher.instance.job_durations
-        for job_node in self.graph.nodes_by_type[NodeType.JOB]:
-            job_id = job_node.job_id
-            self.node_features[NodeType.JOB][job_id, 0] = job_durations[job_id]
-
-    def update(self, scheduled_operation: ScheduledOperation):
-        """Updates the duration features of the nodes in the graph."""
-        self._update_operation_durations(scheduled_operation)
-        if NodeType.MACHINE in self.graph.nodes_by_type:
-            self._update_machine_durations(scheduled_operation)
-        if NodeType.JOB in self.graph.nodes_by_type:
-            self._update_job_durations(scheduled_operation)
+        for job_id, job_duration in enumerate(job_durations):
+            self.features[FeatureType.JOBS][job_id, 0] = job_duration
 
     def _update_operation_durations(
         self, scheduled_operation: ScheduledOperation
     ):
         """Updates the duration of the scheduled operation."""
-        virtual_start_time = max(
+        adjusted_start_time = max(
             scheduled_operation.start_time, self.dispatcher.current_time()
         )
-        new_duration = scheduled_operation.end_time - virtual_start_time
+        adjusted_duration = scheduled_operation.end_time - adjusted_start_time
         operation_id = scheduled_operation.operation.operation_id
-        self.node_features[NodeType.OPERATION][operation_id, 0] = new_duration
+        self.features[FeatureType.OPERATIONS][
+            operation_id, 0
+        ] = adjusted_duration
 
     def _update_machine_durations(
         self, scheduled_operation: ScheduledOperation
@@ -77,10 +81,10 @@ class DurationObserver(FeatureObserver):
         """Updates the cumulative duration of upcoming operations for the
         machine of the scheduled operation."""
         operation_id = scheduled_operation.operation.operation_id
-        operation_duration = self.node_features[NodeType.OPERATION][
+        operation_duration = self.features[FeatureType.OPERATIONS][
             operation_id, 0
         ]
-        self.node_features[NodeType.MACHINE][
+        self.features[FeatureType.MACHINES][
             scheduled_operation.machine_id, 0
         ] -= operation_duration
 
@@ -88,8 +92,14 @@ class DurationObserver(FeatureObserver):
         """Updates the cumulative duration of upcoming operations for the job
         of the scheduled operation."""
         operation_id = scheduled_operation.operation.operation_id
-        operation_duration = self.node_features[NodeType.OPERATION][
+        operation_duration = self.features[FeatureType.OPERATIONS][
             operation_id, 0
         ]
         job_id = scheduled_operation.job_id
-        self.node_features[NodeType.JOB][job_id, 0] -= operation_duration
+        self.features[FeatureType.JOBS][job_id, 0] -= operation_duration
+
+    def __str__(self) -> str:
+        out = ""
+        for feature_type, feature_matrix in self.features.items():
+            out += f"{feature_type}:\n{feature_matrix}"
+        return out
