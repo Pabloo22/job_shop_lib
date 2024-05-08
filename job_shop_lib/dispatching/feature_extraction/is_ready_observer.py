@@ -1,5 +1,6 @@
 """Home of the `IsReadyObserver` class."""
 
+from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.feature_extraction import (
     FeatureObserver,
     FeatureType,
@@ -9,6 +10,13 @@ from job_shop_lib.dispatching.feature_extraction import (
 class IsReadyObserver(FeatureObserver):
     """Feature creator that adds a binary feature indicating if the operation
     is ready to be dispatched."""
+
+    def __init__(
+        self,
+        dispatcher: Dispatcher,
+        feature_types: list[FeatureType] | FeatureType | None = None,
+    ):
+        super().__init__(dispatcher, feature_types, feature_size=1)
 
     def initialize_features(self):
         for feature_type, feature in self.features.items():
