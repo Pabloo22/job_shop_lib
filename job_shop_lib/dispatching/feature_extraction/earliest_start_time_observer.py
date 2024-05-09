@@ -30,12 +30,28 @@ class EarliestStartTimeObserver(FeatureObserver):
             mapping[feature_type]()
 
     def _update_operation_features(self):
-        for operation in self.dispatcher.unscheduled_operations():
-            start_time = self.dispatcher.earliest_start_time(operation)
-            adjusted_start_time = start_time - self.dispatcher.current_time()
-            self.features[FeatureType.OPERATIONS][
-                operation.operation_id, 0
-            ] = adjusted_start_time
+        jobs = self.dispatcher.instance.jobs
+        for job_id, next_operation_idx in enumerate(
+            self.dispatcher.job_next_operation_index
+        ):
+            previous_operation_earliest_end_time = 0
+            for operation in jobs[job_id][next_operation_idx:]:
+                # Earliest start time method takes into account machine
+                # constraints, but it assumes that the operation is the next
+                # operation to be scheduled in the job.
+                earliest_start_time = max(
+                    self.dispatcher.earliest_start_time(operation),
+                    previous_operation_earliest_end_time,
+                )
+                adjusted_start_time = (
+                    earliest_start_time - self.dispatcher.current_time()
+                )
+                self.features[FeatureType.OPERATIONS][
+                    operation.operation_id, 0
+                ] = adjusted_start_time
+                previous_operation_earliest_end_time = (
+                    earliest_start_time + operation.duration
+                )
 
     def _update_machine_features(self):
         for machine_id, start_time in enumerate(
