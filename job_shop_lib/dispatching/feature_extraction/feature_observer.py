@@ -75,11 +75,13 @@ class FeatureObserver(DispatcherObserver):
 
         This method should not be overridden by subclasses.
         """
-        self.features = {
-            feature_type: np.zeros(
-                self.feature_dimensions[feature_type],
-                dtype=np.float32,
-            )
-            for feature_type in self.features
-        }
+        self.set_features_to_zero()
         self.initialize_features()
+
+    def set_features_to_zero(self):
+        """Sets features to zero.
+
+        This method should not be overridden by subclasses.
+        """
+        for feature_type in self.features:
+            self.features[feature_type][:] = 0.0
