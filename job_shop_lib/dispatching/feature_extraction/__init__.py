@@ -3,6 +3,10 @@ from .composite_feature_observer import CompositeFeatureObserver
 from .earliest_start_time_observer import EarliestStartTimeObserver
 from .is_ready_observer import IsReadyObserver
 from .duration_observer import DurationObserver
+from .is_scheduled_observer import IsScheduledObserver
+from .position_in_job_observer import PositionInJobObserver
+from .remaining_operations_observer import RemainingOperationsObserver
+from .factory import FeatureObserverType, feature_observer_factory
 
 __all__ = [
     "FeatureObserver",
@@ -11,4 +15,9 @@ __all__ = [
     "EarliestStartTimeObserver",
     "IsReadyObserver",
     "DurationObserver",
+    "IsScheduledObserver",
+    "PositionInJobObserver",
+    "RemainingOperationsObserver",
+    "FeatureObserverType",
+    "feature_observer_factory",
 ]
