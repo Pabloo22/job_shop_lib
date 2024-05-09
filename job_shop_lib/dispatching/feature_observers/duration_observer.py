@@ -4,7 +4,7 @@ import numpy as np
 
 from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib import ScheduledOperation
-from job_shop_lib.dispatching.feature_extraction import (
+from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,
     FeatureType,
 )

@@ -2,7 +2,7 @@
 
 from enum import Enum
 
-from job_shop_lib.dispatching.feature_extraction import (
+from job_shop_lib.dispatching.feature_observers import (
     IsReadyObserver,
     EarliestStartTimeObserver,
     FeatureObserver,
