@@ -82,3 +82,10 @@ class FeatureObserver(DispatcherObserver):
         """Sets features to zero."""
         for feature_type in self.features:
             self.features[feature_type][:] = 0.0
+
+    def __str__(self):
+        out = [self.__class__.__name__, ":\n"]
+        out.append("-" * len(out[0]))
+        for feature_type, feature in self.features.items():
+            out.append(f"\n{feature_type.value}:\n{feature}")
+        return "".join(out)
