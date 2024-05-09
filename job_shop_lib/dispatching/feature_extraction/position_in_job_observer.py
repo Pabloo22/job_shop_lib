@@ -34,9 +34,3 @@ class PositionInJobObserver(FeatureObserver):
             self.features[FeatureType.OPERATIONS][
                 operation.operation_id, 0
             ] = new_position_in_job
-
-
-if __name__ == "__main__":
-    example_list = [0, 1, 2, 3, 4]
-    for i, item in enumerate(example_list[0 + 1 :]):
-        print(f"{i = }, {item = }")
