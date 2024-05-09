@@ -81,9 +81,3 @@ class DurationObserver(FeatureObserver):
         ]
         job_id = scheduled_operation.job_id
         self.features[FeatureType.JOBS][job_id, 0] -= operation_duration
-
-    def __str__(self) -> str:
-        out = ""
-        for feature_type, feature_matrix in self.features.items():
-            out += f"{feature_type}:\n{feature_matrix}"
-        return out
