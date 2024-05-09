@@ -356,7 +356,9 @@ class Dispatcher:
 
         This method is different from the `start_time` method in that it
         takes into account every machine that can process the operation, not
-        just the one that will process it.
+        just the one that will process it. However, it also assumes that
+        the operation is ready to be scheduled in the job in favor of
+        performance.
 
         Args:
             operation:
