@@ -290,15 +290,22 @@ class Dispatcher:
         Returns:
             A list of Operation objects that are available for scheduling.
         """
-
-        available_operations = self._available_operations()
+        available_operations = self.available_operations_without_pruning()
         if self.pruning_function is not None:
             available_operations = self.pruning_function(
                 self, available_operations
             )
         return available_operations
 
-    def _available_operations(self) -> list[Operation]:
+    @_dispatcher_cache
+    def available_operations_without_pruning(self) -> list[Operation]:
+        """Returns a list of available operations for processing without
+        applying the pruning function.
+
+        Returns:
+            A list of Operation objects that are available for scheduling
+            based on precedence and machine constraints only.
+        """
         available_operations = []
         for job_id, next_position in enumerate(self._job_next_operation_index):
             if next_position == len(self.instance.jobs[job_id]):
