@@ -18,7 +18,6 @@ class FeatureObserverType(str, Enum):
     problem."""
 
     IS_READY = "is_ready"
-    TIME_TO_BE_READY = "time_to_be_ready"
     EARLIEST_START_TIME = "earliest_start_time"
     DURATION = "duration"
     IS_SCHEDULED = "is_scheduled"
@@ -46,7 +45,6 @@ def feature_observer_factory(
     """
     mapping: dict[FeatureObserverType, type[FeatureObserver]] = {
         FeatureObserverType.IS_READY: IsReadyObserver,
-        FeatureObserverType.TIME_TO_BE_READY: EarliestStartTimeObserver,
         FeatureObserverType.EARLIEST_START_TIME: EarliestStartTimeObserver,
         FeatureObserverType.DURATION: DurationObserver,
         FeatureObserverType.IS_SCHEDULED: IsScheduledObserver,
