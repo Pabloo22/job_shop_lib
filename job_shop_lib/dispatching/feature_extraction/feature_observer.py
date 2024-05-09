@@ -62,6 +62,8 @@ class FeatureObserver(DispatcherObserver):
     def update(self, scheduled_operation: ScheduledOperation):
         """Updates the features based on the scheduled operation.
 
+        By default, this method just calls `initialize_features`.
+
         Args:
             scheduled_operation:
                 The operation that has been scheduled.
