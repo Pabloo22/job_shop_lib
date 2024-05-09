@@ -19,6 +19,7 @@ class IsReadyObserver(FeatureObserver):
         super().__init__(dispatcher, feature_types, feature_size=1)
 
     def initialize_features(self):
+        self.set_features_to_zero()
         for feature_type, feature in self.features.items():
             node_ids = self._get_ready_nodes(feature_type)
             feature[node_ids, 0] = 1.0

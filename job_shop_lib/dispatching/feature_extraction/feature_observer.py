@@ -79,9 +79,6 @@ class FeatureObserver(DispatcherObserver):
         self.initialize_features()
 
     def set_features_to_zero(self):
-        """Sets features to zero.
-
-        This method should not be overridden by subclasses.
-        """
+        """Sets features to zero."""
         for feature_type in self.features:
             self.features[feature_type][:] = 0.0
