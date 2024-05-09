@@ -419,6 +419,11 @@ class Dispatcher:
 
         This method checks for operations that either haven't been scheduled
         or have been scheduled but haven't reached their completion time.
+
+        Note:
+        The behavior of this method changed in version 0.5.0. Previously, it
+        only returned unscheduled operations. For the old behavior, use the
+        `unscheduled_operations` method.
         """
         uncompleted_ops = self.unscheduled_operations()
 
