@@ -58,14 +58,10 @@ class DurationObserver(FeatureObserver):
     def _update_operation_durations(
         self, scheduled_operation: ScheduledOperation
     ):
-        adjusted_start_time = max(
-            scheduled_operation.start_time, self.dispatcher.current_time()
-        )
-        adjusted_duration = scheduled_operation.end_time - adjusted_start_time
         operation_id = scheduled_operation.operation.operation_id
-        self.features[FeatureType.OPERATIONS][
-            operation_id, 0
-        ] = adjusted_duration
+        self.features[FeatureType.OPERATIONS][operation_id, 0] = (
+            self.dispatcher.remaining_duration(scheduled_operation)
+        )
 
     def _update_machine_durations(
         self, scheduled_operation: ScheduledOperation

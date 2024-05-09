@@ -365,6 +365,28 @@ class Dispatcher:
         job_start_time = self._job_next_available_time[operation.job_id]
         return max(machine_earliest_start_time, job_start_time)
 
+    def remaining_duration(
+        self, scheduled_operation: ScheduledOperation
+    ) -> int:
+        """Calculates the remaining duration of a scheduled operation.
+
+        The method computes the remaining time for an operation to finish,
+        based on the maximum of the operation's start time or the current time.
+        This helps in determining how much time is left from 'now' until the
+        operation is completed.
+
+        Args:
+            scheduled_operation:
+                The operation for which to calculate the remaining time.
+
+        Returns:
+            The remaining duration.
+        """
+        adjusted_start_time = max(
+            scheduled_operation.start_time, self.current_time()
+        )
+        return scheduled_operation.end_time - adjusted_start_time
+
     @classmethod
     def create_schedule_from_raw_solution(
         cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
