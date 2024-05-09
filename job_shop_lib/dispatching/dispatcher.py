@@ -39,7 +39,7 @@ class DispatcherObserver(abc.ABC):
         return self.__class__.__name__
 
     def __repr__(self) -> str:
-        return str(self)
+        return self.__class__.__name__
 
 
 def _dispatcher_cache(method):
