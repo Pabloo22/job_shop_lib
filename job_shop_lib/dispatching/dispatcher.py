@@ -413,20 +413,20 @@ class Dispatcher:
                     operations.popleft()
         return dispatcher.schedule
 
+    @_dispatcher_cache
     def uncompleted_operations(self) -> list[Operation]:
-        """Returns the list of operations that have not been scheduled.
+        """Returns the list of operations that have not been completed yet.
 
-        An operation is uncompleted if it has not been scheduled yet.
-
-        It is more efficient than checking all operations in the instance.
-
-        This method is deprecated. Use `Dispatcher.unscheduled_operations`
-        instead.
+        This method checks for operations that either haven't been scheduled
+        or have been scheduled but haven't reached their completion time.
         """
-        warn(
-            "Dispatcher.uncompleted_operations is deprecated. Use "
-            "Dispatcher.unscheduled_operations instead. It will be removed in "
-            "version 1.0.0.",
-            DeprecationWarning,
-        )
-        return self.unscheduled_operations()
+        uncompleted_ops = self.unscheduled_operations()
+
+        # Check among scheduled operations if they haven't completed yet
+        current_time = self.current_time()
+        for machine_schedule in self.schedule.schedule:
+            for scheduled_operation in machine_schedule:
+                if scheduled_operation.end_time > current_time:
+                    uncompleted_ops.append(scheduled_operation.operation)
+
+        return uncompleted_ops
