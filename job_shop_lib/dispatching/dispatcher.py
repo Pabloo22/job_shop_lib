@@ -19,11 +19,33 @@ from job_shop_lib import (
 
 # Added here to avoid circular imports
 class DispatcherObserver(abc.ABC):
-    """Interface for classes that observe the dispatcher."""
+    """Interface for classes that observe th"""
 
-    def __init__(self, dispatcher: Dispatcher):
-        """Initializes the observer with the dispatcher and subscribes to
-        it."""
+    def __init__(self, dispatcher: Dispatcher, is_singleton: bool = True):
+        """Initializes the observer with the `Dispatcher` and subscribes to
+        it.
+
+        Args:
+            subject:
+                The subject to observe.
+            is_singleton:
+                Whether the observer should be a singleton. If True, the
+                observer will be the only instance of its class in the
+                subject's list of subscribers. If False, the observer will
+                be added to the subject's list of subscribers every time
+                it is initialized.
+        """
+        if is_singleton and any(
+            isinstance(observer, self.__class__)
+            for observer in dispatcher.subscribers
+        ):
+            raise ValueError(
+                f"An observer of type {self.__class__.__name__} already "
+                "exists in the dispatcher's list of subscribers. If you want "
+                "to create multiple instances of this observer, set "
+                "`is_singleton` to False."
+            )
+
         self.dispatcher = dispatcher
         self.dispatcher.subscribe(self)
 
@@ -86,8 +108,6 @@ class Dispatcher:
         pruning_function:
             A function that filters out operations that are not ready to be
             scheduled.
-        subscribers:
-            A list of observers that are subscribed to the dispatcher.
     """
 
     __slots__ = (

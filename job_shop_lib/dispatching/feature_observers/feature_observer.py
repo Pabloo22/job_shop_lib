@@ -23,13 +23,14 @@ class FeatureObserver(DispatcherObserver):
         dispatcher: Dispatcher,
         feature_types: list[FeatureType] | FeatureType | None = None,
         feature_size: dict[FeatureType, int] | int = 1,
+        is_singleton: bool = True,
     ):
         feature_types = self.get_feature_types_list(feature_types)
         if isinstance(feature_size, int):
             feature_size = {
                 feature_type: feature_size for feature_type in feature_types
             }
-        super().__init__(dispatcher)
+        super().__init__(dispatcher, is_singleton=is_singleton)
 
         number_of_entities = {
             FeatureType.OPERATIONS: dispatcher.instance.num_operations,
