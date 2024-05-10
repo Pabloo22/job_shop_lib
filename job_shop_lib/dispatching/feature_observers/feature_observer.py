@@ -24,10 +24,7 @@ class FeatureObserver(DispatcherObserver):
         feature_types: list[FeatureType] | FeatureType | None = None,
         feature_size: dict[FeatureType, int] | int = 1,
     ):
-        if isinstance(feature_types, FeatureType):
-            feature_types = [feature_types]
-        if feature_types is None:
-            feature_types = list(FeatureType)
+        feature_types = self.get_feature_types_list(feature_types)
         if isinstance(feature_size, int):
             feature_size = {
                 feature_type: feature_size for feature_type in feature_types
@@ -71,10 +68,7 @@ class FeatureObserver(DispatcherObserver):
         self.initialize_features()
 
     def reset(self):
-        """Sets features to zero and calls to `initialize_features`.
-
-        This method should not be overridden by subclasses.
-        """
+        """Sets features to zero and calls to `initialize_features`."""
         self.set_features_to_zero()
         self.initialize_features()
 
@@ -82,6 +76,23 @@ class FeatureObserver(DispatcherObserver):
         """Sets features to zero."""
         for feature_type in self.features:
             self.features[feature_type][:] = 0.0
+
+    @staticmethod
+    def get_feature_types_list(
+        feature_types: list[FeatureType] | FeatureType | None,
+    ) -> list[FeatureType]:
+        """Returns a list of feature types.
+
+        Args:
+            feature_types:
+                A list of feature types or a single feature type. If `None`,
+                all feature types are returned.
+        """
+        if isinstance(feature_types, FeatureType):
+            feature_types = [feature_types]
+        if feature_types is None:
+            feature_types = list(FeatureType)
+        return feature_types
 
     def __str__(self):
         out = [self.__class__.__name__, ":\n"]
