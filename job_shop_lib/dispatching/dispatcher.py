@@ -474,3 +474,18 @@ class Dispatcher:
                     uncompleted_ops.append(scheduled_operation.operation)
 
         return uncompleted_ops
+
+    @_dispatcher_cache
+    def ongoing_operations(self) -> list[ScheduledOperation]:
+        """Returns the list of operations that are currently being processed.
+
+        This method returns the operations that have been scheduled and are
+        currently being processed by the machines.
+        """
+        current_time = self.current_time()
+        ongoing_operations = []
+        for machine_schedule in self.schedule.schedule:
+            for scheduled_operation in machine_schedule:
+                if scheduled_operation.end_time > current_time:
+                    ongoing_operations.append(scheduled_operation)
+        return ongoing_operations
