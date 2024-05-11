@@ -24,14 +24,10 @@ class IsScheduledObserver(FeatureObserver):
                 scheduled_operation.operation.operation_id, 0
             ] = 1.0
 
-        uncompleted_operations = set(self.dispatcher.uncompleted_operations())
-        scheduled_operations = set(self.dispatcher.scheduled_operations())
-        uncompleted_and_scheduled_operations = (
-            uncompleted_operations & scheduled_operations
-        )
-        for operation in uncompleted_and_scheduled_operations:
+        ongoing_operations = self.dispatcher.ongoing_operations()
+        for scheduled_op in ongoing_operations:
             if FeatureType.MACHINES in self.features:
-                machine_id = operation.machine_id
+                machine_id = scheduled_op.machine_id
                 self.features[FeatureType.MACHINES][machine_id, 0] += 1.0
             if FeatureType.JOBS in self.features:
-                self.features[FeatureType.JOBS][operation.job_id, 0] += 1.0
+                self.features[FeatureType.JOBS][scheduled_op.job_id, 0] += 1.0
