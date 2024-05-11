@@ -61,7 +61,7 @@ ft06 = load_benchmark_instance("ft06")
 ```
 
 The module `benchmarks` contains functions to load the instances from the file and return them as `JobShopInstance` objects without having to download them
-manually. The instances are stored in [benchmark_instances.json](job_shop_lib/benchmarks/benchmark_instances.json).
+manually.
 
 The contributions to this benchmark dataset are as follows:
 
