@@ -10,6 +10,7 @@ from job_shop_lib.dispatching.feature_observers import (
     IsScheduledObserver,
     PositionInJobObserver,
     RemainingOperationsObserver,
+    IsCompletedObserver,
 )
 
 
@@ -23,6 +24,7 @@ class FeatureObserverType(str, Enum):
     IS_SCHEDULED = "is_scheduled"
     POSITION_IN_JOB = "position_in_job"
     REMAINING_OPERATIONS = "remaining_operations"
+    IS_COMPLETED = "is_completed"
     COMPOSITE = "composite"
 
 
@@ -50,6 +52,7 @@ def feature_observer_factory(
         FeatureObserverType.IS_SCHEDULED: IsScheduledObserver,
         FeatureObserverType.POSITION_IN_JOB: PositionInJobObserver,
         FeatureObserverType.REMAINING_OPERATIONS: RemainingOperationsObserver,
+        FeatureObserverType.IS_COMPLETED: IsCompletedObserver,
     }
     feature_creator = mapping[node_feature_creator_type]  # type: ignore[index]
     return feature_creator(**kwargs)
