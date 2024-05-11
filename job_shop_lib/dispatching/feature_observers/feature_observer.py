@@ -16,7 +16,7 @@ class FeatureType(str, enum.Enum):
 
 
 class FeatureObserver(DispatcherObserver):
-    """Base class for node feature extractors."""
+    """Base class for feature observers."""
 
     def __init__(
         self,
