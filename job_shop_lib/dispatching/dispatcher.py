@@ -486,3 +486,8 @@ class Dispatcher:
                     break
                 ongoing_operations.append(scheduled_operation)
         return ongoing_operations
+
+    def is_scheduled(self, operation: Operation) -> bool:
+        """Checks if the given operation has been scheduled."""
+        job_next_op_idx = self._job_next_operation_index[operation.job_id]
+        return operation.position_in_job < job_next_op_idx
