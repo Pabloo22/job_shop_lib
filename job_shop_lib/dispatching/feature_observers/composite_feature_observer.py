@@ -28,6 +28,7 @@ class CompositeFeatureObserver(FeatureObserver):
         self,
         dispatcher: Dispatcher,
         feature_observers: list[FeatureObserver] | None = None,
+        subscribe: bool = True,
     ):
         if feature_observers is None:
             feature_observers = [
@@ -37,7 +38,7 @@ class CompositeFeatureObserver(FeatureObserver):
             ]
         self.feature_observers = feature_observers
         self.column_names: dict[FeatureType, list[str]] = defaultdict(list)
-        super().__init__(dispatcher)
+        super().__init__(dispatcher, subscribe=subscribe)
         self._set_column_names()
 
     def initialize_features(self):

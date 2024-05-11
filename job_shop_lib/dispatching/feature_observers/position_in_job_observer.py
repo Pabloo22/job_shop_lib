@@ -15,9 +15,12 @@ class PositionInJobObserver(FeatureObserver):
     Positions are adjusted dynamically as operations are scheduled.
     """
 
-    def __init__(self, dispatcher: Dispatcher):
+    def __init__(self, dispatcher: Dispatcher, subscribe: bool = True):
         super().__init__(
-            dispatcher, feature_types=[FeatureType.OPERATIONS], feature_size=1
+            dispatcher,
+            feature_types=[FeatureType.OPERATIONS],
+            feature_size=1,
+            subscribe=subscribe,
         )
 
     def initialize_features(self):

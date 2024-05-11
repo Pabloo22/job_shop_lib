@@ -19,6 +19,7 @@ class RemainingOperationsObserver(FeatureObserver):
         self,
         dispatcher: Dispatcher,
         feature_types: list[FeatureType] | FeatureType | None = None,
+        subscribe: bool = True,
     ):
         if feature_types is None:
             feature_types = [FeatureType.MACHINES, FeatureType.JOBS]
@@ -29,11 +30,13 @@ class RemainingOperationsObserver(FeatureObserver):
         ):
             raise ValueError("FeatureType.OPERATIONS is not supported.")
         super().__init__(
-            dispatcher, feature_types=feature_types, feature_size=1
+            dispatcher,
+            feature_types=feature_types,
+            feature_size=1,
+            subscribe=subscribe,
         )
 
     def initialize_features(self):
-        self.set_features_to_zero()
         for operation in self.dispatcher.unscheduled_operations():
             if FeatureType.JOBS in self.features:
                 self.features[FeatureType.JOBS][operation.job_id, 0] += 1

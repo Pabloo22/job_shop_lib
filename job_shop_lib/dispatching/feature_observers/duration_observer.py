@@ -19,8 +19,11 @@ class DurationObserver(FeatureObserver):
         self,
         dispatcher: Dispatcher,
         feature_types: list[FeatureType] | FeatureType | None = None,
+        subscribe: bool = True,
     ):
-        super().__init__(dispatcher, feature_types, feature_size=1)
+        super().__init__(
+            dispatcher, feature_types, feature_size=1, subscribe=subscribe
+        )
 
     def initialize_features(self):
         mapping = {

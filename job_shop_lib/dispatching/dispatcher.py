@@ -21,7 +21,12 @@ from job_shop_lib import (
 class DispatcherObserver(abc.ABC):
     """Interface for classes that observe th"""
 
-    def __init__(self, dispatcher: Dispatcher, is_singleton: bool = True):
+    def __init__(
+        self,
+        dispatcher: Dispatcher,
+        is_singleton: bool = True,
+        subscribe: bool = True,
+    ):
         """Initializes the observer with the `Dispatcher` and subscribes to
         it.
 
@@ -34,6 +39,10 @@ class DispatcherObserver(abc.ABC):
                 subject's list of subscribers. If False, the observer will
                 be added to the subject's list of subscribers every time
                 it is initialized.
+            subscribe:
+                Whether to subscribe the observer to the subject. If False,
+                the observer will not be subscribed to the subject and will
+                not receive automatic updates.
         """
         if is_singleton and any(
             isinstance(observer, self.__class__)
@@ -47,7 +56,8 @@ class DispatcherObserver(abc.ABC):
             )
 
         self.dispatcher = dispatcher
-        self.dispatcher.subscribe(self)
+        if subscribe:
+            self.dispatcher.subscribe(self)
 
     @abc.abstractmethod
     def update(self, scheduled_operation: ScheduledOperation):
