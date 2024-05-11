@@ -464,16 +464,12 @@ class Dispatcher:
         only returned unscheduled operations. For the old behavior, use the
         `unscheduled_operations` method.
         """
-        uncompleted_ops = self.unscheduled_operations()
-
-        # Check among scheduled operations if they haven't completed yet
-        current_time = self.current_time()
-        for machine_schedule in self.schedule.schedule:
-            for scheduled_operation in machine_schedule:
-                if scheduled_operation.end_time > current_time:
-                    uncompleted_ops.append(scheduled_operation.operation)
-
-        return uncompleted_ops
+        uncompleted_operations = self.unscheduled_operations()
+        uncompleted_operations.extend(
+            scheduled_operation.operation
+            for scheduled_operation in self.ongoing_operations()
+        )
+        return uncompleted_operations
 
     @_dispatcher_cache
     def ongoing_operations(self) -> list[ScheduledOperation]:
@@ -485,7 +481,8 @@ class Dispatcher:
         current_time = self.current_time()
         ongoing_operations = []
         for machine_schedule in self.schedule.schedule:
-            for scheduled_operation in machine_schedule:
-                if scheduled_operation.end_time > current_time:
-                    ongoing_operations.append(scheduled_operation)
+            for scheduled_operation in reversed(machine_schedule):
+                if scheduled_operation.end_time <= current_time:
+                    break
+                ongoing_operations.append(scheduled_operation)
         return ongoing_operations
