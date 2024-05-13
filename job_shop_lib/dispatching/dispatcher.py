@@ -426,31 +426,22 @@ class Dispatcher:
         )
         return scheduled_operation.end_time - adjusted_start_time
 
-    @classmethod
-    def create_schedule_from_raw_solution(
-        cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
-    ) -> Schedule:
-        """Deprecated method, use `Schedule.from_job_sequences` instead."""
-        warn(
-            "Dispatcher.create_schedule_from_raw_solution is deprecated. "
-            "Use Schedule.from_job_sequences instead. It will be removed in "
-            "version 1.0.0.",
-            DeprecationWarning,
+    @_dispatcher_cache
+    def completed_operations(self) -> set[Operation]:
+        """Returns the set of operations that have been completed.
+
+        This method returns the operations that have been scheduled and the
+        current time is greater than or equal to the end time of the operation.
+        """
+        scheduled_operations = set(self.scheduled_operations())
+        ongoing_operations = set(
+            map(
+                lambda scheduled_op: scheduled_op.operation,
+                self.ongoing_operations(),
+            )
         )
-        dispatcher = cls(instance)
-        dispatcher.reset()
-        raw_solution_deques = [
-            deque(operations) for operations in raw_solution
-        ]
-        while not dispatcher.schedule.is_complete():
-            for machine_id, operations in enumerate(raw_solution_deques):
-                if not operations:
-                    continue
-                operation = operations[0]
-                if dispatcher.is_operation_ready(operation):
-                    dispatcher.dispatch(operation, machine_id)
-                    operations.popleft()
-        return dispatcher.schedule
+        completed_operations = scheduled_operations - ongoing_operations
+        return completed_operations
 
     @_dispatcher_cache
     def uncompleted_operations(self) -> list[Operation]:
@@ -482,7 +473,8 @@ class Dispatcher:
         ongoing_operations = []
         for machine_schedule in self.schedule.schedule:
             for scheduled_operation in reversed(machine_schedule):
-                if scheduled_operation.end_time <= current_time:
+                is_completed = scheduled_operation.end_time <= current_time
+                if is_completed:
                     break
                 ongoing_operations.append(scheduled_operation)
         return ongoing_operations
@@ -491,3 +483,34 @@ class Dispatcher:
         """Checks if the given operation has been scheduled."""
         job_next_op_idx = self._job_next_operation_index[operation.job_id]
         return operation.position_in_job < job_next_op_idx
+
+    def is_ongoing(self, scheduled_operation: ScheduledOperation) -> bool:
+        """Checks if the given operation is currently being processed."""
+        current_time = self.current_time()
+        return scheduled_operation.start_time <= current_time
+
+    @classmethod
+    def create_schedule_from_raw_solution(
+        cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
+    ) -> Schedule:
+        """Deprecated method, use `Schedule.from_job_sequences` instead."""
+        warn(
+            "Dispatcher.create_schedule_from_raw_solution is deprecated. "
+            "Use Schedule.from_job_sequences instead. It will be removed in "
+            "version 1.0.0.",
+            DeprecationWarning,
+        )
+        dispatcher = cls(instance)
+        dispatcher.reset()
+        raw_solution_deques = [
+            deque(operations) for operations in raw_solution
+        ]
+        while not dispatcher.schedule.is_complete():
+            for machine_id, operations in enumerate(raw_solution_deques):
+                if not operations:
+                    continue
+                operation = operations[0]
+                if dispatcher.is_operation_ready(operation):
+                    dispatcher.dispatch(operation, machine_id)
+                    operations.popleft()
+        return dispatcher.schedule
