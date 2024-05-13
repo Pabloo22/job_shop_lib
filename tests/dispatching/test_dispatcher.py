@@ -135,19 +135,27 @@ def test_cache(example_job_shop_instance: JobShopInstance):
 
 
 def test_current_time(example_job_shop_instance: JobShopInstance):
-    solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
-    dispatcher = Dispatcher(
-        example_job_shop_instance, pruning_function=solver.pruning_function
-    )
-    current_times = [0, 0, 0, 1, 1, 7, 7, 10, 11]
+    dispatcher = Dispatcher(example_job_shop_instance)
+    assignments = [
+        (0, 0, 0),
+        (0, 1, 1),
+        (1, 0, 1),
+        (2, 0, 2),
+        (0, 2, 2),
+        (1, 1, 2),
+        (2, 1, 0),
+        (1, 2, 0),
+        (2, 2, 1),
+    ]
+    current_times = [0, 0, 0, 1, 1, 1, 7, 7, 11]
     for i, current_time in enumerate(current_times):
-        solver.step(dispatcher)
-        assert (
-            dispatcher.current_time() == current_time
-        ), f"Failed at iteration {i}."
+        job_id, position_in_job, machine_id = assignments[i]
+        operation = example_job_shop_instance.jobs[job_id][position_in_job]
+        dispatcher.dispatch(operation, machine_id)
+        assert dispatcher.current_time() == current_time
 
 
-def test_uncompleted_operations(example_job_shop_instance: JobShopInstance):
+def test_unscheduled_operations(example_job_shop_instance: JobShopInstance):
     dispatcher = Dispatcher(example_job_shop_instance)
     solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
     expected_uncompleted_operations = set()
@@ -157,7 +165,7 @@ def test_uncompleted_operations(example_job_shop_instance: JobShopInstance):
 
     while not dispatcher.schedule.is_complete():
         assert (
-            set(dispatcher.uncompleted_operations())
+            set(dispatcher.unscheduled_operations())
             == expected_uncompleted_operations
         )
         operation = solver.dispatching_rule(dispatcher)
