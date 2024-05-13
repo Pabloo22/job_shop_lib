@@ -21,7 +21,9 @@ class CompositeFeatureObserver(FeatureObserver):
             List of `FeatureObserver` instances to aggregate features from.
         column_names:
             Dictionary mapping `FeatureType` to a list of column names for the
-            corresponding feature matrix.
+            corresponding feature matrix. Column names are generated based on
+            the class name of the `FeatureObserver` instance that produced the
+            feature.
     """
 
     def __init__(
@@ -40,6 +42,16 @@ class CompositeFeatureObserver(FeatureObserver):
         self.column_names: dict[FeatureType, list[str]] = defaultdict(list)
         super().__init__(dispatcher, subscribe=subscribe)
         self._set_column_names()
+
+    @property
+    def features_as_dataframe(self) -> dict[FeatureType, pd.DataFrame]:
+        """Returns the features as a dictionary of `pd.DataFrame` instances."""
+        return {
+            feature_type: pd.DataFrame(
+                feature_matrix, columns=self.column_names[feature_type]
+            )
+            for feature_type, feature_matrix in self.features.items()
+        }
 
     def initialize_features(self):
         features: dict[FeatureType, list[np.ndarray]] = defaultdict(list)
@@ -67,13 +79,9 @@ class CompositeFeatureObserver(FeatureObserver):
                     self.column_names[feature_type].append(feature_name)
 
     def __str__(self):
-        out = [f"{self.__class__.__name__}:\n"]
+        out = [f"{self.__class__.__name__}:"]
         out.append("-" * (len(out[0]) - 1))
-        for feature_type, feature_matrix in self.features.items():
-            df = pd.DataFrame(
-                feature_matrix, columns=self.column_names[feature_type]
-            )
-            out.append(
-                (f"\n{feature_type.value} features:\n" f"{df.to_string()}\n")
-            )
+        for feature_type, dataframe in self.features_as_dataframe.items():
+            out.append(f"{feature_type}:")
+            out.append(dataframe.to_string())
         return "\n".join(out)
