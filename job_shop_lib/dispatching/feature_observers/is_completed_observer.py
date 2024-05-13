@@ -36,8 +36,13 @@ class IsCompletedObserver(FeatureObserver):
 
     def update(self, scheduled_operation: ScheduledOperation):
         if FeatureType.OPERATIONS in self.features:
-            operation_id = scheduled_operation.operation.operation_id
-            self.features[FeatureType.OPERATIONS][operation_id, 0] = 1
+            # operation_id = scheduled_operation.operation.operation_id
+            # self.features[FeatureType.OPERATIONS][operation_id, 0] = 1
+            completed_operations = [
+                op.operation_id
+                for op in self.dispatcher.completed_operations()
+            ]
+            self.features[FeatureType.OPERATIONS][completed_operations, 0] = 1
         if FeatureType.MACHINES in self.features:
             machine_id = scheduled_operation.machine_id
             self.remaining_ops_per_machine[machine_id, 0] -= 1
