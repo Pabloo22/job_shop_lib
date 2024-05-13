@@ -27,7 +27,8 @@ def create_gif(
     instance: JobShopInstance,
     solver: DispatchingRuleSolver,
     plot_function: (
-        Callable[[Schedule, int, list[Operation] | None], Figure] | None
+        Callable[[Schedule, int, list[Operation] | None, int | None], Figure]
+        | None
     ) = None,
     fps: int = 1,
     remove_frames: bool = True,
@@ -80,50 +81,59 @@ def plot_gantt_chart_wrapper(
     title: str | None = None,
     cmap: str = "viridis",
     show_available_operations: bool = False,
-) -> Callable[[Schedule, int, list[Operation] | None], Figure]:
+) -> Callable[[Schedule, int, list[Operation] | None, int | None], Figure]:
     """Returns a function that plots a Gantt chart for an unfinished schedule.
 
     Args:
         title: The title of the Gantt chart.
         cmap: The name of the colormap to use.
+        show_available_operations:
+            Whether to show the available operations in the Gantt chart.
 
     Returns:
         A function that plots a Gantt chart for a schedule. The function takes
-        a `Schedule` object and the makespan of the schedule as input and
-        returns a `Figure` object.
+        the following arguments:
+        - schedule: The schedule to plot.
+        - makespan: The makespan of the schedule.
+        - available_operations: A list of available operations. If None,
+            the available operations are not shown.
+        - current_time: The current time in the schedule. If provided, a
+            red vertical line is plotted at this time.
     """
 
     def plot_function(
         schedule: Schedule,
         makespan: int,
         available_operations: list | None = None,
+        current_time: int | None = None,
     ) -> Figure:
         fig, ax = plot_gantt_chart(
             schedule, title=title, cmap_name=cmap, xlim=makespan
         )
 
-        if not show_available_operations or available_operations is None:
-            return fig
+        if show_available_operations and available_operations is not None:
 
-        operations_text = "\n".join(
-            str(operation) for operation in available_operations
-        )
-        text = f"Available operations:\n{operations_text}"
-        # Print the available operations at the bottom right corner
-        # of the Gantt chart
-        fig.text(
-            1.25,
-            0.05,
-            text,
-            ha="right",
-            va="bottom",
-            transform=ax.transAxes,
-            bbox={
-                "facecolor": "white",
-                "alpha": 0.5,
-                "boxstyle": "round,pad=0.5",
-            },
-        )
+            operations_text = "\n".join(
+                str(operation) for operation in available_operations
+            )
+            text = f"Available operations:\n{operations_text}"
+            # Print the available operations at the bottom right corner
+            # of the Gantt chart
+            fig.text(
+                1.25,
+                0.05,
+                text,
+                ha="right",
+                va="bottom",
+                transform=ax.transAxes,
+                bbox={
+                    "facecolor": "white",
+                    "alpha": 0.5,
+                    "boxstyle": "round,pad=0.5",
+                },
+            )
+        if current_time is not None:
+            ax.axvline(current_time, color="red", linestyle="--")
         return fig
 
     return plot_function
@@ -133,7 +143,9 @@ def create_gantt_chart_frames(
     frames_dir: str,
     instance: JobShopInstance,
     solver: DispatchingRuleSolver,
-    plot_function: Callable[[Schedule, int, list[Operation] | None], Figure],
+    plot_function: Callable[
+        [Schedule, int, list[Operation] | None, int | None], Figure
+    ],
     plot_current_time: bool = True,
 ) -> None:
     """Creates frames of the Gantt chart for the schedule being built.
@@ -150,7 +162,8 @@ def create_gantt_chart_frames(
             should take a `Schedule` object and the makespan of the schedule as
             input and return a `Figure` object.
         plot_current_time:
-            Whether to plot a vertical line at the current time."""
+            Whether to plot a vertical line at the current time.
+    """
     dispatcher = Dispatcher(instance, pruning_function=solver.pruning_function)
     history_tracker = HistoryTracker(dispatcher)
     makespan = solver.solve(instance, dispatcher).makespan()
@@ -160,23 +173,19 @@ def create_gantt_chart_frames(
         dispatcher.dispatch(
             scheduled_operation.operation, scheduled_operation.machine_id
         )
+        current_time = (
+            None if not plot_current_time else dispatcher.current_time()
+        )
         fig = plot_function(
             dispatcher.schedule,
             makespan,
             dispatcher.available_operations(),
+            current_time,
         )
-        current_time = (
-            None if not plot_current_time else dispatcher.current_time()
-        )
-        _save_frame(fig, frames_dir, i, current_time)
+        _save_frame(fig, frames_dir, i)
 
 
-def _save_frame(
-    figure: Figure, frames_dir: str, number: int, current_time: int | None
-) -> None:
-    if current_time is not None:
-        figure.gca().axvline(current_time, color="red", linestyle="--")
-
+def _save_frame(figure: Figure, frames_dir: str, number: int) -> None:
     figure.savefig(f"{frames_dir}/frame_{number:02d}.png", bbox_inches="tight")
     plt.close(figure)
 
