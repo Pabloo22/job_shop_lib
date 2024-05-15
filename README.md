@@ -149,13 +149,15 @@ class DispatchingRule(str, Enum):
 We can visualize the solution with a `DispatchingRuleSolver` as a gif:
 
 ```python
-from job_shop_lib.visualization import create_gif, get_plot_function
+from job_shop_lib.visualization import create_gif, plot_gantt_chart_wrapper
 from job_shop_lib.dispatching import DispatchingRuleSolver, DispatchingRule
 
 plt.style.use("ggplot")
 
 mwkr_solver = DispatchingRuleSolver("most_work_remaining")
-plot_function = get_plot_function(title="Solution with Most Work Remaining Rule")
+plot_function = plot_gantt_chart_wrapper(
+    title="Solution with Most Work Remaining Rule"
+)
 create_gif(
     gif_path="ft06_optimized.gif",
     instance=ft06,
