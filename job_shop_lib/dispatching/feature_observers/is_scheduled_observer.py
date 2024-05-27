@@ -25,6 +25,7 @@ class IsScheduledObserver(FeatureObserver):
             ] = 1.0
 
         ongoing_operations = self.dispatcher.ongoing_operations()
+        self.set_features_to_zero(exclude=FeatureType.OPERATIONS)
         for scheduled_op in ongoing_operations:
             if FeatureType.MACHINES in self.features:
                 machine_id = scheduled_op.machine_id
