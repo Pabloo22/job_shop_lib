@@ -19,13 +19,45 @@ from job_shop_lib import (
 
 # Added here to avoid circular imports
 class DispatcherObserver(abc.ABC):
-    """Interface for classes that observe the dispatcher."""
+    """Interface for classes that observe th"""
 
-    def __init__(self, dispatcher: Dispatcher):
-        """Initializes the observer with the dispatcher and subscribes to
-        it."""
+    def __init__(
+        self,
+        dispatcher: Dispatcher,
+        is_singleton: bool = True,
+        subscribe: bool = True,
+    ):
+        """Initializes the observer with the `Dispatcher` and subscribes to
+        it.
+
+        Args:
+            subject:
+                The subject to observe.
+            is_singleton:
+                Whether the observer should be a singleton. If True, the
+                observer will be the only instance of its class in the
+                subject's list of subscribers. If False, the observer will
+                be added to the subject's list of subscribers every time
+                it is initialized.
+            subscribe:
+                Whether to subscribe the observer to the subject. If False,
+                the observer will not be subscribed to the subject and will
+                not receive automatic updates.
+        """
+        if is_singleton and any(
+            isinstance(observer, self.__class__)
+            for observer in dispatcher.subscribers
+        ):
+            raise ValueError(
+                f"An observer of type {self.__class__.__name__} already "
+                "exists in the dispatcher's list of subscribers. If you want "
+                "to create multiple instances of this observer, set "
+                "`is_singleton` to False."
+            )
+
         self.dispatcher = dispatcher
-        self.dispatcher.subscribe(self)
+        if subscribe:
+            self.dispatcher.subscribe(self)
 
     @abc.abstractmethod
     def update(self, scheduled_operation: ScheduledOperation):
@@ -39,7 +71,7 @@ class DispatcherObserver(abc.ABC):
         return self.__class__.__name__
 
     def __repr__(self) -> str:
-        return str(self)
+        return self.__class__.__name__
 
 
 def _dispatcher_cache(method):
@@ -86,8 +118,6 @@ class Dispatcher:
         pruning_function:
             A function that filters out operations that are not ready to be
             scheduled.
-        subscribers:
-            A list of observers that are subscribed to the dispatcher.
     """
 
     __slots__ = (
@@ -151,32 +181,6 @@ class Dispatcher:
     def job_next_available_time(self) -> list[int]:
         """Returns the next available time for each job."""
         return self._job_next_available_time
-
-    @classmethod
-    def create_schedule_from_raw_solution(
-        cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
-    ) -> Schedule:
-        """Deprecated method, use `Schedule.from_job_sequences` instead."""
-        warn(
-            "Dispatcher.create_schedule_from_raw_solution is deprecated. "
-            "Use Schedule.from_job_sequences instead. It will be removed in "
-            "version 1.0.0.",
-            DeprecationWarning,
-        )
-        dispatcher = cls(instance)
-        dispatcher.reset()
-        raw_solution_deques = [
-            deque(operations) for operations in raw_solution
-        ]
-        while not dispatcher.schedule.is_complete():
-            for machine_id, operations in enumerate(raw_solution_deques):
-                if not operations:
-                    continue
-                operation = operations[0]
-                if dispatcher.is_operation_ready(operation):
-                    dispatcher.dispatch(operation, machine_id)
-                    operations.popleft()
-        return dispatcher.schedule
 
     def subscribe(self, observer: DispatcherObserver):
         """Subscribes an observer to the dispatcher."""
@@ -305,20 +309,6 @@ class Dispatcher:
         return int(min_start_time)
 
     @_dispatcher_cache
-    def uncompleted_operations(self) -> list[Operation]:
-        """Returns the list of operations that have not been scheduled.
-
-        An operation is uncompleted if it has not been scheduled yet.
-
-        It is more efficient than checking all operations in the instance.
-        """
-        uncompleted_operations = []
-        for job_id, next_position in enumerate(self._job_next_operation_index):
-            operations = self.instance.jobs[job_id][next_position:]
-            uncompleted_operations.extend(operations)
-        return uncompleted_operations
-
-    @_dispatcher_cache
     def available_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing, optionally
         filtering out operations using the pruning function.
@@ -330,15 +320,22 @@ class Dispatcher:
         Returns:
             A list of Operation objects that are available for scheduling.
         """
-
-        available_operations = self._available_operations()
+        available_operations = self.available_operations_without_pruning()
         if self.pruning_function is not None:
             available_operations = self.pruning_function(
                 self, available_operations
             )
         return available_operations
 
-    def _available_operations(self) -> list[Operation]:
+    @_dispatcher_cache
+    def available_operations_without_pruning(self) -> list[Operation]:
+        """Returns a list of available operations for processing without
+        applying the pruning function.
+
+        Returns:
+            A list of Operation objects that are available for scheduling
+            based on precedence and machine constraints only.
+        """
         available_operations = []
         for job_id, next_position in enumerate(self._job_next_operation_index):
             if next_position == len(self.instance.jobs[job_id]):
@@ -346,3 +343,174 @@ class Dispatcher:
             operation = self.instance.jobs[job_id][next_position]
             available_operations.append(operation)
         return available_operations
+
+    @_dispatcher_cache
+    def unscheduled_operations(self) -> list[Operation]:
+        """Returns the list of operations that have not been scheduled."""
+        unscheduled_operations = []
+        for job_id, next_position in enumerate(self._job_next_operation_index):
+            operations = self.instance.jobs[job_id][next_position:]
+            unscheduled_operations.extend(operations)
+        return unscheduled_operations
+
+    @_dispatcher_cache
+    def scheduled_operations(self) -> list[Operation]:
+        """Returns the list of operations that have been scheduled."""
+        scheduled_operations = []
+        for job_id, next_position in enumerate(self._job_next_operation_index):
+            operations = self.instance.jobs[job_id][:next_position]
+            scheduled_operations.extend(operations)
+        return scheduled_operations
+
+    @_dispatcher_cache
+    def available_machines(self) -> list[int]:
+        """Returns the list of available machines."""
+        available_operations = self.available_operations()
+        available_machines = set()
+        for operation in available_operations:
+            available_machines.update(operation.machines)
+        return list(available_machines)
+
+    @_dispatcher_cache
+    def available_jobs(self) -> list[int]:
+        """Returns the list of available jobs."""
+        available_operations = self.available_operations()
+        available_jobs = set(
+            operation.job_id for operation in available_operations
+        )
+        return list(available_jobs)
+
+    def earliest_start_time(self, operation: Operation) -> int:
+        """Calculates the earliest start time for a given operation based on
+        machine and job constraints.
+
+        This method is different from the `start_time` method in that it
+        takes into account every machine that can process the operation, not
+        just the one that will process it. However, it also assumes that
+        the operation is ready to be scheduled in the job in favor of
+        performance.
+
+        Args:
+            operation:
+                The operation for which to calculate the earliest start time.
+
+        Returns:
+            The earliest start time for the operation.
+        """
+        machine_earliest_start_time = min(
+            self._machine_next_available_time[machine_id]
+            for machine_id in operation.machines
+        )
+        job_start_time = self._job_next_available_time[operation.job_id]
+        return max(machine_earliest_start_time, job_start_time)
+
+    def remaining_duration(
+        self, scheduled_operation: ScheduledOperation
+    ) -> int:
+        """Calculates the remaining duration of a scheduled operation.
+
+        The method computes the remaining time for an operation to finish,
+        based on the maximum of the operation's start time or the current time.
+        This helps in determining how much time is left from 'now' until the
+        operation is completed.
+
+        Args:
+            scheduled_operation:
+                The operation for which to calculate the remaining time.
+
+        Returns:
+            The remaining duration.
+        """
+        adjusted_start_time = max(
+            scheduled_operation.start_time, self.current_time()
+        )
+        return scheduled_operation.end_time - adjusted_start_time
+
+    @_dispatcher_cache
+    def completed_operations(self) -> set[Operation]:
+        """Returns the set of operations that have been completed.
+
+        This method returns the operations that have been scheduled and the
+        current time is greater than or equal to the end time of the operation.
+        """
+        scheduled_operations = set(self.scheduled_operations())
+        ongoing_operations = set(
+            map(
+                lambda scheduled_op: scheduled_op.operation,
+                self.ongoing_operations(),
+            )
+        )
+        completed_operations = scheduled_operations - ongoing_operations
+        return completed_operations
+
+    @_dispatcher_cache
+    def uncompleted_operations(self) -> list[Operation]:
+        """Returns the list of operations that have not been completed yet.
+
+        This method checks for operations that either haven't been scheduled
+        or have been scheduled but haven't reached their completion time.
+
+        Note:
+        The behavior of this method changed in version 0.5.0. Previously, it
+        only returned unscheduled operations. For the old behavior, use the
+        `unscheduled_operations` method.
+        """
+        uncompleted_operations = self.unscheduled_operations()
+        uncompleted_operations.extend(
+            scheduled_operation.operation
+            for scheduled_operation in self.ongoing_operations()
+        )
+        return uncompleted_operations
+
+    @_dispatcher_cache
+    def ongoing_operations(self) -> list[ScheduledOperation]:
+        """Returns the list of operations that are currently being processed.
+
+        This method returns the operations that have been scheduled and are
+        currently being processed by the machines.
+        """
+        current_time = self.current_time()
+        ongoing_operations = []
+        for machine_schedule in self.schedule.schedule:
+            for scheduled_operation in reversed(machine_schedule):
+                is_completed = scheduled_operation.end_time <= current_time
+                if is_completed:
+                    break
+                ongoing_operations.append(scheduled_operation)
+        return ongoing_operations
+
+    def is_scheduled(self, operation: Operation) -> bool:
+        """Checks if the given operation has been scheduled."""
+        job_next_op_idx = self._job_next_operation_index[operation.job_id]
+        return operation.position_in_job < job_next_op_idx
+
+    def is_ongoing(self, scheduled_operation: ScheduledOperation) -> bool:
+        """Checks if the given operation is currently being processed."""
+        current_time = self.current_time()
+        return scheduled_operation.start_time <= current_time
+
+    @classmethod
+    def create_schedule_from_raw_solution(
+        cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
+    ) -> Schedule:
+        """Deprecated method, use `Schedule.from_job_sequences` instead."""
+        warn(
+            "Dispatcher.create_schedule_from_raw_solution is deprecated. "
+            "Use Schedule.from_job_sequences instead. It will be removed in "
+            "version 1.0.0.",
+            DeprecationWarning,
+        )
+        dispatcher = cls(instance)
+        dispatcher.reset()
+        raw_solution_deques = [
+            deque(operations) for operations in raw_solution
+        ]
+        while not dispatcher.schedule.is_complete():
+            for machine_id, operations in enumerate(raw_solution_deques):
+                if not operations:
+                    continue
+                operation = operations[0]
+                if dispatcher.is_operation_ready(operation):
+                    dispatcher.dispatch(operation, machine_id)
+                    operations.popleft()
+        return dispatcher.schedule

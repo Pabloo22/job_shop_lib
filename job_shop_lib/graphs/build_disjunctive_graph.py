@@ -23,6 +23,26 @@ from job_shop_lib.graphs import JobShopGraph, EdgeType, NodeType, Node
 
 
 def build_disjunctive_graph(instance: JobShopInstance) -> JobShopGraph:
+    """Builds and returns a disjunctive graph for the given job shop instance.
+
+    This function creates a complete disjunctive graph from a JobShopInstance.
+    It starts by initializing a JobShopGraph object and proceeds by adding
+    disjunctive edges between operations using the same machine, conjunctive
+    edges between successive operations in the same job, and finally, special
+    source and sink nodes with their respective edges to and from all other
+    operations.
+
+    Edges have a "type" attribute indicating whether they are disjunctive or
+    conjunctive.
+
+    Args:
+        instance (JobShopInstance): The job shop instance for which to build
+        the graph.
+
+    Returns:
+        JobShopGraph: A JobShopGraph object representing the disjunctive graph
+        of the job shop scheduling problem.
+    """
     graph = JobShopGraph(instance)
     add_disjunctive_edges(graph)
     add_conjunctive_edges(graph)
