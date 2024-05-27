@@ -16,7 +16,7 @@ from job_shop_lib.dispatching import (
 # flake8: noqa
 STEP_0 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      1.0                0.0       1.0          0.0            0.0          0.0
 1      0.0                1.0       1.0          0.0            1.0          0.0
@@ -28,12 +28,12 @@ FeatureType.OPERATIONS:
 7      1.0                0.0       1.0          0.0            0.0          0.0
 8      0.0                1.0       3.0          0.0            1.0          0.0
 9      0.0                4.0       2.0          0.0            2.0          0.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                0.0       7.0          0.0                  4.0          0.0
 1      1.0                0.0       8.0          0.0                  3.0          0.0
 2      1.0                0.0       9.0          0.0                  3.0          0.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                0.0      11.0          0.0                  4.0          0.0
 1      1.0                0.0       7.0          0.0                  3.0          0.0
@@ -41,7 +41,7 @@ FeatureType.JOBS:
 
 STEP_1 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0                0.0       1.0          1.0            0.0          0.0
 1      1.0                1.0       1.0          0.0            0.0          0.0
@@ -53,12 +53,12 @@ FeatureType.OPERATIONS:
 7      1.0                0.0       1.0          0.0            0.0          0.0
 8      0.0                1.0       3.0          0.0            1.0          0.0
 9      0.0                4.0       2.0          0.0            2.0          0.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                1.0       6.0          1.0                  3.0          0.0
 1      1.0                0.0       8.0          0.0                  3.0          0.0
 2      1.0                0.0       9.0          0.0                  3.0          0.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                1.0      10.0          1.0                  3.0          0.0
 1      1.0                0.0       7.0          0.0                  3.0          0.0
@@ -67,7 +67,7 @@ FeatureType.JOBS:
 
 STEP_2 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0                0.0       1.0          1.0            0.0          0.0
 1      0.0                1.0       1.0          1.0            0.0          0.0
@@ -79,12 +79,12 @@ FeatureType.OPERATIONS:
 7      1.0                0.0       1.0          0.0            0.0          0.0
 8      0.0                1.0       3.0          0.0            1.0          0.0
 9      0.0                4.0       2.0          0.0            2.0          0.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                1.0       6.0          1.0                  3.0          0.0
 1      1.0                2.0       7.0          1.0                  2.0          0.0
 2      1.0                0.0       9.0          0.0                  3.0          0.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                2.0       9.0          2.0                  2.0          0.0
 1      1.0                2.0       7.0          0.0                  3.0          0.0
@@ -92,7 +92,7 @@ FeatureType.JOBS:
 
 STEP_3 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0                0.0       1.0          1.0            0.0          0.0
 1      0.0                1.0       1.0          1.0            0.0          0.0
@@ -104,12 +104,12 @@ FeatureType.OPERATIONS:
 7      1.0                0.0       1.0          0.0            0.0          0.0
 8      0.0                1.0       3.0          0.0            1.0          0.0
 9      0.0                7.0       2.0          0.0            2.0          0.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                1.0       6.0          1.0                  3.0          0.0
 1      0.0                7.0       2.0          2.0                  1.0          0.0
 2      1.0                0.0       9.0          0.0                  3.0          0.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                2.0       9.0          2.0                  2.0          0.0
 1      0.0                7.0       2.0          1.0                  2.0          0.0
@@ -117,7 +117,7 @@ FeatureType.JOBS:
 
 STEP_4 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0               -1.0       1.0          1.0            0.0          1.0
 1      0.0                0.0       1.0          1.0            0.0          0.0
@@ -129,12 +129,12 @@ FeatureType.OPERATIONS:
 7      0.0               -1.0       0.0          1.0            0.0          1.0
 8      1.0                0.0       3.0          0.0            0.0          0.0
 9      0.0                6.0       2.0          0.0            1.0          0.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                0.0       6.0          0.0                  3.0          0.0
 1      0.0                6.0       2.0          2.0                  1.0          0.0
 2      1.0                1.0       8.0          0.0                  2.0          0.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                1.0       9.0          1.0                  2.0          0.0
 1      1.0                6.0       2.0          1.0                  2.0          0.0
@@ -142,7 +142,7 @@ FeatureType.JOBS:
 
 STEP_5 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0               -1.0       1.0          1.0            0.0          1.0
 1      0.0                0.0       1.0          1.0            0.0          0.0
@@ -154,12 +154,12 @@ FeatureType.OPERATIONS:
 7      0.0               -1.0       0.0          1.0            0.0          1.0
 8      1.0                0.0       3.0          0.0            0.0          0.0
 9      0.0                6.0       2.0          0.0            1.0          0.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                0.0       6.0          0.0                  3.0          0.0
 1      0.0                6.0       2.0          2.0                  1.0          0.0
 2      1.0                8.0       1.0          1.0                  1.0          0.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                8.0       2.0          2.0                  1.0          0.0
 1      1.0                8.0       2.0          1.0                  2.0          0.0
@@ -167,7 +167,7 @@ FeatureType.JOBS:
 
 STEP_6 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0               -1.0       1.0          1.0            0.0          1.0
 1      0.0                0.0       1.0          1.0            0.0          0.0
@@ -179,12 +179,12 @@ FeatureType.OPERATIONS:
 7      0.0               -1.0       0.0          1.0            0.0          1.0
 8      1.0                0.0       3.0          0.0            0.0          0.0
 9      0.0                6.0       2.0          0.0            1.0          0.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                0.0       6.0          0.0                  3.0          0.0
 1      0.0                6.0       2.0          2.0                  1.0          0.0
 2      0.0               -1.0       0.0          2.0                  0.0          1.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                8.0       2.0          2.0                  1.0          0.0
 1      0.0                9.0       1.0          2.0                  1.0          0.0
@@ -192,7 +192,7 @@ FeatureType.JOBS:
 
 STEP_7 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0               -7.0       1.0          1.0            0.0          1.0
 1      0.0               -6.0       1.0          1.0            0.0          1.0
@@ -204,12 +204,12 @@ FeatureType.OPERATIONS:
 7      0.0               -7.0       0.0          1.0            0.0          1.0
 8      0.0               -6.0      -3.0          1.0            0.0          1.0
 9      1.0                0.0       2.0          0.0            0.0          0.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                2.0       3.0          0.0                  2.0          0.0
 1      1.0                0.0       2.0          0.0                  1.0          0.0
 2      0.0               -7.0       0.0          2.0                  0.0          1.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                2.0       2.0          1.0                  1.0          0.0
 1      1.0                3.0       1.0          1.0                  1.0          0.0
@@ -217,7 +217,7 @@ FeatureType.JOBS:
 
 STEP_8 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0               -7.0       1.0          1.0            0.0          1.0
 1      0.0               -6.0       1.0          1.0            0.0          1.0
@@ -229,12 +229,12 @@ FeatureType.OPERATIONS:
 7      0.0               -7.0       0.0          1.0            0.0          1.0
 8      0.0               -6.0      -3.0          1.0            0.0          1.0
 9      1.0                0.0       2.0          0.0            0.0          0.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                4.0       1.0          1.0                  1.0          0.0
 1      1.0                0.0       2.0          0.0                  1.0          0.0
 2      0.0               -7.0       0.0          2.0                  0.0          1.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                2.0       0.0          2.0                  0.0          1.0
 1      1.0                4.0       1.0          1.0                  1.0          0.0
@@ -242,7 +242,7 @@ FeatureType.JOBS:
 
 STEP_9 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0               -7.0       1.0          1.0            0.0          1.0
 1      0.0               -6.0       1.0          1.0            0.0          1.0
@@ -254,12 +254,12 @@ FeatureType.OPERATIONS:
 7      0.0               -7.0       0.0          1.0            0.0          1.0
 8      0.0               -6.0      -3.0          1.0            0.0          1.0
 9      1.0                0.0       2.0          0.0            0.0          0.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0               -7.0       0.0          2.0                  0.0          1.0
 1      1.0                0.0       2.0          0.0                  1.0          0.0
 2      0.0               -7.0       0.0          2.0                  0.0          1.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                2.0       0.0          2.0                  0.0          1.0
 1      0.0                4.0       0.0          2.0                  0.0          1.0
@@ -267,7 +267,7 @@ FeatureType.JOBS:
 
 STEP_10 = """CompositeFeatureObserver:
 ------------------------
-FeatureType.OPERATIONS:
+operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0              -12.0       1.0          1.0            0.0          1.0
 1      0.0              -11.0       1.0          1.0            0.0          1.0
@@ -279,12 +279,12 @@ FeatureType.OPERATIONS:
 7      0.0              -12.0       0.0          1.0            0.0          1.0
 8      0.0              -11.0      -3.0          1.0            0.0          1.0
 9      0.0               -5.0      -3.0          1.0            0.0          1.0
-FeatureType.MACHINES:
+machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0              -12.0       0.0          0.0                  0.0          1.0
 1      0.0              -12.0       0.0          0.0                  0.0          1.0
 2      0.0              -12.0       0.0          0.0                  0.0          1.0
-FeatureType.JOBS:
+jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                2.0       0.0          0.0                  0.0          1.0
 1      0.0                4.0       0.0          0.0                  0.0          1.0
