@@ -5,7 +5,7 @@ The factory functions create and return the appropriate functions based on the
 specified names or enums.
 """
 
-from enum import StrEnum
+from enum import Enum
 
 from collections.abc import Callable, Sequence
 import random
@@ -24,7 +24,7 @@ from job_shop_lib.dispatching import (
 )
 
 
-class DispatchingRule(StrEnum):
+class DispatchingRule(str, Enum):
     """Enumeration of dispatching rules for the job shop scheduling problem."""
 
     SHORTEST_PROCESSING_TIME = "shortest_processing_time"
@@ -34,14 +34,14 @@ class DispatchingRule(StrEnum):
     RANDOM = "random"
 
 
-class MachineChooser(StrEnum):
+class MachineChooser(str, Enum):
     """Enumeration of machine chooser strategies for the job shop scheduling"""
 
     FIRST = "first"
     RANDOM = "random"
 
 
-class PruningFunction(StrEnum):
+class PruningFunction(str, Enum):
     """Enumeration of pruning functions.
 
     A pruning function is used by the `Dispatcher` class to reduce the

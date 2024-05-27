@@ -1,13 +1,13 @@
 """Home of the `FeatureObserver` class and `FeatureType` enum."""
 
-from enum import StrEnum
+import enum
 
 import numpy as np
 from job_shop_lib import ScheduledOperation
 from job_shop_lib.dispatching import Dispatcher, DispatcherObserver
 
 
-class FeatureType(StrEnum):
+class FeatureType(str, enum.Enum):
     """Types of features that can be extracted."""
 
     OPERATIONS = "operations"
