@@ -74,9 +74,18 @@ class FeatureObserver(DispatcherObserver):
         self.set_features_to_zero()
         self.initialize_features()
 
-    def set_features_to_zero(self):
+    def set_features_to_zero(
+        self, exclude: FeatureType | list[FeatureType] | None = None
+    ):
         """Sets features to zero."""
+        if exclude is None:
+            exclude = []
+        if isinstance(exclude, FeatureType):
+            exclude = [exclude]
+
         for feature_type in self.features:
+            if feature_type in exclude:
+                continue
             self.features[feature_type][:] = 0.0
 
     @staticmethod
