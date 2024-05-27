@@ -11,9 +11,21 @@ from job_shop_lib.dispatching.feature_observers import (
 
 
 class DurationObserver(FeatureObserver):
-    """Observer that adds a feature indicating the duration of operations,
-    and the cumulative duration of upcoming operations for jobs and
-    machines."""
+    """Measures the remaining duration of operations, machines, and jobs.
+
+    The duration of an Operation is:
+        - if the operation has not been scheduled, it is the duration of the
+        operation.
+        - if the operation has been scheduled, it is the remaining duration of
+        the operation.
+        - if the operation has been completed, it is the last duration of the
+        operation that has been computed. The duration must be set to 0
+        manually if needed. We do not update the duration of completed
+        operations to save computation time.
+
+    The duration of a Machine or Job is the sum of the durations of the
+    unscheduled operations that belong to the machine or job.
+    """
 
     def __init__(
         self,
@@ -44,8 +56,12 @@ class DurationObserver(FeatureObserver):
             mapping[feature_type](scheduled_operation)
 
     def _initialize_operation_durations(self):
-        duration_matrix = self.dispatcher.instance.durations_matrix
+        duration_matrix = self.dispatcher.instance.durations_matrix_array
         operation_durations = np.array(duration_matrix).reshape(-1, 1)
+        # Drop the NaN values
+        operation_durations = operation_durations[
+            ~np.isnan(operation_durations)
+        ].reshape(-1, 1)
         self.features[FeatureType.OPERATIONS] = operation_durations
 
     def _initialize_machine_durations(self):
@@ -69,18 +85,11 @@ class DurationObserver(FeatureObserver):
     def _update_machine_durations(
         self, scheduled_operation: ScheduledOperation
     ):
-        operation_id = scheduled_operation.operation.operation_id
-        operation_duration = self.features[FeatureType.OPERATIONS][
-            operation_id, 0
-        ]
-        self.features[FeatureType.MACHINES][
-            scheduled_operation.machine_id, 0
-        ] -= operation_duration
+        machine_id = scheduled_operation.machine_id
+        op_duration = scheduled_operation.operation.duration
+        self.features[FeatureType.MACHINES][machine_id, 0] -= op_duration
 
     def _update_job_durations(self, scheduled_operation: ScheduledOperation):
-        operation_id = scheduled_operation.operation.operation_id
-        operation_duration = self.features[FeatureType.OPERATIONS][
-            operation_id, 0
-        ]
+        operation_duration = scheduled_operation.operation.duration
         job_id = scheduled_operation.job_id
         self.features[FeatureType.JOBS][job_id, 0] -= operation_duration
