@@ -1,3 +1,5 @@
+import numpy as np
+
 from job_shop_lib import JobShopInstance, Operation
 
 
@@ -112,3 +114,48 @@ def test_max_duration_per_job(job_shop_instance):
 
 def test_max_duration_per_machine(job_shop_instance):
     assert job_shop_instance.max_duration_per_machine == [10, 20, 10]
+
+
+def test_duration_matrix_array():
+    jobs = [
+        [Operation(machines=0, duration=1), Operation(machines=1, duration=2)],
+        [Operation(machines=1, duration=3)],
+    ]
+    instance = JobShopInstance(jobs=jobs)
+    assert str(instance.durations_matrix_array) == str(
+        np.array([[1.0, 2.0], [3.0, np.nan]], dtype=np.float32)
+    )
+
+
+def test_machine_matrix_array_3d():
+    jobs = [
+        [Operation(machines=0, duration=1), Operation(machines=1, duration=2)],
+        [Operation(machines=[0, 1], duration=3)],
+    ]
+    instance = JobShopInstance(jobs=jobs)
+    assert str(instance.machines_matrix_array) == str(
+        np.array(
+            [
+                [[0.0, np.nan], [1.0, np.nan]],
+                [[0.0, 1.0], [np.nan, np.nan]],
+            ],
+            dtype=np.float32,
+        )
+    )
+
+
+def test_machine_matrix_array_2d():
+    jobs = [
+        [Operation(machines=0, duration=1), Operation(machines=1, duration=2)],
+        [Operation(machines=1, duration=3)],
+    ]
+    instance = JobShopInstance(jobs=jobs)
+    assert str(instance.machines_matrix_array) == str(
+        np.array([[0.0, 1.0], [1.0, np.nan]], dtype=np.float32)
+    )
+
+
+if __name__ == "__main__":
+    import pytest
+
+    pytest.main(["-vv", __file__])

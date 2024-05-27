@@ -6,6 +6,8 @@ import os
 import functools
 from typing import Any
 
+import numpy as np
+
 from job_shop_lib import Operation
 
 
@@ -265,6 +267,58 @@ class JobShopInstance:
         ]
 
     @functools.cached_property
+    def durations_matrix_array(self) -> np.ndarray:
+        """Returns the duration matrix of the instance as a numpy array.
+
+        The returned array has shape (num_jobs, max_num_operations_per_job).
+        Non-existing operations are filled with np.nan.
+
+        Example:
+            >>> jobs = [[Operation(0, 2), Operation(1, 3)], [Operation(0, 4)]]
+            >>> instance = JobShopInstance(jobs)
+            >>> instance.durations_matrix_array
+            array([[ 2.,  2.],
+                   [ 4., nan]], dtype=float32)
+        """
+        duration_matrix = self.durations_matrix
+        return self._fill_matrix_with_nans_2d(duration_matrix)
+
+    @functools.cached_property
+    def machines_matrix_array(self) -> np.ndarray:
+        """Returns the machines matrix of the instance as a numpy array.
+
+        The returned array has shape (num_jobs, max_num_operations_per_job,
+        max_num_machines_per_operation). Non-existing machines are filled with
+        np.nan.
+
+        Example:
+            >>> jobs = [
+            ...     [Operation(machines=[0, 1], 2), Operation(machines=1, 3)],
+            ...     [Operation(machines=0, 6)],
+            ... ]
+            >>> instance = JobShopInstance(jobs)
+            >>> instance.machines_matrix_array
+            array([[[ 0.,  1.],
+                    [ 1., nan]],
+                   [[ 0., nan],
+                    [nan, nan]]], dtype=float32)
+        """
+
+        machines_matrix = self.machines_matrix
+        if self.is_flexible:
+            # False positive from mypy, the type of machines_matrix is
+            # list[list[list[int]]] here
+            return self._fill_matrix_with_nans_3d(
+                machines_matrix  # type: ignore[arg-type]
+            )
+
+        # False positive from mypy, the type of machines_matrix is
+        # list[list[int]] here
+        return self._fill_matrix_with_nans_2d(
+            machines_matrix  # type: ignore[arg-type]
+        )
+
+    @functools.cached_property
     def operations_by_machine(self) -> list[list[Operation]]:
         """Returns a list of lists of operations.
 
@@ -353,3 +407,50 @@ class JobShopInstance:
     def total_duration(self) -> int:
         """Returns the sum of the durations of all operations in all jobs."""
         return sum(self.job_durations)
+
+    @staticmethod
+    def _fill_matrix_with_nans_2d(matrix: list[list[int]]) -> np.ndarray:
+        """Fills a matrix with np.nan values.
+
+        Args:
+            matrix:
+                A list of lists of integers.
+
+        Returns:
+            A numpy array with the same shape as the input matrix, filled with
+            np.nan values.
+        """
+        max_length = max(len(row) for row in matrix)
+        squared_matrix = np.full(
+            (len(matrix), max_length), np.nan, dtype=np.float32
+        )
+        for i, row in enumerate(matrix):
+            squared_matrix[i, : len(row)] = row
+        return squared_matrix
+
+    @staticmethod
+    def _fill_matrix_with_nans_3d(matrix: list[list[list[int]]]) -> np.ndarray:
+        """Fills a 3D matrix with np.nan values.
+
+        Args:
+            matrix:
+                A list of lists of lists of integers.
+
+        Returns:
+            A numpy array with the same shape as the input matrix, filled with
+            np.nan values.
+        """
+        max_length = max(len(row) for row in matrix)
+        max_inner_length = len(matrix[0][0])
+        for row in matrix:
+            for inner_row in row:
+                max_inner_length = max(max_inner_length, len(inner_row))
+        squared_matrix = np.full(
+            (len(matrix), max_length, max_inner_length),
+            np.nan,
+            dtype=np.float32,
+        )
+        for i, row in enumerate(matrix):
+            for j, inner_row in enumerate(row):
+                squared_matrix[i, j, : len(inner_row)] = inner_row
+        return squared_matrix
