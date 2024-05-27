@@ -65,7 +65,7 @@ def _plot_machine_schedules(
 ) -> dict[int, Patch]:
     """Plots the schedules for each machine."""
     max_job_id = schedule.instance.num_jobs - 1
-    cmap = plt.cm.get_cmap(cmap_name, max_job_id + 1)
+    cmap = plt.get_cmap(cmap_name, max_job_id + 1)
     norm = Normalize(vmin=0, vmax=max_job_id)
     legend_handles = {}
 
