@@ -82,6 +82,6 @@ class CompositeFeatureObserver(FeatureObserver):
         out = [f"{self.__class__.__name__}:"]
         out.append("-" * (len(out[0]) - 1))
         for feature_type, dataframe in self.features_as_dataframe.items():
-            out.append(f"{feature_type}:")
+            out.append(f"{feature_type.value}:")
             out.append(dataframe.to_string())
         return "\n".join(out)
