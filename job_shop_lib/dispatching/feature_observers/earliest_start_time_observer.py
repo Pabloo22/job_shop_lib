@@ -23,15 +23,7 @@ class EarliestStartTimeObserver(FeatureObserver):
 
         # Earliest start times initialization
         # -------------------------------
-        duration_matrix = dispatcher.instance.durations_matrix
-        max_length = max(
-            len(duration_matrix_row) for duration_matrix_row in duration_matrix
-        )
-        squared_duration_matrix = np.full(
-            (len(duration_matrix), max_length), np.nan
-        )
-        for i, row in enumerate(duration_matrix):
-            squared_duration_matrix[i, : len(row)] = row
+        squared_duration_matrix = dispatcher.instance.durations_matrix_array
         self.earliest_start_times = np.hstack(
             (
                 np.zeros((squared_duration_matrix.shape[0], 1)),
