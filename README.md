@@ -92,12 +92,12 @@ https://github.com/thomasWeise/jsspInstancesAndResults
 
 ### Generate a Random Instance
 
-You can also generate a random instance with the `BasicGenerator` class.
+You can also generate a random instance with the `GeneralInstanceGenerator` class.
 
 ```python
-from job_shop_lib.generators import BasicGenerator
+from job_shop_lib.generation import GeneralInstanceGenerator
 
-generator = BasicGenerator(
+generator = GeneralInstanceGenerator(
     duration_range=(5, 10), seed=42, num_jobs=5, num_machines=5
 )
 random_instance = generator.generate()
@@ -106,7 +106,7 @@ random_instance = generator.generate()
 This class can also work as an iterator to generate multiple instances:
 
 ```python
-generator = BasicGenerator(iteration_limit=100, seed=42)
+generator = GeneralInstanceGenerator(iteration_limit=100, seed=42)
 instances = []
 for instance in generator:
     instances.append(instance)
