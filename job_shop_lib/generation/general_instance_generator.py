@@ -1,16 +1,13 @@
 """Home of the `BasicGenerator` class."""
 
 import random
-from typing import Iterator
 
 from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib.generation import InstanceGenerator
 
 
-class BasicGenerator:  # pylint: disable=too-many-instance-attributes
+class GeneralInstanceGenerator(InstanceGenerator):
     """Generates instances for job shop problems.
-
-    DEPRECATED: Class moved to `job_shop_lib.generation` and renamed to
-    `GeneralInstanceGenerator`. This class will be removed in version 1.0.0.
 
     This class is designed to be versatile, enabling the creation of various
     job shop instances without the need for multiple dedicated classes.
@@ -86,30 +83,24 @@ class BasicGenerator:  # pylint: disable=too-many-instance-attributes
             iteration_limit:
                 Maximum number of instances to generate in iteration mode.
         """
-        if isinstance(num_jobs, int):
-            num_jobs = (num_jobs, num_jobs)
-
-        if isinstance(num_machines, int):
-            num_machines = (num_machines, num_machines)
-
+        super().__init__(
+            num_jobs=num_jobs,
+            num_machines=num_machines,
+            duration_range=duration_range,
+            name_suffix=name_suffix,
+            seed=seed,
+            iteration_limit=iteration_limit,
+        )
         if isinstance(machines_per_operation, int):
             machines_per_operation = (
                 machines_per_operation,
                 machines_per_operation,
             )
-
-        self.num_jobs_range = num_jobs
-        self.duration_range = duration_range
-        self.num_machines_range = num_machines
         self.machines_per_operation = machines_per_operation
 
         self.allow_less_jobs_than_machines = allow_less_jobs_than_machines
         self.allow_recirculation = allow_recirculation
         self.name_suffix = name_suffix
-
-        self._counter = 0
-        self._current_iteration = 0
-        self._iteration_limit = iteration_limit
 
         if seed is not None:
             random.seed(seed)
@@ -133,25 +124,7 @@ class BasicGenerator:  # pylint: disable=too-many-instance-attributes
             jobs.append(job)
             available_machines = list(range(num_machines))
 
-        return JobShopInstance(jobs=jobs, name=self._get_name())
-
-    def __iter__(self) -> Iterator[JobShopInstance]:
-        self._current_iteration = 0
-        return self
-
-    def __next__(self) -> JobShopInstance:
-        if (
-            self._iteration_limit is not None
-            and self._current_iteration >= self._iteration_limit
-        ):
-            raise StopIteration
-        self._current_iteration += 1
-        return self.generate()
-
-    def __len__(self) -> int:
-        if self._iteration_limit is None:
-            raise ValueError("Iteration limit is not set.")
-        return self._iteration_limit
+        return JobShopInstance(jobs=jobs, name=self._next_name())
 
     def create_random_operation(
         self, available_machines: list[int] | None = None
@@ -194,7 +167,3 @@ class BasicGenerator:  # pylint: disable=too-many-instance-attributes
             available_machines.remove(machine_id)
 
         return machine_id
-
-    def _get_name(self) -> str:
-        self._counter += 1
-        return f"{self.name_suffix}_{self._counter}"
