@@ -4,6 +4,7 @@ import random
 
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.generation import InstanceGenerator
+from job_shop_lib import ValidationError
 
 
 class GeneralInstanceGenerator(InstanceGenerator):
@@ -105,14 +106,24 @@ class GeneralInstanceGenerator(InstanceGenerator):
         if seed is not None:
             random.seed(seed)
 
-    def generate(self) -> JobShopInstance:
-        """Generates a single job shop instance"""
-        num_jobs = random.randint(*self.num_jobs_range)
+    def generate(
+        self, num_jobs: int | None = None, num_machines: int | None = None
+    ) -> JobShopInstance:
+        if num_jobs is None:
+            num_jobs = random.randint(*self.num_jobs_range)
 
-        min_num_machines, max_num_machines = self.num_machines_range
-        if not self.allow_less_jobs_than_machines:
-            min_num_machines = min(num_jobs, max_num_machines)
-        num_machines = random.randint(min_num_machines, max_num_machines)
+        if num_machines is None:
+            min_num_machines, max_num_machines = self.num_machines_range
+            if not self.allow_less_jobs_than_machines:
+                min_num_machines = min(num_jobs, max_num_machines)
+            num_machines = random.randint(min_num_machines, max_num_machines)
+        elif (
+            not self.allow_less_jobs_than_machines and num_jobs < num_machines
+        ):
+            raise ValidationError(
+                "Theere are fewer jobs than machines, which is not allowed"
+                "when `allow_less_jobs_than_machines` attribute is False."
+            )
 
         jobs = []
         available_machines = list(range(num_machines))

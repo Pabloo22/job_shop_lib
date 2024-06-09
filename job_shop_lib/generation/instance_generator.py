@@ -3,7 +3,7 @@ import abc
 import random
 from typing import Iterator
 
-from job_shop_lib import JobShopInstance
+from job_shop_lib import JobShopInstance, UninitializedAttributeError
 
 
 class InstanceGenerator(abc.ABC):
@@ -76,8 +76,17 @@ class InstanceGenerator(abc.ABC):
         self._iteration_limit = iteration_limit
 
     @abc.abstractmethod
-    def generate(self) -> JobShopInstance:
-        """Generates a single job shop instance"""
+    def generate(
+        self, num_jobs: int | None = None, num_machines: int | None = None
+    ) -> JobShopInstance:
+        """Generates a single job shop instance
+
+        Args:
+            num_jobs: The number of jobs to generate. If None, a random value
+                within the specified range will be used.
+            num_machines: The number of machines to generate. If None, a random
+                value within the specified range will be used.
+        """
 
     def _next_name(self) -> str:
         self._counter += 1
@@ -98,7 +107,7 @@ class InstanceGenerator(abc.ABC):
 
     def __len__(self) -> int:
         if self._iteration_limit is None:
-            raise ValueError("Iteration limit is not set.")
+            raise UninitializedAttributeError("Iteration limit is not set.")
         return self._iteration_limit
 
     @property
