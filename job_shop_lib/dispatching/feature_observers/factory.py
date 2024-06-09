@@ -29,7 +29,9 @@ class FeatureObserverType(str, Enum):
 
 
 def feature_observer_factory(
-    node_feature_creator_type: str | FeatureObserverType,
+    node_feature_creator_type: (
+        str | FeatureObserverType | type[FeatureObserver]
+    ),
     **kwargs,
 ) -> FeatureObserver:
     """Creates and returns a node feature creator based on the specified
@@ -45,6 +47,10 @@ def feature_observer_factory(
     Returns:
         A node feature creator instance.
     """
+    # if the instance is of type type[FeatureObserver] we can just
+    # call the object constructor with the keyword arguments
+    if isinstance(node_feature_creator_type, type):
+        return node_feature_creator_type(**kwargs)
     mapping: dict[FeatureObserverType, type[FeatureObserver]] = {
         FeatureObserverType.IS_READY: IsReadyObserver,
         FeatureObserverType.EARLIEST_START_TIME: EarliestStartTimeObserver,

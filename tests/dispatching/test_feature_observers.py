@@ -3,6 +3,9 @@ from job_shop_lib.dispatching.feature_observers import (
     feature_observer_factory,
     FeatureObserverType,
     CompositeFeatureObserver,
+    DurationObserver,
+    EarliestStartTimeObserver,
+    FeatureObserver,
 )
 
 from job_shop_lib.dispatching import (
@@ -298,10 +301,12 @@ def test_every_feature_observer(irregular_job_shop_instance: JobShopInstance):
     dispatcher = Dispatcher(
         irregular_job_shop_instance, pruning_function=pruning_function
     )
-    feature_observers_types = [
+    feature_observers_types: list[
+        FeatureObserverType | type[FeatureObserver]
+    ] = [
         FeatureObserverType.IS_READY,
-        FeatureObserverType.EARLIEST_START_TIME,
-        FeatureObserverType.DURATION,
+        EarliestStartTimeObserver,  # For checking the factory
+        DurationObserver,
         FeatureObserverType.IS_SCHEDULED,
         FeatureObserverType.POSITION_IN_JOB,
         FeatureObserverType.REMAINING_OPERATIONS,
