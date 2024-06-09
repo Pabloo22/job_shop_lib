@@ -17,6 +17,7 @@ networkx = "^3"
 imageio = "^2"
 pygraphviz = {version = "^1.12", optional = true}
 numpy = "^1.26.4"
+gymnasium = "^0.29.1"
 
 [tool.poetry.group.test]
 optional = true
