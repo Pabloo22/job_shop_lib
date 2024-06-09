@@ -2,9 +2,8 @@
 
 import random
 
-from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib import JobShopInstance, Operation, ValidationError
 from job_shop_lib.generation import InstanceGenerator
-from job_shop_lib import ValidationError
 
 
 class GeneralInstanceGenerator(InstanceGenerator):
