@@ -3,7 +3,7 @@
 import collections
 import networkx as nx
 
-from job_shop_lib import JobShopInstance, JobShopLibError
+from job_shop_lib import JobShopInstance, ValidationError
 from job_shop_lib.graphs import Node, NodeType
 
 
@@ -168,7 +168,7 @@ class JobShopGraph:
         if isinstance(v_of_edge, Node):
             v_of_edge = v_of_edge.node_id
         if u_of_edge not in self.graph or v_of_edge not in self.graph:
-            raise JobShopLibError(
+            raise ValidationError(
                 "`u_of_edge` and `v_of_edge` must be in the graph."
             )
         self.graph.add_edge(u_of_edge, v_of_edge, **attr)

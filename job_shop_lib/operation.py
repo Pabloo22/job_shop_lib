@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from job_shop_lib import JobShopLibError
+from job_shop_lib import UninitializedAttributeError
 
 
 class Operation:
@@ -50,17 +50,20 @@ class Operation:
         """Returns the id of the machine associated with the operation.
 
         Raises:
-            ValueError: If the operation has multiple machines in its list.
+            UninitializedAttributeError: If the operation has multiple machines
+            in its list.
         """
         if len(self.machines) > 1:
-            raise JobShopLibError("Operation has multiple machines.")
+            raise UninitializedAttributeError(
+                "Operation has multiple machines."
+            )
         return self.machines[0]
 
     @property
     def job_id(self) -> int:
         """Returns the id of the job that the operation belongs to."""
         if self._job_id is None:
-            raise JobShopLibError("Operation has no job_id.")
+            raise UninitializedAttributeError("Operation has no job_id.")
         return self._job_id
 
     @job_id.setter
@@ -73,10 +76,13 @@ class Operation:
         job.
 
         Raises:
-            ValueError: If the operation has no position_in_job.
+            UninitializedAttributeError: If the operation has no
+            `position_in_job`.
         """
         if self._position_in_job is None:
-            raise JobShopLibError("Operation has no position_in_job.")
+            raise UninitializedAttributeError(
+                "Operation has no `position_in_job`."
+            )
         return self._position_in_job
 
     @position_in_job.setter
@@ -94,10 +100,10 @@ class Operation:
         instance.
 
         Raises:
-            ValueError: If the operation has no id.
+            UninitializedAttributeError: If the operation has no id.
         """
         if self._operation_id is None:
-            raise JobShopLibError("Operation has no id.")
+            raise UninitializedAttributeError("Operation has no id.")
         return self._operation_id
 
     @operation_id.setter

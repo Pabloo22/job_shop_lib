@@ -1,5 +1,6 @@
 import pytest
 
+from job_shop_lib import ValidationError
 from job_shop_lib.dispatching import (
     dispatching_rule_factory,
     shortest_processing_time_rule,
@@ -45,7 +46,7 @@ def test_dispatching_rule_factory():
         == most_work_remaining_rule
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         dispatching_rule_factory("unknown_rule")
 
 

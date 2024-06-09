@@ -1,6 +1,10 @@
 """Home of the `Node` class."""
 
-from job_shop_lib import Operation, JobShopLibError
+from job_shop_lib import (
+    Operation,
+    ValidationError,
+    UninitializedAttributeError,
+)
 from job_shop_lib.graphs.constants import NodeType
 
 
@@ -75,21 +79,21 @@ class Node:
                 node_type is NodeType.JOB.
 
         Raises:
-            JobShopLibError:
+            ValidationError:
                 If the node_type is OPERATION and operation is None.
-            JobShopLibError:
+            ValidationError:
                 If the node_type is MACHINE and machine_id is None.
-            JobShopLibError:
+            ValidationError:
                 If the node_type is JOB and job_id is None.
         """
         if node_type == NodeType.OPERATION and operation is None:
-            raise JobShopLibError("Operation node must have an operation.")
+            raise ValidationError("Operation node must have an operation.")
 
         if node_type == NodeType.MACHINE and machine_id is None:
-            raise JobShopLibError("Machine node must have a machine_id.")
+            raise ValidationError("Machine node must have a machine_id.")
 
         if node_type == NodeType.JOB and job_id is None:
-            raise JobShopLibError("Job node must have a job_id.")
+            raise ValidationError("Job node must have a job_id.")
 
         self.node_type = node_type
         self._node_id: int | None = None
@@ -102,7 +106,9 @@ class Node:
     def node_id(self) -> int:
         """Returns a unique identifier for the node."""
         if self._node_id is None:
-            raise JobShopLibError("Node has not been assigned an id.")
+            raise UninitializedAttributeError(
+                "Node has not been assigned an id."
+            )
         return self._node_id
 
     @node_id.setter
@@ -116,7 +122,7 @@ class Node:
         This property is mandatory for nodes of type `OPERATION`.
         """
         if self._operation is None:
-            raise JobShopLibError("Node has no operation.")
+            raise UninitializedAttributeError("Node has no operation.")
         return self._operation
 
     @property
@@ -126,7 +132,7 @@ class Node:
         This property is mandatory for nodes of type `MACHINE`.
         """
         if self._machine_id is None:
-            raise JobShopLibError("Node has no `machine_id`.")
+            raise UninitializedAttributeError("Node has no `machine_id`.")
         return self._machine_id
 
     @property
@@ -136,7 +142,7 @@ class Node:
         This property is mandatory for nodes of type `JOB`.
         """
         if self._job_id is None:
-            raise JobShopLibError("Node has no `job_id`.")
+            raise UninitializedAttributeError("Node has no `job_id`.")
         return self._job_id
 
     def __hash__(self) -> int:
