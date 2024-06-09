@@ -1,6 +1,6 @@
 """Home of the `RemainingOperationsObserver` class."""
 
-from job_shop_lib import ScheduledOperation
+from job_shop_lib import ScheduledOperation, ValidationError
 from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,
@@ -28,7 +28,7 @@ class RemainingOperationsObserver(FeatureObserver):
             feature_types == FeatureType.OPERATIONS
             or FeatureType.OPERATIONS in feature_types
         ):
-            raise ValueError("FeatureType.OPERATIONS is not supported.")
+            raise ValidationError("FeatureType.OPERATIONS is not supported.")
         super().__init__(
             dispatcher,
             feature_types=feature_types,

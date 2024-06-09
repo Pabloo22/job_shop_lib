@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 from collections import deque
 
-from job_shop_lib import ScheduledOperation, JobShopInstance, JobShopLibError
+from job_shop_lib import ScheduledOperation, JobShopInstance, ValidationError
 
 
 class Schedule:
@@ -161,7 +161,7 @@ class Schedule:
                     at_least_one_operation_scheduled = True
 
             if not at_least_one_operation_scheduled:
-                raise JobShopLibError(
+                raise ValidationError(
                     "Invalid job sequences. No valid operation to schedule."
                 )
         return dispatcher.schedule

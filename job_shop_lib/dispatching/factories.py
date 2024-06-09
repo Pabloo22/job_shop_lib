@@ -10,7 +10,7 @@ from enum import Enum
 from collections.abc import Callable, Sequence
 import random
 
-from job_shop_lib import Operation
+from job_shop_lib import Operation, ValidationError
 from job_shop_lib.dispatching import (
     shortest_processing_time_rule,
     first_come_first_served_rule,
@@ -90,7 +90,7 @@ def dispatching_rule_factory(
 
     dispatching_rule = dispatching_rule.lower()
     if dispatching_rule not in dispatching_rules:
-        raise ValueError(
+        raise ValidationError(
             f"Dispatching rule {dispatching_rule} not recognized. Available "
             f"dispatching rules: {', '.join(dispatching_rules)}."
         )
@@ -131,7 +131,7 @@ def machine_chooser_factory(
 
     machine_chooser = machine_chooser.lower()
     if machine_chooser not in machine_choosers:
-        raise ValueError(
+        raise ValidationError(
             f"Machine chooser {machine_chooser} not recognized. Available "
             f"machine choosers: {', '.join(machine_choosers)}."
         )
@@ -198,7 +198,7 @@ def pruning_function_factory(
     }
 
     if pruning_function_name not in pruning_strategies:
-        raise ValueError(
+        raise ValidationError(
             f"Unsupported pruning function '{pruning_function_name}'. "
             f"Supported values are {', '.join(pruning_strategies.keys())}."
         )

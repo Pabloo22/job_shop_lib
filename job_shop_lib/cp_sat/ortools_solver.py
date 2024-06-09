@@ -63,7 +63,7 @@ class ORToolsSolver(BaseSolver):
             )
         if self.makespan is None:
             # Check added to satisfy mypy
-            raise ValueError("The makespan variable was not set.")
+            raise RuntimeError("The makespan variable was not set.")
 
         metadata = {
             "status": "optimal" if status == cp_model.OPTIMAL else "feasible",

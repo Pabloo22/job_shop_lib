@@ -14,6 +14,7 @@ from job_shop_lib import (
     Schedule,
     ScheduledOperation,
     Operation,
+    ValidationError,
 )
 
 
@@ -48,7 +49,7 @@ class DispatcherObserver(abc.ABC):
             isinstance(observer, self.__class__)
             for observer in dispatcher.subscribers
         ):
-            raise ValueError(
+            raise ValidationError(
                 f"An observer of type {self.__class__.__name__} already "
                 "exists in the dispatcher's list of subscribers. If you want "
                 "to create multiple instances of this observer, set "
@@ -219,7 +220,7 @@ class Dispatcher:
         """
 
         if not self.is_operation_ready(operation):
-            raise ValueError("Operation is not ready to be scheduled.")
+            raise ValidationError("Operation is not ready to be scheduled.")
 
         start_time = self.start_time(operation, machine_id)
 

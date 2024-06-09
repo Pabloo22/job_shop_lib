@@ -24,3 +24,21 @@ class NoSolutionFoundError(JobShopLibError):
     TypeError, which may indicate a bug in the code or an invalid
     input, rather than a failure to find a solution.
     """
+
+
+class ValidationError(JobShopLibError):
+    """Exception raised when a validation check fails.
+
+    This exception is raised when a validation check fails, indicating
+    that the input data is invalid or does not meet the requirements of
+    the function or class that is performing the validation.
+
+    It is useful to distinguish this exception from other exceptions
+    that may be raised by a function or class, such as a ValueError or
+    a TypeError, which may indicate a bug in the code or an invalid
+    input, rather than a validation failure.
+    """
+
+
+class UninitializedAttributeError(JobShopLibError):
+    """Exception raised when an attribute is accessed before initialization."""
