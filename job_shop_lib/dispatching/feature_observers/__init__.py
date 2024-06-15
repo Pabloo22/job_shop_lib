@@ -10,7 +10,11 @@ from .is_scheduled_observer import IsScheduledObserver
 from .position_in_job_observer import PositionInJobObserver
 from .remaining_operations_observer import RemainingOperationsObserver
 from .is_completed_observer import IsCompletedObserver
-from .factory import FeatureObserverType, feature_observer_factory
+from .factory import (
+    FeatureObserverType,
+    feature_observer_factory,
+    initialize_composite_observer,
+)
 
 __all__ = [
     "FeatureObserver",
@@ -25,4 +29,5 @@ __all__ = [
     "IsCompletedObserver",
     "FeatureObserverType",
     "feature_observer_factory",
+    "initialize_composite_observer",
 ]
