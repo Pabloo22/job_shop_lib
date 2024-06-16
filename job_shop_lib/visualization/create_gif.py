@@ -103,7 +103,7 @@ def plot_gantt_chart_wrapper(
 
     def plot_function(
         schedule: Schedule,
-        makespan: int,
+        makespan: int | None = None,
         available_operations: list | None = None,
         current_time: int | None = None,
     ) -> Figure:
