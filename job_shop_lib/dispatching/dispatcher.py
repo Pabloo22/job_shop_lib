@@ -490,6 +490,27 @@ class Dispatcher:
         current_time = self.current_time()
         return scheduled_operation.start_time <= current_time
 
+    def next_operation(self, job_id: int) -> Operation:
+        """Returns the next operation to be scheduled for the given job.
+
+        Args:
+            job_id:
+                The id of the job for which to return the next operation.
+
+        Raises:
+            ValidationError: If there are no more operations left for the job.
+        """
+        if (
+            len(self.instance.jobs[job_id])
+            <= self._job_next_operation_index[job_id]
+        ):
+            raise ValidationError(
+                f"No more operations left for job {job_id} to schedule."
+            )
+        return self.instance.jobs[job_id][
+            self._job_next_operation_index[job_id]
+        ]
+
     @classmethod
     def create_schedule_from_raw_solution(
         cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
