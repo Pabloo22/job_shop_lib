@@ -1,5 +1,10 @@
 """Home of the `CompositeFeatureObserver` class."""
 
+# The Self type can be imported directly from Python’s typing module in
+# version 3.11 and beyond. We use the typing_extensions module to support
+# python 3.10.
+from typing_extensions import Self
+
 from collections import defaultdict
 import numpy as np
 import pandas as pd
@@ -8,6 +13,8 @@ from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,
     FeatureType,
+    FeatureObserverConfig,
+    feature_observer_factory,
 )
 
 
@@ -42,6 +49,31 @@ class CompositeFeatureObserver(FeatureObserver):
         self.column_names: dict[FeatureType, list[str]] = defaultdict(list)
         super().__init__(dispatcher, subscribe=subscribe)
         self._set_column_names()
+
+    @classmethod
+    def from_feature_observers_configs(
+        cls,
+        dispatcher: Dispatcher,
+        feature_observer_configs: list[FeatureObserverConfig],
+        subscribe: bool = True,
+    ) -> Self:
+        """Creates the composite feature observer.
+
+        Args:
+            dispatcher:
+                The dispatcher used to create the feature observers.
+            feature_observer_configs:
+                The list of feature observer configuration objects.
+            subscribe:
+                Whether to subscribe the CompositeFeatureObserver to the
+                dispatcher.
+        """
+        observers = [
+            feature_observer_factory(observer_config, dispatcher=dispatcher)
+            for observer_config in feature_observer_configs
+        ]
+        composite_observer = cls(dispatcher, observers, subscribe=subscribe)
+        return composite_observer
 
     @property
     def features_as_dataframe(self) -> dict[FeatureType, pd.DataFrame]:

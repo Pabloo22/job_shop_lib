@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.feature_observers import (
     IsReadyObserver,
     EarliestStartTimeObserver,
@@ -14,7 +13,6 @@ from job_shop_lib.dispatching.feature_observers import (
     PositionInJobObserver,
     RemainingOperationsObserver,
     IsCompletedObserver,
-    CompositeFeatureObserver,
 )
 
 
@@ -95,29 +93,3 @@ def feature_observer_factory(
     }
     feature_creator = mapping[node_feature_creator_type]  # type: ignore[index]
     return feature_creator(**kwargs)
-
-
-def initialize_composite_observer(
-    dispatcher: Dispatcher,
-    feature_observer_configs: list[FeatureObserverConfig],
-    subscribe: bool = True,
-) -> CompositeFeatureObserver:
-    """Creates the composite feature observer.
-
-    Args:
-        dispatcher:
-            The dispatcher used to create the feature observers.
-        feature_observer_configs:
-            The list of feature observer configuration objects.
-        subscribe:
-            Whether to subscribe the CompositeFeatureObserver to the
-            dispatcher.
-    """
-    observers = [
-        feature_observer_factory(observer_config, dispatcher=dispatcher)
-        for observer_config in feature_observer_configs
-    ]
-    composite_observer = CompositeFeatureObserver(
-        dispatcher, observers, subscribe=subscribe
-    )
-    return composite_observer
