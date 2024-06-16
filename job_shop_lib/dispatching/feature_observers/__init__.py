@@ -2,7 +2,6 @@
 dispatcher."""
 
 from .feature_observer import FeatureObserver, FeatureType
-from .composite_feature_observer import CompositeFeatureObserver
 from .earliest_start_time_observer import EarliestStartTimeObserver
 from .is_ready_observer import IsReadyObserver
 from .duration_observer import DurationObserver
@@ -13,9 +12,10 @@ from .is_completed_observer import IsCompletedObserver
 from .factory import (
     FeatureObserverType,
     feature_observer_factory,
-    initialize_composite_observer,
     FeatureObserverConfig,
 )
+from .composite_feature_observer import CompositeFeatureObserver
+
 
 __all__ = [
     "FeatureObserver",
@@ -30,6 +30,5 @@ __all__ = [
     "IsCompletedObserver",
     "FeatureObserverType",
     "feature_observer_factory",
-    "initialize_composite_observer",
     "FeatureObserverConfig",
 ]
