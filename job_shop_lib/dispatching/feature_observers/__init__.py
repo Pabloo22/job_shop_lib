@@ -14,6 +14,7 @@ from .factory import (
     FeatureObserverType,
     feature_observer_factory,
     initialize_composite_observer,
+    FeatureObserverConfig,
 )
 
 __all__ = [
@@ -30,4 +31,5 @@ __all__ = [
     "FeatureObserverType",
     "feature_observer_factory",
     "initialize_composite_observer",
+    "FeatureObserverConfig",
 ]
