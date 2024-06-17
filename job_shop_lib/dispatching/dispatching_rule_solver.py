@@ -98,9 +98,29 @@ class DispatchingRuleSolver(BaseSolver):
                 The dispatcher object that will be used to dispatch the
                 operations.
         """
+        selected_operation, machine_id = self.select_operation_and_machine(
+            dispatcher
+        )
+        dispatcher.dispatch(selected_operation, machine_id)
+
+    def select_operation_and_machine(
+        self, dispatcher: Dispatcher
+    ) -> tuple[Operation, int]:
+        """Chooses an operation and a machine based on the dispatching rule
+        and machine chooser.
+
+        Args:
+            dispatcher:
+                The dispatcher object that will be passed to the dispatching
+                rule and machine chooser.
+
+        Returns:
+            A tuple containing the operation to be dispatched and the machine
+            id where the operation will be dispatched.
+        """
         selected_operation = self.dispatching_rule(dispatcher)
         machine_id = self.machine_chooser(dispatcher, selected_operation)
-        dispatcher.dispatch(selected_operation, machine_id)
+        return selected_operation, machine_id
 
 
 if __name__ == "__main__":
