@@ -5,12 +5,19 @@ import os
 import pathlib
 import shutil
 from collections.abc import Callable
+from typing import Sequence
 
 import imageio
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from job_shop_lib import JobShopInstance, Schedule, Operation
+from job_shop_lib import (
+    JobShopInstance,
+    Schedule,
+    Operation,
+    ScheduledOperation,
+    ValidationError,
+)
 from job_shop_lib.dispatching import (
     DispatchingRuleSolver,
     Dispatcher,
@@ -19,21 +26,24 @@ from job_shop_lib.dispatching import (
 from job_shop_lib.visualization.gantt_chart import plot_gantt_chart
 
 
+PlotFunction = Callable[
+    [Schedule, int | None, list[Operation] | None, int | None], Figure
+]
+
+
 # Most of the arguments are optional with default values. There is no way to
 # reduce the number of arguments without losing functionality.
 # pylint: disable=too-many-arguments
 def create_gif(
     gif_path: str,
     instance: JobShopInstance,
-    solver: DispatchingRuleSolver,
-    plot_function: (
-        Callable[[Schedule, int, list[Operation] | None, int | None], Figure]
-        | None
-    ) = None,
+    solver: DispatchingRuleSolver | None = None,
+    plot_function: PlotFunction | None = None,
     fps: int = 1,
     remove_frames: bool = True,
     frames_dir: str | None = None,
     plot_current_time: bool = True,
+    schedule_history: Sequence[ScheduledOperation] | None = None,
 ) -> None:
     """Creates a GIF of the schedule being built by the given solver.
 
@@ -69,7 +79,12 @@ def create_gif(
     path.mkdir(exist_ok=True)
     frames_dir = str(path)
     create_gantt_chart_frames(
-        frames_dir, instance, solver, plot_function, plot_current_time
+        frames_dir,
+        instance,
+        solver,
+        plot_function,
+        plot_current_time,
+        schedule_history,
     )
     create_gif_from_frames(frames_dir, gif_path, fps)
 
@@ -81,7 +96,7 @@ def plot_gantt_chart_wrapper(
     title: str | None = None,
     cmap: str = "viridis",
     show_available_operations: bool = False,
-) -> Callable[[Schedule, int, list[Operation] | None, int | None], Figure]:
+) -> PlotFunction:
     """Returns a function that plots a Gantt chart for an unfinished schedule.
 
     Args:
@@ -142,11 +157,10 @@ def plot_gantt_chart_wrapper(
 def create_gantt_chart_frames(
     frames_dir: str,
     instance: JobShopInstance,
-    solver: DispatchingRuleSolver,
-    plot_function: Callable[
-        [Schedule, int, list[Operation] | None, int | None], Figure
-    ],
+    solver: DispatchingRuleSolver | None,
+    plot_function: PlotFunction,
     plot_current_time: bool = True,
+    schedule_history: Sequence[ScheduledOperation] | None = None,
 ) -> None:
     """Creates frames of the Gantt chart for the schedule being built.
 
@@ -156,20 +170,42 @@ def create_gantt_chart_frames(
         instance:
             The instance of the job shop problem to be scheduled.
         solver:
-            The dispatching rule solver to use.
+            The dispatching rule solver to use. If not provided, the history
+            of scheduled operations should be provided.
         plot_function:
             A function that plots a Gantt chart for a schedule. It
             should take a `Schedule` object and the makespan of the schedule as
             input and return a `Figure` object.
         plot_current_time:
             Whether to plot a vertical line at the current time.
+        scheduled_history:
+            A sequence of scheduled operations. If not provided, the solver
     """
-    dispatcher = Dispatcher(instance, pruning_function=solver.pruning_function)
-    history_tracker = HistoryTracker(dispatcher)
-    makespan = solver.solve(instance, dispatcher).makespan()
-    dispatcher.unsubscribe(history_tracker)
-    dispatcher.reset()
-    for i, scheduled_operation in enumerate(history_tracker.history, start=1):
+    if solver is not None and schedule_history is None:
+        dispatcher = Dispatcher(
+            instance, pruning_function=solver.pruning_function
+        )
+        history_tracker = HistoryTracker(dispatcher)
+        makespan = solver.solve(instance, dispatcher).makespan()
+        dispatcher.unsubscribe(history_tracker)
+        dispatcher.reset()
+        schedule_history = history_tracker.history
+    elif schedule_history is not None and solver is None:
+        dispatcher = Dispatcher(instance)
+        makespan = max(
+            scheduled_operation.end_time
+            for scheduled_operation in schedule_history
+        )
+    elif schedule_history is not None and solver is not None:
+        raise ValidationError(
+            "Only one of 'solver' and 'history' should be provided."
+        )
+    else:
+        raise ValidationError(
+            "Either 'solver' or 'history' should be provided."
+        )
+
+    for i, scheduled_operation in enumerate(schedule_history, start=1):
         dispatcher.dispatch(
             scheduled_operation.operation, scheduled_operation.machine_id
         )
