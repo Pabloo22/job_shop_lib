@@ -97,7 +97,7 @@ def plot_gantt_chart_wrapper(
 # reduce the number of arguments without losing functionality.
 # pylint: disable=too-many-arguments
 def create_gif(
-    gif_path: str,
+    gif_path: str | None,
     instance: JobShopInstance,
     solver: DispatchingRuleSolver | None = None,
     plot_function: PlotFunction | None = None,
@@ -113,7 +113,9 @@ def create_gif(
 
     Args:
         gif_path:
-            The path to save the GIF file. It should end with ".gif".
+            The path to save the GIF file. It should end with ".gif". If not
+            provided, the name of the instance is used. It will be made an
+            optional argument in version 1.0.0.
         instance:
             The instance of the job shop problem to be scheduled.
         solver:
@@ -137,6 +139,9 @@ def create_gif(
             A sequence of scheduled operations. If not provided, the solver
             will be used to generate the history.
     """
+    if gif_path is None:
+        gif_path = f"{instance.name}_gantt_chart.gif"
+
     if plot_function is None:
         plot_function = plot_gantt_chart_wrapper()
 
