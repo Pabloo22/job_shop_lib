@@ -9,19 +9,19 @@ from job_shop_lib.dispatching import (
     random_operation_rule,
     DispatchingRule,
     create_or_get_observer,
-    HistoryTracker,
+    HistoryObserver,
     Dispatcher,
 )
 
 
 def test_create_or_get_observer(example_job_shop_instance: JobShopInstance):
     dispatcher = Dispatcher(example_job_shop_instance)
-    observer = create_or_get_observer(dispatcher, HistoryTracker)
-    assert isinstance(observer, HistoryTracker)
+    observer = create_or_get_observer(dispatcher, HistoryObserver)
+    assert isinstance(observer, HistoryObserver)
     assert observer.dispatcher is dispatcher
 
     # Test getting the same observer
-    assert create_or_get_observer(dispatcher, HistoryTracker) is observer
+    assert create_or_get_observer(dispatcher, HistoryObserver) is observer
 
 
 def test_dispatching_rule_factory():
