@@ -5,10 +5,17 @@ from job_shop_lib.reinforcement_learning.reward_functions import (
     MakespanReward,
     IdleTimeReward,
 )
-from job_shop_lib.reinforcement_learning.utils import (
-    create_dict_space,
-    create_observation,
+from job_shop_lib.reinforcement_learning.gantt_chart_creator import (
+    GanttChartConfig,
+    GanttChartWrapperConfig,
+    GifConfig,
+    VideoConfig,
+    GanttChartCreator,
+)
+
+from job_shop_lib.reinforcement_learning.single_job_shop_graph_env import (
     ObservationSpaceKey,
+    SingleJobShopGraphEnv,
 )
 
 
@@ -17,6 +24,10 @@ __all__ = [
     "RewardFunction",
     "MakespanReward",
     "IdleTimeReward",
-    "create_dict_space",
-    "create_observation",
+    "GanttChartConfig",
+    "GanttChartWrapperConfig",
+    "GifConfig",
+    "VideoConfig",
+    "GanttChartCreator",
+    "SingleJobShopGraphEnv",
 ]
