@@ -20,7 +20,36 @@ from job_shop_lib import (
 
 # Added here to avoid circular imports
 class DispatcherObserver(abc.ABC):
-    """Interface for classes that observe th"""
+    """Abstract class that allows objects to observe and respond to changes
+    within the `Dispatcher`.
+
+    It follows the Observer design pattern, where observers subscribe to the
+    dispatcher and receive updates when certain events occur, such as when
+    an operation is scheduled or when the dispatcher is reset.
+
+    Attributes:
+        dispatcher:
+            The `Dispatcher` instance to observe.
+
+    Example:
+
+    ```python
+    from job_shop_lib.dispatching import DispatcherObserver, Dispatcher
+    from job_shop_lib import ScheduledOperation
+
+
+    class HistoryObserver(DispatcherObserver):
+        def __init__(self, dispatcher: Dispatcher):
+            super().__init__(dispatcher)
+            self.history: list[ScheduledOperation] = []
+
+        def update(self, scheduled_operation: ScheduledOperation):
+            self.history.append(scheduled_operation)
+
+        def reset(self):
+            self.history = []
+    ```
+    """
 
     def __init__(
         self,
@@ -32,18 +61,19 @@ class DispatcherObserver(abc.ABC):
         it.
 
         Args:
-            subject:
-                The subject to observe.
+            dispatcher:
+                The `Dispatcher` instance to observe.
             is_singleton:
-                Whether the observer should be a singleton. If True, the
-                observer will be the only instance of its class in the
-                subject's list of subscribers. If False, the observer will
-                be added to the subject's list of subscribers every time
-                it is initialized.
+                If True, ensures only one instance of this observer type is
+                subscribed to the dispatcher.
             subscribe:
-                Whether to subscribe the observer to the subject. If False,
-                the observer will not be subscribed to the subject and will
-                not receive automatic updates.
+                If True, automatically subscribes the observer to the
+                dispatcher.
+
+        Raises:
+            ValidationError: If `is_singleton` is True and an observer of the
+                same type already exists in the dispatcher's list of
+                subscribers.
         """
         if is_singleton and any(
             isinstance(observer, self.__class__)
