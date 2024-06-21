@@ -18,6 +18,12 @@ class RewardFunction(DispatcherObserver):
         super().__init__(dispatcher, subscribe=subscribe)
         self.rewards: list[float] = []
 
+    @property
+    def last_reward(self) -> float:
+        """Returns the reward of the last step or 0 if no rewards have been
+        calculated."""
+        return self.rewards[-1] if self.rewards else 0
+
     def reset(self) -> None:
         self.rewards = []
 
