@@ -6,7 +6,6 @@ from job_shop_lib.reinforcement_learning.reward_functions import (
     IdleTimeReward,
 )
 from job_shop_lib.reinforcement_learning.gantt_chart_creator import (
-    GanttChartConfig,
     GanttChartWrapperConfig,
     GifConfig,
     VideoConfig,
@@ -24,7 +23,6 @@ __all__ = [
     "RewardFunction",
     "MakespanReward",
     "IdleTimeReward",
-    "GanttChartConfig",
     "GanttChartWrapperConfig",
     "GifConfig",
     "VideoConfig",
