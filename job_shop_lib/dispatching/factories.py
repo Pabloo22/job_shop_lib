@@ -63,10 +63,10 @@ def create_or_get_observer(
     observers.
 
     Args:
-        dispatcher: 
+        dispatcher:
             The dispatcher instance to which the observer will be added or
             retrieved.
-        observer: 
+        observer:
             The type of observer to be created or retrieved.
         **kwargs:
             Additional keyword arguments to be passed to the observer's
