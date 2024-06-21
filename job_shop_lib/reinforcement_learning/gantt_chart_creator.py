@@ -6,22 +6,10 @@ import matplotlib.pyplot as plt
 
 from job_shop_lib.dispatching import HistoryObserver
 from job_shop_lib.visualization import (
-    plot_gantt_chart,
-    create_gannt_chart_video,
+    create_gantt_chart_video,
     plot_gantt_chart_wrapper,
     create_gif,
 )
-
-
-class GanttChartConfig(TypedDict, total=False):
-    """Configuration for plotting the Gantt chart using the `plot_gantt_chart`
-    function."""
-
-    title: str | None
-    cmap_name: str
-    xlim: int | None
-    number_of_x_ticks: int
-
 
 class GanttChartWrapperConfig(TypedDict, total=False):
     """Configuration for creating the plot function with the
@@ -63,8 +51,8 @@ class GanttChartCreator:
     evolution of the schedule over time.
 
     Attributes:
-        history_tracker:
-            The history tracker observing the dispatcher's state.
+        history_observer:
+            The history observer observing the dispatcher's state.
         gantt_chart_config:
             Configuration for plotting the Gantt chart.
         gif_config:
@@ -81,11 +69,9 @@ class GanttChartCreator:
     def __init__(
         self,
         history_observer: HistoryObserver,
-        gantt_chart_config: GanttChartConfig | None = None,
         gantt_chart_wrapper_config: GanttChartWrapperConfig | None = None,
         gif_config: GifConfig | None = None,
         video_config: VideoConfig | None = None,
-        infer_gantt_chart_config: bool = True,
     ):
         """Initializes the GanttChartCreator with the given configurations
         and history observer.
@@ -93,12 +79,6 @@ class GanttChartCreator:
         Args:
             history_observer:
                 The history tracker observing the dispatcher's state.
-            gantt_chart_config:
-                Configuration for plotting the Gantt chart. Valid keys are:
-                - title: The title of the Gantt chart.
-                - cmap_name: The name of the colormap to use.
-                - xlim: The maximum value for the x-axis.
-                - number_of_x_ticks: The number of ticks to use in the x-axis.
             gantt_chart_wrapper_config:
                 Configuration for the Gantt chart wrapper function. Valid keys
                 are:
@@ -130,12 +110,7 @@ class GanttChartCreator:
                 - frames_dir: The directory to store the frames.
                 - plot_current_time: Whether to plot the current time in the
                     Gantt chart.
-            infer_gantt_chart_config:
-                Whether to infer the Gantt chart configuration from the
-                history tracker. Defaults to True.
         """
-        if gantt_chart_config is None:
-            gantt_chart_config = {}
         if gif_config is None:
             gif_config = {"gif_path": None}
         if gantt_chart_wrapper_config is None:
@@ -143,16 +118,6 @@ class GanttChartCreator:
         if video_config is None:
             video_config = {}
 
-        if "title" in gantt_chart_config and infer_gantt_chart_config:
-            gantt_chart_wrapper_config.setdefault(
-                "title", gantt_chart_config["title"]
-            )
-        if "cmap_name" in gantt_chart_config and infer_gantt_chart_config:
-            gantt_chart_wrapper_config.setdefault(
-                "cmap", gantt_chart_config["cmap_name"]
-            )
-
-        self.gannt_chart_config = gantt_chart_config
         self.gif_config = gif_config
         self.gannt_chart_wrapper_config = gantt_chart_wrapper_config
         self.video_config = video_config
@@ -176,15 +141,18 @@ class GanttChartCreator:
         """The dispatcher being observed."""
         return self.history_tracker.dispatcher
 
-    def plot_gannt_chart(self) -> tuple[plt.Figure, plt.Axes]:
+    def plot_gantt_chart(self) -> plt.Figure:
         """Plots the current Gantt chart of the schedule.
 
         Returns:
             tuple[plt.Figure, plt.Axes]:
                 The figure and axes of the plotted Gantt chart.
         """
-        return plot_gantt_chart(
-            self.history_tracker.dispatcher.schedule, **self.gannt_chart_config
+        return self.plot_function(
+            self.schedule,
+            None,
+            self.dispatcher.available_operations(),
+            self.dispatcher.current_time(),
         )
 
     def create_gif(self) -> None:
@@ -219,7 +187,7 @@ class GanttChartCreator:
         `HistoryTracker` to create a video that shows the progression of the
         scheduling process.
         """
-        create_gannt_chart_video(
+        create_gantt_chart_video(
             instance=self.history_tracker.dispatcher.instance,
             schedule_history=self.history_tracker.history,
             plot_function=self.plot_function,
