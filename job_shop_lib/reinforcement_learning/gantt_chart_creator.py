@@ -11,6 +11,7 @@ from job_shop_lib.visualization import (
     create_gif,
 )
 
+
 class GanttChartWrapperConfig(TypedDict, total=False):
     """Configuration for creating the plot function with the
     `plot_gantt_chart_wrapper` function."""

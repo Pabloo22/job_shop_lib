@@ -9,11 +9,11 @@ from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.dispatching import Dispatcher, prune_dominated_operations
 from job_shop_lib.dispatching.feature_observers import (
     CompositeFeatureObserver,
+    FeatureObserverConfig,
     feature_observer_factory,
 )
 from job_shop_lib.generation import InstanceGenerator
 from job_shop_lib.graphs import JobShopGraph, build_agent_task_graph
-from job_shop_lib.reinforcement_learning import FeatureObserverConfig
 
 
 class MultiJobShopGraphEnv(gym.Env):
