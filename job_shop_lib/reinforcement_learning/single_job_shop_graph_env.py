@@ -3,12 +3,16 @@
 from copy import deepcopy
 from enum import Enum
 from typing import Callable, Any
-from matplotlib.figure import Figure
 
+import matplotlib.pyplot as plt
 import gymnasium as gym
 import numpy as np
 
-from job_shop_lib import JobShopInstance, Operation, Schedule
+from job_shop_lib import (
+    JobShopInstance,
+    Operation,
+    UninitializedAttributeError,
+)
 from job_shop_lib.graphs import JobShopGraph
 from job_shop_lib.dispatching import Dispatcher, prune_dominated_operations
 from job_shop_lib.dispatching.feature_observers import (
@@ -16,9 +20,11 @@ from job_shop_lib.dispatching.feature_observers import (
     CompositeFeatureObserver,
     FeatureType,
 )
-from job_shop_lib.visualization import plot_gantt_chart_wrapper
 
-from job_shop_lib.reinforcement_learning import RewardFunction
+from job_shop_lib.reinforcement_learning import (
+    RewardFunction,
+    GanttChartCreator,
+)
 
 
 class ObservationSpaceKey(str, Enum):
@@ -53,7 +59,17 @@ class SingleJobShopGraphEnv(gym.Env):
             - "jobs"
             - "machines"
 
-        Keys can be accessed using the `ObservationSpaceKey` enumeration."""
+        Keys can be accessed using the `ObservationSpaceKey` enumeration.
+
+    Render modes:
+        - human: Renders the current Gannt chart.
+        - save_video: Saves a video of the Gantt chart. Used only if the
+            schedule is completed.
+        - save_gif: Saves a GIF of the Gantt chart. Used only if the schedule
+            is completed.
+    """
+
+    metadata = {"render_modes": ["human", "save_video", "save_gif"]}
 
     def __init__(
         self,
@@ -63,6 +79,8 @@ class SingleJobShopGraphEnv(gym.Env):
         pruning_function: (
             Callable[[Dispatcher, list[Operation]], list[Operation]] | None
         ) = prune_dominated_operations,
+        render_mode: str | None = None,
+        gantt_chart_creator: GanttChartCreator | None = None,
     ) -> None:
         super().__init__()
         # Used for resetting the environment
@@ -85,28 +103,8 @@ class SingleJobShopGraphEnv(gym.Env):
             [self.instance.num_jobs, self.instance.num_machines]
         )
         self.observation_space = self._get_observation_space()
-        if render_function is None:
-            render_function = plot_gantt_chart_wrapper()
-        self.render_function = render_function
-
-    @property
-    def instance(self) -> JobShopInstance:
-        """Returns the instance the environment is working on."""
-        return self.job_shop_graph.instance
-
-    def get_observation(self) -> dict[str, np.ndarray]:
-        """Returns the current observation of the environment."""
-        observation: dict[str, np.ndarray] = {
-            ObservationSpaceKey.REMOVED_NODES.value: np.array(
-                self.job_shop_graph.removed_nodes, dtype=int
-            ),
-            ObservationSpaceKey.EDGE_LIST.value: np.array(
-                self.job_shop_graph.graph.edges(), dtype=int
-            ).T,
-        }
-        for feature_type, matrix in self.composite_observer.features.items():
-            observation[feature_type.value] = matrix
-        return observation
+        self.render_mode = render_mode
+        self._gantt_chart_creator = gantt_chart_creator
 
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
@@ -127,22 +125,24 @@ class SingleJobShopGraphEnv(gym.Env):
             )
         return gym.spaces.Dict(dict_space)
 
-    def reset(
-        self,
-        *,
-        seed: int | None = None,
-        options: dict[str, Any] | None = None,
-    ) -> tuple[dict[str, np.ndarray], dict]:
-        """Resets the environment."""
-        super().reset(seed=seed, options=options)
-        self.dispatcher.reset()
-        self.job_shop_graph = deepcopy(self.initial_job_shop_graph)
-        obs = self.get_observation()
-        return obs, {}
+    @property
+    def gantt_chart_creator(self) -> GanttChartCreator:
+        """Returns the Gantt chart creator."""
+        if self._gantt_chart_creator is None:
+            raise UninitializedAttributeError(
+                "The Gantt chart creator has not been set."
+            )
+        return self._gantt_chart_creator
 
-    def render(self):
-        """Renders the environment."""
-        super().render()
+    @gantt_chart_creator.setter
+    def gantt_chart_creator(self, value: GanttChartCreator):
+        """Sets the Gantt chart creator."""
+        self._gantt_chart_creator = value
+
+    @property
+    def instance(self) -> JobShopInstance:
+        """Returns the instance the environment is working on."""
+        return self.job_shop_graph.instance
 
     def step(
         self, action: tuple[int, int]
@@ -184,3 +184,40 @@ class SingleJobShopGraphEnv(gym.Env):
             if self.job_shop_graph.removed_nodes[node_id]:
                 continue
             self.job_shop_graph.remove_node(node_id)
+
+    def get_observation(self) -> dict[str, np.ndarray]:
+        """Returns the current observation of the environment."""
+        observation: dict[str, np.ndarray] = {
+            ObservationSpaceKey.REMOVED_NODES.value: np.array(
+                self.job_shop_graph.removed_nodes, dtype=int
+            ),
+            ObservationSpaceKey.EDGE_LIST.value: np.array(
+                self.job_shop_graph.graph.edges(), dtype=int
+            ).T,
+        }
+        for feature_type, matrix in self.composite_observer.features.items():
+            observation[feature_type.value] = matrix
+        return observation
+
+    def reset(
+        self,
+        *,
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
+    ) -> tuple[dict[str, np.ndarray], dict]:
+        """Resets the environment."""
+        super().reset(seed=seed, options=options)
+        self.dispatcher.reset()
+        self.job_shop_graph = deepcopy(self.initial_job_shop_graph)
+        obs = self.get_observation()
+        return obs, {}
+
+    def render(self):
+        """Renders the environment."""
+        if self.render_mode == "human":
+            self.gantt_chart_creator.plot_gantt_chart()
+            plt.show(block=False)
+        elif self.render_mode == "save_video":
+            self.gantt_chart_creator.create_video()
+        elif self.render_mode == "save_gif":
+            self.gantt_chart_creator.create_gif()
