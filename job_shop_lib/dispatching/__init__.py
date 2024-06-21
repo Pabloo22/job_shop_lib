@@ -23,6 +23,7 @@ from job_shop_lib.dispatching.factories import (
     machine_chooser_factory,
     pruning_function_factory,
     composite_pruning_function_factory,
+    create_or_get_observer,
 )
 from job_shop_lib.dispatching.dispatching_rule_solver import (
     DispatchingRuleSolver,
@@ -49,4 +50,5 @@ __all__ = [
     "composite_pruning_function_factory",
     "DispatcherObserver",
     "HistoryTracker",
+    "create_or_get_observer",
 ]
