@@ -168,7 +168,7 @@ def create_gif(
 # Most of the arguments are optional with default values. There is no way to
 # reduce the number of arguments without losing functionality.
 # pylint: disable=too-many-arguments
-def create_gannt_chart_video(
+def create_gantt_chart_video(
     instance: JobShopInstance,
     video_path: str | None = None,
     solver: DispatchingRuleSolver | None = None,

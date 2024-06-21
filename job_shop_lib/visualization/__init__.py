@@ -3,7 +3,7 @@
 from job_shop_lib.visualization.gantt_chart import plot_gantt_chart
 from job_shop_lib.visualization.gantt_chart_video_and_gif_creation import (
     create_gif,
-    create_gannt_chart_video,
+    create_gantt_chart_video,
     create_gantt_chart_frames,
     plot_gantt_chart_wrapper,
     create_video_from_frames,
@@ -17,7 +17,7 @@ from job_shop_lib.visualization.agent_task_graph import (
 
 __all__ = [
     "plot_gantt_chart",
-    "create_gannt_chart_video",
+    "create_gantt_chart_video",
     "create_gif",
     "create_gantt_chart_frames",
     "plot_gantt_chart_wrapper",
