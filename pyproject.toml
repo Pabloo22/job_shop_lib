@@ -14,7 +14,7 @@ ortools = ">=9.9,<9.10"
 matplotlib = "^3"
 pyarrow = "^15.0.0"  # An optional pandas' dependency that will be required in the future
 networkx = "^3"
-imageio = "^2"
+imageio = {extras = ["ffmpeg"], version = "^2.34.1"}
 pygraphviz = {version = "^1.12", optional = true}
 numpy = "^1.26.4"
 gymnasium = "^0.29.1"
