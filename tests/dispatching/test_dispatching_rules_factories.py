@@ -1,6 +1,6 @@
 import pytest
 
-from job_shop_lib import ValidationError
+from job_shop_lib import ValidationError, JobShopInstance
 from job_shop_lib.dispatching import (
     dispatching_rule_factory,
     shortest_processing_time_rule,
@@ -8,7 +8,20 @@ from job_shop_lib.dispatching import (
     most_work_remaining_rule,
     random_operation_rule,
     DispatchingRule,
+    create_or_get_observer,
+    HistoryTracker,
+    Dispatcher,
 )
+
+
+def test_create_or_get_observer(example_job_shop_instance: JobShopInstance):
+    dispatcher = Dispatcher(example_job_shop_instance)
+    observer = create_or_get_observer(dispatcher, HistoryTracker)
+    assert isinstance(observer, HistoryTracker)
+    assert observer.dispatcher is dispatcher
+
+    # Test getting the same observer
+    assert create_or_get_observer(dispatcher, HistoryTracker) is observer
 
 
 def test_dispatching_rule_factory():
@@ -51,4 +64,6 @@ def test_dispatching_rule_factory():
 
 
 if __name__ == "__main__":
-    test_dispatching_rule_factory()
+    pytest.main(
+        ["-vv", "tests/dispatching/test_dispatching_rules_factories.py"]
+    )

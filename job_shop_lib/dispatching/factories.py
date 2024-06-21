@@ -18,6 +18,7 @@ from job_shop_lib.dispatching import (
     most_operations_remaining_rule,
     random_operation_rule,
     Dispatcher,
+    DispatcherObserver,
     prune_dominated_operations,
     prune_non_immediate_machines,
     create_composite_pruning_function,
@@ -50,6 +51,33 @@ class PruningFunction(str, Enum):
 
     DOMINATED_OPERATIONS = "dominated_operations"
     NON_IMMEDIATE_MACHINES = "non_immediate_machines"
+
+
+def create_or_get_observer(
+    dispatcher: Dispatcher,
+    observer: type[DispatcherObserver],
+    **kwargs,
+) -> DispatcherObserver:
+    """Creates a new observer of the specified type or returns an existing
+    observer of the same type if it already exists in the dispatcher's list of
+    observers.
+
+    Args:
+        dispatcher: 
+            The dispatcher instance to which the observer will be added or
+            retrieved.
+        observer: 
+            The type of observer to be created or retrieved.
+        **kwargs:
+            Additional keyword arguments to be passed to the observer's
+            constructor.
+    """
+    for existing_observer in dispatcher.subscribers:
+        if isinstance(existing_observer, observer):
+            return existing_observer
+
+    new_observer = observer(dispatcher, **kwargs)
+    return new_observer
 
 
 def dispatching_rule_factory(
