@@ -4,7 +4,11 @@ from typing import TypedDict, Required
 
 import matplotlib.pyplot as plt
 
-from job_shop_lib.dispatching import HistoryObserver
+from job_shop_lib.dispatching import (
+    Dispatcher,
+    HistoryObserver,
+    create_or_get_observer,
+)
 from job_shop_lib.visualization import (
     create_gantt_chart_video,
     plot_gantt_chart_wrapper,
@@ -44,12 +48,16 @@ class VideoConfig(TypedDict, total=False):
 
 
 class GanttChartCreator:
-    """Facade class that centralizes the creation of Gantt charts and GIFs.
+    """Facade class that centralizes the creation of Gantt charts, videos
+    and GIFs.
 
-    It leverages a HistoryTracker to keep track of the operations being
+    It leverages a `HistoryObserver` to keep track of the operations being
     scheduled and provides methods to plot the current state
     of the schedule as a Gantt chart and to create a GIF that shows the
     evolution of the schedule over time.
+
+    It adds a new `HistoryObserver` to the dispatcher if it does
+    not have one already. Otherwise, it uses the observer already present.
 
     Attributes:
         history_observer:
@@ -69,7 +77,7 @@ class GanttChartCreator:
 
     def __init__(
         self,
-        history_observer: HistoryObserver,
+        dispatcher: Dispatcher,
         gantt_chart_wrapper_config: GanttChartWrapperConfig | None = None,
         gif_config: GifConfig | None = None,
         video_config: VideoConfig | None = None,
@@ -77,9 +85,13 @@ class GanttChartCreator:
         """Initializes the GanttChartCreator with the given configurations
         and history observer.
 
+        This class adds a new `HistoryObserver` to the dispatcher if it does
+        not have one already. Otherwise, it uses the observer already present.
+
         Args:
-            history_observer:
-                The history tracker observing the dispatcher's state.
+            dispatcher:
+                The `Dispatcher` class that will be tracked using a
+                `HistoryObserver`.
             gantt_chart_wrapper_config:
                 Configuration for the Gantt chart wrapper function. Valid keys
                 are:
@@ -122,7 +134,9 @@ class GanttChartCreator:
         self.gif_config = gif_config
         self.gannt_chart_wrapper_config = gantt_chart_wrapper_config
         self.video_config = video_config
-        self.history_tracker = history_observer
+        self.history_observer = create_or_get_observer(
+            dispatcher, observer=HistoryObserver
+        )
         self.plot_function = plot_gantt_chart_wrapper(
             **self.gannt_chart_wrapper_config
         )
@@ -130,17 +144,17 @@ class GanttChartCreator:
     @property
     def instance(self):
         """The instance being scheduled."""
-        return self.history_tracker.dispatcher.instance
+        return self.history_observer.dispatcher.instance
 
     @property
     def schedule(self):
         """The current schedule."""
-        return self.history_tracker.dispatcher.schedule
+        return self.history_observer.dispatcher.schedule
 
     @property
     def dispatcher(self):
         """The dispatcher being observed."""
-        return self.history_tracker.dispatcher
+        return self.history_observer.dispatcher
 
     def plot_gantt_chart(self) -> plt.Figure:
         """Plots the current Gantt chart of the schedule.
@@ -174,8 +188,8 @@ class GanttChartCreator:
         `gif_config` attribute.
         """
         create_gif(
-            instance=self.history_tracker.dispatcher.instance,
-            schedule_history=self.history_tracker.history,
+            instance=self.history_observer.dispatcher.instance,
+            schedule_history=self.history_observer.history,
             plot_function=self.plot_function,
             **self.gif_config
         )
@@ -189,8 +203,8 @@ class GanttChartCreator:
         scheduling process.
         """
         create_gantt_chart_video(
-            instance=self.history_tracker.dispatcher.instance,
-            schedule_history=self.history_tracker.history,
+            instance=self.history_observer.dispatcher.instance,
+            schedule_history=self.history_observer.history,
             plot_function=self.plot_function,
             **self.video_config
         )
