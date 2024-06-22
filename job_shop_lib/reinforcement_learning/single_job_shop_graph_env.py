@@ -2,17 +2,13 @@
 
 from copy import deepcopy
 from enum import Enum
-from typing import Callable, Any
+from typing import Callable, Any, TypedDict
 
 import matplotlib.pyplot as plt
 import gymnasium as gym
 import numpy as np
 
-from job_shop_lib import (
-    JobShopInstance,
-    Operation,
-    UninitializedAttributeError,
-)
+from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.graphs import JobShopGraph
 from job_shop_lib.dispatching import Dispatcher, prune_dominated_operations
 from job_shop_lib.dispatching.feature_observers import (
@@ -24,6 +20,9 @@ from job_shop_lib.dispatching.feature_observers import (
 from job_shop_lib.reinforcement_learning import (
     RewardFunction,
     GanttChartCreator,
+    GanttChartWrapperConfig,
+    VideoConfig,
+    GifConfig,
 )
 
 
@@ -35,6 +34,14 @@ class ObservationSpaceKey(str, Enum):
     OPERATIONS = FeatureType.OPERATIONS.value
     JOBS = FeatureType.JOBS.value
     MACHINES = FeatureType.MACHINES.value
+
+
+class RenderConfig(TypedDict, total=False):
+    """Configuration needed to initialize the `GanttChartCreator` class."""
+
+    gantt_chart_wrapper_config: GanttChartWrapperConfig
+    video_config: VideoConfig
+    gif_config: GifConfig
 
 
 class SingleJobShopGraphEnv(gym.Env):
@@ -80,7 +87,7 @@ class SingleJobShopGraphEnv(gym.Env):
             Callable[[Dispatcher, list[Operation]], list[Operation]] | None
         ) = prune_dominated_operations,
         render_mode: str | None = None,
-        gantt_chart_creator: GanttChartCreator | None = None,
+        render_config: RenderConfig | None = None,
     ) -> None:
         super().__init__()
         # Used for resetting the environment
@@ -104,7 +111,11 @@ class SingleJobShopGraphEnv(gym.Env):
         )
         self.observation_space = self._get_observation_space()
         self.render_mode = render_mode
-        self._gantt_chart_creator = gantt_chart_creator
+        if render_config is None:
+            render_config = {}
+        self.gantt_chart_creator = GanttChartCreator(
+            dispatcher=self.dispatcher, **render_config
+        )
 
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
@@ -124,20 +135,6 @@ class SingleJobShopGraphEnv(gym.Env):
                 low=-np.inf, high=np.inf, shape=matrix.shape
             )
         return gym.spaces.Dict(dict_space)
-
-    @property
-    def gantt_chart_creator(self) -> GanttChartCreator:
-        """Returns the Gantt chart creator."""
-        if self._gantt_chart_creator is None:
-            raise UninitializedAttributeError(
-                "The Gantt chart creator has not been set."
-            )
-        return self._gantt_chart_creator
-
-    @gantt_chart_creator.setter
-    def gantt_chart_creator(self, value: GanttChartCreator):
-        """Sets the Gantt chart creator."""
-        self._gantt_chart_creator = value
 
     @property
     def instance(self) -> JobShopInstance:
