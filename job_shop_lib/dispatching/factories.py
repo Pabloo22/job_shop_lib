@@ -6,6 +6,7 @@ specified names or enums.
 """
 
 from enum import Enum
+from typing import TypeVar
 
 from collections.abc import Callable, Sequence
 import random
@@ -53,11 +54,16 @@ class PruningFunction(str, Enum):
     NON_IMMEDIATE_MACHINES = "non_immediate_machines"
 
 
+# Disable pylint's false positive
+# pylint: disable=invalid-name
+ObserverType = TypeVar("ObserverType", bound=DispatcherObserver)
+
+
 def create_or_get_observer(
     dispatcher: Dispatcher,
-    observer: type[DispatcherObserver],
+    observer: type[ObserverType],
     **kwargs,
-) -> DispatcherObserver:
+) -> ObserverType:
     """Creates a new observer of the specified type or returns an existing
     observer of the same type if it already exists in the dispatcher's list of
     observers.

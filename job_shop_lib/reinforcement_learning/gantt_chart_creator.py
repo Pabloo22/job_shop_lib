@@ -134,7 +134,7 @@ class GanttChartCreator:
         self.gif_config = gif_config
         self.gannt_chart_wrapper_config = gantt_chart_wrapper_config
         self.video_config = video_config
-        self.history_observer = create_or_get_observer(
+        self.history_observer: HistoryObserver = create_or_get_observer(
             dispatcher, observer=HistoryObserver
         )
         self.plot_function = plot_gantt_chart_wrapper(
