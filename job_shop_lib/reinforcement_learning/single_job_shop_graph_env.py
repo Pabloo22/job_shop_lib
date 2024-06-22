@@ -107,7 +107,7 @@ class SingleJobShopGraphEnv(gym.Env):
         self.reward_function = reward_function(self.dispatcher)
 
         self.action_space = gym.spaces.MultiDiscrete(
-            [self.instance.num_jobs, self.instance.num_machines]
+            [self.instance.num_jobs, self.instance.num_machines], start=[0, -1]
         )
         self.observation_space = self._get_observation_space()
         self.render_mode = render_mode
@@ -163,7 +163,8 @@ class SingleJobShopGraphEnv(gym.Env):
         """
         job_id, machine_id = action
         operation = self.dispatcher.next_operation(job_id)
-
+        if machine_id == -1:
+            machine_id = operation.machine_id
         self.dispatcher.dispatch(operation, machine_id)
         self._remove_completed_nodes()
 
