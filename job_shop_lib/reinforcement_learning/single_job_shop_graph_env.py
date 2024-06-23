@@ -30,7 +30,7 @@ class ObservationSpaceKey(str, Enum):
     """Enumeration of the keys for the observation space dictionary."""
 
     REMOVED_NODES = "removed_nodes"
-    EDGE_LIST = "edge_list"
+    EDGE_INDEX = "edge_index"
     OPERATIONS = FeatureType.OPERATIONS.value
     JOBS = FeatureType.JOBS.value
     MACHINES = FeatureType.MACHINES.value
@@ -88,6 +88,7 @@ class SingleJobShopGraphEnv(gym.Env):
         ) = prune_dominated_operations,
         render_mode: str | None = None,
         render_config: RenderConfig | None = None,
+        use_padding: bool = True,
     ) -> None:
         super().__init__()
         # Used for resetting the environment
@@ -109,25 +110,33 @@ class SingleJobShopGraphEnv(gym.Env):
         self.action_space = gym.spaces.MultiDiscrete(
             [self.instance.num_jobs, self.instance.num_machines], start=[0, -1]
         )
-        self.observation_space = self._get_observation_space()
+        self.observation_space: gym.spaces.Dict = self._get_observation_space()
         self.render_mode = render_mode
         if render_config is None:
             render_config = {}
         self.gantt_chart_creator = GanttChartCreator(
             dispatcher=self.dispatcher, **render_config
         )
+        self.use_padding = use_padding
 
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
+        num_edges = self.job_shop_graph.num_edges
         dict_space: dict[str, gym.Space] = {
             ObservationSpaceKey.REMOVED_NODES.value: gym.spaces.MultiBinary(
                 len(self.job_shop_graph.nodes)
             ),
-            ObservationSpaceKey.EDGE_LIST.value: gym.spaces.MultiDiscrete(
+            ObservationSpaceKey.EDGE_INDEX.value: gym.spaces.MultiDiscrete(
                 np.full(
-                    (2, self.job_shop_graph.num_edges),
-                    fill_value=len(self.job_shop_graph.nodes),
-                )
+                    (2, num_edges),
+                    fill_value=len(self.job_shop_graph.nodes) + 1,
+                    dtype=np.int32,
+                ),
+                start=np.full(
+                    (2, num_edges),
+                    fill_value=-1,
+                    dtype=np.int32,
+                ),  # -1 is used as padding
             ),
         }
         for feature_type, matrix in self.composite_observer.features.items():
@@ -187,15 +196,49 @@ class SingleJobShopGraphEnv(gym.Env):
         """Returns the current observation of the environment."""
         observation: dict[str, np.ndarray] = {
             ObservationSpaceKey.REMOVED_NODES.value: np.array(
-                self.job_shop_graph.removed_nodes, dtype=int
+                self.job_shop_graph.removed_nodes, dtype=np.int32
             ),
-            ObservationSpaceKey.EDGE_LIST.value: np.array(
-                self.job_shop_graph.graph.edges(), dtype=int
-            ).T,
+            ObservationSpaceKey.EDGE_INDEX.value: self._get_edge_index(),
         }
         for feature_type, matrix in self.composite_observer.features.items():
             observation[feature_type.value] = matrix
         return observation
+
+    def _get_edge_index(self) -> np.ndarray:
+        """Returns the edge index matrix."""
+        edge_index = np.array(
+            self.job_shop_graph.graph.edges(), dtype=np.int32
+        ).T
+
+        if self.use_padding:
+            edge_index = self._add_padding(edge_index)
+        return edge_index
+
+    def _add_padding(self, edge_index: np.ndarray) -> np.ndarray:
+        """Adds padding to the edge index matrix."""
+
+        if edge_index.size == 0:  # Happens at the last step
+            # Mypy does not understand the type of the observation_space
+            return np.full(
+                self.observation_space[  # type: ignore[arg-type]
+                    ObservationSpaceKey.EDGE_INDEX.value
+                ].shape,
+                fill_value=-1,
+                dtype=np.int32,
+            )
+
+        # Mypy does not understand the type of the observation_space
+        num_edges = self.observation_space[  # type: ignore[index]
+            ObservationSpaceKey.EDGE_INDEX.value
+        ].shape[1]
+        padding_size = num_edges - edge_index.shape[1]
+        padded_edge_index = np.pad(
+            edge_index,
+            ((0, 0), (0, padding_size)),
+            mode="constant",
+            constant_values=-1,
+        )
+        return padded_edge_index
 
     def reset(
         self,
