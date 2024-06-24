@@ -60,6 +60,10 @@ class SingleJobShopGraphEnv(gym.Env):
 
     metadata = {"render_modes": ["human", "save_video", "save_gif"]}
 
+    # I think the class is easier to use this way. We could initiliaze the
+    # class from Dispatcher or an already initialized RewardFunction. However,
+    # it would be impossible to add good default values.
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         job_shop_graph: JobShopGraph,
