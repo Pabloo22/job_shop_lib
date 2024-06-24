@@ -4,6 +4,9 @@ from job_shop_lib.reinforcement_learning.types_and_constants import (
     ObservationSpaceKey,
     RenderConfig,
     ObservationDict,
+    GanttChartWrapperConfig,
+    GifConfig,
+    VideoConfig,
 )
 
 from job_shop_lib.reinforcement_learning.reward_functions import (
@@ -12,9 +15,6 @@ from job_shop_lib.reinforcement_learning.reward_functions import (
     IdleTimeReward,
 )
 from job_shop_lib.reinforcement_learning.gantt_chart_creator import (
-    GanttChartWrapperConfig,
-    GifConfig,
-    VideoConfig,
     GanttChartCreator,
 )
 
