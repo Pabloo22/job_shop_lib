@@ -81,7 +81,7 @@ def single_job_shop_graph_env_ft06() -> SingleJobShopGraphEnv:
     env = SingleJobShopGraphEnv(
         job_shop_graph=job_shop_graph,
         feature_observer_configs=feature_observer_configs,
-        reward_function=MakespanReward,
+        reward_function_type=MakespanReward,
         render_mode="save_video",
         render_config={"video_config": {"fps": 4}},
     )

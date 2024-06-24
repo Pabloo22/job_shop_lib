@@ -1,8 +1,7 @@
 """Home of the `SingleJobShopGraphEnv` class."""
 
 from copy import deepcopy
-from enum import Enum
-from typing import Callable, Any, TypedDict
+from typing import Callable, Any
 
 import matplotlib.pyplot as plt
 import gymnasium as gym
@@ -14,34 +13,17 @@ from job_shop_lib.dispatching import Dispatcher, prune_dominated_operations
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserverConfig,
     CompositeFeatureObserver,
-    FeatureType,
 )
 
 from job_shop_lib.reinforcement_learning import (
     RewardFunction,
     GanttChartCreator,
-    GanttChartWrapperConfig,
-    VideoConfig,
-    GifConfig,
+    MakespanReward,
+    add_padding,
+    RenderConfig,
+    ObservationSpaceKey,
+    ObservationDict,
 )
-
-
-class ObservationSpaceKey(str, Enum):
-    """Enumeration of the keys for the observation space dictionary."""
-
-    REMOVED_NODES = "removed_nodes"
-    EDGE_INDEX = "edge_index"
-    OPERATIONS = FeatureType.OPERATIONS.value
-    JOBS = FeatureType.JOBS.value
-    MACHINES = FeatureType.MACHINES.value
-
-
-class RenderConfig(TypedDict, total=False):
-    """Configuration needed to initialize the `GanttChartCreator` class."""
-
-    gantt_chart_wrapper_config: GanttChartWrapperConfig
-    video_config: VideoConfig
-    gif_config: GifConfig
 
 
 class SingleJobShopGraphEnv(gym.Env):
@@ -82,7 +64,7 @@ class SingleJobShopGraphEnv(gym.Env):
         self,
         job_shop_graph: JobShopGraph,
         feature_observer_configs: list[FeatureObserverConfig],
-        reward_function: type[RewardFunction],
+        reward_function_type: type[RewardFunction] = MakespanReward,
         pruning_function: (
             Callable[[Dispatcher, list[Operation]], list[Operation]] | None
         ) = prune_dominated_operations,
@@ -90,6 +72,27 @@ class SingleJobShopGraphEnv(gym.Env):
         render_config: RenderConfig | None = None,
         use_padding: bool = True,
     ) -> None:
+        """Initializes the SingleJobShopGraphEnv environment.
+
+        Args:
+            job_shop_graph:
+                The JobShopGraph instance representing the job shop problem.
+            feature_observer_configs:
+                A list of FeatureObserverConfig instances for the feature
+                observers.
+            reward_function_type:
+                The type of the reward function to use.
+            pruning_function:
+                The function to use for pruning dominated operations.
+            render_mode:
+                The mode for rendering the environment ("human", "save_video",
+                "save_gif").
+            render_config:
+                Configuration for rendering (e.g., paths for saving videos
+                or GIFs).
+            use_padding:
+                Whether to use padding for the edge index.
+        """
         super().__init__()
         # Used for resetting the environment
         self.initial_job_shop_graph = deepcopy(job_shop_graph)
@@ -105,7 +108,7 @@ class SingleJobShopGraphEnv(gym.Env):
                 self.dispatcher, feature_observer_configs
             )
         )
-        self.reward_function = reward_function(self.dispatcher)
+        self.reward_function = reward_function_type(self.dispatcher)
 
         self.action_space = gym.spaces.MultiDiscrete(
             [self.instance.num_jobs, self.instance.num_machines], start=[0, -1]
@@ -118,6 +121,11 @@ class SingleJobShopGraphEnv(gym.Env):
             dispatcher=self.dispatcher, **render_config
         )
         self.use_padding = use_padding
+
+    @property
+    def instance(self) -> JobShopInstance:
+        """Returns the instance the environment is working on."""
+        return self.job_shop_graph.instance
 
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
@@ -134,9 +142,9 @@ class SingleJobShopGraphEnv(gym.Env):
                 ),
                 start=np.full(
                     (2, num_edges),
-                    fill_value=-1,
+                    fill_value=-1,  # -1 is used for padding
                     dtype=np.int32,
-                ),  # -1 is used as padding
+                ),
             ),
         }
         for feature_type, matrix in self.composite_observer.features.items():
@@ -145,14 +153,22 @@ class SingleJobShopGraphEnv(gym.Env):
             )
         return gym.spaces.Dict(dict_space)
 
-    @property
-    def instance(self) -> JobShopInstance:
-        """Returns the instance the environment is working on."""
-        return self.job_shop_graph.instance
+    def reset(
+        self,
+        *,
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
+    ) -> tuple[ObservationDict, dict]:
+        """Resets the environment."""
+        super().reset(seed=seed, options=options)
+        self.dispatcher.reset()
+        self.job_shop_graph = deepcopy(self.initial_job_shop_graph)
+        obs = self.get_observation()
+        return obs, {}
 
     def step(
         self, action: tuple[int, int]
-    ) -> tuple[dict[str, np.ndarray], float, bool, bool, dict[str, Any]]:
+    ) -> tuple[ObservationDict, float, bool, bool, dict[str, Any]]:
         """Takes a step in the environment.
 
         Args:
@@ -192,9 +208,9 @@ class SingleJobShopGraphEnv(gym.Env):
                 continue
             self.job_shop_graph.remove_node(node_id)
 
-    def get_observation(self) -> dict[str, np.ndarray]:
+    def get_observation(self) -> ObservationDict:
         """Returns the current observation of the environment."""
-        observation: dict[str, np.ndarray] = {
+        observation: ObservationDict = {
             ObservationSpaceKey.REMOVED_NODES.value: np.array(
                 self.job_shop_graph.removed_nodes, dtype=np.int32
             ),
@@ -211,47 +227,14 @@ class SingleJobShopGraphEnv(gym.Env):
         ).T
 
         if self.use_padding:
-            edge_index = self._add_padding(edge_index)
-        return edge_index
-
-    def _add_padding(self, edge_index: np.ndarray) -> np.ndarray:
-        """Adds padding to the edge index matrix."""
-
-        if edge_index.size == 0:  # Happens at the last step
-            # Mypy does not understand the type of the observation_space
-            return np.full(
-                self.observation_space[  # type: ignore[arg-type]
-                    ObservationSpaceKey.EDGE_INDEX.value
-                ].shape,
-                fill_value=-1,
-                dtype=np.int32,
+            output_shape = self.observation_space[
+                ObservationSpaceKey.EDGE_INDEX.value
+            ].shape
+            assert output_shape is not None  # For the type checker
+            edge_index = add_padding(
+                edge_index, output_shape=output_shape, dtype=np.int32
             )
-
-        # Mypy does not understand the type of the observation_space
-        num_edges = self.observation_space[  # type: ignore[index]
-            ObservationSpaceKey.EDGE_INDEX.value
-        ].shape[1]
-        padding_size = num_edges - edge_index.shape[1]
-        padded_edge_index = np.pad(
-            edge_index,
-            ((0, 0), (0, padding_size)),
-            mode="constant",
-            constant_values=-1,
-        )
-        return padded_edge_index
-
-    def reset(
-        self,
-        *,
-        seed: int | None = None,
-        options: dict[str, Any] | None = None,
-    ) -> tuple[dict[str, np.ndarray], dict]:
-        """Resets the environment."""
-        super().reset(seed=seed, options=options)
-        self.dispatcher.reset()
-        self.job_shop_graph = deepcopy(self.initial_job_shop_graph)
-        obs = self.get_observation()
-        return obs, {}
+        return edge_index
 
     def render(self):
         """Renders the environment."""
