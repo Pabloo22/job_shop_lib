@@ -1,19 +1,26 @@
 """Home of the `GraphEnvironment` class."""
 
-from typing import Callable
+from collections import defaultdict
+from typing import Callable, Any
+from copy import deepcopy
 
 import gymnasium as gym
 import numpy as np
 
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.dispatching import Dispatcher, prune_dominated_operations
-from job_shop_lib.dispatching.feature_observers import (
-    CompositeFeatureObserver,
-    FeatureObserverConfig,
-    feature_observer_factory,
-)
+from job_shop_lib.dispatching.feature_observers import FeatureObserverConfig
 from job_shop_lib.generation import InstanceGenerator
 from job_shop_lib.graphs import JobShopGraph, build_agent_task_graph
+from job_shop_lib.reinforcement_learning import (
+    SingleJobShopGraphEnv,
+    RewardFunction,
+    RenderConfig,
+    MakespanReward,
+    ObservationDict,
+    ObservationSpaceKey,
+    add_padding,
+)
 
 
 class MultiJobShopGraphEnv(gym.Env):
@@ -52,7 +59,7 @@ class MultiJobShopGraphEnv(gym.Env):
             Keys are defined in the `ObservationSpaceKey` enum:
                 - "removed_nodes": Binary vector indicating the removed nodes.
                     Shape: (max_num_nodes, 1).
-                - "edge_list": Matrix with the edge list in COO format. Each
+                - "edge_index": Matrix with the edge list in COO format. Each
                     column represents an edge, and the first row contains the
                     source nodes, and the second row contains the target nodes.
                     Shape: (2, max_num_edges).
@@ -86,92 +93,174 @@ class MultiJobShopGraphEnv(gym.Env):
         graph_builder: Callable[
             [JobShopInstance], JobShopGraph
         ] = build_agent_task_graph,
-        pruning_function: (
-            Callable[[Dispatcher, list[Operation]], list[Operation]] | None
-        ) = prune_dominated_operations,
+        pruning_function: Callable[
+            [Dispatcher, list[Operation]], list[Operation]
+        ] = prune_dominated_operations,
+        reward_function_type: type[RewardFunction] = MakespanReward,
+        render_mode: str | None = None,
+        render_config: RenderConfig | None = None,
+        use_padding: bool = True,
     ) -> None:
         super().__init__()
 
-        # Check no-composite feature observer
+        # Create an instance with the maximum size
+        instance_with_max_size = instance_generator.generate(
+            num_jobs=instance_generator.max_num_jobs,
+            num_machines=instance_generator.max_num_machines,
+        )
+        graph = graph_builder(instance_with_max_size)
+
+        self.single_job_shop_graph_env = SingleJobShopGraphEnv(
+            job_shop_graph=graph,
+            feature_observer_configs=feature_observer_configs,
+            reward_function_type=reward_function_type,
+            pruning_function=pruning_function,
+            render_mode=render_mode,
+            render_config=render_config,
+            use_padding=use_padding,
+        )
         self.instance_generator = instance_generator
-        self.feature_observer_configs = feature_observer_configs
         self.graph_builder = graph_builder
-        self.pruning_function = pruning_function
+        self.render_mode = render_mode
+        self.render_config = render_config
+        self.feature_observer_configs = feature_observer_configs
 
-        self.action_space = gym.spaces.Discrete(
-            instance_generator.max_num_jobs
+        self.action_space = deepcopy(
+            self.single_job_shop_graph_env.action_space
         )
-        self.observation_space = self._infer_observation_space()
+        self.observation_space: gym.spaces.Dict = deepcopy(
+            self.single_job_shop_graph_env.observation_space
+        )
 
-        self.dispatcher = None
-        self.composite_observer = None
+    @property
+    def dispatcher(self) -> Dispatcher:
+        """Returns the current dispatcher instance."""
+        return self.single_job_shop_graph_env.dispatcher
 
-    def _infer_observation_space(self):
-        """Infer the observation space from the feature observers.
+    @property
+    def reward_function(self) -> RewardFunction:
+        """Returns the current reward function instance."""
+        return self.single_job_shop_graph_env.reward_function
 
-        The observation space can be inferred generating an instance with the
-        maximum number of jobs and machines, creating a graph (number of nodes
-        maximum, and edge types), and initializing the Dispatcher class with
-        the feature observers (dimension of the feature vector).
+    @reward_function.setter
+    def reward_function(self, reward_function: RewardFunction) -> None:
+        """Sets the reward function instance."""
+        self.single_job_shop_graph_env.reward_function = reward_function
+
+    @property
+    def pruning_function(
+        self,
+    ) -> Callable[[Dispatcher, list[Operation]], list[Operation]] | None:
+        """Returns the current pruning function."""
+        return self.single_job_shop_graph_env.dispatcher.pruning_function
+
+    @pruning_function.setter
+    def pruning_function(
+        self,
+        pruning_function: Callable[
+            [Dispatcher, list[Operation]], list[Operation]
+        ],
+    ) -> None:
+        """Sets the pruning function."""
+        self.single_job_shop_graph_env.dispatcher.pruning_function = (
+            pruning_function
+        )
+
+    @property
+    def use_padding(self) -> bool:
+        """Returns whether the padding is used."""
+        return self.single_job_shop_graph_env.use_padding
+
+    @use_padding.setter
+    def use_padding(self, use_padding: bool) -> None:
+        """Sets whether the padding is used."""
+        self.single_job_shop_graph_env.use_padding = use_padding
+
+    def reset(
+        self,
+        *,
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
+    ) -> tuple[ObservationDict, dict]:
+        """Resets the environment and returns the initial observation.
+
+        Returns:
+            Tuple with the initial observation and the info dictionary.
         """
-        instance_with_max_size = self.instance_generator.generate(
-            num_jobs=self.instance_generator.max_num_jobs,
-            num_machines=self.instance_generator.max_num_machines,
+        instance = self.instance_generator.generate()
+        graph = self.graph_builder(instance)
+        self.single_job_shop_graph_env = SingleJobShopGraphEnv(
+            job_shop_graph=graph,
+            feature_observer_configs=self.feature_observer_configs,
+            reward_function_type=self.reward_function.__class__,
+            pruning_function=self.pruning_function,
+            render_mode=self.render_mode,
+            render_config=self.render_config,
+            use_padding=self.single_job_shop_graph_env.use_padding,
         )
-        graph = self.graph_builder(instance_with_max_size)
-        dispatcher = Dispatcher(instance_with_max_size)
-        composite_observer = self._initialize_feature_observers(dispatcher)
-        feature_dict = self._create_dict_space(graph, composite_observer)
 
-        return gym.spaces.Dict(feature_dict)
+        return self.single_job_shop_graph_env.reset(seed=seed, options=options)
 
-    def _removed_nodes(self, graph: JobShopGraph) -> np.ndarray:
-        """Return the removed nodes as a binary vector."""
-        return np.array(graph.removed_nodes, dtype=np.int8).reshape(-1, 1)
+    def step(
+        self, action: tuple[int, int]
+    ) -> tuple[ObservationDict, float, bool, bool, dict]:
+        """Executes the action and returns the next observation, reward,
+        termination flag, and info dictionary.
 
-    @staticmethod
-    def _edge_list(graph: JobShopGraph) -> np.ndarray:
-        """Return the edge list as a matrix."""
-        return np.array(graph.graph.edges(), dtype=np.int32).T
+        Args:
+            action: Tuple with the selected job and machine.
 
-    def _initialize_feature_observers(
-        self, dispatcher: Dispatcher
-    ) -> CompositeFeatureObserver:
-        """Creates the composite feature observer."""
-        observers = [
-            feature_observer_factory(
-                observer_config.feature_observer_type,
-                dispatcher=dispatcher,
-                **observer_config.kwargs
+        Returns:
+            Tuple with the next observation, reward, termination flag, and
+            info dictionary.
+        """
+        obs, reward, done, truncated, info = (
+            self.single_job_shop_graph_env.step(action)
+        )
+        if self.use_padding:
+            obs = self._add_padding_to_observation(obs)
+
+        return obs, reward, done, truncated, info
+
+    def _add_padding_to_observation(
+        self, observation: ObservationDict
+    ) -> ObservationDict:
+        """Adds padding to the observation.
+
+        "removed_nodes":
+            input_shape: (num_nodes,)
+            output_shape: (max_num_nodes,) (padded with True)
+        "edge_index":
+            input_shape: (2, num_edges)
+            output_shape: (2, max_num_edges) (padded with -1)
+        "operations":
+            input_shape: (num_operations, num_features)
+            output_shape: (max_num_operations, num_features) (padded with -1)
+        "jobs":
+            input_shape: (num_jobs, num_features)
+            output_shape: (max_num_jobs, num_features) (padded with -1)
+        "machines":
+            input_shape: (num_machines, num_features)
+            output_shape: (max_num_machines, num_features) (padded with -1)
+        """
+        padding_value: dict[str, float | bool] = defaultdict(lambda: -1)
+        padding_value[ObservationSpaceKey.REMOVED_NODES.value] = True
+        for key, value in observation.items():
+            if not isinstance(value, np.ndarray):  # Make mypy happy
+                continue
+            expected_shape = self._get_output_shape(key)
+            observation[key] = add_padding(  # type: ignore[literal-required]
+                value,
+                expected_shape,
+                padding_value=padding_value[key],
             )
-            for observer_config in self.feature_observer_configs
-        ]
-        composite_observer = CompositeFeatureObserver(dispatcher, observers)
-        return composite_observer
+        return observation
 
-    @staticmethod
-    def _create_dict_space(
-        graph: JobShopGraph, composite_observer: CompositeFeatureObserver
-    ) -> dict[str, gym.Space]:
-        """Create the observation space as a dictionary."""
-        dict_space: dict[str, gym.Space] = {
-            "removed_nodes": gym.spaces.MultiBinary(len(graph.nodes)),
-            "edge_list": gym.spaces.MultiDiscrete(
-                np.full((2, graph.num_edges), fill_value=len(graph.nodes))
-            ),
-        }
-        for feature_type, matrix in composite_observer.features.items():
-            dict_space[feature_type.value] = gym.spaces.Box(
-                low=-np.inf, high=np.inf, shape=matrix.shape
-            )
-        return dict_space
+    def _get_output_shape(self, key: str) -> tuple[int, ...]:
+        """Returns the output shape of the observation space key."""
+        output_shape = self.observation_space[key].shape
+        assert output_shape is not None  # Make mypy happy
+        return output_shape
 
-
-if __name__ == "__main__":
-    import networkx as nx
-
-    G = nx.Graph()  # or DiGraph, MultiGraph, MultiDiGraph, etc
-    G.add_edge(0, 1)
-    G.add_edge(1, 2)
-    G.add_edge(2, 3, weight=5)
-    print(np.array(G.edges()).T)
+    def render(self) -> None:
+        self.single_job_shop_graph_env.render()
