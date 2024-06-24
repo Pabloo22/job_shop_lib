@@ -216,7 +216,7 @@ class SingleJobShopGraphEnv(gym.Env):
         """Returns the current observation of the environment."""
         observation: ObservationDict = {
             ObservationSpaceKey.REMOVED_NODES.value: np.array(
-                self.job_shop_graph.removed_nodes, dtype=np.int32
+                self.job_shop_graph.removed_nodes, dtype=bool
             ),
             ObservationSpaceKey.EDGE_INDEX.value: self._get_edge_index(),
         }
