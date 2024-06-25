@@ -5,16 +5,17 @@ import numpy as np
 from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
     ObservationSpaceKey,
+    ObservationDict,
 )
 
 
-def random_action(observation: dict[str, np.ndarray]) -> tuple[int, int]:
+def random_action(observation: ObservationDict) -> tuple[int, int]:
     ready_operations = []
-    for op, is_ready in enumerate(
-        observation[ObservationSpaceKey.JOBS].ravel()
+    for operation_id, is_ready in enumerate(
+        observation[ObservationSpaceKey.JOBS.value].ravel()
     ):
         if is_ready == 1.0:
-            ready_operations.append(op)
+            ready_operations.append(operation_id)
 
     operation_id = random.choice(ready_operations)
     machine_id = -1  # We can use -1 if each operation can only be scheduled
@@ -78,7 +79,7 @@ def test_edge_index_padding(
                 if padding_start > 0:
                     assert np.all(row[padding_start:])
 
-    removed_nodes = np.all(obs[ObservationSpaceKey.REMOVED_NODES])
+    removed_nodes = np.all(obs[ObservationSpaceKey.REMOVED_NODES.value])
     assert np.all(removed_nodes)
 
 
