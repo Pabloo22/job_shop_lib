@@ -176,6 +176,16 @@ class MultiJobShopGraphEnv(gym.Env):
         """Sets whether the padding is used."""
         self.single_job_shop_graph_env.use_padding = use_padding
 
+    @property
+    def job_shop_graph(self) -> JobShopGraph:
+        """Returns the current job shop graph."""
+        return self.single_job_shop_graph_env.job_shop_graph
+
+    @property
+    def instance(self) -> JobShopInstance:
+        """Returns the current job shop instance."""
+        return self.single_job_shop_graph_env.instance
+
     def reset(
         self,
         *,
