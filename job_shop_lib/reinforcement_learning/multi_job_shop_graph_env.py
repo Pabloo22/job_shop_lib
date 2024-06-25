@@ -209,7 +209,13 @@ class MultiJobShopGraphEnv(gym.Env):
             use_padding=self.single_job_shop_graph_env.use_padding,
         )
 
-        return self.single_job_shop_graph_env.reset(seed=seed, options=options)
+        obs, info = self.single_job_shop_graph_env.reset(
+            seed=seed, options=options
+        )
+        if self.use_padding:
+            obs = self._add_padding_to_observation(obs)
+
+        return obs, info
 
     def step(
         self, action: tuple[int, int]
