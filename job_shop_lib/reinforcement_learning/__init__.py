@@ -23,6 +23,9 @@ from job_shop_lib.reinforcement_learning.utils import add_padding
 from job_shop_lib.reinforcement_learning.single_job_shop_graph_env import (
     SingleJobShopGraphEnv,
 )
+from job_shop_lib.reinforcement_learning.multi_job_shop_graph_env import (
+    MultiJobShopGraphEnv,
+)
 
 
 __all__ = [
@@ -38,4 +41,5 @@ __all__ = [
     "RenderConfig",
     "ObservationDict",
     "add_padding",
+    "MultiJobShopGraphEnv",
 ]
