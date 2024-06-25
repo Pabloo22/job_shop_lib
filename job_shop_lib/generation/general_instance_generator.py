@@ -105,6 +105,14 @@ class GeneralInstanceGenerator(InstanceGenerator):
         if seed is not None:
             random.seed(seed)
 
+    def __repr__(self) -> str:
+        return (
+            f"GeneralInstanceGenerator("
+            f"num_jobs_range={self.num_jobs_range}, "
+            f"num_machines_range={self.num_machines_range}, "
+            f"duration_range={self.duration_range})"
+        )
+
     def generate(
         self, num_jobs: int | None = None, num_machines: int | None = None
     ) -> JobShopInstance:
