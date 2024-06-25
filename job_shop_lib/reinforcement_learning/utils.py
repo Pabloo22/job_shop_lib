@@ -13,7 +13,7 @@ def add_padding(
 ) -> np.ndarray:
     """Adds padding to the array."""
 
-    if np.any(np.less(array.shape, output_shape)):
+    if np.any(np.less(output_shape, array.shape)):
         raise ValidationError(
             "Output shape must be greater than the input shape. "
             f"Got output shape: {output_shape}, input shape: {array.shape}."
