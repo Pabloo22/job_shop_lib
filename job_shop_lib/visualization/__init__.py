@@ -14,6 +14,12 @@ from job_shop_lib.visualization.agent_task_graph import (
     plot_agent_task_graph,
     three_columns_layout,
 )
+from job_shop_lib.visualization.gantt_chart_creator import (
+    GanttChartCreator,
+    GanttChartWrapperConfig,
+    GifConfig,
+    VideoConfig,
+)
 
 __all__ = [
     "plot_gantt_chart",
@@ -26,4 +32,8 @@ __all__ = [
     "plot_disjunctive_graph",
     "plot_agent_task_graph",
     "three_columns_layout",
+    "GanttChartCreator",
+    "GanttChartWrapperConfig",
+    "GifConfig",
+    "VideoConfig",
 ]

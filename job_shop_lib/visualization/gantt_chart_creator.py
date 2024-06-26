@@ -1,4 +1,6 @@
-"""Home of the `GanttChartCreator` class."""
+"""Home of the `GanttChartCreator` class and its configuration types."""
+
+from typing import TypedDict, Required
 
 import matplotlib.pyplot as plt
 
@@ -12,11 +14,37 @@ from job_shop_lib.visualization import (
     plot_gantt_chart_wrapper,
     create_gif,
 )
-from job_shop_lib.reinforcement_learning.types_and_constants import (
-    GanttChartWrapperConfig,
-    GifConfig,
-    VideoConfig,
-)
+
+
+class GanttChartWrapperConfig(TypedDict, total=False):
+    """Configuration for creating the plot function with the
+    `plot_gantt_chart_wrapper` function."""
+
+    title: str | None
+    cmap: str
+    show_available_operations: bool
+
+
+class GifConfig(TypedDict, total=False):
+    """Configuration for creating the GIF using the `create_gannt_chart_video`
+    function."""
+
+    gif_path: Required[str | None]
+    fps: int
+    remove_frames: bool
+    frames_dir: str | None
+    plot_current_time: bool
+
+
+class VideoConfig(TypedDict, total=False):
+    """Configuration for creating the video using the
+    `create_gannt_chart_video` function."""
+
+    video_path: str | None
+    fps: int
+    remove_frames: bool
+    frames_dir: str | None
+    plot_current_time: bool
 
 
 class GanttChartCreator:

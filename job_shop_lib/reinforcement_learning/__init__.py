@@ -14,9 +14,6 @@ from job_shop_lib.reinforcement_learning.reward_functions import (
     MakespanReward,
     IdleTimeReward,
 )
-from job_shop_lib.reinforcement_learning.gantt_chart_creator import (
-    GanttChartCreator,
-)
 
 from job_shop_lib.reinforcement_learning.utils import add_padding
 
@@ -36,7 +33,6 @@ __all__ = [
     "GanttChartWrapperConfig",
     "GifConfig",
     "VideoConfig",
-    "GanttChartCreator",
     "SingleJobShopGraphEnv",
     "RenderConfig",
     "ObservationDict",
