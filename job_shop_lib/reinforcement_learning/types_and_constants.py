@@ -1,4 +1,4 @@
-"""Contains types and enumerations used in the reinforcement learning 
+"""Contains types and enumerations used in the reinforcement learning
 module."""
 
 from enum import Enum
