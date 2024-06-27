@@ -22,6 +22,7 @@ class IsCompletedObserver(FeatureObserver):
         dispatcher: Dispatcher,
         feature_types: list[FeatureType] | FeatureType | None = None,
         subscribe: bool = True,
+        is_singleton: bool = True,
     ):
         feature_types = self.get_feature_types_list(feature_types)
         self.remaining_ops_per_machine = np.zeros(
@@ -31,7 +32,11 @@ class IsCompletedObserver(FeatureObserver):
             (dispatcher.instance.num_jobs, 1), dtype=int
         )
         super().__init__(
-            dispatcher, feature_types, feature_size=1, subscribe=subscribe
+            dispatcher,
+            feature_types,
+            feature_size=1,
+            subscribe=subscribe,
+            is_singleton=is_singleton,
         )
 
     def initialize_features(self):
