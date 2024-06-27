@@ -210,13 +210,9 @@ class JobShopGraph:
         Returns:
             The node representing the machine with the given id.
         """
-        machine_node = self._nodes_by_type[NodeType.MACHINE][machine_id]
-        if machine_node.machine_id != machine_id:
-            # Search for the machine node with the given id
-            for node in self._nodes_by_type[NodeType.MACHINE]:
-                if node.machine_id == machine_id:
-                    return node
-        return machine_node
+        return self.get_node_by_type_and_id(
+            NodeType.MACHINE, machine_id, "machine_id"
+        )
 
     def get_job_node(self, job_id: int) -> Node:
         """Returns the node representing the job with the given id.
@@ -227,13 +223,7 @@ class JobShopGraph:
         Returns:
             The node representing the job with the given id.
         """
-        job_node = self._nodes_by_type[NodeType.JOB][job_id]
-        if job_node.job_id != job_id:
-            # Search for the job node with the given id
-            for node in self._nodes_by_type[NodeType.JOB]:
-                if node.job_id == job_id:
-                    return node
-        return job_node
+        return self.get_node_by_type_and_id(NodeType.JOB, job_id, "job_id")
 
     def get_operation_node(self, operation_id: int) -> Node:
         """Returns the node representing the operation with the given id.
@@ -244,10 +234,42 @@ class JobShopGraph:
         Returns:
             The node representing the operation with the given id.
         """
-        operation_node = self._nodes_by_type[NodeType.OPERATION][operation_id]
-        if operation_node.operation.operation_id != operation_id:
-            # Search for the operation node with the given id
-            for node in self._nodes_by_type[NodeType.OPERATION]:
-                if node.operation.operation_id == operation_id:
-                    return node
-        return operation_node
+        return self.get_node_by_type_and_id(
+            NodeType.OPERATION, operation_id, "operation.operation_id"
+        )
+
+    def get_node_by_type_and_id(
+        self, node_type: NodeType, node_id: int, id_attr: str
+    ) -> Node:
+        """Generic method to get a node by type and id.
+
+        Args:
+            node_type:
+                The type of the node.
+            node_id:
+                The id of the node.
+            id_attr:
+                The attribute name to compare the id. Can be nested like
+                'operation.operation_id'.
+
+        Returns:
+            The node with the given id.
+        """
+
+        def get_nested_attr(obj, attr_path: str):
+            """Helper function to get nested attribute."""
+            attrs = attr_path.split(".")
+            for attr in attrs:
+                obj = getattr(obj, attr)
+            return obj
+
+        nodes = self._nodes_by_type[node_type]
+        node = nodes[node_id]
+        if get_nested_attr(node, id_attr) == node_id:
+            return node
+
+        for node in nodes:
+            if get_nested_attr(node, id_attr) == node_id:
+                return node
+
+        raise ValidationError(f"No node found with node.{id_attr}={node_id}")
