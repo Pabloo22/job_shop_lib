@@ -1,6 +1,7 @@
 import pytest
 import networkx as nx
 
+from job_shop_lib import JobShopInstance
 from job_shop_lib.graphs import (
     JobShopGraph,
     NodeType,
@@ -8,6 +9,7 @@ from job_shop_lib.graphs import (
     add_disjunctive_edges,
     add_source_sink_edges,
     add_source_sink_nodes,
+    build_complete_agent_task_graph,
 )
 
 
@@ -136,5 +138,35 @@ def test_remove_node(example_job_shop_instance):
         assert v in remaining_node_ids
 
 
+def test_get_machine_node(example_job_shop_instance: JobShopInstance):
+    graph = build_complete_agent_task_graph(example_job_shop_instance)
+
+    for machine_id in range(example_job_shop_instance.num_machines):
+        machine_node = graph.get_machine_node(machine_id)
+        assert machine_node.node_type == NodeType.MACHINE
+        assert machine_node.machine_id == machine_id
+
+
+def test_get_job_node(example_job_shop_instance: JobShopInstance):
+    graph = build_complete_agent_task_graph(example_job_shop_instance)
+
+    for job_id in range(example_job_shop_instance.num_jobs):
+        job_node = graph.get_job_node(job_id)
+        assert job_node.node_type == NodeType.JOB
+        assert job_node.job_id == job_id
+
+
+def test_get_operation_node(example_job_shop_instance: JobShopInstance):
+    graph = build_complete_agent_task_graph(example_job_shop_instance)
+
+    for job in example_job_shop_instance.jobs:
+        for operation in job:
+            operation_node = graph.get_operation_node(operation.operation_id)
+            assert operation_node.node_type == NodeType.OPERATION
+            assert (
+                operation_node.operation.operation_id == operation.operation_id
+            )
+
+
 if __name__ == "__main__":
-    pytest.main(["-v", "tests/graphs/test_job_shop_graph.py"])
+    pytest.main(["-vv", "tests/graphs/test_job_shop_graph.py"])

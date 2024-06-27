@@ -200,3 +200,54 @@ class JobShopGraph:
         if isinstance(node, Node):
             node = node.node_id
         return self.removed_nodes[node]
+
+    def get_machine_node(self, machine_id: int) -> Node:
+        """Returns the node representing the machine with the given id.
+
+        Args:
+            machine_id: The id of the machine.
+
+        Returns:
+            The node representing the machine with the given id.
+        """
+        machine_node = self._nodes_by_type[NodeType.MACHINE][machine_id]
+        if machine_node.machine_id != machine_id:
+            # Search for the machine node with the given id
+            for node in self._nodes_by_type[NodeType.MACHINE]:
+                if node.machine_id == machine_id:
+                    return node
+        return machine_node
+
+    def get_job_node(self, job_id: int) -> Node:
+        """Returns the node representing the job with the given id.
+
+        Args:
+            job_id: The id of the job.
+
+        Returns:
+            The node representing the job with the given id.
+        """
+        job_node = self._nodes_by_type[NodeType.JOB][job_id]
+        if job_node.job_id != job_id:
+            # Search for the job node with the given id
+            for node in self._nodes_by_type[NodeType.JOB]:
+                if node.job_id == job_id:
+                    return node
+        return job_node
+
+    def get_operation_node(self, operation_id: int) -> Node:
+        """Returns the node representing the operation with the given id.
+
+        Args:
+            operation_id: The id of the operation.
+
+        Returns:
+            The node representing the operation with the given id.
+        """
+        operation_node = self._nodes_by_type[NodeType.OPERATION][operation_id]
+        if operation_node.operation.operation_id != operation_id:
+            # Search for the operation node with the given id
+            for node in self._nodes_by_type[NodeType.OPERATION]:
+                if node.operation.operation_id == operation_id:
+                    return node
+        return operation_node
