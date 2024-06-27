@@ -62,6 +62,7 @@ ObserverType = TypeVar("ObserverType", bound=DispatcherObserver)
 def create_or_get_observer(
     dispatcher: Dispatcher,
     observer: type[ObserverType],
+    condition: Callable[[DispatcherObserver], bool] = lambda _: True,
     **kwargs,
 ) -> ObserverType:
     """Creates a new observer of the specified type or returns an existing
@@ -79,7 +80,9 @@ def create_or_get_observer(
             constructor.
     """
     for existing_observer in dispatcher.subscribers:
-        if isinstance(existing_observer, observer):
+        if isinstance(existing_observer, observer) and condition(
+            existing_observer
+        ):
             return existing_observer
 
     new_observer = observer(dispatcher, **kwargs)
