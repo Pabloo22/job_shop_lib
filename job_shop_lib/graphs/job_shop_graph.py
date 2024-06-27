@@ -263,10 +263,11 @@ class JobShopGraph:
                 obj = getattr(obj, attr)
             return obj
 
-        nodes = self._nodes_by_type[node_type]
-        node = nodes[node_id]
-        if get_nested_attr(node, id_attr) == node_id:
-            return node
+        if node_id >= len(self._nodes_by_type[node_type]):
+            nodes = self._nodes_by_type[node_type]
+            node = nodes[node_id]
+            if get_nested_attr(node, id_attr) == node_id:
+                return node
 
         for node in nodes:
             if get_nested_attr(node, id_attr) == node_id:
