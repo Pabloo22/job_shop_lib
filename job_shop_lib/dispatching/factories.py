@@ -6,10 +6,10 @@ specified names or enums.
 """
 
 from enum import Enum
-from typing import TypeVar
-
+from typing import TypeVar, Generic, Any
 from collections.abc import Callable, Sequence
 import random
+from dataclasses import dataclass, field
 
 from job_shop_lib import Operation, ValidationError
 from job_shop_lib.dispatching import (
@@ -57,6 +57,41 @@ class PruningFunction(str, Enum):
 # Disable pylint's false positive
 # pylint: disable=invalid-name
 ObserverType = TypeVar("ObserverType", bound=DispatcherObserver)
+T = TypeVar("T")
+
+
+@dataclass(slots=True, frozen=True)
+class DispatcherObserverConfig(Generic[T]):
+    """Configuration for initializing any type of class.
+
+    Useful for specifying the type of the dispatcher observer and additional
+    keyword arguments to pass to the dispatcher observer constructor while
+    not containing the `dispatcher` argument.
+
+    Attributes:
+        type:
+            Type of the class to be initialized.
+        kwargs:
+            Keyword arguments needed to initialize the class. It must not
+            contain the `dispatcher` argument.
+    """
+
+    # We use the type hint T, instead of ObserverType, to allow for string or
+    # specific Enum values to be passed as the type argument. For example:
+    # FeatureObserverConfig = DispatcherObserverConfig[
+    #     type[FeatureObserver] | FeatureObserverType | str
+    # ]
+    # This allows for the creation of a FeatureObserver instance
+    # from the factory function.
+    class_type: T
+    kwargs: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        if "dispatcher" in self.kwargs:
+            raise ValueError(
+                "The 'dispatcher' argument should not be included in the "
+                "kwargs attribute."
+            )
 
 
 def create_or_get_observer(

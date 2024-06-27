@@ -27,6 +27,7 @@ from job_shop_lib.dispatching.factories import (
     pruning_function_factory,
     composite_pruning_function_factory,
     create_or_get_observer,
+    DispatcherObserverConfig,
 )
 from job_shop_lib.dispatching.dispatching_rule_solver import (
     DispatchingRuleSolver,
@@ -55,4 +56,5 @@ __all__ = [
     "HistoryObserver",
     "create_or_get_observer",
     "HistoryTracker",
+    "DispatcherObserverConfig",
 ]

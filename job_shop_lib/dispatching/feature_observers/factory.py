@@ -1,9 +1,8 @@
 """Contains factory functions for creating node feature encoders."""
 
-from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
 
+from job_shop_lib.dispatching import DispatcherObserverConfig
 from job_shop_lib.dispatching.feature_observers import (
     IsReadyObserver,
     EarliestStartTimeObserver,
@@ -29,24 +28,9 @@ class FeatureObserverType(str, Enum):
     COMPOSITE = "composite"
 
 
-@dataclass(slots=True, frozen=True)
-class FeatureObserverConfig:
-    """Configuration for initializing a feature observer.
-
-    Useful for specifying the type of the feature observer and additional
-    keyword arguments to pass to the feature observer constructor while
-    not containing the `dispatcher` argument.
-
-    Attributes:
-        type:
-            Type of the feature observer.
-        kwargs:
-            Additional keyword arguments to pass to the feature observer
-            constructor. It must not contain the `dispatcher` argument.
-    """
-
-    feature_observer_type: FeatureObserverType | str | type[FeatureObserver]
-    kwargs: dict[str, Any] = field(default_factory=dict)
+FeatureObserverConfig = DispatcherObserverConfig[
+    type[FeatureObserver] | FeatureObserverType | str
+]
 
 
 def feature_observer_factory(
@@ -54,7 +38,9 @@ def feature_observer_factory(
         str
         | FeatureObserverType
         | type[FeatureObserver]
-        | FeatureObserverConfig
+        | DispatcherObserverConfig[
+            type[FeatureObserver] | FeatureObserverType | str
+        ]
     ),
     **kwargs,
 ) -> FeatureObserver:
@@ -71,9 +57,9 @@ def feature_observer_factory(
     Returns:
         A node feature creator instance.
     """
-    if isinstance(node_feature_creator_type, FeatureObserverConfig):
+    if isinstance(node_feature_creator_type, DispatcherObserverConfig):
         return feature_observer_factory(
-            node_feature_creator_type.feature_observer_type,
+            node_feature_creator_type.class_type,
             **node_feature_creator_type.kwargs,
             **kwargs,
         )
