@@ -9,7 +9,15 @@ import numpy as np
 
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.graphs import JobShopGraph
-from job_shop_lib.dispatching import Dispatcher, prune_dominated_operations
+from job_shop_lib.graphs.graph_updaters import (
+    GraphUpdater,
+    ResidualGraphUpdater,
+)
+from job_shop_lib.dispatching import (
+    Dispatcher,
+    prune_dominated_operations,
+    DispatcherObserverConfig,
+)
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserverConfig,
     CompositeFeatureObserver,
@@ -67,7 +75,12 @@ class SingleJobShopGraphEnv(gym.Env):
         self,
         job_shop_graph: JobShopGraph,
         feature_observer_configs: list[FeatureObserverConfig],
-        reward_function_type: type[RewardFunction] = MakespanReward,
+        reward_function_config: DispatcherObserverConfig[
+            type[RewardFunction]
+        ] = DispatcherObserverConfig(class_type=MakespanReward),
+        graph_updater_config: DispatcherObserverConfig[
+            type[GraphUpdater]
+        ] = DispatcherObserverConfig(class_type=ResidualGraphUpdater),
         pruning_function: (
             Callable[[Dispatcher, list[Operation]], list[Operation]] | None
         ) = prune_dominated_operations,
@@ -83,8 +96,10 @@ class SingleJobShopGraphEnv(gym.Env):
             feature_observer_configs:
                 A list of FeatureObserverConfig instances for the feature
                 observers.
-            reward_function_type:
-                The type of the reward function to use.
+            reward_function_config:
+                The configuration for the reward function.
+            graph_updater_config:
+                The configuration for the graph updater.
             pruning_function:
                 The function to use for pruning dominated operations.
             render_mode:
@@ -100,7 +115,6 @@ class SingleJobShopGraphEnv(gym.Env):
         # Used for resetting the environment
         self.initial_job_shop_graph = deepcopy(job_shop_graph)
 
-        self.job_shop_graph = job_shop_graph
         self.dispatcher = Dispatcher(
             self.instance, pruning_function=pruning_function
         )
@@ -111,8 +125,14 @@ class SingleJobShopGraphEnv(gym.Env):
                 self.dispatcher, feature_observer_configs
             )
         )
-        self.reward_function = reward_function_type(self.dispatcher)
-
+        self.reward_function = reward_function_config.class_type(
+            dispatcher=self.dispatcher, **reward_function_config.kwargs
+        )
+        self.graph_updater = graph_updater_config.class_type(
+            dispatcher=self.dispatcher,
+            job_shop_graph=job_shop_graph,
+            **graph_updater_config.kwargs,
+        )
         self.action_space = gym.spaces.MultiDiscrete(
             [self.instance.num_jobs, self.instance.num_machines], start=[0, -1]
         )
@@ -129,6 +149,11 @@ class SingleJobShopGraphEnv(gym.Env):
     def instance(self) -> JobShopInstance:
         """Returns the instance the environment is working on."""
         return self.job_shop_graph.instance
+
+    @property
+    def job_shop_graph(self) -> JobShopGraph:
+        """Returns the job shop graph."""
+        return self.graph_updater.job_shop_graph
 
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
@@ -165,7 +190,6 @@ class SingleJobShopGraphEnv(gym.Env):
         """Resets the environment."""
         super().reset(seed=seed, options=options)
         self.dispatcher.reset()
-        self.job_shop_graph = deepcopy(self.initial_job_shop_graph)
         obs = self.get_observation()
         return obs, {}
 
@@ -193,23 +217,18 @@ class SingleJobShopGraphEnv(gym.Env):
         operation = self.dispatcher.next_operation(job_id)
         if machine_id == -1:
             machine_id = operation.machine_id
-        self.dispatcher.dispatch(operation, machine_id)
-        self._remove_completed_nodes()
 
+        self.dispatcher.dispatch(operation, machine_id)
+
+        obs = self.get_observation()
         reward = self.reward_function.last_reward
         done = self.dispatcher.schedule.is_complete()
-        info: dict[str, Any] = {}
         truncated = False
-        obs = self.get_observation()
+        info: dict[str, Any] = {
+            "feature_names": self.composite_observer.column_names,
+            "available_operations": self.dispatcher.available_operations(),
+        }
         return obs, reward, done, truncated, info
-
-    def _remove_completed_nodes(self):
-        """Removes completed nodes from the graph."""
-        for operation in self.dispatcher.completed_operations():
-            node_id = operation.operation_id
-            if self.job_shop_graph.removed_nodes[node_id]:
-                continue
-            self.job_shop_graph.remove_node(node_id)
 
     def get_observation(self) -> ObservationDict:
         """Returns the current observation of the environment."""
