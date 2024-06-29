@@ -121,7 +121,7 @@ class SingleJobShopGraphEnv(gym.Env):
 
         # Observers added to track the environment state
         self.composite_observer = (
-            CompositeFeatureObserver.from_feature_observers_configs(
+            CompositeFeatureObserver.from_feature_observer_configs(
                 self.dispatcher, feature_observer_configs
             )
         )

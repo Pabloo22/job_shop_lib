@@ -1,11 +1,12 @@
 """Home of the `CompositeFeatureObserver` class."""
 
+from collections import defaultdict
+
 # The Self type can be imported directly from Python’s typing module in
 # version 3.11 and beyond. We use the typing_extensions module to support
 # python 3.10.
 from typing_extensions import Self
 
-from collections import defaultdict
 import numpy as np
 import pandas as pd
 
@@ -51,7 +52,7 @@ class CompositeFeatureObserver(FeatureObserver):
         self._set_column_names()
 
     @classmethod
-    def from_feature_observers_configs(
+    def from_feature_observer_configs(
         cls,
         dispatcher: Dispatcher,
         feature_observer_configs: list[FeatureObserverConfig],
