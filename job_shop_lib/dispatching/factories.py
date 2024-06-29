@@ -88,7 +88,7 @@ class DispatcherObserverConfig(Generic[T]):
 
     def __post_init__(self):
         if "dispatcher" in self.kwargs:
-            raise ValueError(
+            raise ValidationError(
                 "The 'dispatcher' argument should not be included in the "
                 "kwargs attribute."
             )
