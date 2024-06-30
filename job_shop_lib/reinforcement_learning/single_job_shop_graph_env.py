@@ -1,7 +1,8 @@
 """Home of the `SingleJobShopGraphEnv` class."""
 
 from copy import deepcopy
-from typing import Callable, Any
+from collections.abc import Callable, Sequence
+from typing import Any
 
 import matplotlib.pyplot as plt
 import gymnasium as gym
@@ -74,7 +75,7 @@ class SingleJobShopGraphEnv(gym.Env):
     def __init__(
         self,
         job_shop_graph: JobShopGraph,
-        feature_observer_configs: list[FeatureObserverConfig],
+        feature_observer_configs: Sequence[FeatureObserverConfig],
         reward_function_config: DispatcherObserverConfig[
             type[RewardFunction]
         ] = DispatcherObserverConfig(class_type=MakespanReward),
@@ -267,3 +268,28 @@ class SingleJobShopGraphEnv(gym.Env):
             self.gantt_chart_creator.create_video()
         elif self.render_mode == "save_gif":
             self.gantt_chart_creator.create_gif()
+
+
+if __name__ == "__main__":
+    from job_shop_lib.dispatching.feature_observers import (
+        FeatureObserverType,
+        FeatureType,
+    )
+    from job_shop_lib.graphs import build_disjunctive_graph
+    from job_shop_lib.benchmarking import load_benchmark_instance
+
+    instance = load_benchmark_instance("ft06")
+    job_shop_graph_ = build_disjunctive_graph(instance)
+    feature_observer_configs_ = [
+        DispatcherObserverConfig(
+            FeatureObserverType.IS_READY,
+            kwargs={"feature_types": [FeatureType.JOBS]},
+        )
+    ]
+
+    env = SingleJobShopGraphEnv(
+        job_shop_graph=job_shop_graph_,
+        feature_observer_configs=feature_observer_configs_,
+        render_mode="save_video",
+        render_config={"video_config": {"fps": 4}},
+    )

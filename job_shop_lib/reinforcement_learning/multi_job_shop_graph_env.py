@@ -1,7 +1,8 @@
 """Home of the `GraphEnvironment` class."""
 
 from collections import defaultdict
-from typing import Callable, Any
+from collections.abc import Callable, Sequence
+from typing import Any
 from copy import deepcopy
 
 import gymnasium as gym
@@ -97,7 +98,7 @@ class MultiJobShopGraphEnv(gym.Env):
     def __init__(
         self,
         instance_generator: InstanceGenerator,
-        feature_observer_configs: list[FeatureObserverConfig],
+        feature_observer_configs: Sequence[FeatureObserverConfig],
         graph_initializer: Callable[
             [JobShopInstance], JobShopGraph
         ] = build_agent_task_graph,

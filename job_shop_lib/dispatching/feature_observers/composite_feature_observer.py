@@ -1,6 +1,7 @@
 """Home of the `CompositeFeatureObserver` class."""
 
 from collections import defaultdict
+from collections.abc import Sequence
 
 # The Self type can be imported directly from Python’s typing module in
 # version 3.11 and beyond. We use the typing_extensions module to support
@@ -56,7 +57,7 @@ class CompositeFeatureObserver(FeatureObserver):
     def from_feature_observer_configs(
         cls,
         dispatcher: Dispatcher,
-        feature_observer_configs: list[FeatureObserverConfig],
+        feature_observer_configs: Sequence[FeatureObserverConfig],
         subscribe: bool = True,
     ) -> Self:
         """Creates the composite feature observer.
