@@ -8,10 +8,18 @@ import gymnasium as gym
 import numpy as np
 
 from job_shop_lib import JobShopInstance, Operation
-from job_shop_lib.dispatching import Dispatcher, prune_dominated_operations
+from job_shop_lib.dispatching import (
+    Dispatcher,
+    prune_dominated_operations,
+    DispatcherObserverConfig,
+)
 from job_shop_lib.dispatching.feature_observers import FeatureObserverConfig
 from job_shop_lib.generation import InstanceGenerator
 from job_shop_lib.graphs import JobShopGraph, build_agent_task_graph
+from job_shop_lib.graphs.graph_updaters import (
+    GraphUpdater,
+    ResidualGraphUpdater,
+)
 from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
     RewardFunction,
@@ -90,13 +98,18 @@ class MultiJobShopGraphEnv(gym.Env):
         self,
         instance_generator: InstanceGenerator,
         feature_observer_configs: list[FeatureObserverConfig],
-        graph_builder: Callable[
+        graph_initializer: Callable[
             [JobShopInstance], JobShopGraph
         ] = build_agent_task_graph,
+        graph_updater_config: DispatcherObserverConfig[
+            type[GraphUpdater]
+        ] = DispatcherObserverConfig(class_type=ResidualGraphUpdater),
         pruning_function: Callable[
             [Dispatcher, list[Operation]], list[Operation]
         ] = prune_dominated_operations,
-        reward_function_type: type[RewardFunction] = MakespanReward,
+        reward_function_config: DispatcherObserverConfig[
+            type[RewardFunction]
+        ] = DispatcherObserverConfig(class_type=MakespanReward),
         render_mode: str | None = None,
         render_config: RenderConfig | None = None,
         use_padding: bool = True,
@@ -108,22 +121,25 @@ class MultiJobShopGraphEnv(gym.Env):
             num_jobs=instance_generator.max_num_jobs,
             num_machines=instance_generator.max_num_machines,
         )
-        graph = graph_builder(instance_with_max_size)
+        graph = graph_initializer(instance_with_max_size)
 
         self.single_job_shop_graph_env = SingleJobShopGraphEnv(
             job_shop_graph=graph,
             feature_observer_configs=feature_observer_configs,
-            reward_function_type=reward_function_type,
+            reward_function_config=reward_function_config,
+            graph_updater_config=graph_updater_config,
             pruning_function=pruning_function,
             render_mode=render_mode,
             render_config=render_config,
             use_padding=use_padding,
         )
         self.instance_generator = instance_generator
-        self.graph_builder = graph_builder
+        self.graph_initializer = graph_initializer
         self.render_mode = render_mode
         self.render_config = render_config
         self.feature_observer_configs = feature_observer_configs
+        self.reward_function_config = reward_function_config
+        self.graph_updater_config = graph_updater_config
 
         self.action_space = deepcopy(
             self.single_job_shop_graph_env.action_space
@@ -198,11 +214,11 @@ class MultiJobShopGraphEnv(gym.Env):
             Tuple with the initial observation and the info dictionary.
         """
         instance = self.instance_generator.generate()
-        graph = self.graph_builder(instance)
+        graph = self.graph_initializer(instance)
         self.single_job_shop_graph_env = SingleJobShopGraphEnv(
             job_shop_graph=graph,
             feature_observer_configs=self.feature_observer_configs,
-            reward_function_type=self.reward_function.__class__,
+            reward_function_config=self.reward_function_config,
             pruning_function=self.pruning_function,
             render_mode=self.render_mode,
             render_config=self.render_config,
