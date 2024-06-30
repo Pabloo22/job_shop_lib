@@ -69,8 +69,9 @@ class DispatcherObserverConfig(Generic[T]):
     not containing the `dispatcher` argument.
 
     Attributes:
-        type:
-            Type of the class to be initialized.
+        class_type:
+            Type of the class to be initialized. It can be a type hint, an
+            enum value, or a string.
         kwargs:
             Keyword arguments needed to initialize the class. It must not
             contain the `dispatcher` argument.
