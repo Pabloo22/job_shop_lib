@@ -1,13 +1,11 @@
 import pytest
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.reinforcement_learning import (
-    MakespanReward,
-    IdleTimeReward,
     SingleJobShopGraphEnv,
     MultiJobShopGraphEnv,
 )
+from job_shop_lib.dispatching import DispatcherObserverConfig
 from job_shop_lib.dispatching.feature_observers import (
-    FeatureObserverConfig,
     FeatureObserverType,
     FeatureType,
 )
@@ -75,7 +73,7 @@ def single_job_shop_graph_env_ft06() -> SingleJobShopGraphEnv:
     instance = load_benchmark_instance("ft06")
     job_shop_graph = build_disjunctive_graph(instance)
     feature_observer_configs = [
-        FeatureObserverConfig(
+        DispatcherObserverConfig(
             FeatureObserverType.IS_READY,
             kwargs={"feature_types": [FeatureType.JOBS]},
         )
@@ -84,7 +82,6 @@ def single_job_shop_graph_env_ft06() -> SingleJobShopGraphEnv:
     env = SingleJobShopGraphEnv(
         job_shop_graph=job_shop_graph,
         feature_observer_configs=feature_observer_configs,
-        reward_function_type=MakespanReward,
         render_mode="save_video",
         render_config={"video_config": {"fps": 4}},
     )
@@ -99,7 +96,7 @@ def multi_job_shop_graph_env() -> MultiJobShopGraphEnv:
         allow_less_jobs_than_machines=False,
     )
     feature_observer_configs = [
-        FeatureObserverConfig(
+        DispatcherObserverConfig(
             FeatureObserverType.IS_READY,
             kwargs={"feature_types": [FeatureType.JOBS]},
         )
@@ -108,8 +105,7 @@ def multi_job_shop_graph_env() -> MultiJobShopGraphEnv:
     env = MultiJobShopGraphEnv(
         instance_generator=generator,
         feature_observer_configs=feature_observer_configs,
-        graph_builder=build_agent_task_graph,
-        reward_function_type=IdleTimeReward,
+        graph_initializer=build_agent_task_graph,
         render_mode="human",
         render_config={"video_config": {"fps": 4}},
     )
