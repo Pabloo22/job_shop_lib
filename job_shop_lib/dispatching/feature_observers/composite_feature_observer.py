@@ -8,6 +8,7 @@ from collections import defaultdict
 from typing_extensions import Self
 
 import numpy as np
+from numpy.typing import NDArray
 import pandas as pd
 
 from job_shop_lib.dispatching import Dispatcher
@@ -87,7 +88,9 @@ class CompositeFeatureObserver(FeatureObserver):
         }
 
     def initialize_features(self):
-        features: dict[FeatureType, list[np.ndarray]] = defaultdict(list)
+        features: dict[FeatureType, list[NDArray[np.float32]]] = defaultdict(
+            list
+        )
         for observer in self.feature_observers:
             for feature_type, feature_matrix in observer.features.items():
                 features[feature_type].append(feature_matrix)
