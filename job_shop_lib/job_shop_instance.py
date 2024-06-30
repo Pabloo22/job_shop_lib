@@ -7,6 +7,7 @@ import functools
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from job_shop_lib import Operation
 
@@ -267,7 +268,7 @@ class JobShopInstance:
         ]
 
     @functools.cached_property
-    def durations_matrix_array(self) -> np.ndarray:
+    def durations_matrix_array(self) -> NDArray[np.float32]:
         """Returns the duration matrix of the instance as a numpy array.
 
         The returned array has shape (num_jobs, max_num_operations_per_job).
@@ -284,7 +285,7 @@ class JobShopInstance:
         return self._fill_matrix_with_nans_2d(duration_matrix)
 
     @functools.cached_property
-    def machines_matrix_array(self) -> np.ndarray:
+    def machines_matrix_array(self) -> NDArray[np.float32]:
         """Returns the machines matrix of the instance as a numpy array.
 
         The returned array has shape (num_jobs, max_num_operations_per_job,
@@ -409,7 +410,9 @@ class JobShopInstance:
         return sum(self.job_durations)
 
     @staticmethod
-    def _fill_matrix_with_nans_2d(matrix: list[list[int]]) -> np.ndarray:
+    def _fill_matrix_with_nans_2d(
+        matrix: list[list[int]],
+    ) -> NDArray[np.float32]:
         """Fills a matrix with np.nan values.
 
         Args:
@@ -429,7 +432,9 @@ class JobShopInstance:
         return squared_matrix
 
     @staticmethod
-    def _fill_matrix_with_nans_3d(matrix: list[list[list[int]]]) -> np.ndarray:
+    def _fill_matrix_with_nans_3d(
+        matrix: list[list[list[int]]],
+    ) -> NDArray[np.float32]:
         """Fills a 3D matrix with np.nan values.
 
         Args:
