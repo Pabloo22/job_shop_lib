@@ -260,10 +260,6 @@ class Dispatcher:
         self.schedule.add(scheduled_operation)
         self._update_tracking_attributes(scheduled_operation)
 
-        # Notify subscribers
-        for subscriber in self.subscribers:
-            subscriber.update(scheduled_operation)
-
     def is_operation_ready(self, operation: Operation) -> bool:
         """Returns True if the given operation is ready to be scheduled.
 
@@ -316,6 +312,10 @@ class Dispatcher:
         self._job_next_operation_index[job_id] += 1
         self._job_next_available_time[job_id] = end_time
         self._cache = {}
+
+        # Notify subscribers
+        for subscriber in self.subscribers:
+            subscriber.update(scheduled_operation)
 
     @_dispatcher_cache
     def current_time(self) -> int:
