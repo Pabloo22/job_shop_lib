@@ -7,6 +7,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 import gymnasium as gym
 import numpy as np
+from numpy.typing import NDArray
 
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.graphs import JobShopGraph
@@ -117,7 +118,7 @@ class SingleJobShopGraphEnv(gym.Env):
         self.initial_job_shop_graph = deepcopy(job_shop_graph)
 
         self.dispatcher = Dispatcher(
-            self.instance, pruning_function=pruning_function
+            job_shop_graph.instance, pruning_function=pruning_function
         )
 
         # Observers added to track the environment state
@@ -243,7 +244,7 @@ class SingleJobShopGraphEnv(gym.Env):
             observation[feature_type.value] = matrix
         return observation
 
-    def _get_edge_index(self) -> np.ndarray:
+    def _get_edge_index(self) -> NDArray[np.int32]:
         """Returns the edge index matrix."""
         edge_index = np.array(
             self.job_shop_graph.graph.edges(), dtype=np.int32
