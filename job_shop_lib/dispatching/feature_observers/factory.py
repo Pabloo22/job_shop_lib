@@ -28,9 +28,14 @@ class FeatureObserverType(str, Enum):
     COMPOSITE = "composite"
 
 
-FeatureObserverConfig = DispatcherObserverConfig[
-    type[FeatureObserver] | FeatureObserverType | str
-]
+# FeatureObserverConfig = DispatcherObserverConfig[
+#     type[FeatureObserver] | FeatureObserverType | str
+# ]
+FeatureObserverConfig = (
+    DispatcherObserverConfig[type[FeatureObserver]]
+    | DispatcherObserverConfig[FeatureObserverType]
+    | DispatcherObserverConfig[str]
+)
 
 
 def feature_observer_factory(
@@ -38,9 +43,7 @@ def feature_observer_factory(
         str
         | FeatureObserverType
         | type[FeatureObserver]
-        | DispatcherObserverConfig[
-            type[FeatureObserver] | FeatureObserverType | str
-        ]
+        | FeatureObserverConfig
     ),
     **kwargs,
 ) -> FeatureObserver:
