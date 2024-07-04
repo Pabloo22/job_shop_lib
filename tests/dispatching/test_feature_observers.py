@@ -2,6 +2,7 @@ from job_shop_lib import JobShopInstance
 from job_shop_lib.dispatching.feature_observers import (
     feature_observer_factory,
     FeatureObserverType,
+    FeatureType,
     CompositeFeatureObserver,
     DurationObserver,
     EarliestStartTimeObserver,
@@ -352,7 +353,25 @@ def test_duration_observer_init(irregular_job_shop_instance: JobShopInstance):
     )
 
 
+def test_is_completed_observer(example_job_shop_instance: JobShopInstance):
+    dispatcher = Dispatcher(example_job_shop_instance)
+    is_completed_observer = feature_observer_factory(
+        FeatureObserverType.IS_COMPLETED, dispatcher=dispatcher
+    )
+    # Solve the job shop instance to simulate completing all operations
+    solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
+    solver.solve(dispatcher.instance, dispatcher)
+
+    feature_types = [
+        FeatureType.OPERATIONS,
+        FeatureType.MACHINES,
+        FeatureType.JOBS,
+    ]
+    for feature_type in feature_types:
+        assert all(is_completed_observer.features[feature_type] == 1)
+
+
 if __name__ == "__main__":
     import pytest
 
-    pytest.main(["-vv", "tests/dispatching/test_feature_observers.py"])
+    pytest.main(["-vv", __file__])
