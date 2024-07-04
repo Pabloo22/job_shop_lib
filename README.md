@@ -11,13 +11,15 @@
 
 </div>
 
-An easy-to-use and modular Python library for the Job Shop Scheduling Problem (JSSP) with a special focus on graph representations.
+JobShopLib is a Python package for creating, solving, and visualizing Job Shop Scheduling Problems (JSSP).
 
-It provides intuitive data structures to represent instances and solutions, as well as solvers and visualization tools.
+It provides intuitive data structures to represent instances and solutions, as well as solvers and visualization tools. 
 
-See the [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing) Google Colab notebook for a quick start guide! 
+It follows a modular design, allowing users to easily extend the library with new solvers, dispatching rules, or visualization functions.
 
-## Installation
+See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing) Google Colab notebook for a quick start guide! 
+
+## Installation :package:
 
 You can install the library from PyPI:
 
@@ -25,11 +27,33 @@ You can install the library from PyPI:
 pip install job-shop-lib
 ```
 
-## Quick Start :rocket:
+## Key Features :star:
+
+- **Data Structures**: Easily create, manage, and manipulate job shop instances and solutions with user-friendly data structures. See [Getting Started](examples/00-Getting-Started.ipynb) and [How Solutions are Represented](examples/01-How-Solutions-are-Represented.ipynb).
+
+- **Benchmark Instances**: Load well-known benchmark instances directly from the library without manual downloading. See [Load Benchmark Instances](examples/05-Load-Benchmark-Instances.ipynb).
+
+- **Random Instance Generation**: Create random instances with customizable sizes and properties or augment existing ones. See [`generation`](job_shop_lib/generation) package.
+
+- **Multiple Solvers**:
+  - **Constraint Programming Solver**: OR-Tools' CP-SAT solver. See [Solving the Problem](examples/02-Solving-the-Problem.ipynb).
+
+  - **Dispatching Rule Solvers**: Use any of the available dispatching rules or create custom ones. See [Dispatching Rules](examples/03-Dispatching-Rules.ipynb).
+
+- **Gantt Charts**: Visualize final schedules and how are they created iteratively by dispatching rule solvers or sequences of scheduling decisions with GIFs or videos. See [Save Gif](examples/06-Save-Gif.ipynb).
+
+- **Graph Representations**:
+  - **Disjunctive Graphs**: Represent and visualize instances as disjunctive graphs. See [Disjunctive Graph](examples/04-Disjunctive-Graph.ipynb).
+  - **Agent-Task Graphs**: Encode instances as agent-task graphs (introduced in [ScheduleNet paper](https://arxiv.org/abs/2106.03051)). See [Agent-Task Graph](examples/07-Agent-Task-Graph.ipynb).
+  - Build your own custom graphs with the `JobShopGraph` class.
+
+- **Gymnasium Environments**: Two environments for solving the problem with Graph Neural Networks (GNNs) or any other method, and Reinforcement Learning (RL). See [SingleJobShopGraphEnv](examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](examples/10-MultiJobShopGraphEnv.ipynb).
+
+## Some Examples :rocket:
 
 ### Create a Job Shop Instance
 
-You can create a Job Shop Instance by defining the jobs and operations. An operation is defined by the machine(s) it is processed on and the duration (processing time).
+You can create a `JobShopInstance` by defining the jobs and operations. An operation is defined by the machine(s) it is processed on and the duration (processing time).
 
 ```python
 from job_shop_lib import JobShopInstance, Operation
@@ -197,8 +221,8 @@ plt.show()
 ![Example Disjunctive Graph](images/example_disjunctive_graph.png)
 
 
-> [!WARNING]
-> This plot function requires having the optional dependency [PyGraphViz](https://pygraphviz.github.io/) installed.
+> [!TIP]
+> Installing the optional dependency [PyGraphViz](https://pygraphviz.github.io/) is recommended.
 
 The `JobShopGraph` class provides easy access to the nodes, for example, to get all the nodes of a specific type:
 
@@ -261,25 +285,24 @@ plt.show()
 
 For more details, check the [examples](examples) folder.
 
-## Installation for development
+## Installation for development :hammer_and_wrench:
 
 ### With Poetry
 
 1. Clone the repository.
 
+```bash
+git clone git clone https://github.com/Pabloo22/job_shop_lib.git
+cd job_shop_lib
+```
+
 2. Install [poetry](https://python-poetry.org/docs/) if you don't have it already:
+
 ```bash
-pip install poetry==1.7
+pip install poetry
 ```
-3. Create the virtual environment:
-```bash
-poetry shell
-```
-4. Install dependencies:
-```bash
-poetry install --with notebooks --with test --with lint --all-extras
-```
-or equivalently:
+
+3. Install dependencies:
 ```bash
 make poetry_install_all 
 ```
@@ -294,12 +317,12 @@ cd job_shop_lib
 pip install -e .
 ```
 
-## License
+## License :scroll:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 
-## References
+## References :books:
 
  - J. Adams, E. Balas, and D. Zawack, "The shifting bottleneck procedure
      for job shop scheduling," Management Science, vol. 34, no. 3,
