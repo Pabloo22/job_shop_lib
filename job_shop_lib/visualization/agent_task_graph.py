@@ -51,6 +51,7 @@ def plot_agent_task_graph(
 
     # Create the networkx graph
     graph = job_shop_graph.graph
+    nodes = job_shop_graph.non_removed_nodes()
 
     # Create the layout if it was not provided
     if layout is None:
@@ -64,16 +65,17 @@ def plot_agent_task_graph(
             job_shop_graph.nodes_by_type[NodeType.MACHINE]
         )
     }
+
     node_colors = [
         _get_node_color(node, machine_colors) for node in job_shop_graph.nodes
-    ]
+    ]  # We need to get the color of all nodes to avoid an index error
     node_shapes = {"machine": "s", "job": "d", "operation": "o", "global": "o"}
 
     # Draw nodes with different shapes based on their type
     for node_type, shape in node_shapes.items():
         current_nodes = [
             node.node_id
-            for node in job_shop_graph.nodes
+            for node in nodes
             if node.node_type.name.lower() == node_type
         ]
         nx.draw_networkx_nodes(
@@ -90,9 +92,7 @@ def plot_agent_task_graph(
     # Draw edges
     nx.draw_networkx_edges(graph, layout, ax=ax)
 
-    node_labels = {
-        node.node_id: _get_node_label(node) for node in job_shop_graph.nodes
-    }
+    node_labels = {node.node_id: _get_node_label(node) for node in nodes}
     nx.draw_networkx_labels(graph, layout, node_labels, ax=ax)
 
     ax.set_axis_off()
@@ -181,10 +181,29 @@ def three_columns_layout(
 
     x_positions = _get_x_positions(leftmost_position, rightmost_position)
 
-    operation_nodes = job_shop_graph.nodes_by_type[NodeType.OPERATION]
-    machine_nodes = job_shop_graph.nodes_by_type[NodeType.MACHINE]
-    job_nodes = job_shop_graph.nodes_by_type[NodeType.JOB]
-    global_nodes = job_shop_graph.nodes_by_type[NodeType.GLOBAL]
+    operation_nodes = [
+        node
+        for node in job_shop_graph.nodes_by_type[NodeType.OPERATION]
+        if not job_shop_graph.is_removed(node)
+    ]
+    machine_nodes = [
+        node
+        for node in job_shop_graph.nodes_by_type[NodeType.MACHINE]
+        if not job_shop_graph.is_removed(node)
+    ]
+    job_nodes = [
+        node
+        for node in job_shop_graph.nodes_by_type[NodeType.JOB]
+        if not job_shop_graph.is_removed(node)
+    ]
+    global_nodes = [
+        node
+        for node in job_shop_graph.nodes_by_type[NodeType.GLOBAL]
+        if not job_shop_graph.is_removed(node)
+    ]
+
+    # job_nodes = job_shop_graph.nodes_by_type[NodeType.JOB]
+    # global_nodes = job_shop_graph.nodes_by_type[NodeType.GLOBAL]
 
     total_positions = len(operation_nodes) + len(global_nodes) * 2
     y_spacing = (topmost_position - bottommost_position) / total_positions
