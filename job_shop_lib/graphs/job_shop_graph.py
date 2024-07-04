@@ -201,6 +201,10 @@ class JobShopGraph:
             node = node.node_id
         return self.removed_nodes[node]
 
+    def non_removed_nodes(self) -> list[Node]:
+        """Returns the nodes that are not removed from the graph."""
+        return [node for node in self._nodes if not self.is_removed(node)]
+
     def get_machine_node(self, machine_id: int) -> Node:
         """Returns the node representing the machine with the given id.
 
