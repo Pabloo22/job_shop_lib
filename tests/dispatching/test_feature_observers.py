@@ -355,18 +355,20 @@ def test_duration_observer_init(irregular_job_shop_instance: JobShopInstance):
 
 def test_is_completed_observer(example_job_shop_instance: JobShopInstance):
     dispatcher = Dispatcher(example_job_shop_instance)
+    feature_types = [
+        FeatureType.MACHINES,
+        FeatureType.JOBS,
+    ]
     is_completed_observer = feature_observer_factory(
-        FeatureObserverType.IS_COMPLETED, dispatcher=dispatcher
+        FeatureObserverType.IS_COMPLETED,
+        dispatcher=dispatcher,
+        feature_types=feature_types,
     )
     # Solve the job shop instance to simulate completing all operations
     solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
     solver.solve(dispatcher.instance, dispatcher)
 
-    feature_types = [
-        FeatureType.OPERATIONS,
-        FeatureType.MACHINES,
-        FeatureType.JOBS,
-    ]
+    assert set(is_completed_observer.features) == set(feature_types)
     for feature_type in feature_types:
         assert all(is_completed_observer.features[feature_type] == 1)
 
