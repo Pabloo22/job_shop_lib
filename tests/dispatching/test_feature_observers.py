@@ -1,4 +1,5 @@
 from job_shop_lib import JobShopInstance
+from job_shop_lib.generation import GeneralInstanceGenerator
 from job_shop_lib.dispatching.feature_observers import (
     feature_observer_factory,
     FeatureObserverType,
@@ -7,6 +8,7 @@ from job_shop_lib.dispatching.feature_observers import (
     DurationObserver,
     EarliestStartTimeObserver,
     FeatureObserver,
+    IsCompletedObserver,
 )
 
 from job_shop_lib.dispatching import (
@@ -364,6 +366,16 @@ def test_is_completed_observer(example_job_shop_instance: JobShopInstance):
         dispatcher=dispatcher,
         feature_types=feature_types,
     )
+
+    assert isinstance(is_completed_observer, IsCompletedObserver)
+    assert (
+        is_completed_observer.remaining_ops_per_machine.sum()
+        == example_job_shop_instance.num_operations
+    )
+    assert (
+        is_completed_observer.remaining_ops_per_job.sum()
+        == example_job_shop_instance.num_operations
+    )
     # Solve the job shop instance to simulate completing all operations
     solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
     solver.solve(dispatcher.instance, dispatcher)
@@ -371,6 +383,18 @@ def test_is_completed_observer(example_job_shop_instance: JobShopInstance):
     assert set(is_completed_observer.features) == set(feature_types)
     for feature_type in feature_types:
         assert all(is_completed_observer.features[feature_type] == 1)
+
+
+def test_is_completed_observer_with_random_instances():
+    generator = GeneralInstanceGenerator(
+        num_jobs=(5, 10),
+        num_machines=(3, 6),
+        iteration_limit=100,
+        allow_less_jobs_than_machines=False,
+        seed=42,
+    )
+    for instance in generator:
+        test_is_completed_observer(instance)
 
 
 if __name__ == "__main__":
