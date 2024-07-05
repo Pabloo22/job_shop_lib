@@ -83,6 +83,30 @@ def test_edge_index_padding(
     assert np.all(removed_nodes)
 
 
+def test_all_nodes_removed(
+    single_job_shop_graph_env_ft06_agent_task: SingleJobShopGraphEnv,
+):
+    env = single_job_shop_graph_env_ft06_agent_task
+    obs, _ = env.reset()
+    done = False
+    while not done:
+        action = random_action(obs)
+        obs, _, done, *_ = env.step(action)
+
+    assert env.dispatcher.schedule.is_complete()
+    removed_nodes = obs[ObservationSpaceKey.REMOVED_NODES.value]
+
+    assert env.job_shop_graph is env.graph_updater.job_shop_graph
+    try:
+        assert np.all(removed_nodes)
+    except AssertionError:
+        print(removed_nodes)
+        print(env.instance.to_dict())
+        print(env.instance)
+        print(env.job_shop_graph.nodes)
+        raise
+
+
 if __name__ == "__main__":
     import pytest
 
