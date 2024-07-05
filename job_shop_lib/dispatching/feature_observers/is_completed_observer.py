@@ -53,9 +53,12 @@ class IsCompletedObserver(FeatureObserver):
             self.remaining_ops_per_machine[
                 scheduled_operation.operation.machines, 0
             ] -= 1
-            is_completed = self.remaining_ops_per_machine[
-                scheduled_operation.operation.machines, 0
-            ] == 0
+            is_completed = (
+                self.remaining_ops_per_machine[
+                    scheduled_operation.operation.machines, 0
+                ]
+                == 0
+            )
             self.features[FeatureType.MACHINES][
                 scheduled_operation.operation.machines, 0
             ] = is_completed
@@ -88,6 +91,10 @@ class IsCompletedObserver(FeatureObserver):
         # instead of uncompleted_operations, because in this case
         # they will output the same operations, and the former is slightly
         # more efficient.
+
+        # First, we se everything to 0.
+        self.remaining_ops_per_machine[:, 0] = 0
+        self.remaining_ops_per_job[:, 0] = 0
         for operation in self.dispatcher.unscheduled_operations():
             if FeatureType.JOBS in self.features:
                 self.remaining_ops_per_job[operation.job_id, 0] += 1
