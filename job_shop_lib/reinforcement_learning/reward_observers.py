@@ -5,7 +5,7 @@ from job_shop_lib.dispatching import DispatcherObserver, Dispatcher
 from job_shop_lib import ScheduledOperation
 
 
-class RewardFunction(DispatcherObserver):
+class RewardObserver(DispatcherObserver):
     """Base class for all reward functions.
 
     Attributes:
@@ -28,7 +28,7 @@ class RewardFunction(DispatcherObserver):
         self.rewards = []
 
 
-class MakespanReward(RewardFunction):
+class MakespanReward(RewardObserver):
     """Dense reward function based on the negative makespan of the schedule.
 
     The reward is calculated as the difference between the makespan of the
@@ -57,7 +57,7 @@ class MakespanReward(RewardFunction):
         self.rewards.append(reward)
 
 
-class IdleTimeReward(RewardFunction):
+class IdleTimeReward(RewardObserver):
     """Dense reward function based on the negative idle time of the schedule.
 
     The reward is calculated as the difference between the idle time of the

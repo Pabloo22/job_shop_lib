@@ -26,7 +26,7 @@ from job_shop_lib.dispatching.feature_observers import (
 )
 from job_shop_lib.visualization import GanttChartCreator
 from job_shop_lib.reinforcement_learning import (
-    RewardFunction,
+    RewardObserver,
     MakespanReward,
     add_padding,
     RenderConfig,
@@ -78,7 +78,7 @@ class SingleJobShopGraphEnv(gym.Env):
         job_shop_graph: JobShopGraph,
         feature_observer_configs: Sequence[FeatureObserverConfig],
         reward_function_config: DispatcherObserverConfig[
-            type[RewardFunction]
+            type[RewardObserver]
         ] = DispatcherObserverConfig(class_type=MakespanReward),
         graph_updater_config: DispatcherObserverConfig[
             type[GraphUpdater]

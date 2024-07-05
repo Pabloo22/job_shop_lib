@@ -9,8 +9,8 @@ from job_shop_lib.reinforcement_learning.types_and_constants import (
     VideoConfig,
 )
 
-from job_shop_lib.reinforcement_learning.reward_functions import (
-    RewardFunction,
+from job_shop_lib.reinforcement_learning.reward_observers import (
+    RewardObserver,
     MakespanReward,
     IdleTimeReward,
 )
@@ -27,7 +27,7 @@ from job_shop_lib.reinforcement_learning.multi_job_shop_graph_env import (
 
 __all__ = [
     "ObservationSpaceKey",
-    "RewardFunction",
+    "RewardObserver",
     "MakespanReward",
     "IdleTimeReward",
     "GanttChartWrapperConfig",

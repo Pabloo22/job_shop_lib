@@ -23,7 +23,7 @@ from job_shop_lib.graphs.graph_updaters import (
 )
 from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
-    RewardFunction,
+    RewardObserver,
     RenderConfig,
     MakespanReward,
     ObservationDict,
@@ -109,7 +109,7 @@ class MultiJobShopGraphEnv(gym.Env):
             [Dispatcher, list[Operation]], list[Operation]
         ] = prune_dominated_operations,
         reward_function_config: DispatcherObserverConfig[
-            type[RewardFunction]
+            type[RewardObserver]
         ] = DispatcherObserverConfig(class_type=MakespanReward),
         render_mode: str | None = None,
         render_config: RenderConfig | None = None,
@@ -155,12 +155,12 @@ class MultiJobShopGraphEnv(gym.Env):
         return self.single_job_shop_graph_env.dispatcher
 
     @property
-    def reward_function(self) -> RewardFunction:
+    def reward_function(self) -> RewardObserver:
         """Returns the current reward function instance."""
         return self.single_job_shop_graph_env.reward_function
 
     @reward_function.setter
-    def reward_function(self, reward_function: RewardFunction) -> None:
+    def reward_function(self, reward_function: RewardObserver) -> None:
         """Sets the reward function instance."""
         self.single_job_shop_graph_env.reward_function = reward_function
 
@@ -225,7 +225,6 @@ class MultiJobShopGraphEnv(gym.Env):
             render_config=self.render_config,
             use_padding=self.single_job_shop_graph_env.use_padding,
         )
-
         obs, info = self.single_job_shop_graph_env.reset(
             seed=seed, options=options
         )
