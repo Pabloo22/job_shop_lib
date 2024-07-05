@@ -13,9 +13,7 @@
 
 JobShopLib is a Python package for creating, solving, and visualizing Job Shop Scheduling Problems (JSSP).
 
-It provides intuitive data structures to represent instances and solutions, as well as solvers and visualization tools. 
-
-It follows a modular design, allowing users to easily extend the library with new solvers, dispatching rules, or visualization functions.
+It follows a modular design, allowing users to easily extend the library with new solvers, dispatching rules, visualization functions, etc.
 
 See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing) Google Colab notebook for a quick start guide! 
 
