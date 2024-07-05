@@ -73,11 +73,11 @@ class ResidualGraphUpdater(GraphUpdater):
                 return False  # Make the type checker happy.
 
             for feature_type in feature_types:
-                if feature_type not in observer.features:
+                if feature_type not in observer.features.keys():
                     return False
             return True
 
-        feature_types = []
+        feature_types: list[FeatureType] = []
         if self.remove_completed_machine_nodes:
             feature_types.append(FeatureType.MACHINES)
         if self.remove_completed_job_nodes:
@@ -122,19 +122,27 @@ class ResidualGraphUpdater(GraphUpdater):
             self._remove_completed_job_nodes()
 
     def _remove_completed_machine_nodes(self):
-        """Removes the completed machine nodes from the graph."""
+        """Removes the completed machine nodes from the graph if they are
+        not already removed."""
+
         for machine_id, is_completed in enumerate(
-            self.is_completed_observer.features[FeatureType.MACHINES]
+            self.is_completed_observer.features[FeatureType.MACHINES].flatten()
         ):
-            if is_completed == 1:
-                machine_node = self.job_shop_graph.get_machine_node(machine_id)
+            if is_completed == 1 and not self.job_shop_graph.is_removed(
+                machine_node := self.job_shop_graph.get_machine_node(
+                    machine_id
+                )
+            ):
                 self.job_shop_graph.remove_node(machine_node.node_id)
 
     def _remove_completed_job_nodes(self):
-        """Removes the completed job nodes from the graph."""
+        """Removes the completed job nodes from the graph if they are not
+        already removed."""
+
         for job_id, is_completed in enumerate(
             self.is_completed_observer.features[FeatureType.JOBS]
         ):
-            if is_completed == 1:
-                job_node = self.job_shop_graph.get_job_node(job_id)
+            if is_completed == 1 and not self.job_shop_graph.is_removed(
+                job_node := self.job_shop_graph.get_job_node(job_id)
+            ):
                 self.job_shop_graph.remove_node(job_node.node_id)
