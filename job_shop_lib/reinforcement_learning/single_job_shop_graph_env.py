@@ -127,13 +127,13 @@ class SingleJobShopGraphEnv(gym.Env):
                 self.dispatcher, feature_observer_configs
             )
         )
-        self.reward_function = reward_function_config.class_type(
-            dispatcher=self.dispatcher, **reward_function_config.kwargs
-        )
         self.graph_updater = graph_updater_config.class_type(
             dispatcher=self.dispatcher,
             job_shop_graph=job_shop_graph,
             **graph_updater_config.kwargs,
+        )
+        self.reward_function = reward_function_config.class_type(
+            dispatcher=self.dispatcher, **reward_function_config.kwargs
         )
         self.action_space = gym.spaces.MultiDiscrete(
             [self.instance.num_jobs, self.instance.num_machines], start=[0, -1]
