@@ -368,30 +368,44 @@ def test_is_completed_observer(example_job_shop_instance: JobShopInstance):
     )
 
     assert isinstance(is_completed_observer, IsCompletedObserver)
-    assert (
-        is_completed_observer.remaining_ops_per_machine.sum()
-        == example_job_shop_instance.num_operations
-    )
-    assert (
-        is_completed_observer.remaining_ops_per_job.sum()
-        == example_job_shop_instance.num_operations
-    )
+    if not example_job_shop_instance.is_flexible:
+        assert (
+            is_completed_observer.remaining_ops_per_machine.sum()
+            == example_job_shop_instance.num_operations
+        )
+        assert (
+            is_completed_observer.remaining_ops_per_job.sum()
+            == example_job_shop_instance.num_operations
+        )
     # Solve the job shop instance to simulate completing all operations
     solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
-    solver.solve(dispatcher.instance, dispatcher)
+    for _ in range(dispatcher.instance.num_operations):
+        solver.step(dispatcher)
+        assert all(is_completed_observer.remaining_ops_per_machine >= 0)
+        assert all(is_completed_observer.remaining_ops_per_job >= 0)
+
+    assert dispatcher.schedule.is_complete()
 
     assert set(is_completed_observer.features) == set(feature_types)
     for feature_type in feature_types:
-        assert all(is_completed_observer.features[feature_type] == 1)
+        try:
+            assert all(is_completed_observer.features[feature_type] == 1)
+        except AssertionError:
+            print(is_completed_observer.features[feature_type])
+            print(feature_type)
+            print(is_completed_observer.remaining_ops_per_machine)
+            print(dispatcher.instance.to_dict())
+            raise
 
 
 def test_is_completed_observer_with_random_instances():
     generator = GeneralInstanceGenerator(
-        num_jobs=(5, 10),
-        num_machines=(3, 6),
+        num_jobs=(2, 10),
+        num_machines=(2, 10),
         iteration_limit=100,
         allow_less_jobs_than_machines=False,
         seed=42,
+        machines_per_operation=(1, 2),
     )
     for instance in generator:
         test_is_completed_observer(instance)

@@ -50,10 +50,15 @@ class IsCompletedObserver(FeatureObserver):
             ]
             self.features[FeatureType.OPERATIONS][completed_operations, 0] = 1
         if FeatureType.MACHINES in self.features:
-            machine_id = scheduled_operation.machine_id
-            self.remaining_ops_per_machine[machine_id, 0] -= 1
-            is_completed = self.remaining_ops_per_machine[machine_id, 0] == 0
-            self.features[FeatureType.MACHINES][machine_id, 0] = is_completed
+            self.remaining_ops_per_machine[
+                scheduled_operation.operation.machines, 0
+            ] -= 1
+            is_completed = self.remaining_ops_per_machine[
+                scheduled_operation.operation.machines, 0
+            ] == 0
+            self.features[FeatureType.MACHINES][
+                scheduled_operation.operation.machines, 0
+            ] = is_completed
         if FeatureType.JOBS in self.features:
             job_id = scheduled_operation.job_id
             self.remaining_ops_per_job[job_id, 0] -= 1
@@ -87,7 +92,7 @@ class IsCompletedObserver(FeatureObserver):
             if FeatureType.JOBS in self.features:
                 self.remaining_ops_per_job[operation.job_id, 0] += 1
             if FeatureType.MACHINES in self.features:
-                self.remaining_ops_per_machine[operation.machine_id, 0] += 1
+                self.remaining_ops_per_machine[operation.machines, 0] += 1
 
     def _get_remaining_operations_observer(
         self, dispatcher: Dispatcher, feature_types: Iterable[FeatureType]
