@@ -23,7 +23,7 @@ from job_shop_lib.dispatching import (
     Dispatcher,
     HistoryObserver,
 )
-from job_shop_lib.visualization.gantt_chart import plot_gantt_chart
+from job_shop_lib.visualization._gantt_chart import plot_gantt_chart
 
 
 PlotFunction = Callable[

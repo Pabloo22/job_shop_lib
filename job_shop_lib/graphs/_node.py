@@ -5,7 +5,7 @@ from job_shop_lib import (
     ValidationError,
     UninitializedAttributeError,
 )
-from job_shop_lib.graphs.constants import NodeType
+from job_shop_lib.graphs._constants import NodeType
 
 
 class Node:

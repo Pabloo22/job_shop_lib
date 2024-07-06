@@ -65,7 +65,7 @@ References:
         Journal of Operational Research, vol. 64, no. 2, pp. 278–285, 1993.
 """
 
-from job_shop_lib.benchmarking.load_benchmark import (
+from job_shop_lib.benchmarking._load_benchmark import (
     load_all_benchmark_instances,
     load_benchmark_instance,
     load_benchmark_json,

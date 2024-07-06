@@ -7,7 +7,7 @@ from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,
     FeatureType,
 )
-from job_shop_lib.scheduled_operation import ScheduledOperation
+from job_shop_lib import ScheduledOperation
 
 
 class EarliestStartTimeObserver(FeatureObserver):
