@@ -3,7 +3,7 @@ from job_shop_lib.benchmarking import (
     load_all_benchmark_instances,
     load_benchmark_instance,
 )
-from job_shop_lib.cp_sat import ORToolsSolver
+from job_shop_lib.constraint_programming import ORToolsSolver
 
 
 def test_load_benchmark_instance():

@@ -1,7 +1,7 @@
 import pytest
 
 from job_shop_lib import NoSolutionFoundError
-from job_shop_lib.cp_sat import ORToolsSolver
+from job_shop_lib.constraint_programming import ORToolsSolver
 
 
 def test_solve(example_job_shop_instance):

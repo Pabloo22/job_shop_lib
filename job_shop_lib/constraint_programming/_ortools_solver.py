@@ -1,4 +1,4 @@
-"""Home of the ORToolsSolver class."""
+"""Home of the `ORToolsSolver` class."""
 
 from __future__ import annotations
 
