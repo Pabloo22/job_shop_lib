@@ -45,6 +45,7 @@ pandas = "^2.2.1"
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^7.3.7"
+furo = "^2024.5.6"
 
 [tool.poetry.extras]
 pygraphviz = ["pygraphviz"]
