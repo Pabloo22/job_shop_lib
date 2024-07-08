@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from job_shop_lib import UninitializedAttributeError
+from job_shop_lib.exceptions import UninitializedAttributeError
 
 
 class Operation:

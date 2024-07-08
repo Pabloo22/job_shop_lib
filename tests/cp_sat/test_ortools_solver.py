@@ -1,6 +1,6 @@
 import pytest
 
-from job_shop_lib import NoSolutionFoundError
+from job_shop_lib.exceptions import NoSolutionFoundError
 from job_shop_lib.constraint_programming import ORToolsSolver
 
 

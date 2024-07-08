@@ -1,9 +1,9 @@
 """Home of the `Node` class."""
 
-from job_shop_lib import (
-    Operation,
-    ValidationError,
+from job_shop_lib import Operation
+from job_shop_lib.exceptions import (
     UninitializedAttributeError,
+    ValidationError,
 )
 from job_shop_lib.graphs._constants import NodeType
 

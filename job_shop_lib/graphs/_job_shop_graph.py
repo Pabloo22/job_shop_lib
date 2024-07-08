@@ -3,7 +3,8 @@
 import collections
 import networkx as nx
 
-from job_shop_lib import JobShopInstance, ValidationError
+from job_shop_lib import JobShopInstance
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.graphs import Node, NodeType
 
 

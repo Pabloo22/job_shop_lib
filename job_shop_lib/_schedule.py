@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import Any
 from collections import deque
 
-from job_shop_lib import ScheduledOperation, JobShopInstance, ValidationError
+from job_shop_lib import ScheduledOperation, JobShopInstance
+from job_shop_lib.exceptions import ValidationError
 
 
 class Schedule:

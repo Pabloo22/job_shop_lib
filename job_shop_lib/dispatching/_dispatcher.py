@@ -14,8 +14,8 @@ from job_shop_lib import (
     Schedule,
     ScheduledOperation,
     Operation,
-    ValidationError,
 )
+from job_shop_lib.exceptions import ValidationError
 
 
 # Added here to avoid circular imports

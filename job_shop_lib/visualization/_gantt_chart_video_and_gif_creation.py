@@ -16,8 +16,8 @@ from job_shop_lib import (
     Schedule,
     Operation,
     ScheduledOperation,
-    ValidationError,
 )
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import (
     DispatchingRuleSolver,
     Dispatcher,
@@ -53,6 +53,7 @@ def plot_gantt_chart_wrapper(
             the available operations are not shown.
         - current_time: The current time in the schedule. If provided, a
             red vertical line is plotted at this time.
+
     """
 
     def plot_function(

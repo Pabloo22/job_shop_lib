@@ -1,6 +1,7 @@
 """Home of the `RemainingOperationsObserver` class."""
 
-from job_shop_lib import ScheduledOperation, ValidationError
+from job_shop_lib import ScheduledOperation
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,

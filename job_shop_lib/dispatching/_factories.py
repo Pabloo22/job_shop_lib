@@ -11,7 +11,8 @@ from collections.abc import Callable, Sequence
 import random
 from dataclasses import dataclass, field
 
-from job_shop_lib import Operation, ValidationError
+from job_shop_lib import Operation
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import (
     shortest_processing_time_rule,
     first_come_first_served_rule,

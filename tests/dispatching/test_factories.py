@@ -1,6 +1,7 @@
 import pytest
 
-from job_shop_lib import ValidationError, JobShopInstance
+from job_shop_lib import JobShopInstance
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import (
     dispatching_rule_factory,
     shortest_processing_time_rule,

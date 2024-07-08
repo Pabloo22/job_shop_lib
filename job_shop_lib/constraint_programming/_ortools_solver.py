@@ -13,7 +13,8 @@ from job_shop_lib import (
     ScheduledOperation,
     Operation,
 )
-from job_shop_lib import NoSolutionFoundError, BaseSolver
+from job_shop_lib import BaseSolver
+from job_shop_lib.exceptions import NoSolutionFoundError
 
 
 class ORToolsSolver(BaseSolver):

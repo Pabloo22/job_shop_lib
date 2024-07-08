@@ -5,7 +5,7 @@ from typing import TypeVar, Any
 import numpy as np
 from numpy.typing import NDArray
 
-from job_shop_lib import ValidationError
+from job_shop_lib.exceptions import ValidationError
 
 T = TypeVar("T", bound=np.number)
 

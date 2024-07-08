@@ -3,7 +3,8 @@ import abc
 import random
 from typing import Iterator
 
-from job_shop_lib import JobShopInstance, UninitializedAttributeError
+from job_shop_lib import JobShopInstance
+from job_shop_lib.exceptions import UninitializedAttributeError
 
 
 class InstanceGenerator(abc.ABC):

@@ -1,8 +1,7 @@
 """Home of the `ScheduledOperation` class."""
 
-from warnings import warn
-
-from job_shop_lib import Operation, JobShopLibError
+from job_shop_lib import Operation
+from job_shop_lib.exceptions import ValidationError
 
 
 class ScheduledOperation:
@@ -30,10 +29,6 @@ class ScheduledOperation:
                 The time at which the operation is scheduled to start.
             machine_id:
                 The id of the machine on which the operation is scheduled.
-
-        Raises:
-            ValueError:
-                If the machine_id is not valid for the operation.
         """
         self.operation = operation
         self.start_time = start_time
@@ -49,7 +44,7 @@ class ScheduledOperation:
     @machine_id.setter
     def machine_id(self, value: int):
         if value not in self.operation.machines:
-            raise JobShopLibError(
+            raise ValidationError(
                 f"Operation cannot be scheduled on machine {value}. "
                 f"Valid machines are {self.operation.machines}."
             )
@@ -57,35 +52,13 @@ class ScheduledOperation:
 
     @property
     def job_id(self) -> int:
-        """Returns the id of the job that the operation belongs to.
-
-        Raises:
-            ValueError: If the operation has no job_id.
-        """
-
-        if self.operation.job_id is None:
-            raise JobShopLibError("Operation has no job_id.")
+        """Returns the id of the job that the operation belongs to."""
         return self.operation.job_id
 
     @property
-    def position(self) -> int:
-        """Deprecated. Use `position_in_job` instead."""
-        warn(
-            "The `position` attribute is deprecated. Use `position_in_job` "
-            "instead. It will be removed in version 1.0.0.",
-            DeprecationWarning,
-        )
-        return self.position_in_job
-
-    @property
     def position_in_job(self) -> int:
-        """Returns the position (starting at zero) of the operation in the job.
-
-        Raises:
-            ValueError: If the operation has no position_in_job.
-        """
-        if self.operation.position_in_job is None:
-            raise JobShopLibError("Operation has no position.")
+        """Returns the position (starting at zero) of the operation in the
+        job."""
         return self.operation.position_in_job
 
     @property

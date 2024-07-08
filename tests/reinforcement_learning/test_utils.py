@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from numpy.typing import NDArray
 
-from job_shop_lib import ValidationError
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.reinforcement_learning import add_padding
 
 
@@ -98,9 +98,7 @@ def test_add_padding_bool_array_with_dtype():
         dtype=bool,
     )
     output_shape = (3, 3)
-    result = add_padding(
-        array, output_shape, dtype=np.int32
-    )
+    result = add_padding(array, output_shape, dtype=np.int32)
     expected = np.array(
         [
             [1, 0, -1],

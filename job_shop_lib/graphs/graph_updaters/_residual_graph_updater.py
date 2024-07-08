@@ -1,6 +1,7 @@
 """Home of the `ResidualGraphUpdater` class."""
 
-from job_shop_lib import ScheduledOperation, UninitializedAttributeError
+from job_shop_lib import ScheduledOperation
+from job_shop_lib.exceptions import UninitializedAttributeError
 from job_shop_lib.graphs import NodeType, JobShopGraph
 from job_shop_lib.graphs.graph_updaters import (
     GraphUpdater,
