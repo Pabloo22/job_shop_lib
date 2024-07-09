@@ -3,8 +3,7 @@ Problem step-by-step."""
 
 from job_shop_lib.dispatching._dispatcher import Dispatcher, DispatcherObserver
 from job_shop_lib.dispatching._history_observer import (
-    HistoryObserver,
-    HistoryTracker,
+    HistoryObserver
 )
 from job_shop_lib.dispatching._dispatching_rules import (
     shortest_processing_time_rule,
@@ -55,6 +54,5 @@ __all__ = [
     "DispatcherObserver",
     "HistoryObserver",
     "create_or_get_observer",
-    "HistoryTracker",
     "DispatcherObserverConfig",
 ]
