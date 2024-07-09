@@ -33,5 +33,5 @@ class BaseSolver(abc.ABC):
         schedule = self.solve(instance)
         elapsed_time = time_start - time.perf_counter()
         schedule.metadata["elapsed_time"] = elapsed_time
-        schedule.metadata["solved_by"] = f"{self.__class__.__name__}"
+        schedule.metadata["solved_by"] = self.__class__.__name__
         return schedule
