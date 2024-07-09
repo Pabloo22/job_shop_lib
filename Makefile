@@ -8,8 +8,8 @@ test:
 poetry_install_all:
 	poetry install --with notebooks --with test --with lint --with docs --all-extras
 
-doc:
+html_docs:
 	cd docs && make html
 
-clean_doc:
+clean_docs:
 	cd docs && make clean
