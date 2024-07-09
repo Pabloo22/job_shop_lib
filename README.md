@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/source/jslib_minimalist_logo_no_background_cut.png" height="150px">
+<img src="docs/source/images/jslib_minimalist_logo_no_background_cut.png" height="150px">
 
 <h1>Job Shop Library</h1>
 
@@ -153,7 +153,7 @@ ft06_schedule = solver(ft06)
 fig, ax = plot_gantt_chart(ft06_schedule)
 plt.show()
 ```
-![Example Gannt Chart](images/ft06_solution.png)
+![Example Gannt Chart](docs/source/images/ft06_solution.png)
 
 ### Solve an Instance with a Dispatching Rule Solver
 
@@ -189,7 +189,7 @@ create_gif(
 )
 ```
 
-![Example Gif](examples/ft06_optimized.gif)
+![Example Gif](docs/source/examples/output/ft06_optimized.gif)
 
 The dashed red line represents the current time step, which is computed as the earliest time when the next operation can start.
 
@@ -216,7 +216,7 @@ fig = plot_disjunctive_graph(instance)
 plt.show()
 ```
 
-![Example Disjunctive Graph](images/example_disjunctive_graph.png)
+![Example Disjunctive Graph](docs/source/images/example_disjunctive_graph.png)
 
 
 > [!TIP]
@@ -275,7 +275,7 @@ plt.show()
 ```
 
 <div align="center">
-<img src="examples/agent_task_graph.png" width="300">
+<img src="docs/source/images/agent_task_graph.png" width="300">
 </div>
 <br>
 
