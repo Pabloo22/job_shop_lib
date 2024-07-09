@@ -5,9 +5,7 @@ from __future__ import annotations
 import abc
 from typing import Any
 from collections.abc import Callable
-from collections import deque
 from functools import wraps
-from warnings import warn
 
 from job_shop_lib import (
     JobShopInstance,
@@ -540,29 +538,3 @@ class Dispatcher:
         return self.instance.jobs[job_id][
             self._job_next_operation_index[job_id]
         ]
-
-    @classmethod
-    def create_schedule_from_raw_solution(
-        cls, instance: JobShopInstance, raw_solution: list[list[Operation]]
-    ) -> Schedule:
-        """Deprecated method, use `Schedule.from_job_sequences` instead."""
-        warn(
-            "Dispatcher.create_schedule_from_raw_solution is deprecated. "
-            "Use Schedule.from_job_sequences instead. It will be removed in "
-            "version 1.0.0.",
-            DeprecationWarning,
-        )
-        dispatcher = cls(instance)
-        dispatcher.reset()
-        raw_solution_deques = [
-            deque(operations) for operations in raw_solution
-        ]
-        while not dispatcher.schedule.is_complete():
-            for machine_id, operations in enumerate(raw_solution_deques):
-                if not operations:
-                    continue
-                operation = operations[0]
-                if dispatcher.is_operation_ready(operation):
-                    dispatcher.dispatch(operation, machine_id)
-                    operations.popleft()
-        return dispatcher.schedule
