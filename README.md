@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="images/logo_with_transparent_background.png" height="150px">
+<img src="docs/source/jslib_minimalist_logo_no_background_cut.png" height="150px">
 
 <h1>Job Shop Library</h1>
 
@@ -144,7 +144,7 @@ Every solver is a `Callable` that receives a `JobShopInstance` and returns a `Sc
 ```python
 import matplotlib.pyplot as plt
 
-from job_shop_lib.cp_sat import ORToolsSolver
+from job_shop_lib.constraint_programming import ORToolsSolver
 from job_shop_lib.visualization import plot_gantt_chart
 
 solver = ORToolsSolver(max_time_in_seconds=10)
