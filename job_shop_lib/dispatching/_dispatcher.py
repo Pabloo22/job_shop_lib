@@ -19,7 +19,7 @@ from job_shop_lib.exceptions import ValidationError
 # Added here to avoid circular imports
 class DispatcherObserver(abc.ABC):
     """Abstract class that allows objects to observe and respond to changes
-    within the `Dispatcher`.
+    within the :class:`Dispatcher`.
 
     It follows the Observer design pattern, where observers subscribe to the
     dispatcher and receive updates when certain events occur, such as when
@@ -27,26 +27,27 @@ class DispatcherObserver(abc.ABC):
 
     Attributes:
         dispatcher:
-            The `Dispatcher` instance to observe.
+            The :class:`Dispatcher` instance to observe.
 
     Example:
 
-    ```python
-    from job_shop_lib.dispatching import DispatcherObserver, Dispatcher
-    from job_shop_lib import ScheduledOperation
+    .. code-block:: python
+
+        from job_shop_lib.dispatching import DispatcherObserver, Dispatcher
+        from job_shop_lib import ScheduledOperation
 
 
-    class HistoryObserver(DispatcherObserver):
-        def __init__(self, dispatcher: Dispatcher):
-            super().__init__(dispatcher)
-            self.history: list[ScheduledOperation] = []
+        class HistoryObserver(DispatcherObserver):
+            def __init__(self, dispatcher: Dispatcher):
+                super().__init__(dispatcher)
+                self.history: list[ScheduledOperation] = []
 
-        def update(self, scheduled_operation: ScheduledOperation):
-            self.history.append(scheduled_operation)
+            def update(self, scheduled_operation: ScheduledOperation):
+                self.history.append(scheduled_operation)
 
-        def reset(self):
-            self.history = []
-    ```
+            def reset(self):
+                self.history = []
+
     """
 
     def __init__(
@@ -55,8 +56,8 @@ class DispatcherObserver(abc.ABC):
         is_singleton: bool = True,
         subscribe: bool = True,
     ):
-        """Initializes the observer with the `Dispatcher` and subscribes to
-        it.
+        """Initializes the observer with the :class:`Dispatcher` and subscribes
+        to it.
 
         Args:
             dispatcher:
@@ -69,7 +70,7 @@ class DispatcherObserver(abc.ABC):
                 dispatcher.
 
         Raises:
-            ValidationError: If `is_singleton` is True and an observer of the
+            ValidationError: If ``is_singleton`` is True and an observer of the
                 same type already exists in the dispatcher's list of
                 subscribers.
         """
