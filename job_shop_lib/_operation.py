@@ -8,6 +8,14 @@ from job_shop_lib.exceptions import UninitializedAttributeError
 class Operation:
     """Stores machine and duration information for a job operation.
 
+    An operation is a task that must be performed on a machine. It is part of a
+    job and has a duration that represents the time it takes to complete the
+    task.
+
+    Tip:
+        To use custom attributes, such as due dates or priorities, subclass
+        this class and add the desired attributes.
+
     Note:
         To increase performance, some solvers such as the CP-SAT solver use
         only integers to represent the operation's attributes. Should a
@@ -32,10 +40,12 @@ class Operation:
         """Initializes the object with the given machines and duration.
 
         Args:
-            machines: A list of machine ids that can perform the operation. If
+            machines:
+                A list of machine ids that can perform the operation. If
                 only one machine can perform the operation, it can be passed as
                 an integer.
-            duration: The time it takes to perform the operation.
+            duration:
+                The time it takes to perform the operation.
         """
         self.machines = [machines] if isinstance(machines, int) else machines
         self.duration = duration
