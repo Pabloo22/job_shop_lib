@@ -18,11 +18,26 @@ from job_shop_lib.exceptions import NoSolutionFoundError
 
 
 class ORToolsSolver(BaseSolver):
-    """A solver for the job shop scheduling problem using constraint
-    programming.
+    """Solver based on `OR-Tools' CP-SAT
+    <https://developers.google.com/optimization/cp/cp_solver>`_ solver.
 
-    This solver uses the ortools library to solve the job shop scheduling
-    problem using constraint programming.
+    Attributes:
+        log_search_progress (``bool``):
+            Whether to log the search progress to the console.
+        max_time_in_seconds (``float | None``):
+            The maximum time in seconds to allow the solver to search for
+            a solution. If no solution is found within this time, a
+            :class:`~job_shop_lib.exceptions.NoSolutionFoundError` is
+            raised. If ``None``, the solver will run until an optimal
+            solution is found.
+        model (``cp_model.CpModel``):
+            The `OR-Tools' CP-SAT model
+            <https://developers.google.com/optimization/reference/python/sat/
+            python/cp_model#cp_model.CpModel>`_.
+        solver (``cp_model.CpSolver``):
+            The `OR-Tools' CP-SAT solver
+            <https://developers.google.com/optimization/reference/python/sat/
+            python/cp_model#cp_model.CpSolver>`_.
     """
 
     def __init__(
@@ -30,10 +45,22 @@ class ORToolsSolver(BaseSolver):
         max_time_in_seconds: float | None = None,
         log_search_progress: bool = False,
     ):
+        """Initializes the solver.
+
+        Args:
+            max_time_in_seconds:
+                The maximum time in seconds to allow the solver to search for
+                a solution. If no solution is found within this time, a
+                :class:`~job_shop_lib.exceptions.NoSolutionFoundError` is
+                raised. If ``None``, the solver will run until an optimal
+                solution is found.
+            log_search_progress:
+                Whether to log the search progress to the console.
+        """
         self.log_search_progress = log_search_progress
         self.max_time_in_seconds = max_time_in_seconds
 
-        self.makespan: cp_model.IntVar | None = None
+        self._makespan: cp_model.IntVar | None = None
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
@@ -47,9 +74,22 @@ class ORToolsSolver(BaseSolver):
         """Creates the variables, constraints and objective, and solves the
         problem.
 
-        If a solution is found, it extracts and returns the start times of
-        each operation and the makespan. If no solution is found, it raises
-        a NoSolutionFound exception.
+        Args:
+            instance: The job shop instance to be solved.
+
+        Returns:
+            The best schedule found by the solver.
+            Its metadata contains the following information:
+
+            * status (``str``): ``"optimal"`` or ``"feasible"``
+            * elapsed_time (``float``): The time taken to solve the problem
+            * makespan (``int``): The total duration of the schedule
+            * solved_by (``str``): ``"ORToolsSolver"``
+
+        Raises:
+            NoSolutionFoundError:
+                If no solution could be found for the given problem within the
+                time limit.
         """
         self._initialize_model(instance)
 
@@ -62,14 +102,12 @@ class ORToolsSolver(BaseSolver):
                 f"No solution could be found for the given problem. "
                 f"Elapsed time: {elapsed_time} seconds."
             )
-        if self.makespan is None:
-            # Check added to satisfy mypy
-            raise RuntimeError("The makespan variable was not set.")
+        assert self._makespan is not None  # Make mypy happy
 
         metadata = {
             "status": "optimal" if status == cp_model.OPTIMAL else "feasible",
             "elapsed_time": elapsed_time,
-            "makespan": self.solver.Value(self.makespan),
+            "makespan": self.solver.Value(self._makespan),
             "solved_by": "ORToolsSolver",
         }
         return self._create_schedule(instance, metadata)
@@ -155,12 +193,12 @@ class ORToolsSolver(BaseSolver):
     def _set_objective(self, instance: JobShopInstance):
         """The objective is to minimize the makespan, which is the total
         duration of the schedule."""
-        self.makespan = self.model.NewIntVar(
+        self._makespan = self.model.NewIntVar(
             0, instance.total_duration, "makespan"
         )
         end_times = [end for _, end in self._operations_start.values()]
-        self.model.AddMaxEquality(self.makespan, end_times)
-        self.model.Minimize(self.makespan)
+        self.model.AddMaxEquality(self._makespan, end_times)
+        self.model.Minimize(self._makespan)
 
     def _add_job_constraints(self, instance: JobShopInstance):
         """Adds job constraints to the model. Operations within a job must be
