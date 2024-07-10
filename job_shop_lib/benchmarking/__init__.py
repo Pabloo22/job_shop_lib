@@ -1,5 +1,11 @@
 """Contains functions to load benchmark instances.
 
+.. autosummary::
+
+    load_all_benchmark_instances
+    load_benchmark_instance
+    load_benchmark_json
+
 You can load a benchmark instance from the library:
 
 .. code-block:: python
@@ -79,6 +85,7 @@ References:
 
     - E. Taillard, "Benchmarks for basic scheduling problems," European
       Journal of Operational Research, vol. 64, no. 2, pp. 278–285, 1993.
+
 """
 
 from job_shop_lib.benchmarking._load_benchmark import (
