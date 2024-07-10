@@ -8,7 +8,7 @@ API
    job_shop_lib
 
 
-.. rubric:: Modules
+.. rubric:: Subpackages and Modules
 
 .. autosummary::
    :toctree:
