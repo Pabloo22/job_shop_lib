@@ -2,7 +2,7 @@ API
 ===
 
 .. autosummary::
-   :toctree: generated
+   :toctree: api
    :recursive:
 
    job_shop_lib
@@ -11,8 +11,6 @@ API
 .. rubric:: Subpackages and Modules
 
 .. autosummary::
-   :toctree:
-   :recursive:
 
    job_shop_lib.benchmarking
    job_shop_lib.constraint_programming

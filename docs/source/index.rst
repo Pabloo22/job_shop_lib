@@ -20,7 +20,6 @@ Google Colab notebook for a quick start guide!
 
 .. toctree::
     :maxdepth: 3
-    :caption: Contents:
 
     install
     examples

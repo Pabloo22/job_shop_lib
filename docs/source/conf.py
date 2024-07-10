@@ -35,16 +35,16 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "_*.py"]
 add_module_names = False  # pylint: disable=invalid-name
 python_use_unqualified_type_names = True  # pylint: disable=invalid-name
 autosummary_generate = True  # pylint: disable=invalid-name
+autosummary_generate_overwrite = True  # pylint: disable=invalid-name
 
 autodoc_mock_imports = ["ortools"]
 autodoc_default_options = {
     "members": True,
     "undoc-members": True,
     "show-inheritance": True,
-    "imported-members": True,
+    "imported-members": False,
     "special-members": "__init__",
 }
-
 add_function_parentheses = True  # pylint: disable=invalid-name
 modindex_common_prefix = ["job_shop_lib"]
 
