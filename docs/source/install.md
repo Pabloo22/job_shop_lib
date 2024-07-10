@@ -5,7 +5,7 @@
 :end-before: <!-- end installation -->
 ```
 
-### Development
+## Development
 
 ```{include} ../../README.md
 :start-after: <!-- start installation development -->
