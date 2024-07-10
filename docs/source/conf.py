@@ -26,6 +26,8 @@ extensions = [
     "sphinx.ext.autosummary",
     "nbsphinx",
     "nbsphinx_link",
+    "sphinx.ext.doctest",
+    "myst_parser",
 ]
 
 templates_path = ["_templates"]
@@ -39,7 +41,7 @@ autodoc_default_options = {
     "members": True,
     "undoc-members": True,
     "show-inheritance": True,
-    # "imported-members": True,
+    "imported-members": True,
     "special-members": "__init__",
 }
 

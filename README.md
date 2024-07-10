@@ -19,11 +19,19 @@ See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcoww
 
 ## Installation :package:
 
-You can install the library from PyPI:
+<!-- start installation -->
+
+JobShopLib is distributed on [PyPI](https://pypi.org/project/job-shop-lib/) and it supports Python 3.10+.
+
+You can install the latest version using `pip`:
 
 ```bash
 pip install job-shop-lib
 ```
+
+<!-- end installation -->
+
+<!-- key features -->
 
 ## Key Features :star:
 
@@ -46,6 +54,8 @@ pip install job-shop-lib
   - Build your own custom graphs with the `JobShopGraph` class.
 
 - **Gymnasium Environments**: Two environments for solving the problem with Graph Neural Networks (GNNs) or any other method, and Reinforcement Learning (RL). See [SingleJobShopGraphEnv](examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](examples/10-MultiJobShopGraphEnv.ipynb).
+
+<!-- end key features -->
 
 ## Some Examples :rocket:
 
@@ -283,14 +293,14 @@ plt.show()
 
 For more details, check the [examples](examples) folder.
 
-## Installation for development :hammer_and_wrench:
+## Installation for development
 
-### With Poetry
+<!-- start installation development -->
 
 1. Clone the repository.
 
 ```bash
-git clone git clone https://github.com/Pabloo22/job_shop_lib.git
+git clone https://github.com/Pabloo22/job_shop_lib.git
 cd job_shop_lib
 ```
 
@@ -305,15 +315,7 @@ pip install poetry
 make poetry_install_all 
 ```
 
-### With PyPI
-
-If you don't want to use Poetry, you can install the library directly from the source code:
-
-```bash
-git clone https://github.com/Pabloo22/job_shop_lib.git
-cd job_shop_lib
-pip install -e .
-```
+<!-- end installation development -->
 
 ## License :scroll:
 

@@ -19,11 +19,12 @@ See
 Google Colab notebook for a quick start guide!
 
 .. toctree::
-   :maxdepth: 3
-   :caption: Contents:
+    :maxdepth: 3
+    :caption: Contents:
 
-   examples
-   api
+    install
+    examples
+    api
 
 Indices and tables
 ==================
