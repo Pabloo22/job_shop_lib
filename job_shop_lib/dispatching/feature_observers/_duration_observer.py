@@ -13,15 +13,15 @@ from job_shop_lib.dispatching.feature_observers import (
 class DurationObserver(FeatureObserver):
     """Measures the remaining duration of operations, machines, and jobs.
 
-    The duration of an Operation is:
+    The duration of an :class:`Operation` is:
         - if the operation has not been scheduled, it is the duration of the
-        operation.
+          operation.
         - if the operation has been scheduled, it is the remaining duration of
-        the operation.
+          the operation.
         - if the operation has been completed, it is the last duration of the
-        operation that has been computed. The duration must be set to 0
-        manually if needed. We do not update the duration of completed
-        operations to save computation time.
+          operation that has been computed. The duration must be set to 0
+          manually if needed. We do not update the duration of completed
+          operations to save computation time.
 
     The duration of a Machine or Job is the sum of the durations of the
     unscheduled operations that belong to the machine or job.
