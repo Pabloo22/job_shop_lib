@@ -10,15 +10,25 @@ from job_shop_lib.exceptions import ValidationError
 
 
 class Schedule:
-    """Data structure to store a schedule for a `JobShopInstance` object.
+    """Data structure to store a complete or partial solution for a particular
+    :class:`JobShopInstance`.
+
+    A schedule is a list of lists of :class:`ScheduledOperation` objects. Each
+    list represents the order of operations on a machine.
+
+    The main methods of this class are:
+
+    .. autosummary::
+        :nosignatures:
+
+        makespan
+        is_complete
+        add
+        reset
 
     Attributes:
         instance:
-            The `JobShopInstance` object that the schedule is for.
-        schedule:
-            A list of lists of `ScheduledOperation` objects. Each list of
-            `ScheduledOperation` objects represents the order of operations
-            on a machine.
+            The :class:`JobShopInstance` object that the schedule is for.
         metadata:
             A dictionary with additional information about the schedule. It
             can be used to store information about the algorithm that generated
@@ -41,12 +51,11 @@ class Schedule:
 
         Args:
             instance:
-                The `JobShopInstance` object that the schedule is for.
+                The :class:`JobShopInstance` object that the schedule is for.
             schedule:
-                A list of lists of `ScheduledOperation` objects. Each list of
-                `ScheduledOperation` objects represents the order of operations
-                on a machine. If not provided, the schedule is initialized as
-                an empty schedule.
+                A list of lists of :class:`ScheduledOperation` objects. Each
+                list represents the order of operations on a machine. If
+                not provided, the schedule is initialized as an empty schedule.
             **metadata:
                 Additional information about the schedule.
         """
@@ -64,7 +73,8 @@ class Schedule:
 
     @property
     def schedule(self) -> list[list[ScheduledOperation]]:
-        """Returns the schedule attribute."""
+        """A list of lists of :class:`ScheduledOperation` objects. Each list
+        represents the order of operations on a machine."""
         return self._schedule
 
     @schedule.setter
@@ -74,7 +84,7 @@ class Schedule:
 
     @property
     def num_scheduled_operations(self) -> int:
-        """Returns the number of operations that have been scheduled."""
+        """The number of operations that have been scheduled so far."""
         return sum(len(machine_schedule) for machine_schedule in self.schedule)
 
     def to_dict(self) -> dict:
@@ -85,13 +95,14 @@ class Schedule:
         Returns:
             A dictionary representation of the schedule with the following
             keys:
-                - "instance": A dictionary representation of the instance.
-                - "job_sequences": A list of lists of job ids. Each list of job
-                    ids represents the order of operations on the machine. The
-                    machine that the list corresponds to is determined by the
-                    index of the list.
-                - "metadata": A dictionary with additional information about
-                    the schedule.
+
+                - **"instance"**: A dictionary representation of the instance.
+                - **"job_sequences"**: A list of lists of job ids. Each list
+                  of job ids represents the order of operations on the machine.
+                  The machine that the list corresponds to is determined by the
+                  index of the list.
+                - **"metadata"**: A dictionary with additional information
+                  about the schedule.
         """
         job_sequences: list[list[int]] = []
         for machine_schedule in self.schedule:
@@ -132,14 +143,14 @@ class Schedule:
 
         Args:
             instance:
-                The `JobShopInstance` object that the schedule is for.
+                The :class:`JobShopInstance` object that the schedule is for.
             job_sequences:
                 A list of lists of job ids. Each list of job ids represents the
                 order of operations on the machine. The machine that the list
                 corresponds to is determined by the index of the list.
 
         Returns:
-            A `Schedule` object with the given job sequences.
+            A :class:`Schedule` object with the given job sequences.
         """
         from job_shop_lib.dispatching import Dispatcher
 
@@ -183,18 +194,19 @@ class Schedule:
         return max_end_time
 
     def is_complete(self) -> bool:
-        """Returns True if all operations have been scheduled."""
+        """Returns ``True`` if all operations have been scheduled."""
         return self.num_scheduled_operations == self.instance.num_operations
 
     def add(self, scheduled_operation: ScheduledOperation):
-        """Adds a new `ScheduledOperation` to the schedule.
+        """Adds a new :class:`ScheduledOperation` to the schedule.
 
         Args:
             scheduled_operation:
-                The `ScheduledOperation` to add to the schedule.
+                The :class:`ScheduledOperation` to add to the schedule.
 
         Raises:
-            ValueError: If the start time of the new operation is before the
+            ValidationError:
+                If the start time of the new operation is before the
                 end time of the last operation on the same machine. In favor of
                 performance, this method does not checks precedence
                 constraints.
@@ -213,49 +225,45 @@ class Schedule:
             return
 
         last_operation = self.schedule[new_operation.machine_id][-1]
-        self._check_start_time(new_operation, last_operation)
+        if not self._is_valid_start_time(new_operation, last_operation):
+            raise ValidationError(
+                "Operation cannot be scheduled before the last operation on "
+                "the same machine: end time of last operation "
+                f"({last_operation.end_time}) > start time of new operation "
+                f"({new_operation.start_time})."
+            )
 
     @staticmethod
-    def _check_start_time(
+    def _is_valid_start_time(
         scheduled_operation: ScheduledOperation,
         previous_operation: ScheduledOperation,
     ):
-        """Raises a ValueError if the start time of the new operation is before
-        the end time of the last operation on the same machine."""
-
-        if previous_operation.end_time <= scheduled_operation.start_time:
-            return
-
-        raise ValueError(
-            "Operation cannot be scheduled before the last operation on "
-            "the same machine: end time of last operation "
-            f"({previous_operation.end_time}) > start time of new operation "
-            f"({scheduled_operation.start_time})."
-        )
+        return previous_operation.end_time <= scheduled_operation.start_time
 
     @staticmethod
     def check_schedule(schedule: list[list[ScheduledOperation]]):
-        """Checks if a schedule is valid and raises a ValueError if it is not.
+        """Checks if a schedule is valid and raises a
+        :class:`~exceptions.ValidationError` if it is not.
 
         A schedule is considered invalid if:
-            - A `ScheduledOperation` has a machine id that does not match the
-              machine id of the machine schedule (the list of
-              `ScheduledOperation` objects) that it belongs to.
-            - The start time of a `ScheduledOperation` is before the end time
-              of the last operation on the same machine.
+            - A :class:`ScheduledOperation` has a machine id that does not
+              match the machine id of the machine schedule (the list of
+              :class:`ScheduledOperation` objects) that it belongs to.
+            - The start time of a :class:`ScheduledOperation` is before the
+              end time of the last operation on the same machine.
 
         Args:
             schedule:
-                The schedule (a list of lists of `ScheduledOperation` objects)
-                to check.
+                The schedule (a list of lists of :class:`ScheduledOperation`
+                objects) to check.
 
         Raises:
-            ValueError: If the schedule is invalid.
+            ValidationError: If the schedule is invalid.
         """
         for machine_id, scheduled_operations in enumerate(schedule):
             for i, scheduled_operation in enumerate(scheduled_operations):
                 if scheduled_operation.machine_id != machine_id:
-                    raise ValueError(
+                    raise ValidationError(
                         "The machine id of the scheduled operation "
                         f"({ScheduledOperation.machine_id}) does not match "
                         f"the machine id of the machine schedule ({machine_id}"
@@ -265,9 +273,19 @@ class Schedule:
                 if i == 0:
                     continue
 
-                Schedule._check_start_time(
+                if not Schedule._is_valid_start_time(
                     scheduled_operation, scheduled_operations[i - 1]
-                )
+                ):
+                    raise ValidationError(
+                        "Invalid schedule. The start time of the new "
+                        "operation is before the end time of the last "
+                        "operation on the same machine."
+                        "End time of last operation: "
+                        f"{scheduled_operations[i - 1].end_time}. "
+                        f"Start time of new operation: "
+                        f"{scheduled_operation.start_time}. At index "
+                        f"[{machine_id}][{i}]."
+                    )
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, Schedule):
