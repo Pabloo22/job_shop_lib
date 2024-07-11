@@ -46,7 +46,8 @@ autodoc_default_options = {
     "special-members": "__init__",
 }
 add_function_parentheses = True  # pylint: disable=invalid-name
-modindex_common_prefix = ["job_shop_lib"]
+modindex_common_prefix = ["job_shop_lib."]
+smartquotes = False  # pylint: disable=invalid-name
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
