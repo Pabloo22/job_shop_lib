@@ -37,7 +37,7 @@ class DispatchingRule(str, Enum):
     RANDOM = "random"
 
 
-class MachineChooser(str, Enum):
+class MachineChooserType(str, Enum):
     """Enumeration of machine chooser strategies for the job shop scheduling"""
 
     FIRST = "first"
@@ -96,35 +96,6 @@ class DispatcherObserverConfig(Generic[T]):
             )
 
 
-def create_or_get_observer(
-    dispatcher: Dispatcher,
-    observer: type[ObserverType],
-    condition: Callable[[DispatcherObserver], bool] = lambda _: True,
-    **kwargs,
-) -> ObserverType:
-    """Creates a new observer of the specified type or returns an existing
-    observer of the same type if it already exists in the dispatcher's list of
-    observers.
-
-    Args:
-        dispatcher:
-            The dispatcher instance to which the observer will be added or
-            retrieved.
-        observer:
-            The type of observer to be created or retrieved.
-        **kwargs:
-            Additional keyword arguments to be passed to the observer's
-            constructor.
-    """
-    for existing_observer in dispatcher.subscribers:
-        if isinstance(existing_observer, observer) and condition(
-            existing_observer
-        ):
-            return existing_observer
-
-    new_observer = observer(dispatcher, **kwargs)
-    return new_observer
-
 
 def dispatching_rule_factory(
     dispatching_rule: str | DispatchingRule,
@@ -172,9 +143,12 @@ def dispatching_rule_factory(
     return dispatching_rules[dispatching_rule]  # type: ignore[index]
 
 
+MachineChooser = Callable[[Dispatcher, Operation], int]
+
+
 def machine_chooser_factory(
-    machine_chooser: str,
-) -> Callable[[Dispatcher, Operation], int]:
+    machine_chooser: str | MachineChooser,
+) -> MachineChooser:
     """Creates and returns a machine chooser function based on the specified
     machine chooser strategy name.
 
@@ -197,11 +171,14 @@ def machine_chooser_factory(
             not supported.
     """
     machine_choosers: dict[str, Callable[[Dispatcher, Operation], int]] = {
-        MachineChooser.FIRST: lambda _, operation: operation.machines[0],
-        MachineChooser.RANDOM: lambda _, operation: random.choice(
+        MachineChooserType.FIRST: lambda _, operation: operation.machines[0],
+        MachineChooserType.RANDOM: lambda _, operation: random.choice(
             operation.machines
         ),
     }
+
+    if callable(machine_chooser):
+        return machine_chooser
 
     machine_chooser = machine_chooser.lower()
     if machine_chooser not in machine_choosers:

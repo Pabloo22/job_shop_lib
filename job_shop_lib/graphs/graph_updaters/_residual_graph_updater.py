@@ -12,7 +12,7 @@ from job_shop_lib.dispatching.feature_observers import (
     IsCompletedObserver,
     FeatureType,
 )
-from job_shop_lib.dispatching import create_or_get_observer, DispatcherObserver
+from job_shop_lib.dispatching import DispatcherObserver
 
 
 class ResidualGraphUpdater(GraphUpdater):
@@ -80,8 +80,7 @@ class ResidualGraphUpdater(GraphUpdater):
         if self.remove_completed_job_nodes:
             feature_types.append(FeatureType.JOBS)
         if feature_types:
-            self._is_completed_observer = create_or_get_observer(
-                dispatcher,
+            self._is_completed_observer = dispatcher.create_or_get_observer(
                 IsCompletedObserver,
                 condition=has_all_features,
                 feature_types=feature_types,

@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from job_shop_lib.dispatching import (
     Dispatcher,
     HistoryObserver,
-    create_or_get_observer,
 )
 from job_shop_lib.visualization import (
     create_gantt_chart_video,
@@ -134,8 +133,8 @@ class GanttChartCreator:
         self.gif_config = gif_config
         self.gannt_chart_wrapper_config = gantt_chart_wrapper_config
         self.video_config = video_config
-        self.history_observer: HistoryObserver = create_or_get_observer(
-            dispatcher, observer=HistoryObserver
+        self.history_observer: HistoryObserver = (
+            dispatcher.create_or_get_observer(HistoryObserver)
         )
         self.plot_function = plot_gantt_chart_wrapper(
             **self.gannt_chart_wrapper_config

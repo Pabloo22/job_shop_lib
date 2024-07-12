@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Any
+from typing import Any, TypeVar
 from collections.abc import Callable
 from functools import wraps
 
@@ -113,6 +113,11 @@ class DispatcherObserver(abc.ABC):
 
     def __repr__(self) -> str:
         return self.__class__.__name__
+
+
+# Disable pylint's false positive
+# pylint: disable=invalid-name
+ObserverType = TypeVar("ObserverType", bound=DispatcherObserver)
 
 
 def _dispatcher_cache(method):
@@ -327,6 +332,35 @@ class Dispatcher:
         for subscriber in self.subscribers:
             subscriber.update(scheduled_operation)
 
+    def create_or_get_observer(
+        self,
+        observer: type[ObserverType],
+        condition: Callable[[DispatcherObserver], bool] = lambda _: True,
+        **kwargs,
+    ) -> ObserverType:
+        """Creates a new observer of the specified type or returns an existing
+        observer of the same type if it already exists in the dispatcher's list
+        of observers.
+
+        Args:
+            dispatcher:
+                The dispatcher instance to which the observer will be added or
+                retrieved.
+            observer:
+                The type of observer to be created or retrieved.
+            **kwargs:
+                Additional keyword arguments to be passed to the observer's
+                constructor.
+        """
+        for existing_observer in self.subscribers:
+            if isinstance(existing_observer, observer) and condition(
+                existing_observer
+            ):
+                return existing_observer
+
+        new_observer = observer(self, **kwargs)
+        return new_observer
+
     @_dispatcher_cache
     def current_time(self) -> int:
         """Returns the current time of the schedule.
@@ -377,12 +411,11 @@ class Dispatcher:
             A list of Operation objects that are available for scheduling
             based on precedence and machine constraints only.
         """
-        available_operations = []
-        for job_id, next_position in enumerate(self._job_next_operation_index):
-            if next_position == len(self.instance.jobs[job_id]):
-                continue
-            operation = self.instance.jobs[job_id][next_position]
-            available_operations.append(operation)
+        available_operations = [
+            self.instance.jobs[job_id][position]
+            for job_id, position in enumerate(self._job_next_operation_index)
+            if position < len(self.instance.jobs[job_id])
+        ]
         return available_operations
 
     @_dispatcher_cache
