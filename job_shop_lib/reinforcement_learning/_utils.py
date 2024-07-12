@@ -19,8 +19,8 @@ def add_padding(
     """Adds padding to the array.
 
     Pads the input array to the specified output shape with a given padding
-    value. If the `dtype` is not specified, the dtype of the input array is
-    used.
+    value. If the ``dtype`` is not specified, the ``dtype`` of the input array
+    is used.
 
     Args:
         array:
@@ -30,17 +30,20 @@ def add_padding(
         padding_value:
             The value to use for padding. Defaults to -1.
         dtype:
-            The data type for the output array. Defaults to None, in which
+            The data type for the output array. Defaults to ``None``, in which
             case the dtype of the input array is used.
 
     Returns:
         The padded array with the specified output shape.
 
     Raises:
-        A `ValidationError` if the output shape is smaller than the
-        input shape.
+        ValidationError: 
+            If the output shape is smaller than the input shape.
 
     Examples:
+
+    .. doctest::
+
         >>> array = np.array([[1, 2], [3, 4]])
         >>> add_padding(array, (3, 3))
         array([[ 1,  2, -1],
