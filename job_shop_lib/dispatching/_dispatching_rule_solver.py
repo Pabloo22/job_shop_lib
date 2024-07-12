@@ -125,15 +125,34 @@ class DispatchingRuleSolver(BaseSolver):
 
 if __name__ == "__main__":
     import time
+    import cProfile
+    import pstats
+    from io import StringIO
     from job_shop_lib.benchmarking import load_benchmark_instance
 
-    ta_instances = []
-    for i in range(1, 81):
-        ta_instances.append(load_benchmark_instance(f"ta{i:02d}"))
-    solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
-    # cProfile.run("for instance in ta_instances: solver.solve(instance)")
+    ta_instances = [
+        load_benchmark_instance(f"ta{i:02d}") for i in range(1, 81)
+    ]
+    solver = DispatchingRuleSolver(dispatching_rule="random")
+
     start = time.perf_counter()
+
+    # Create a Profile object
+    profiler = cProfile.Profile()
+
+    # Run the code under profiling
+    profiler.enable()
     for instance_ in ta_instances:
         solver.solve(instance_)
+    profiler.disable()
+
     end = time.perf_counter()
+
+    # Print elapsed time
     print(f"Elapsed time: {end - start:.2f} seconds.")
+
+    # Print profiling results
+    s = StringIO()
+    ps = pstats.Stats(profiler, stream=s).sort_stats("cumulative")
+    ps.print_stats(20)  # Print top 20 time-consuming functions
+    print(s.getvalue())
