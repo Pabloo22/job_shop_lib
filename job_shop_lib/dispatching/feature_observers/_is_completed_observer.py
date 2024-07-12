@@ -22,9 +22,8 @@ class IsCompletedObserver(FeatureObserver):
         dispatcher: Dispatcher,
         feature_types: list[FeatureType] | FeatureType | None = None,
         subscribe: bool = True,
-        is_singleton: bool = True,
     ):
-        feature_types = self.get_feature_types_list(feature_types)
+        feature_types = self._get_feature_types_list(feature_types)
         self.remaining_ops_per_machine = np.zeros(
             (dispatcher.instance.num_machines, 1), dtype=int
         )
@@ -33,42 +32,11 @@ class IsCompletedObserver(FeatureObserver):
         )
         super().__init__(
             dispatcher,
-            feature_types,
-            feature_size=1,
+            feature_types=feature_types,
             subscribe=subscribe,
-            is_singleton=is_singleton,
         )
 
     def initialize_features(self):
-        self._initialize_remaining_operations()
-
-    def update(self, scheduled_operation: ScheduledOperation):
-        if FeatureType.OPERATIONS in self.features:
-            completed_operations = [
-                op.operation_id
-                for op in self.dispatcher.completed_operations()
-            ]
-            self.features[FeatureType.OPERATIONS][completed_operations, 0] = 1
-        if FeatureType.MACHINES in self.features:
-            self.remaining_ops_per_machine[
-                scheduled_operation.operation.machines, 0
-            ] -= 1
-            is_completed = (
-                self.remaining_ops_per_machine[
-                    scheduled_operation.operation.machines, 0
-                ]
-                == 0
-            )
-            self.features[FeatureType.MACHINES][
-                scheduled_operation.operation.machines, 0
-            ] = is_completed
-        if FeatureType.JOBS in self.features:
-            job_id = scheduled_operation.job_id
-            self.remaining_ops_per_job[job_id, 0] -= 1
-            is_completed = self.remaining_ops_per_job[job_id, 0] == 0
-            self.features[FeatureType.JOBS][job_id, 0] = is_completed
-
-    def _initialize_remaining_operations(self):
         remaining_ops_observer = self._get_remaining_operations_observer(
             self.dispatcher, self.features
         )
@@ -100,6 +68,32 @@ class IsCompletedObserver(FeatureObserver):
                 self.remaining_ops_per_job[operation.job_id, 0] += 1
             if FeatureType.MACHINES in self.features:
                 self.remaining_ops_per_machine[operation.machines, 0] += 1
+
+    def update(self, scheduled_operation: ScheduledOperation):
+        if FeatureType.OPERATIONS in self.features:
+            completed_operations = [
+                op.operation_id
+                for op in self.dispatcher.completed_operations()
+            ]
+            self.features[FeatureType.OPERATIONS][completed_operations, 0] = 1
+        if FeatureType.MACHINES in self.features:
+            self.remaining_ops_per_machine[
+                scheduled_operation.operation.machines, 0
+            ] -= 1
+            is_completed = (
+                self.remaining_ops_per_machine[
+                    scheduled_operation.operation.machines, 0
+                ]
+                == 0
+            )
+            self.features[FeatureType.MACHINES][
+                scheduled_operation.operation.machines, 0
+            ] = is_completed
+        if FeatureType.JOBS in self.features:
+            job_id = scheduled_operation.job_id
+            self.remaining_ops_per_job[job_id, 0] -= 1
+            is_completed = self.remaining_ops_per_job[job_id, 0] == 0
+            self.features[FeatureType.JOBS][job_id, 0] = is_completed
 
     def _get_remaining_operations_observer(
         self, dispatcher: Dispatcher, feature_types: Iterable[FeatureType]

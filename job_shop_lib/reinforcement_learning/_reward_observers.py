@@ -14,7 +14,9 @@ class RewardObserver(DispatcherObserver):
             dispatcher.
     """
 
-    def __init__(self, dispatcher: Dispatcher, subscribe: bool = True) -> None:
+    def __init__(
+        self, dispatcher: Dispatcher, *, subscribe: bool = True
+    ) -> None:
         super().__init__(dispatcher, subscribe=subscribe)
         self.rewards: list[float] = []
 
@@ -25,6 +27,7 @@ class RewardObserver(DispatcherObserver):
         return self.rewards[-1] if self.rewards else 0
 
     def reset(self) -> None:
+        """Sets rewards attribute to a new empty list."""
         self.rewards = []
 
 
@@ -40,8 +43,8 @@ class MakespanReward(RewardObserver):
             Makespan of the schedule after the last operation was scheduled.
     """
 
-    def __init__(self, dispatcher: Dispatcher) -> None:
-        super().__init__(dispatcher)
+    def __init__(self, dispatcher: Dispatcher, *, subscribe=True) -> None:
+        super().__init__(dispatcher, subscribe=subscribe)
         self.current_makespan = dispatcher.schedule.makespan()
 
     def reset(self) -> None:
@@ -80,8 +83,3 @@ class IdleTimeReward(RewardObserver):
 
         reward = -idle_time
         self.rewards.append(reward)
-
-
-if __name__ == "__main__":
-    a = [1, 2]
-    print(a[:-1])

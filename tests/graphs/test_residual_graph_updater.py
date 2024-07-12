@@ -30,7 +30,6 @@ def test_removes_all_nodes_disjunctive_graph(
     ResidualGraphUpdater(
         dispatcher,
         job_shop_graph,
-        is_singleton=False,
         subscribe=True,
         remove_completed_job_nodes=True,
         remove_completed_machine_nodes=True,
@@ -72,7 +71,6 @@ def test_removes_all_nodes_agent_task_graph():
     ResidualGraphUpdater(
         dispatcher,
         job_shop_graph,
-        is_singleton=False,
         subscribe=True,
         remove_completed_job_nodes=True,
         remove_completed_machine_nodes=True,
@@ -95,7 +93,6 @@ def test_initialization(example_job_shop_instance: JobShopInstance):
     updater = ResidualGraphUpdater(
         dispatcher,
         job_shop_graph,
-        is_singleton=False,
         subscribe=True,
         remove_completed_job_nodes=True,
         remove_completed_machine_nodes=True,

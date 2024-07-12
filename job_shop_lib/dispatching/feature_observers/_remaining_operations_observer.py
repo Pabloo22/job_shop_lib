@@ -15,6 +15,8 @@ class RemainingOperationsObserver(FeatureObserver):
 
     It does not support FeatureType.OPERATIONS.
     """
+    
+    _supported_feature_types = [FeatureType.MACHINES, FeatureType.JOBS]
 
     def __init__(
         self,
@@ -33,7 +35,6 @@ class RemainingOperationsObserver(FeatureObserver):
         super().__init__(
             dispatcher,
             feature_types=feature_types,
-            feature_size=1,
             subscribe=subscribe,
         )
 

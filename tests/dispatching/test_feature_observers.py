@@ -322,7 +322,9 @@ def test_every_feature_observer(irregular_job_shop_instance: JobShopInstance):
         )
         for feature_observer_type in feature_observers_types
     ]
-    composite = CompositeFeatureObserver(dispatcher, feature_observers)
+    composite = CompositeFeatureObserver(
+        dispatcher, feature_observers=feature_observers
+    )
     assert str(composite) == STEP_0
     solver = DispatchingRuleSolver("most_work_remaining")
 

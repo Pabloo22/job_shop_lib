@@ -2,7 +2,6 @@
 
 import numpy as np
 
-from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib import ScheduledOperation
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,
@@ -26,16 +25,6 @@ class DurationObserver(FeatureObserver):
     The duration of a Machine or Job is the sum of the durations of the
     unscheduled operations that belong to the machine or job.
     """
-
-    def __init__(
-        self,
-        dispatcher: Dispatcher,
-        feature_types: list[FeatureType] | FeatureType | None = None,
-        subscribe: bool = True,
-    ):
-        super().__init__(
-            dispatcher, feature_types, feature_size=1, subscribe=subscribe
-        )
 
     def initialize_features(self):
         mapping = {

@@ -33,7 +33,6 @@ class GraphUpdater(DispatcherObserver):
         dispatcher: Dispatcher,
         job_shop_graph: JobShopGraph,
         *,
-        is_singleton: bool = False,
         subscribe: bool = True,
     ):
         """
@@ -46,14 +45,11 @@ class GraphUpdater(DispatcherObserver):
             graph_updater:
                 A function that updates the job shop graph based on the
                 dispatcher state and a scheduled operation.
-            is_singleton:
-                If True, ensures only one instance of this observer type is
-                subscribed to the dispatcher. Defaults to False.
             subscribe:
                 If True, automatically subscribes the observer to the
                 dispatcher. Defaults to True.
         """
-        super().__init__(dispatcher, is_singleton, subscribe)
+        super().__init__(dispatcher, subscribe=subscribe)
         self.initial_job_shop_graph = deepcopy(job_shop_graph)
         self.job_shop_graph = job_shop_graph
 

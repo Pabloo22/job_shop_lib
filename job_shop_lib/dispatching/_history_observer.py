@@ -7,10 +7,8 @@ from job_shop_lib import ScheduledOperation
 class HistoryObserver(DispatcherObserver):
     """Observer that stores the history of the dispatcher."""
 
-    def __init__(self, dispatcher: Dispatcher):
-        """Initializes the observer with the current state of the
-        dispatcher."""
-        super().__init__(dispatcher)
+    def __init__(self, dispatcher: Dispatcher, *, subscribe: bool = True):
+        super().__init__(dispatcher, subscribe=subscribe)
         self.history: list[ScheduledOperation] = []
 
     def update(self, scheduled_operation: ScheduledOperation):

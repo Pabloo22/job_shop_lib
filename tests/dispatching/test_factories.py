@@ -53,7 +53,6 @@ def test_create_or_get_observer_with_condition(
         IsCompletedObserver,
         condition=has_machine_feature,
         feature_types=[FeatureType.MACHINES],
-        is_singleton=False,
     )
     assert isinstance(is_completed_observer_2, IsCompletedObserver)
     assert is_completed_observer_2 is not is_completed_observer

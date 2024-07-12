@@ -1,6 +1,5 @@
 """Home of the `PositionInJobObserver` class."""
 
-from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib import ScheduledOperation
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,
@@ -15,13 +14,7 @@ class PositionInJobObserver(FeatureObserver):
     Positions are adjusted dynamically as operations are scheduled.
     """
 
-    def __init__(self, dispatcher: Dispatcher, subscribe: bool = True):
-        super().__init__(
-            dispatcher,
-            feature_types=[FeatureType.OPERATIONS],
-            feature_size=1,
-            subscribe=subscribe,
-        )
+    _supported_feature_types = [FeatureType.OPERATIONS]
 
     def initialize_features(self):
         for operation in self.dispatcher.unscheduled_operations():

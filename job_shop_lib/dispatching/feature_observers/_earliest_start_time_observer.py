@@ -17,8 +17,9 @@ class EarliestStartTimeObserver(FeatureObserver):
     def __init__(
         self,
         dispatcher: Dispatcher,
-        feature_types: list[FeatureType] | FeatureType | None = None,
+        *,
         subscribe: bool = True,
+        feature_types: list[FeatureType] | FeatureType | None = None,
     ):
 
         # Earliest start times initialization
@@ -33,7 +34,7 @@ class EarliestStartTimeObserver(FeatureObserver):
         self.earliest_start_times[np.isnan(squared_duration_matrix)] = np.nan
         # -------------------------------
         super().__init__(
-            dispatcher, feature_types, feature_size=1, subscribe=subscribe
+            dispatcher, feature_types=feature_types, subscribe=subscribe
         )
 
     def update(self, scheduled_operation: ScheduledOperation):

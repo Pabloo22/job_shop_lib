@@ -22,7 +22,7 @@ class ResidualGraphUpdater(GraphUpdater):
         self,
         dispatcher: Dispatcher,
         job_shop_graph: JobShopGraph,
-        is_singleton: bool = False,
+        *,
         subscribe: bool = True,
         remove_completed_machine_nodes: bool = True,
         remove_completed_job_nodes: bool = True,
@@ -34,9 +34,6 @@ class ResidualGraphUpdater(GraphUpdater):
                 The dispatcher instance to observe.
             job_shop_graph:
                 The job shop graph to update.
-            is_singleton:
-                If True, ensures only one instance of this observer type is
-                subscribed to the dispatcher. Defaults to False.
             subscribe:
                 If True, automatically subscribes the observer to the
                 dispatcher. Defaults to True.
@@ -59,7 +56,6 @@ class ResidualGraphUpdater(GraphUpdater):
         super().__init__(
             dispatcher,
             job_shop_graph,
-            is_singleton=is_singleton,
             subscribe=subscribe,
         )
 
@@ -89,7 +85,6 @@ class ResidualGraphUpdater(GraphUpdater):
                 IsCompletedObserver,
                 condition=has_all_features,
                 feature_types=feature_types,
-                is_singleton=False,
             )
 
     @property

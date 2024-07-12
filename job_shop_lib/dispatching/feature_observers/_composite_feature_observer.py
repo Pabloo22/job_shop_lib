@@ -12,6 +12,7 @@ import numpy as np
 from numpy.typing import NDArray
 import pandas as pd
 
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,
@@ -39,8 +40,10 @@ class CompositeFeatureObserver(FeatureObserver):
     def __init__(
         self,
         dispatcher: Dispatcher,
-        feature_observers: list[FeatureObserver] | None = None,
+        *,
         subscribe: bool = True,
+        feature_types: list[FeatureType] | FeatureType | None = None,
+        feature_observers: list[FeatureObserver] | None = None,
     ):
         if feature_observers is None:
             feature_observers = [
@@ -48,6 +51,16 @@ class CompositeFeatureObserver(FeatureObserver):
                 for observer in dispatcher.subscribers
                 if isinstance(observer, FeatureObserver)
             ]
+        feature_types = self._get_feature_types_list(feature_types)
+        for observer in feature_observers:
+            if not set(observer.features.keys()).issubset(set(feature_types)):
+                raise ValidationError(
+                    "The feature types observed by the feature observer "
+                    f"{observer.__class__.__name__} are not a subset of the "
+                    "feature types specified in the CompositeFeatureObserver."
+                    f"Observer feature types: {observer.features.keys()}"
+                    f"Composite feature types: {feature_types}"
+                )
         self.feature_observers = feature_observers
         self.column_names: dict[FeatureType, list[str]] = defaultdict(list)
         super().__init__(dispatcher, subscribe=subscribe)
@@ -75,7 +88,9 @@ class CompositeFeatureObserver(FeatureObserver):
             feature_observer_factory(observer_config, dispatcher=dispatcher)
             for observer_config in feature_observer_configs
         ]
-        composite_observer = cls(dispatcher, observers, subscribe=subscribe)
+        composite_observer = cls(
+            dispatcher, feature_observers=observers, subscribe=subscribe
+        )
         return composite_observer
 
     @property

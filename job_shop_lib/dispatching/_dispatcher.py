@@ -50,10 +50,15 @@ class DispatcherObserver(abc.ABC):
 
     """
 
+    # Made read-only following Google Style Guide recommendation
+    _is_singleton = True
+    """If True, ensures only one instance of this observer type is subscribed
+    to the dispatcher."""
+
     def __init__(
         self,
         dispatcher: Dispatcher,
-        is_singleton: bool = True,
+        *,
         subscribe: bool = True,
     ):
         """Initializes the observer with the :class:`Dispatcher` and subscribes
@@ -62,9 +67,6 @@ class DispatcherObserver(abc.ABC):
         Args:
             dispatcher:
                 The `Dispatcher` instance to observe.
-            is_singleton:
-                If True, ensures only one instance of this observer type is
-                subscribed to the dispatcher.
             subscribe:
                 If True, automatically subscribes the observer to the
                 dispatcher.
@@ -74,7 +76,7 @@ class DispatcherObserver(abc.ABC):
                 same type already exists in the dispatcher's list of
                 subscribers.
         """
-        if is_singleton and any(
+        if self._is_singleton and any(
             isinstance(observer, self.__class__)
             for observer in dispatcher.subscribers
         ):
@@ -88,6 +90,15 @@ class DispatcherObserver(abc.ABC):
         self.dispatcher = dispatcher
         if subscribe:
             self.dispatcher.subscribe(self)
+
+    @property
+    def is_singleton(self) -> bool:
+        """Returns whether this observer is a singleton.
+
+        This is a class attribute that determines whether only one
+        instance of this observer type can be subscribed to the dispatcher.
+        """
+        return self._is_singleton
 
     @abc.abstractmethod
     def update(self, scheduled_operation: ScheduledOperation):
