@@ -53,7 +53,7 @@ It includes the following information:
     {'optimum': 55,
     'upper_bound': 55,
     'lower_bound': 55,
-    'reference': "J.F. Muth, G.L. Thompson. 'Industrial scheduling.', 
+    'reference': "J.F. Muth, G.L. Thompson. 'Industrial scheduling.',
     Englewood Cliffs, NJ, Prentice-Hall, 1963."}
 
 References:

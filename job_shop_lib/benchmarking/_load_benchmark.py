@@ -28,8 +28,8 @@ def load_all_benchmark_instances() -> dict[str, JobShopInstance]:
 def load_benchmark_instance(name: str) -> JobShopInstance:
     """Loads a specific benchmark instance.
 
-    Calls to :func:`load_benchmark_json` to load the benchmark instances from the
-    JSON file. The instance is then loaded from the dictionary using the
+    Calls to :func:`load_benchmark_json` to load the benchmark instances from
+    the JSON file. The instance is then loaded from the dictionary using the
     provided name. Since `load_benchmark_json` is cached, the file is only
     read once.
 
