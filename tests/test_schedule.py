@@ -1,5 +1,6 @@
 import pytest
 from job_shop_lib import Schedule, ScheduledOperation, JobShopInstance
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import (
     DispatchingRuleSolver,
     DispatchingRule,
@@ -68,7 +69,7 @@ def test_check_start_time_raises_error(job_shop_instance: JobShopInstance):
     overlapping_op = ScheduledOperation(
         job_shop_instance.jobs[1][0], start_time=0, machine_id=1
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         schedule.add(overlapping_op)
 
 
