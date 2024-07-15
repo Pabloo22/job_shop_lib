@@ -1,11 +1,12 @@
 """Home of the `IsCompletedObserver` class."""
 
-from typing import Iterable
-
 import numpy as np
 
 from job_shop_lib import ScheduledOperation
-from job_shop_lib.dispatching import Dispatcher
+from job_shop_lib.dispatching import (
+    Dispatcher,
+    DispatcherObserver,
+)
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,
     FeatureType,
@@ -37,37 +38,34 @@ class IsCompletedObserver(FeatureObserver):
         )
 
     def initialize_features(self):
-        remaining_ops_observer = self._get_remaining_operations_observer(
-            self.dispatcher, self.features
+        def _has_same_features(observer: DispatcherObserver) -> bool:
+            if not isinstance(observer, RemainingOperationsObserver):
+                return False
+            return all(
+                feature_type in observer.features
+                for feature_type in remaining_ops_feature_types
+            )
+
+        self.set_features_to_zero()
+
+        remaining_ops_feature_types = [
+            feature_type
+            for feature_type in self.features.keys()
+            if feature_type != FeatureType.OPERATIONS
+        ]
+        remaining_ops_observer = self.dispatcher.create_or_get_observer(
+            RemainingOperationsObserver,
+            condition=_has_same_features,
+            feature_types=remaining_ops_feature_types,
         )
-        if remaining_ops_observer is not None:
-            if FeatureType.JOBS in self.features:
-                self.remaining_ops_per_job = remaining_ops_observer.features[
-                    FeatureType.JOBS
-                ].copy()
-            if FeatureType.MACHINES in self.features:
-                self.remaining_ops_per_machine = (
-                    remaining_ops_observer.features[
-                        FeatureType.MACHINES
-                    ].copy()
-                )
-            return
-
-        # If there is no remaining operations observer, we need to
-        # compute the remaining operations ourselves.
-        # We iterate over all operations using scheduled_operations
-        # instead of uncompleted_operations, because in this case
-        # they will output the same operations, and the former is slightly
-        # more efficient.
-
-        # First, we se everything to 0.
-        self.remaining_ops_per_machine[:, 0] = 0
-        self.remaining_ops_per_job[:, 0] = 0
-        for operation in self.dispatcher.unscheduled_operations():
-            if FeatureType.JOBS in self.features:
-                self.remaining_ops_per_job[operation.job_id, 0] += 1
-            if FeatureType.MACHINES in self.features:
-                self.remaining_ops_per_machine[operation.machines, 0] += 1
+        if FeatureType.JOBS in self.features:
+            self.remaining_ops_per_job = remaining_ops_observer.features[
+                FeatureType.JOBS
+            ].copy()
+        if FeatureType.MACHINES in self.features:
+            self.remaining_ops_per_machine = remaining_ops_observer.features[
+                FeatureType.MACHINES
+            ].copy()
 
     def update(self, scheduled_operation: ScheduledOperation):
         if FeatureType.OPERATIONS in self.features:
@@ -94,17 +92,3 @@ class IsCompletedObserver(FeatureObserver):
             self.remaining_ops_per_job[job_id, 0] -= 1
             is_completed = self.remaining_ops_per_job[job_id, 0] == 0
             self.features[FeatureType.JOBS][job_id, 0] = is_completed
-
-    def _get_remaining_operations_observer(
-        self, dispatcher: Dispatcher, feature_types: Iterable[FeatureType]
-    ) -> RemainingOperationsObserver | None:
-        for observer in dispatcher.subscribers:
-            if not isinstance(observer, RemainingOperationsObserver):
-                continue
-            has_same_features = all(
-                feature_type in observer.features
-                for feature_type in feature_types
-            )
-            if has_same_features:
-                return observer
-        return None
