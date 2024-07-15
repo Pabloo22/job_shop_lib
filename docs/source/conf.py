@@ -57,4 +57,4 @@ html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 templates_path = ["_templates"]
 
-html_logo = "images/jslib_minimalist_logo_no_background_cut_resized.png"
+html_logo = "images/logo_no_bg_resized_fixed.png"

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/source/images/jslib_minimalist_logo_no_background_cut.png" height="150px">
+<img src="docs/source/images/jslib_minimalist_logo_no_background_fixed.png" height="150px">
 
 <h1>Job Shop Library</h1>
 
