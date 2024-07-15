@@ -1,7 +1,50 @@
 """Contains the dispatching rules for the job shop scheduling problem."""
 
-from .dispatching_rule import DispatchingRule
+from ._dispatching_rules_functions import (
+    shortest_processing_time_rule,
+    first_come_first_served_rule,
+    most_work_remaining_rule,
+    most_operations_remaining_rule,
+    random_operation_rule,
+    score_based_rule,
+    score_based_rule_with_tie_breaker,
+    shortest_processing_time_score,
+    first_come_first_served_score,
+    most_work_remaining_score,
+    most_operations_remaining_score,
+    random_score,
+)
+
+from ._factory import (
+    dispatching_rule_factory,
+    DispatchingRuleType,
+    MachineChooserType,
+    machine_chooser_factory,
+    MachineChooser,
+)
+from ._dispatching_rule_observer import DispatchingRuleObserver
+from ._most_work_remaining_rule_observer import MostWorkRemainingRuleObserver
+from ._dispatching_rule_solver import DispatchingRuleSolver
 
 __all__ = [
-    "DispatchingRule",
+    "DispatchingRuleObserver",
+    "shortest_processing_time_rule",
+    "first_come_first_served_rule",
+    "most_work_remaining_rule",
+    "most_operations_remaining_rule",
+    "random_operation_rule",
+    "score_based_rule",
+    "score_based_rule_with_tie_breaker",
+    "shortest_processing_time_score",
+    "first_come_first_served_score",
+    "most_work_remaining_score",
+    "most_operations_remaining_score",
+    "random_score",
+    "dispatching_rule_factory",
+    "DispatchingRuleType",
+    "MachineChooserType",
+    "machine_chooser_factory",
+    "MachineChooser",
+    "MostWorkRemainingRuleObserver",
+    "DispatchingRuleSolver",
 ]

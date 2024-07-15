@@ -1,12 +1,13 @@
 """Home of the `MostWorkRemainingRule` class."""
 
+import numpy as np
+
 from job_shop_lib import Operation
+from job_shop_lib._scheduled_operation import ScheduledOperation
 from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import (
     Dispatcher,
     DispatcherObserver,
-    MachineChooser,
-    MachineChooserType,
 )
 from job_shop_lib.dispatching.feature_observers import (
     DurationObserver,
@@ -25,9 +26,6 @@ class MostWorkRemainingRuleObserver(DispatchingRuleObserver):
         dispatcher: Dispatcher,
         *,
         subscribe: bool = True,
-        machine_chooser: (
-            str | MachineChooser | MachineChooserType
-        ) = MachineChooserType.FIRST,
     ):
 
         def has_job_feature(observer: DispatcherObserver) -> bool:
@@ -43,22 +41,29 @@ class MostWorkRemainingRuleObserver(DispatchingRuleObserver):
             IsReadyObserver,
             condition=has_job_feature,
         )
-        super().__init__(
-            dispatcher, subscribe=subscribe, machine_chooser=machine_chooser
-        )
+        super().__init__(dispatcher, subscribe=subscribe)
 
-    def select_action(self) -> tuple[Operation, int]:
+    def scores(self) -> np.ndarray:
+        """Returns the scores for each job based on the remaining work."""
+        work_remaining = self._duration_observer.features[FeatureType.JOBS]
+        # Set to +inf if job is not ready
+        work_remaining[~self._is_ready_observer.features[FeatureType.JOBS]] = (
+            float("inf")
+        )
+        return work_remaining.flatten()
+
+    def select_operation(self) -> Operation:
         # Choose job with the most work remaining
-        work_remaining = self._duration_observer.features[
-            FeatureType.JOBS
-        ].flatten()
+        work_remaining = self.scores()
         job_ids = work_remaining.argsort()
         for job_id in job_ids:
-            if not self._is_ready_observer.features[FeatureType.JOBS][
-                job_id, 0
-            ]:
-                continue
             operation = self.dispatcher.next_operation(job_id)
-            return operation, self.machine_chooser(self.dispatcher, operation)
+            return operation
 
         raise ValidationError("No operation available found to dispatch.")
+
+    def reset(self):
+        pass
+
+    def update(self, scheduled_operation: ScheduledOperation):
+        pass

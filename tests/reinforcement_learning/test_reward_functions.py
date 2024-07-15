@@ -2,9 +2,9 @@ from job_shop_lib import JobShopInstance
 from job_shop_lib.reinforcement_learning import MakespanReward, IdleTimeReward
 from job_shop_lib.dispatching import (
     Dispatcher,
-    DispatchingRuleSolver,
     prune_dominated_operations,
 )
+from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 
 
 def test_makespan_reward(example_job_shop_instance: JobShopInstance):

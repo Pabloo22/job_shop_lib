@@ -5,9 +5,11 @@ from job_shop_lib import Operation
 from job_shop_lib.dispatching import (
     DispatcherObserver,
     Dispatcher,
-    MachineChooser,
-    MachineChooserType,
+)
+from job_shop_lib.dispatching.rules import (
     machine_chooser_factory,
+    MachineChooserType,
+    MachineChooser,
 )
 
 

@@ -19,10 +19,10 @@ from job_shop_lib import (
 )
 from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import (
-    DispatchingRuleSolver,
     Dispatcher,
     HistoryObserver,
 )
+from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 from job_shop_lib.visualization._gantt_chart import plot_gantt_chart
 
 

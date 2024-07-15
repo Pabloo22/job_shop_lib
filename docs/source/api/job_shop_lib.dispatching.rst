@@ -28,4 +28,5 @@
    :recursive:
 
    job_shop_lib.dispatching.feature_observers
+   job_shop_lib.dispatching.rules
 

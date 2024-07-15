@@ -4,13 +4,17 @@ from collections.abc import Callable
 
 from job_shop_lib import JobShopInstance, Schedule, Operation, BaseSolver
 from job_shop_lib.dispatching import (
-    dispatching_rule_factory,
-    machine_chooser_factory,
     pruning_function_factory,
-    DispatchingRule,
-    MachineChooser,
     Dispatcher,
     PruningFunction,
+    DispatcherObserverConfig,
+)
+from job_shop_lib.dispatching.rules import (
+    dispatching_rule_factory,
+    machine_chooser_factory,
+    DispatchingRuleType,
+    MachineChooserType,
+    DispatchingRuleObserver,
 )
 
 
@@ -33,11 +37,14 @@ class DispatchingRuleSolver(BaseSolver):
     def __init__(
         self,
         dispatching_rule: (
-            str | Callable[[Dispatcher], Operation]
-        ) = DispatchingRule.MOST_WORK_REMAINING,
+            str
+            | Callable[[Dispatcher], Operation]
+            | type[DispatchingRuleObserver]
+            | DispatcherObserverConfig
+        ) = DispatchingRuleType.MOST_WORK_REMAINING,
         machine_chooser: (
             str | Callable[[Dispatcher, Operation], int]
-        ) = MachineChooser.FIRST,
+        ) = MachineChooserType.FIRST,
         pruning_function: (
             str
             | Callable[[Dispatcher, list[Operation]], list[Operation]]
@@ -75,6 +82,7 @@ class DispatchingRuleSolver(BaseSolver):
         self.dispatching_rule = dispatching_rule
         self.machine_chooser = machine_chooser
         self.pruning_function = pruning_function
+        self._dispatching_rule_observer: DispatchingRuleObserver | None = None
 
     def solve(
         self, instance: JobShopInstance, dispatcher: Dispatcher | None = None
@@ -98,9 +106,22 @@ class DispatchingRuleSolver(BaseSolver):
                 The dispatcher object that will be used to dispatch the
                 operations.
         """
-        selected_operation, machine_id = self.select_operation_and_machine(
-            dispatcher
-        )
+        if issubclass(type(self.dispatching_rule), DispatchingRuleObserver):
+            dispatching_rule = dispatcher.create_or_get_observer(
+                self.dispatching_rule
+            )
+            selected_operation, machine_id = dispatching_rule.select_action()
+        elif isinstance(self.dispatching_rule, DispatcherObserverConfig):
+            dispatching_rule = dispatcher.create_or_get_observer(
+                self.dispatching_rule.class_type,
+                **self.dispatching_rule.kwargs,
+            )
+            selected_operation, machine_id = dispatching_rule
+        else:
+            dispatching_rule = self.dispatching_rule
+            selected_operation, machine_id = self.select_operation_and_machine(
+                dispatcher
+            )
         dispatcher.dispatch(selected_operation, machine_id)
 
     def select_operation_and_machine(
@@ -121,6 +142,33 @@ class DispatchingRuleSolver(BaseSolver):
         selected_operation = self.dispatching_rule(dispatcher)
         machine_id = self.machine_chooser(dispatcher, selected_operation)
         return selected_operation, machine_id
+
+    def _set_dispatching_rule_observer(self, dispatcher: Dispatcher):
+        """Sets the dispatching rule observer for the dispatcher."""
+        if issubclass(type(self.dispatching_rule), DispatchingRuleObserver):
+            self._dispatching_rule_observer = (
+                dispatcher.create_or_get_observer(self.dispatching_rule)
+            )
+        elif isinstance(self.dispatching_rule, DispatcherObserverConfig):
+            self._dispatching_rule_observer = (
+                dispatcher.create_or_get_observer(
+                    self.dispatching_rule.class_type,
+                    **self.dispatching_rule.kwargs,
+                )
+            )
+        else:
+            self._dispatching_rule_observer = None
+
+
+class A:
+    def __init__(self, a: int):
+        self.a = a
+
+
+type_a = A
+
+if issubclass(type_a, A):
+    print("type_a is a type")
 
 
 if __name__ == "__main__":

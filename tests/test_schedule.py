@@ -1,17 +1,17 @@
 import pytest
 from job_shop_lib import Schedule, ScheduledOperation, JobShopInstance
 from job_shop_lib.exceptions import ValidationError
-from job_shop_lib.dispatching import (
+from job_shop_lib.dispatching.rules import (
     DispatchingRuleSolver,
-    DispatchingRule,
+    DispatchingRuleType,
 )
 from job_shop_lib.benchmarking import load_benchmark_instance
 
 
 RULES_TO_TEST = [
-    DispatchingRule.MOST_WORK_REMAINING,
-    DispatchingRule.FIRST_COME_FIRST_SERVED,
-    DispatchingRule.MOST_OPERATIONS_REMAINING,
+    DispatchingRuleType.MOST_WORK_REMAINING,
+    DispatchingRuleType.FIRST_COME_FIRST_SERVED,
+    DispatchingRuleType.MOST_OPERATIONS_REMAINING,
 ]
 INSTANCES_TO_TEST = [
     load_benchmark_instance(f"la{i:02d}") for i in range(1, 11)
@@ -76,7 +76,7 @@ def test_check_start_time_raises_error(job_shop_instance: JobShopInstance):
 @pytest.mark.parametrize("dispatching_rule", RULES_TO_TEST)
 @pytest.mark.parametrize("instance", INSTANCES_TO_TEST)
 def test_from_job_sequences_2(
-    dispatching_rule: DispatchingRule,
+    dispatching_rule: DispatchingRuleType,
     instance: JobShopInstance,
 ):
     solver = DispatchingRuleSolver(dispatching_rule=dispatching_rule)

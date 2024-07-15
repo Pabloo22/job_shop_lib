@@ -1,5 +1,6 @@
 from job_shop_lib import JobShopInstance
-from job_shop_lib.dispatching import Dispatcher, DispatchingRuleSolver
+from job_shop_lib.dispatching import Dispatcher
+from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 from job_shop_lib.dispatching.feature_observers import (
     IsCompletedObserver,
     FeatureType,
