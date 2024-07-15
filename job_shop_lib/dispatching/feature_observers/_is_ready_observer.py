@@ -13,17 +13,17 @@ class IsReadyObserver(FeatureObserver):
     def initialize_features(self):
         self.set_features_to_zero()
         for feature_type, feature in self.features.items():
-            node_ids = self._get_ready_nodes(feature_type)
-            feature[node_ids, 0] = 1.0
+            feature_ids = self._get_ready_feature_ids(feature_type)
+            feature[feature_ids, 0] = 1.0
 
-    def _get_ready_nodes(self, feature_type: FeatureType) -> list[int]:
+    def _get_ready_feature_ids(self, feature_type: FeatureType) -> list[int]:
         mapping = {
-            FeatureType.OPERATIONS: self._get_ready_operation_nodes,
+            FeatureType.OPERATIONS: self._get_ready_operations,
             FeatureType.MACHINES: self.dispatcher.available_machines,
             FeatureType.JOBS: self.dispatcher.available_jobs,
         }
         return mapping[feature_type]()
 
-    def _get_ready_operation_nodes(self) -> list[int]:
+    def _get_ready_operations(self) -> list[int]:
         available_operations = self.dispatcher.available_operations()
         return [operation.operation_id for operation in available_operations]

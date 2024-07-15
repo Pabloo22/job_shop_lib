@@ -138,6 +138,8 @@ class FeatureObserver(DispatcherObserver):
             if feature_type not in self._supported_feature_types:
                 raise ValidationError(
                     f"Feature type {feature_type} is not supported."
+                    " Supported feature types are: "
+                    f"{self._supported_feature_types}"
                 )
         return feature_types
 

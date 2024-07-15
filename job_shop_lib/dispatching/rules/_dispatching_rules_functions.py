@@ -38,7 +38,7 @@ def first_come_first_served_rule(dispatcher: Dispatcher) -> Operation:
 def most_work_remaining_rule_2(dispatcher: Dispatcher) -> Operation:
     """Dispatches the operation which job has the most remaining work."""
     job_remaining_work = [0] * dispatcher.instance.num_jobs
-    for operation in dispatcher.uncompleted_operations():
+    for operation in dispatcher.unscheduled_operations():
         job_remaining_work[operation.job_id] += operation.duration
 
     return max(

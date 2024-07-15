@@ -39,7 +39,7 @@ FeatureObserverConfig = (
 
 
 def feature_observer_factory(
-    node_feature_creator_type: (
+    feature_creator_type: (
         str
         | FeatureObserverType
         | type[FeatureObserver]
@@ -51,7 +51,7 @@ def feature_observer_factory(
     node feature creator type.
 
     Args:
-        node_feature_creator_type:
+        feature_creator_type:
             The type of node feature creator to create.
         **kwargs:
             Additional keyword arguments to pass to the node
@@ -60,16 +60,16 @@ def feature_observer_factory(
     Returns:
         A node feature creator instance.
     """
-    if isinstance(node_feature_creator_type, DispatcherObserverConfig):
+    if isinstance(feature_creator_type, DispatcherObserverConfig):
         return feature_observer_factory(
-            node_feature_creator_type.class_type,
-            **node_feature_creator_type.kwargs,
+            feature_creator_type.class_type,
+            **feature_creator_type.kwargs,
             **kwargs,
         )
     # if the instance is of type type[FeatureObserver] we can just
     # call the object constructor with the keyword arguments
-    if isinstance(node_feature_creator_type, type):
-        return node_feature_creator_type(**kwargs)
+    if isinstance(feature_creator_type, type):
+        return feature_creator_type(**kwargs)
 
     mapping: dict[FeatureObserverType, type[FeatureObserver]] = {
         FeatureObserverType.IS_READY: IsReadyObserver,
@@ -80,5 +80,5 @@ def feature_observer_factory(
         FeatureObserverType.REMAINING_OPERATIONS: RemainingOperationsObserver,
         FeatureObserverType.IS_COMPLETED: IsCompletedObserver,
     }
-    feature_creator = mapping[node_feature_creator_type]  # type: ignore[index]
+    feature_creator = mapping[feature_creator_type]  # type: ignore[index]
     return feature_creator(**kwargs)
