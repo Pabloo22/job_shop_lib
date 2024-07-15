@@ -7,14 +7,12 @@ from job_shop_lib.dispatching import (
     pruning_function_factory,
     Dispatcher,
     PruningFunction,
-    DispatcherObserverConfig,
 )
 from job_shop_lib.dispatching.rules import (
     dispatching_rule_factory,
     machine_chooser_factory,
     DispatchingRuleType,
     MachineChooserType,
-    DispatchingRuleObserver,
 )
 
 
@@ -37,10 +35,7 @@ class DispatchingRuleSolver(BaseSolver):
     def __init__(
         self,
         dispatching_rule: (
-            str
-            | Callable[[Dispatcher], Operation]
-            | type[DispatchingRuleObserver]
-            | DispatcherObserverConfig
+            str | Callable[[Dispatcher], Operation] 
         ) = DispatchingRuleType.MOST_WORK_REMAINING,
         machine_chooser: (
             str | Callable[[Dispatcher, Operation], int]
@@ -82,7 +77,6 @@ class DispatchingRuleSolver(BaseSolver):
         self.dispatching_rule = dispatching_rule
         self.machine_chooser = machine_chooser
         self.pruning_function = pruning_function
-        self._dispatching_rule_observer: DispatchingRuleObserver | None = None
 
     def solve(
         self, instance: JobShopInstance, dispatcher: Dispatcher | None = None
@@ -106,69 +100,9 @@ class DispatchingRuleSolver(BaseSolver):
                 The dispatcher object that will be used to dispatch the
                 operations.
         """
-        if issubclass(type(self.dispatching_rule), DispatchingRuleObserver):
-            dispatching_rule = dispatcher.create_or_get_observer(
-                self.dispatching_rule
-            )
-            selected_operation, machine_id = dispatching_rule.select_action()
-        elif isinstance(self.dispatching_rule, DispatcherObserverConfig):
-            dispatching_rule = dispatcher.create_or_get_observer(
-                self.dispatching_rule.class_type,
-                **self.dispatching_rule.kwargs,
-            )
-            selected_operation, machine_id = dispatching_rule
-        else:
-            dispatching_rule = self.dispatching_rule
-            selected_operation, machine_id = self.select_operation_and_machine(
-                dispatcher
-            )
-        dispatcher.dispatch(selected_operation, machine_id)
-
-    def select_operation_and_machine(
-        self, dispatcher: Dispatcher
-    ) -> tuple[Operation, int]:
-        """Chooses an operation and a machine based on the dispatching rule
-        and machine chooser.
-
-        Args:
-            dispatcher:
-                The dispatcher object that will be passed to the dispatching
-                rule and machine chooser.
-
-        Returns:
-            A tuple containing the operation to be dispatched and the machine
-            id where the operation will be dispatched.
-        """
         selected_operation = self.dispatching_rule(dispatcher)
         machine_id = self.machine_chooser(dispatcher, selected_operation)
-        return selected_operation, machine_id
-
-    def _set_dispatching_rule_observer(self, dispatcher: Dispatcher):
-        """Sets the dispatching rule observer for the dispatcher."""
-        if issubclass(type(self.dispatching_rule), DispatchingRuleObserver):
-            self._dispatching_rule_observer = (
-                dispatcher.create_or_get_observer(self.dispatching_rule)
-            )
-        elif isinstance(self.dispatching_rule, DispatcherObserverConfig):
-            self._dispatching_rule_observer = (
-                dispatcher.create_or_get_observer(
-                    self.dispatching_rule.class_type,
-                    **self.dispatching_rule.kwargs,
-                )
-            )
-        else:
-            self._dispatching_rule_observer = None
-
-
-class A:
-    def __init__(self, a: int):
-        self.a = a
-
-
-type_a = A
-
-if issubclass(type_a, A):
-    print("type_a is a type")
+        dispatcher.dispatch(selected_operation, machine_id)
 
 
 if __name__ == "__main__":
@@ -181,7 +115,7 @@ if __name__ == "__main__":
     ta_instances = [
         load_benchmark_instance(f"ta{i:02d}") for i in range(1, 81)
     ]
-    solver = DispatchingRuleSolver(dispatching_rule="random")
+    solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
 
     start = time.perf_counter()
 

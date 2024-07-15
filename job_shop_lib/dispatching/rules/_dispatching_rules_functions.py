@@ -10,7 +10,13 @@ from typing import Callable
 import random
 
 from job_shop_lib import Operation
-from job_shop_lib.dispatching import Dispatcher
+from job_shop_lib.exceptions import ValidationError
+from job_shop_lib.dispatching import Dispatcher, DispatcherObserver
+from job_shop_lib.dispatching.feature_observers import (
+    DurationObserver,
+    FeatureType,
+    IsReadyObserver,
+)
 
 
 def shortest_processing_time_rule(dispatcher: Dispatcher) -> Operation:
@@ -29,7 +35,7 @@ def first_come_first_served_rule(dispatcher: Dispatcher) -> Operation:
     )
 
 
-def most_work_remaining_rule(dispatcher: Dispatcher) -> Operation:
+def most_work_remaining_rule_2(dispatcher: Dispatcher) -> Operation:
     """Dispatches the operation which job has the most remaining work."""
     job_remaining_work = [0] * dispatcher.instance.num_jobs
     for operation in dispatcher.uncompleted_operations():
@@ -137,11 +143,30 @@ def first_come_first_served_score(dispatcher: Dispatcher) -> list[int]:
 
 def most_work_remaining_score(dispatcher: Dispatcher) -> list[int]:
     """Scores each job based on the remaining work in the job."""
-    num_jobs = dispatcher.instance.num_jobs
-    scores = [0] * num_jobs
-    for operation in dispatcher.uncompleted_operations():
-        scores[operation.job_id] += operation.duration
-    return scores
+
+    def has_job_feature(observer: DispatcherObserver) -> bool:
+        if not isinstance(observer, DurationObserver):
+            return False
+        return FeatureType.JOBS in observer.features
+
+    duration_observer = dispatcher.create_or_get_observer(
+        DurationObserver, condition=has_job_feature
+    )
+    is_ready_observer = dispatcher.create_or_get_observer(
+        IsReadyObserver, condition=has_job_feature
+    )
+
+    if not duration_observer or not is_ready_observer:
+        raise ValidationError("Required observers are not available.")
+
+    work_remaining = duration_observer.features[FeatureType.JOBS].copy()
+    is_ready = is_ready_observer.features[FeatureType.JOBS]
+    work_remaining[~is_ready.astype(bool)] = 0
+
+    return work_remaining.flatten().tolist()
+
+
+most_work_remaining_rule = score_based_rule(most_work_remaining_score)
 
 
 def most_operations_remaining_score(dispatcher: Dispatcher) -> list[int]:

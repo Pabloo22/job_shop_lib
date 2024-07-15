@@ -2,15 +2,7 @@
 
 from abc import abstractmethod
 from job_shop_lib import Operation
-from job_shop_lib.dispatching import (
-    DispatcherObserver,
-    Dispatcher,
-)
-from job_shop_lib.dispatching.rules import (
-    machine_chooser_factory,
-    MachineChooserType,
-    MachineChooser,
-)
+from job_shop_lib.dispatching import DispatcherObserver
 
 
 class DispatchingRuleObserver(DispatcherObserver):
@@ -21,22 +13,9 @@ class DispatchingRuleObserver(DispatcherObserver):
     available.
     """
 
-    def __init__(
-        self,
-        dispatcher: Dispatcher,
-        *,
-        subscribe: bool = True,
-        machine_chooser: (
-            str | MachineChooser | MachineChooserType
-        ) = MachineChooserType.FIRST,
-    ):
-        super().__init__(dispatcher, subscribe=subscribe)
-        self.machine_chooser = machine_chooser_factory(machine_chooser)
-
     @abstractmethod
-    def select_action(self) -> tuple[Operation, int]:
-        """Returns the selected operation and the ID of the machine
-        where it should be dispatched."""
+    def select_operation(self) -> Operation:
+        """Returns the selected operation."""
 
     def __call__(self) -> tuple[Operation, int]:
-        return self.select_action()
+        return self.select_operation()

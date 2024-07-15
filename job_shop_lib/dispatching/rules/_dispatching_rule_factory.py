@@ -17,7 +17,6 @@ from job_shop_lib.dispatching.rules import (
     most_operations_remaining_rule,
     random_operation_rule,
     most_work_remaining_rule,
-    DispatchingRuleObserver,
 )
 
 
@@ -33,7 +32,7 @@ class DispatchingRuleType(str, Enum):
 
 def dispatching_rule_factory(
     dispatching_rule: str | DispatchingRuleType,
-) -> Callable[[Dispatcher], Operation] | type[DispatchingRuleObserver]:
+) -> Callable[[Dispatcher], Operation]:
     """Creates and returns a dispatching rule function based on the specified
     dispatching rule name.
 

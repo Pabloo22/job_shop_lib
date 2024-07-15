@@ -13,9 +13,11 @@ from job_shop_lib.dispatching.feature_observers import (
 
 from job_shop_lib.dispatching import (
     Dispatcher,
-    DispatchingRuleSolver,
     PruningFunction,
     pruning_function_factory,
+)
+from job_shop_lib.dispatching.rules import (
+    DispatchingRuleSolver,
 )
 
 # Disable flake8 line-too-long check
@@ -175,26 +177,26 @@ STEP_6 = """CompositeFeatureObserver:
 ------------------------
 operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
-0      0.0               -1.0       1.0          1.0            0.0          1.0
-1      0.0                0.0       1.0          1.0            0.0          0.0
-2      0.0                1.0       7.0          1.0            0.0          0.0
-3      0.0                8.0       2.0          0.0            0.0          0.0
-4      0.0                1.0       5.0          1.0            0.0          0.0
-5      0.0                8.0       1.0          1.0            0.0          0.0
-6      0.0                9.0       1.0          0.0            0.0          0.0
-7      0.0               -1.0       0.0          1.0            0.0          1.0
-8      1.0                0.0       3.0          0.0            0.0          0.0
-9      0.0                6.0       2.0          0.0            1.0          0.0
+0      0.0               -7.0       1.0          1.0            0.0          1.0
+1      0.0               -6.0       1.0          1.0            0.0          1.0
+2      0.0               -5.0       7.0          1.0            0.0          0.0
+3      1.0                2.0       2.0          0.0            0.0          0.0
+4      0.0               -5.0       5.0          1.0            0.0          1.0
+5      1.0                2.0       1.0          0.0            0.0          0.0
+6      0.0                3.0       1.0          0.0            1.0          0.0
+7      0.0               -7.0       0.0          1.0            0.0          1.0
+8      0.0               -6.0      -3.0          1.0            0.0          1.0
+9      1.0                0.0       2.0          0.0            0.0          0.0
 machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
-0      1.0                0.0       6.0          0.0                  3.0          0.0
-1      0.0                6.0       2.0          2.0                  1.0          0.0
-2      0.0               -1.0       0.0          2.0                  0.0          1.0
+0      1.0                2.0       3.0          0.0                  2.0          0.0
+1      1.0                0.0       2.0          0.0                  1.0          0.0
+2      1.0                2.0       1.0          1.0                  1.0          0.0
 jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
-0      0.0                8.0       2.0          2.0                  1.0          0.0
-1      0.0                9.0       1.0          2.0                  1.0          0.0
-2      1.0                0.0       5.0          0.0                  2.0          0.0"""
+0      1.0                2.0       2.0          1.0                  1.0          0.0
+1      1.0                2.0       2.0          0.0                  2.0          0.0
+2      1.0                0.0       2.0          0.0                  1.0          0.0"""
 
 STEP_7 = """CompositeFeatureObserver:
 ------------------------
@@ -203,22 +205,22 @@ operations:
 0      0.0               -7.0       1.0          1.0            0.0          1.0
 1      0.0               -6.0       1.0          1.0            0.0          1.0
 2      0.0               -5.0       7.0          1.0            0.0          0.0
-3      1.0                2.0       2.0          0.0            0.0          0.0
+3      0.0                2.0       2.0          1.0            0.0          0.0
 4      0.0               -5.0       5.0          1.0            0.0          1.0
-5      0.0                2.0       1.0          1.0            0.0          0.0
-6      1.0                3.0       1.0          0.0            0.0          0.0
+5      1.0                2.0       1.0          0.0            0.0          0.0
+6      0.0                4.0       1.0          0.0            1.0          0.0
 7      0.0               -7.0       0.0          1.0            0.0          1.0
 8      0.0               -6.0      -3.0          1.0            0.0          1.0
 9      1.0                0.0       2.0          0.0            0.0          0.0
 machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
-0      1.0                2.0       3.0          0.0                  2.0          0.0
+0      0.0                4.0       1.0          1.0                  1.0          0.0
 1      1.0                0.0       2.0          0.0                  1.0          0.0
-2      0.0               -7.0       0.0          2.0                  0.0          1.0
+2      1.0                2.0       1.0          1.0                  1.0          0.0
 jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
-0      1.0                2.0       2.0          1.0                  1.0          0.0
-1      1.0                3.0       1.0          1.0                  1.0          0.0
+0      0.0                2.0       0.0          2.0                  0.0          1.0
+1      1.0                2.0       2.0          0.0                  2.0          0.0
 2      1.0                0.0       2.0          0.0                  1.0          0.0"""
 
 STEP_8 = """CompositeFeatureObserver:
@@ -250,26 +252,26 @@ STEP_9 = """CompositeFeatureObserver:
 ------------------------
 operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
-0      0.0               -7.0       1.0          1.0            0.0          1.0
-1      0.0               -6.0       1.0          1.0            0.0          1.0
-2      0.0               -5.0       7.0          1.0            0.0          0.0
-3      0.0                2.0       2.0          1.0            0.0          0.0
-4      0.0               -5.0       5.0          1.0            0.0          1.0
-5      0.0                2.0       1.0          1.0            0.0          0.0
-6      0.0                4.0       1.0          1.0            0.0          0.0
-7      0.0               -7.0       0.0          1.0            0.0          1.0
-8      0.0               -6.0      -3.0          1.0            0.0          1.0
-9      1.0                0.0       2.0          0.0            0.0          0.0
+0      0.0              -11.0       1.0          1.0            0.0          1.0
+1      0.0              -10.0       1.0          1.0            0.0          1.0
+2      0.0               -9.0       7.0          1.0            0.0          1.0
+3      0.0               -2.0       2.0          1.0            0.0          1.0
+4      0.0               -9.0       5.0          1.0            0.0          1.0
+5      0.0               -2.0       1.0          1.0            0.0          1.0
+6      1.0                0.0       1.0          0.0            0.0          0.0
+7      0.0              -11.0       0.0          1.0            0.0          1.0
+8      0.0              -10.0      -3.0          1.0            0.0          1.0
+9      0.0               -4.0      -2.0          1.0            0.0          1.0
 machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
-0      0.0               -7.0       0.0          2.0                  0.0          1.0
-1      1.0                0.0       2.0          0.0                  1.0          0.0
-2      0.0               -7.0       0.0          2.0                  0.0          1.0
+0      1.0                0.0       1.0          0.0                  1.0          0.0
+1      0.0              -11.0       0.0          0.0                  0.0          1.0
+2      0.0              -11.0       0.0          0.0                  0.0          1.0
 jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
-0      0.0                2.0       0.0          2.0                  0.0          1.0
-1      0.0                4.0       0.0          2.0                  0.0          1.0
-2      1.0                0.0       2.0          0.0                  1.0          0.0"""
+0      0.0                2.0       0.0          0.0                  0.0          1.0
+1      1.0                0.0       1.0          0.0                  1.0          0.0
+2      0.0                0.0       0.0          0.0                  0.0          1.0"""
 
 STEP_10 = """CompositeFeatureObserver:
 ------------------------
@@ -281,10 +283,10 @@ operations:
 3      0.0               -3.0       2.0          1.0            0.0          1.0
 4      0.0              -10.0       5.0          1.0            0.0          1.0
 5      0.0               -3.0       1.0          1.0            0.0          1.0
-6      0.0               -1.0       1.0          1.0            0.0          1.0
+6      0.0               -1.0       0.0          1.0            0.0          1.0
 7      0.0              -12.0       0.0          1.0            0.0          1.0
 8      0.0              -11.0      -3.0          1.0            0.0          1.0
-9      0.0               -5.0      -3.0          1.0            0.0          1.0
+9      0.0               -5.0      -2.0          1.0            0.0          1.0
 machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0              -12.0       0.0          0.0                  0.0          1.0
@@ -293,7 +295,7 @@ machines:
 jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0                2.0       0.0          0.0                  0.0          1.0
-1      0.0                4.0       0.0          0.0                  0.0          1.0
+1      0.0                0.0       0.0          0.0                  0.0          1.0
 2      0.0                0.0       0.0          0.0                  0.0          1.0"""
 
 
@@ -342,7 +344,7 @@ def test_every_feature_observer(irregular_job_shop_instance: JobShopInstance):
     ]
     for step in steps:
         solver.step(dispatcher)
-        assert str(composite) == step
+        assert str(composite) == step, f"index: {steps.index(step)}"
 
 
 def test_duration_observer_init(irregular_job_shop_instance: JobShopInstance):
