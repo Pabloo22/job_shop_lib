@@ -1,5 +1,7 @@
 """Contains the dispatching rules for the job shop scheduling problem."""
 
+from ._dispatching_rule_observer import DispatchingRuleObserver
+from ._most_work_remaining_rule_observer import MostWorkRemainingRuleObserver
 from ._dispatching_rules_functions import (
     shortest_processing_time_rule,
     first_come_first_served_rule,
@@ -14,17 +16,18 @@ from ._dispatching_rules_functions import (
     most_operations_remaining_score,
     random_score,
 )
+from ._machine_chooser_factory import (
+    MachineChooserType,
+    MachineChooser,
+    machine_chooser_factory,
+)
 
-from ._factory import (
+from ._dispatching_rule_factory import (
     dispatching_rule_factory,
     DispatchingRuleType,
-    MachineChooserType,
-    machine_chooser_factory,
-    MachineChooser,
 )
-from ._dispatching_rule_observer import DispatchingRuleObserver
-from ._most_work_remaining_rule_observer import MostWorkRemainingRuleObserver
 from ._dispatching_rule_solver import DispatchingRuleSolver
+
 
 __all__ = [
     "DispatchingRuleObserver",
