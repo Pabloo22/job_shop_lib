@@ -37,7 +37,7 @@ def add_padding(
         The padded array with the specified output shape.
 
     Raises:
-        ValidationError: 
+        ValidationError:
             If the output shape is smaller than the input shape.
 
     Examples:
