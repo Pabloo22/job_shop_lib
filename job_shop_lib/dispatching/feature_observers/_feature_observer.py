@@ -33,6 +33,11 @@ class FeatureObserver(DispatcherObserver):
     _feature_size: dict[FeatureType, int] | int = 1
     _supported_feature_types = list(FeatureType)
 
+    __slots__ = (
+        "features",
+        "feature_dimensions",
+    )
+
     def __init__(
         self,
         dispatcher: Dispatcher,
