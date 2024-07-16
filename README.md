@@ -2,7 +2,7 @@
 
 <img src="docs/source/images/jslib_minimalist_logo_no_background_fixed.png" height="150px">
 
-<h1>Job Shop Lib</h1>
+<h1>JobShopLib</h1>
 
 [![Tests](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml/badge.svg)](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml)
 ![Python versions](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
