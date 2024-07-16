@@ -137,3 +137,33 @@ class CompositeFeatureObserver(FeatureObserver):
             out.append(f"{feature_type.value}:")
             out.append(dataframe.to_string())
         return "\n".join(out)
+
+
+if __name__ == "__main__":
+    from cProfile import Profile
+    from job_shop_lib.benchmarking import load_benchmark_instance
+    from job_shop_lib.dispatching.rules import DispatchingRuleSolver
+    from job_shop_lib.dispatching.feature_observers import (
+        FeatureObserverType,
+    )
+
+    ta80 = load_benchmark_instance("ta80")
+
+    dispatcher_ = Dispatcher(ta80)
+    feature_observer_types_ = list(FeatureObserverType)
+    feature_observers_ = [
+        feature_observer_factory(
+            observer_type,
+            dispatcher=dispatcher_,
+        )
+        for observer_type in feature_observer_types_
+        if not observer_type == FeatureObserverType.COMPOSITE
+        # and not FeatureObserverType.EARLIEST_START_TIME
+    ]
+    composite_observer_ = CompositeFeatureObserver(
+        dispatcher_, feature_observers=feature_observers_
+    )
+    solver = DispatchingRuleSolver(dispatching_rule="random")
+    profiler = Profile()
+    profiler.runcall(solver.solve, dispatcher_.instance, dispatcher_)
+    profiler.print_stats("cumtime")
