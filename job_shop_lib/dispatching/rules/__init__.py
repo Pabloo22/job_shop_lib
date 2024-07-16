@@ -12,9 +12,10 @@ from ._dispatching_rules_functions import (
     score_based_rule_with_tie_breaker,
     shortest_processing_time_score,
     first_come_first_served_score,
-    most_work_remaining_score,
+    MostWorkRemainingScorer,
     most_operations_remaining_score,
     random_score,
+    observer_based_most_work_remaining_rule,
 )
 from ._machine_chooser_factory import (
     MachineChooserType,
@@ -40,7 +41,7 @@ __all__ = [
     "score_based_rule_with_tie_breaker",
     "shortest_processing_time_score",
     "first_come_first_served_score",
-    "most_work_remaining_score",
+    "MostWorkRemainingScorer",
     "most_operations_remaining_score",
     "random_score",
     "dispatching_rule_factory",
@@ -50,4 +51,5 @@ __all__ = [
     "MachineChooser",
     "MostWorkRemainingRuleObserver",
     "DispatchingRuleSolver",
+    "observer_based_most_work_remaining_rule",
 ]
