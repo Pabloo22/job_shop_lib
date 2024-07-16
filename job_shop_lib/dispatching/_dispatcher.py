@@ -343,11 +343,12 @@ class Dispatcher:
         of observers.
 
         Args:
-            dispatcher:
-                The dispatcher instance to which the observer will be added or
-                retrieved.
             observer:
                 The type of observer to be created or retrieved.
+            condition:
+                A function that takes an observer and returns True if it is
+                the observer to be retrieved. By default, it returns True for
+                all observers.
             **kwargs:
                 Additional keyword arguments to be passed to the observer's
                 constructor.
