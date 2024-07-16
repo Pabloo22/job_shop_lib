@@ -35,7 +35,7 @@ class DispatchingRuleSolver(BaseSolver):
     def __init__(
         self,
         dispatching_rule: (
-            str | Callable[[Dispatcher], Operation] 
+            str | Callable[[Dispatcher], Operation]
         ) = DispatchingRuleType.MOST_WORK_REMAINING,
         machine_chooser: (
             str | Callable[[Dispatcher, Operation], int]
@@ -112,10 +112,16 @@ if __name__ == "__main__":
     from io import StringIO
     from job_shop_lib.benchmarking import load_benchmark_instance
 
+    # from job_shop_lib.dispatching.rules._dispatching_rules_functions import (
+    #     most_work_remaining_rule_2,
+    # )
+
     ta_instances = [
         load_benchmark_instance(f"ta{i:02d}") for i in range(1, 81)
     ]
-    solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
+    solver = DispatchingRuleSolver(
+        dispatching_rule="most_work_remaining", pruning_function=None
+    )
 
     start = time.perf_counter()
 
@@ -136,5 +142,5 @@ if __name__ == "__main__":
     # Print profiling results
     s = StringIO()
     ps = pstats.Stats(profiler, stream=s).sort_stats("cumulative")
-    ps.print_stats(20)  # Print top 20 time-consuming functions
-    print(s.getvalue())
+    profiler.print_stats("cumtime")  # Print top 20 time-consuming functions
+    # print(s.getvalue())
