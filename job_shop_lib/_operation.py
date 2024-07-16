@@ -31,9 +31,9 @@ class Operation:
     __slots__ = (
         "machines",
         "duration",
-        "_job_id",
-        "_position_in_job",
-        "_operation_id",
+        "job_id",
+        "position_in_job",
+        "operation_id",
     )
 
     def __init__(self, machines: int | list[int], duration: int):
@@ -51,9 +51,9 @@ class Operation:
         self.duration = duration
 
         # Defined outside the class by the JobShopInstance class:
-        self._job_id: int | None = None
-        self._position_in_job: int | None = None
-        self._operation_id: int | None = None
+        self.job_id: int = -1
+        self.position_in_job: int = -1
+        self.operation_id: int = -1
 
     @property
     def machine_id(self) -> int:
@@ -69,56 +69,13 @@ class Operation:
             )
         return self.machines[0]
 
-    @property
-    def job_id(self) -> int:
-        """Returns the id of the job that the operation belongs to."""
-        if self._job_id is None:
-            raise UninitializedAttributeError("Operation has no job_id.")
-        return self._job_id
-
-    @job_id.setter
-    def job_id(self, value: int) -> None:
-        self._job_id = value
-
-    @property
-    def position_in_job(self) -> int:
-        """Returns the position (starting at zero) of the operation in the
-        job.
-
-        Raises:
-            UninitializedAttributeError: If the operation has no
-            `position_in_job`.
-        """
-        if self._position_in_job is None:
-            raise UninitializedAttributeError(
-                "Operation has no `position_in_job`."
-            )
-        return self._position_in_job
-
-    @position_in_job.setter
-    def position_in_job(self, value: int) -> None:
-        self._position_in_job = value
-
-    @property
-    def operation_id(self) -> int:
-        """Returns the id of the operation.
-
-        The operation id is unique within a job shop instance and should
-        be set by the JobShopInstance class.
-
-        It starts at 0 and is incremented by 1 for each operation in the
-        instance.
-
-        Raises:
-            UninitializedAttributeError: If the operation has no id.
-        """
-        if self._operation_id is None:
-            raise UninitializedAttributeError("Operation has no id.")
-        return self._operation_id
-
-    @operation_id.setter
-    def operation_id(self, value: int) -> None:
-        self._operation_id = value
+    def is_initialized(self) -> bool:
+        """Returns whether the operation has been initialized."""
+        return (
+            self.job_id == -1
+            or self.position_in_job == -1
+            or self.operation_id == -1
+        )
 
     def __hash__(self) -> int:
         return hash(self.operation_id)
