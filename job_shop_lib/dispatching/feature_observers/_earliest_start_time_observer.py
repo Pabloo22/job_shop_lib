@@ -14,6 +14,13 @@ class EarliestStartTimeObserver(FeatureObserver):
     """Observer that adds a feature indicating the earliest start time of
     each operation, machine, and job in the graph."""
 
+    __slots__ = (
+        "earliest_start_times",
+        "_job_ids",
+        "_positions",
+        "machine_ids",
+    )
+
     def __init__(
         self,
         dispatcher: Dispatcher,
@@ -33,6 +40,30 @@ class EarliestStartTimeObserver(FeatureObserver):
         )
         self.earliest_start_times[np.isnan(squared_duration_matrix)] = np.nan
         # -------------------------------
+
+        # Cache:
+        operations_by_machine = dispatcher.instance.operations_by_machine
+        self._is_regular_instance = all(
+            len(job) == len(dispatcher.instance.jobs[0])
+            for job in dispatcher.instance.jobs
+        )
+        if self._is_regular_instance:
+            self._job_ids = np.array(
+                [
+                    [op.job_id for op in machine_ops]
+                    for machine_ops in operations_by_machine
+                ]
+            )
+            self._positions = np.array(
+                [
+                    [op.position_in_job for op in machine_ops]
+                    for machine_ops in operations_by_machine
+                ]
+            )
+        else:
+            self._job_ids = np.array([])
+            self._positions = np.array([])
+
         super().__init__(
             dispatcher, feature_types=feature_types, subscribe=subscribe
         )
@@ -69,31 +100,56 @@ class EarliestStartTimeObserver(FeatureObserver):
 
         # Now, we compute the gap that could be introduced by the new
         # next_available_time of the machine.
-        operations_by_machine = self.dispatcher.instance.operations_by_machine
-        for operation in operations_by_machine[scheduled_operation.machine_id]:
-            if self.dispatcher.is_scheduled(operation):
-                continue
-            old_start_time = self.earliest_start_times[
-                operation.job_id, operation.position_in_job
-            ]
-            new_start_time = max(old_start_time, scheduled_operation.end_time)
-            gap = new_start_time - old_start_time
-            self.earliest_start_times[
-                operation.job_id, operation.position_in_job :
-            ] += gap
+        machine_ops = self.dispatcher.instance.operations_by_machine[
+            scheduled_operation.machine_id
+        ]
+        unscheduled_mask = np.array(
+            [not self.dispatcher.is_scheduled(op) for op in machine_ops]
+        )
+        if np.any(unscheduled_mask):
+            if self._job_ids.size == 0:
+                job_ids = np.array([op.job_id for op in machine_ops])[
+                    unscheduled_mask
+                ]
+            else:
+                job_ids = self._job_ids[scheduled_operation.machine_id][
+                    unscheduled_mask
+                ]
+
+            if self._positions.size == 0:
+                positions = np.array(
+                    [op.position_in_job for op in machine_ops]
+                )[unscheduled_mask]
+            else:
+                positions = self._positions[scheduled_operation.machine_id][
+                    unscheduled_mask
+                ]
+            old_start_times = self.earliest_start_times[job_ids, positions]
+            new_start_times = np.maximum(
+                scheduled_operation.end_time, old_start_times
+            )
+            gaps = new_start_times - old_start_times
+
+            for job_id, position, gap in zip(job_ids, positions, gaps):
+                self.earliest_start_times[job_id, position:] += gap
 
         self.initialize_features()
 
     def initialize_features(self):
         """Initializes the features based on the current state of the
         dispatcher."""
-        mapping = {
-            FeatureType.OPERATIONS: self._update_operation_features,
-            FeatureType.MACHINES: self._update_machine_features,
-            FeatureType.JOBS: self._update_job_features,
-        }
         for feature_type in self.features:
-            mapping[feature_type]()
+            if feature_type == FeatureType.OPERATIONS:
+                self._update_operation_features()
+            elif (
+                feature_type == FeatureType.MACHINES
+                and self._is_regular_instance
+            ):
+                self._update_machine_features_vectorized()
+            elif feature_type == FeatureType.MACHINES:
+                self._update_machine_features()
+            elif feature_type == FeatureType.JOBS:
+                self._update_job_features()
 
     def _update_operation_features(self):
         """Ravels the 2D array into a 1D array"""
@@ -128,6 +184,42 @@ class EarliestStartTimeObserver(FeatureObserver):
                 min_earliest_start_time - current_time
             )
 
+    def _update_machine_features_vectorized(self):
+        """Picks the minimum start time of all operations that can be scheduled
+        on that machine"""
+        current_time = self.dispatcher.current_time()
+        operations_by_machine = self.dispatcher.instance.operations_by_machine
+
+        # Create a mask for unscheduled operations
+        is_unscheduled = np.array(
+            [
+                [not self.dispatcher.is_scheduled(op) for op in machine_ops]
+                for machine_ops in operations_by_machine
+            ]
+        )
+
+        # Get earliest start times for all operations
+        earliest_start_times = self.earliest_start_times[
+            self._job_ids, self._positions
+        ]
+
+        # Apply mask for unscheduled operations
+        masked_start_times = np.where(
+            is_unscheduled, earliest_start_times, np.inf
+        )
+
+        # Find minimum start time for each machine
+        min_start_times = np.min(masked_start_times, axis=1)
+
+        # Handle cases where all operations are scheduled
+        min_start_times = np.where(
+            np.isinf(min_start_times), 0, min_start_times
+        )
+
+        self.features[FeatureType.MACHINES][:, 0] = (
+            min_start_times - current_time
+        )
+
     def _update_job_features(self):
         """Picks the earliest start time of the next operation in the job"""
         current_time = self.dispatcher.current_time()
@@ -141,17 +233,3 @@ class EarliestStartTimeObserver(FeatureObserver):
                 self.earliest_start_times[job_id, next_operation_idx]
                 - current_time
             )
-
-
-if __name__ == "__main__":
-    squared_durations_matrix = np.array([[1, 1, 7], [5, 1, 1], [1, 3, 2]])
-    # Add a zeros column to the left of the matrix
-    cumulative_durations = np.hstack(
-        (
-            np.zeros((squared_durations_matrix.shape[0], 1)),
-            squared_durations_matrix[:, :-1],
-        )
-    )
-    # Set to nan the values that are not available
-    cumulative_durations[np.isnan(squared_durations_matrix)] = np.nan
-    print(cumulative_durations)
