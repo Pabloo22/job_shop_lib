@@ -35,25 +35,25 @@ pip install job-shop-lib
 
 ## Key Features :star:
 
-- **Data Structures**: Easily create, manage, and manipulate job shop instances and solutions with user-friendly data structures. See [Getting Started](examples/00-Getting-Started.ipynb) and [How Solutions are Represented](examples/01-How-Solutions-are-Represented.ipynb).
+- **Data Structures**: Easily create, manage, and manipulate job shop instances and solutions with user-friendly data structures. See [Getting Started](docs/source/examples/00-Getting-Started.ipynb) and [How Solutions are Represented](docs/source/examples/01-How-Solutions-are-Represented.ipynb).
 
-- **Benchmark Instances**: Load well-known benchmark instances directly from the library without manual downloading. See [Load Benchmark Instances](examples/05-Load-Benchmark-Instances.ipynb).
+- **Benchmark Instances**: Load well-known benchmark instances directly from the library without manual downloading. See [Load Benchmark Instances](docs/source/examples/05-Load-Benchmark-Instances.ipynb).
 
 - **Random Instance Generation**: Create random instances with customizable sizes and properties or augment existing ones. See [`generation`](job_shop_lib/generation) package.
 
 - **Multiple Solvers**:
-  - **Constraint Programming Solver**: OR-Tools' CP-SAT solver. See [Solving the Problem](examples/02-Solving-the-Problem.ipynb).
+  - **Constraint Programming Solver**: OR-Tools' CP-SAT solver. See [Solving the Problem](docs/source/examples/02-Solving-the-Problem.ipynb).
 
-  - **Dispatching Rule Solvers**: Use any of the available dispatching rules or create custom ones. See [Dispatching Rules](examples/03-Dispatching-Rules.ipynb).
+  - **Dispatching Rule Solvers**: Use any of the available dispatching rules or create custom ones. See [Dispatching Rules](docs/source/examples/03-Dispatching-Rules.ipynb).
 
-- **Gantt Charts**: Visualize final schedules and how are they created iteratively by dispatching rule solvers or sequences of scheduling decisions with GIFs or videos. See [Save Gif](examples/06-Save-Gif.ipynb).
+- **Gantt Charts**: Visualize final schedules and how are they created iteratively by dispatching rule solvers or sequences of scheduling decisions with GIFs or videos. See [Save Gif](docs/source/examples/06-Save-Gif.ipynb).
 
 - **Graph Representations**:
-  - **Disjunctive Graphs**: Represent and visualize instances as disjunctive graphs. See [Disjunctive Graph](examples/04-Disjunctive-Graph.ipynb).
-  - **Agent-Task Graphs**: Encode instances as agent-task graphs (introduced in [ScheduleNet paper](https://arxiv.org/abs/2106.03051)). See [Agent-Task Graph](examples/07-Agent-Task-Graph.ipynb).
+  - **Disjunctive Graphs**: Represent and visualize instances as disjunctive graphs. See [Disjunctive Graph](docs/source/examples/04-Disjunctive-Graph.ipynb).
+  - **Agent-Task Graphs**: Encode instances as agent-task graphs (introduced in [ScheduleNet paper](https://arxiv.org/abs/2106.03051)). See [Agent-Task Graph](docs/source/examples/07-Agent-Task-Graph.ipynb).
   - Build your own custom graphs with the `JobShopGraph` class.
 
-- **Gymnasium Environments**: Two environments for solving the problem with Graph Neural Networks (GNNs) or any other method, and Reinforcement Learning (RL). See [SingleJobShopGraphEnv](examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](examples/10-MultiJobShopGraphEnv.ipynb).
+- **Gymnasium Environments**: Two environments for solving the problem with Graph Neural Networks (GNNs) or any other method, and Reinforcement Learning (RL). See [SingleJobShopGraphEnv](docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](examples/10-MultiJobShopGraphEnv.ipynb).
 
 <!-- end key features -->
 
