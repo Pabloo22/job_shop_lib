@@ -6,11 +6,10 @@ which operations are selected for execution based on certain criteria such as
 shortest processing time, first come first served, etc.
 """
 
-from typing import Callable
+from collections.abc import Callable, Sequence
 import random
 
 from job_shop_lib import Operation
-from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import Dispatcher, DispatcherObserver
 from job_shop_lib.dispatching.feature_observers import (
     DurationObserver,
@@ -65,7 +64,7 @@ def random_operation_rule(dispatcher: Dispatcher) -> Operation:
 
 
 def score_based_rule(
-    score_function: Callable[[Dispatcher], list[int]]
+    score_function: Callable[[Dispatcher], Sequence[float]]
 ) -> Callable[[Dispatcher], Operation]:
     """Creates a dispatching rule based on a scoring function.
 
@@ -89,7 +88,7 @@ def score_based_rule(
 
 
 def score_based_rule_with_tie_breaker(
-    score_functions: list[Callable[[Dispatcher], list[int]]],
+    score_functions: list[Callable[[Dispatcher], Sequence[int]]],
 ) -> Callable[[Dispatcher], Operation]:
     """Creates a dispatching rule based on multiple scoring functions.
 
@@ -141,32 +140,86 @@ def first_come_first_served_score(dispatcher: Dispatcher) -> list[int]:
     return scores
 
 
-def most_work_remaining_score(dispatcher: Dispatcher) -> list[int]:
-    """Scores each job based on the remaining work in the job."""
+class MostWorkRemainingScorer:  # pylint: disable=too-few-public-methods
+    """Scores each job based on the remaining work in the job.
 
-    def has_job_feature(observer: DispatcherObserver) -> bool:
-        if not isinstance(observer, DurationObserver):
-            return False
-        return FeatureType.JOBS in observer.features
+    This class is conceptually a function: it can be called with a
+    :class:`~job_shop_lib.dispatching.Dispatcher` instance as input, and it
+    returns a list of scores for each job. The reason for using a class instead
+    of a function is to cache the observers that are created for each
+    dispatcher instance. This way, the observers do not have to be retrieved
+    every time the function is called.
 
-    duration_observer = dispatcher.create_or_get_observer(
-        DurationObserver, condition=has_job_feature
-    )
-    is_ready_observer = dispatcher.create_or_get_observer(
-        IsReadyObserver, condition=has_job_feature
-    )
+    """
 
-    if not duration_observer or not is_ready_observer:
-        raise ValidationError("Required observers are not available.")
+    def __init__(self) -> None:
+        self._duration_observer: DurationObserver | None = None
+        self._is_ready_observer: IsReadyObserver | None = None
+        self._current_dispatcher: Dispatcher | None = None
 
-    work_remaining = duration_observer.features[FeatureType.JOBS].copy()
-    is_ready = is_ready_observer.features[FeatureType.JOBS]
-    work_remaining[~is_ready.astype(bool)] = 0
+    def __call__(self, dispatcher: Dispatcher) -> Sequence[int]:
+        """Scores each job based on the remaining work in the job."""
 
-    return work_remaining.flatten().tolist()
+        if self._current_dispatcher is not dispatcher:
+            self._duration_observer = None
+            self._is_ready_observer = None
+            self._current_dispatcher = dispatcher
+
+        def has_job_feature(observer: DispatcherObserver) -> bool:
+            if not isinstance(observer, DurationObserver):
+                return False
+            return FeatureType.JOBS in observer.features
+
+        if self._duration_observer is None:
+            self._duration_observer = dispatcher.create_or_get_observer(
+                DurationObserver,
+                condition=has_job_feature,
+                feature_types=FeatureType.JOBS,
+            )
+        if self._is_ready_observer is None:
+            self._is_ready_observer = dispatcher.create_or_get_observer(
+                IsReadyObserver,
+                condition=has_job_feature,
+                feature_types=FeatureType.JOBS,
+            )
+
+        work_remaining = self._duration_observer.features[
+            FeatureType.JOBS
+        ].copy()
+        is_ready = self._is_ready_observer.features[FeatureType.JOBS]
+        work_remaining[~is_ready.astype(bool)] = 0
+
+        return work_remaining.ravel()  # type: ignore[return-value]
 
 
-most_work_remaining_rule = score_based_rule(most_work_remaining_score)
+most_work_remaining_rule = score_based_rule(MostWorkRemainingScorer())
+
+# def most_work_remaining_score(dispatcher: Dispatcher) -> list[int]:
+#     """Scores each job based on the remaining work in the job."""
+
+#     def has_job_feature(observer: DispatcherObserver) -> bool:
+#         if not isinstance(observer, DurationObserver):
+#             return False
+#         return FeatureType.JOBS in observer.features
+
+#     duration_observer = dispatcher.create_or_get_observer(
+#         DurationObserver, condition=has_job_feature
+#     )
+#     is_ready_observer = dispatcher.create_or_get_observer(
+#         IsReadyObserver, condition=has_job_feature
+#     )
+
+#     if not duration_observer or not is_ready_observer:
+#         raise ValidationError("Required observers are not available.")
+
+#     work_remaining = duration_observer.features[FeatureType.JOBS].copy()
+#     is_ready = is_ready_observer.features[FeatureType.JOBS]
+#     work_remaining[~is_ready.astype(bool)] = 0
+
+#     return work_remaining.flatten().tolist()
+
+
+# most_work_remaining_rule = score_based_rule(most_work_remaining_score)
 
 
 def most_operations_remaining_score(dispatcher: Dispatcher) -> list[int]:
