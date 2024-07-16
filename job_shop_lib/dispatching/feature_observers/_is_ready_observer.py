@@ -17,12 +17,16 @@ class IsReadyObserver(FeatureObserver):
             feature[feature_ids, 0] = 1.0
 
     def _get_ready_feature_ids(self, feature_type: FeatureType) -> list[int]:
-        mapping = {
-            FeatureType.OPERATIONS: self._get_ready_operations,
-            FeatureType.MACHINES: self.dispatcher.available_machines,
-            FeatureType.JOBS: self.dispatcher.available_jobs,
-        }
-        return mapping[feature_type]()
+        if feature_type == FeatureType.OPERATIONS:
+            return self._get_ready_operations()
+        if feature_type == FeatureType.MACHINES:
+            return self.dispatcher.available_machines()
+        if feature_type == FeatureType.JOBS:
+            return self.dispatcher.available_jobs()
+        raise ValueError(f"Feature type {feature_type} is not supported.")
+
+    def reset(self):
+        self.initialize_features()
 
     def _get_ready_operations(self) -> list[int]:
         available_operations = self.dispatcher.available_operations()

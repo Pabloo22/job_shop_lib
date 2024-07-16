@@ -67,6 +67,9 @@ class IsCompletedObserver(FeatureObserver):
                 FeatureType.MACHINES
             ].copy()
 
+    def reset(self):
+        self.initialize_features()
+
     def update(self, scheduled_operation: ScheduledOperation):
         if FeatureType.OPERATIONS in self.features:
             completed_operations = [
