@@ -31,6 +31,7 @@ jobs:
       run: |
         cd docs
         poetry run make html
+        touch build/html/.nojekyll
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
