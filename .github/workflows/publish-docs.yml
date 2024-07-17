@@ -29,14 +29,12 @@ jobs:
 
     - name: Build Documentation
       run: |
-        cd docs
-        poetry run make html
-        touch build/html/.nojekyll
+        poetry run sphinx-build -b html docs/source/ html
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         publish_branch: gh-pages
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: docs/build/html
+        publish_dir: html
         force_orphan: true
