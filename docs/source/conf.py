@@ -58,17 +58,31 @@ napoleon_preprocess_types = True  # pylint: disable=invalid-name
 
 napoleon_type_aliases = {
     "`Dispatcher`": ":class:`~job_shop_lib.dispatching.Dispatcher`",
-    "`DispatcherObserver`": ":class:`~job_shop_lib.dispatching.DispatcherObserver`",
-    "`FeatureType`": ":class:`~job_shop_lib.dispatching.feature_observers.FeatureType`",
-    "`GraphUpdater`": ":class:`~job_shop_lib.graphs.graph_updaters.GraphUpdater`",
-    "`IsCompletedObserver`": ":class:`~job_shop_lib.dispatching.feature_observers.IsCompletedObserver`",
+    "`DispatcherObserver`": (
+        ":class:`~job_shop_lib.dispatching.DispatcherObserver`"
+    ),
+    "`FeatureType`": (
+        ":class:`~job_shop_lib.dispatching.feature_observers.FeatureType`"
+    ),
+    "`GraphUpdater`": (
+        ":class:`~job_shop_lib.graphs.graph_updaters.GraphUpdater`"
+    ),
+    "`IsCompletedObserver`": (
+        ":class:`~job_shop_lib.dispatching.feature_observers"
+        ".IsCompletedObserver`"
+    ),
     "`JobShopGraph`": ":class:`~job_shop_lib.graphs.JobShopGraph`",
     "`Operation`": ":class:`~job_shop_lib.Operation`",
     "`ScheduledOperation`": ":class:`~job_shop_lib.ScheduledOperation`",
     "`NodeType`": ":class:`~job_shop_lib.graphs.NodeType`",
     "`ValidationError`": ":class:`~job_shop_lib.exceptions.ValidationError`",
-    "`UninitializedAttributeError`": ":class:`~job_shop_lib.exceptions.UninitializedAttributeError`",
-    "`remove_completed_operations`": ":func:`~job_shop_lib.graphs.graph_updaters.remove_completed_operations`",
+    "`UninitializedAttributeError`": (
+        ":class:`~job_shop_lib.exceptions.UninitializedAttributeError`"
+    ),
+    "`remove_completed_operations`": (
+        ":func:`~job_shop_lib.graphs.graph_updaters"
+        ".remove_completed_operations`"
+    ),
 }
 
 # -- Options for HTML output -------------------------------------------------
