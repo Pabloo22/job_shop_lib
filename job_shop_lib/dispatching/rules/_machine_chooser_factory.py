@@ -40,7 +40,8 @@ def machine_chooser_factory(
             used. Supported values are 'first' and 'random'.
 
     Returns:
-        A function that takes a Dispatcher instance and an Operation as input
+        A function that takes a :class:`~job_shop_lib.dispatching.Dispatcher`
+        and an :class:`~job_shop_lib.Operation` as input
         and returns the index of the selected machine based on the specified
         machine chooser strategy.
 

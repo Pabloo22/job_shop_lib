@@ -4,9 +4,9 @@ from collections.abc import Callable
 
 from job_shop_lib import JobShopInstance, Schedule, Operation, BaseSolver
 from job_shop_lib.dispatching import (
-    pruning_function_factory,
+    ready_operations_filter_factory,
     Dispatcher,
-    PruningFunction,
+    ReadyOperationsFilterType,
 )
 from job_shop_lib.dispatching.rules import (
     dispatching_rule_factory,
@@ -44,7 +44,7 @@ class DispatchingRuleSolver(BaseSolver):
             str
             | Callable[[Dispatcher, list[Operation]], list[Operation]]
             | None
-        ) = PruningFunction.DOMINATED_OPERATIONS,
+        ) = ReadyOperationsFilterType.DOMINATED_OPERATIONS,
     ):
         """Initializes the solver with the given dispatching rule, machine
         chooser and pruning function.
@@ -72,7 +72,9 @@ class DispatchingRuleSolver(BaseSolver):
         if isinstance(machine_chooser, str):
             machine_chooser = machine_chooser_factory(machine_chooser)
         if isinstance(pruning_function, str):
-            pruning_function = pruning_function_factory(pruning_function)
+            pruning_function = ready_operations_filter_factory(
+                pruning_function
+            )
 
         self.dispatching_rule = dispatching_rule
         self.machine_chooser = machine_chooser
@@ -85,7 +87,7 @@ class DispatchingRuleSolver(BaseSolver):
         dispatching rule algorithm."""
         if dispatcher is None:
             dispatcher = Dispatcher(
-                instance, pruning_function=self.pruning_function
+                instance, ready_operations_filter=self.pruning_function
             )
         while not dispatcher.schedule.is_complete():
             self.step(dispatcher)

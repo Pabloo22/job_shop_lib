@@ -13,8 +13,8 @@ from job_shop_lib.dispatching.feature_observers import (
 
 from job_shop_lib.dispatching import (
     Dispatcher,
-    PruningFunction,
-    pruning_function_factory,
+    ReadyOperationsFilterType,
+    ready_operations_filter_factory,
 )
 from job_shop_lib.dispatching.rules import (
     DispatchingRuleSolver,
@@ -300,11 +300,12 @@ jobs:
 
 
 def test_every_feature_observer(irregular_job_shop_instance: JobShopInstance):
-    pruning_function = pruning_function_factory(
-        PruningFunction.DOMINATED_OPERATIONS
+    pruning_function = ready_operations_filter_factory(
+        ReadyOperationsFilterType.DOMINATED_OPERATIONS
     )
     dispatcher = Dispatcher(
-        irregular_job_shop_instance, pruning_function=pruning_function
+        irregular_job_shop_instance,
+        ready_operations_filter=pruning_function,
     )
     feature_observers_types: list[
         FeatureObserverType | type[FeatureObserver]

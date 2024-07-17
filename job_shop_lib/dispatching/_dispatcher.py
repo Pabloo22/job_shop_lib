@@ -161,7 +161,7 @@ class Dispatcher:
             The instance of the job shop problem to be scheduled.
         schedule:
             The schedule of operations on machines.
-        pruning_function:
+        ready_operations_filter:
             A function that filters out operations that are not ready to be
             scheduled.
     """
@@ -172,7 +172,7 @@ class Dispatcher:
         "_machine_next_available_time",
         "_job_next_operation_index",
         "_job_next_available_time",
-        "pruning_function",
+        "ready_operations_filter",
         "subscribers",
         "_cache",
     )
@@ -180,7 +180,7 @@ class Dispatcher:
     def __init__(
         self,
         instance: JobShopInstance,
-        pruning_function: (
+        ready_operations_filter: (
             Callable[[Dispatcher, list[Operation]], list[Operation]] | None
         ) = None,
     ) -> None:
@@ -189,16 +189,17 @@ class Dispatcher:
         Args:
             instance:
                 The instance of the job shop problem to be solved.
-            pruning_function:
+            ready_operations_filter:
                 A function that filters out operations that are not ready to
                 be scheduled. The function should take the dispatcher and a
                 list of operations as input and return a list of operations
-                that are ready to be scheduled. If `None`, no pruning is done.
+                that are ready to be scheduled. If `None`, no filtering is
+                done.
         """
 
         self.instance = instance
         self.schedule = Schedule(self.instance)
-        self.pruning_function = pruning_function
+        self.ready_operations_filter = ready_operations_filter
 
         self._machine_next_available_time = [0] * self.instance.num_machines
         self._job_next_operation_index = [0] * self.instance.num_jobs
@@ -369,7 +370,7 @@ class Dispatcher:
         The current time is the minimum start time of the available
         operations.
         """
-        available_operations = self.available_operations()
+        available_operations = self.ready_operations()
         current_time = self.min_start_time(available_operations)
         return current_time
 
@@ -385,32 +386,33 @@ class Dispatcher:
         return int(min_start_time)
 
     @_dispatcher_cache
-    def available_operations(self) -> list[Operation]:
+    def ready_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing, optionally
-        filtering out operations using the pruning function.
+        filtering out operations using the filter function.
 
         This method first gathers all possible next operations from the jobs
         being processed. It then optionally filters these operations using the
-        pruning function.
+        filter function.
 
         Returns:
-            A list of Operation objects that are available for scheduling.
+            A list of :class:`Operation` objects that are available for
+            scheduling.
         """
-        available_operations = self.available_operations_without_pruning()
-        if self.pruning_function is not None:
-            available_operations = self.pruning_function(
+        available_operations = self.raw_ready_operations()
+        if self.ready_operations_filter is not None:
+            available_operations = self.ready_operations_filter(
                 self, available_operations
             )
         return available_operations
 
     @_dispatcher_cache
-    def available_operations_without_pruning(self) -> list[Operation]:
+    def raw_ready_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing without
-        applying the pruning function.
+        applying the filter function.
 
         Returns:
-            A list of Operation objects that are available for scheduling
-            based on precedence and machine constraints only.
+            A list of :class:`Operation` objects that are available for
+            scheduling based on precedence and machine constraints only.
         """
         available_operations = [
             self.instance.jobs[job_id][position]
@@ -440,7 +442,7 @@ class Dispatcher:
     @_dispatcher_cache
     def available_machines(self) -> list[int]:
         """Returns the list of available machines."""
-        available_operations = self.available_operations()
+        available_operations = self.ready_operations()
         available_machines = set()
         for operation in available_operations:
             available_machines.update(operation.machines)
@@ -449,7 +451,7 @@ class Dispatcher:
     @_dispatcher_cache
     def available_jobs(self) -> list[int]:
         """Returns the list of available jobs."""
-        available_operations = self.available_operations()
+        available_operations = self.ready_operations()
         available_jobs = set(
             operation.job_id for operation in available_operations
         )

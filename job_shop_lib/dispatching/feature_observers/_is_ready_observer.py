@@ -29,5 +29,5 @@ class IsReadyObserver(FeatureObserver):
         self.initialize_features()
 
     def _get_ready_operations(self) -> list[int]:
-        available_operations = self.dispatcher.available_operations()
+        available_operations = self.dispatcher.ready_operations()
         return [operation.operation_id for operation in available_operations]

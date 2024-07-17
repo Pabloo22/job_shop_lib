@@ -11,7 +11,7 @@ import numpy as np
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.dispatching import (
     Dispatcher,
-    prune_dominated_operations,
+    filter_dominated_operations,
     DispatcherObserverConfig,
 )
 from job_shop_lib.dispatching.feature_observers import FeatureObserverConfig
@@ -49,9 +49,9 @@ class MultiJobShopGraphEnv(gym.Env):
             from the `Dispatcher` instance.
         graph_builder:
             Function that creates a graph representation of the instance.
-        pruning_function:
-            The `pruning_function` is used to prune the list of operations
-            that can be selected by the agent. By default, the
+        ready_operations_filter:
+            The ``ready_operations_filter`` is used to prune the list of
+            operations that can be selected by the agent. By default, the
             `prune_dominated_operations` function is used.
         action_space:
             Discrete action space with the maximum number of jobs. The maximum
@@ -105,9 +105,9 @@ class MultiJobShopGraphEnv(gym.Env):
         graph_updater_config: DispatcherObserverConfig[
             type[GraphUpdater]
         ] = DispatcherObserverConfig(class_type=ResidualGraphUpdater),
-        pruning_function: Callable[
+        ready_operations_filter: Callable[
             [Dispatcher, list[Operation]], list[Operation]
-        ] = prune_dominated_operations,
+        ] = filter_dominated_operations,
         reward_function_config: DispatcherObserverConfig[
             type[RewardObserver]
         ] = DispatcherObserverConfig(class_type=MakespanReward),
@@ -129,7 +129,7 @@ class MultiJobShopGraphEnv(gym.Env):
             feature_observer_configs=feature_observer_configs,
             reward_function_config=reward_function_config,
             graph_updater_config=graph_updater_config,
-            pruning_function=pruning_function,
+            ready_operations_filter=ready_operations_filter,
             render_mode=render_mode,
             render_config=render_config,
             use_padding=use_padding,
@@ -165,21 +165,23 @@ class MultiJobShopGraphEnv(gym.Env):
         self.single_job_shop_graph_env.reward_function = reward_function
 
     @property
-    def pruning_function(
+    def ready_operations_filter(
         self,
     ) -> Callable[[Dispatcher, list[Operation]], list[Operation]] | None:
-        """Returns the current pruning function."""
-        return self.single_job_shop_graph_env.dispatcher.pruning_function
+        """Returns the current ready operations filter."""
+        return (
+            self.single_job_shop_graph_env.dispatcher.ready_operations_filter
+        )
 
-    @pruning_function.setter
-    def pruning_function(
+    @ready_operations_filter.setter
+    def ready_operations_filter(
         self,
         pruning_function: Callable[
             [Dispatcher, list[Operation]], list[Operation]
         ],
     ) -> None:
-        """Sets the pruning function."""
-        self.single_job_shop_graph_env.dispatcher.pruning_function = (
+        """Sets the ready operations filter."""
+        self.single_job_shop_graph_env.dispatcher.ready_operations_filter = (
             pruning_function
         )
 
@@ -220,7 +222,7 @@ class MultiJobShopGraphEnv(gym.Env):
             job_shop_graph=graph,
             feature_observer_configs=self.feature_observer_configs,
             reward_function_config=self.reward_function_config,
-            pruning_function=self.pruning_function,
+            ready_operations_filter=self.ready_operations_filter,
             render_mode=self.render_mode,
             render_config=self.render_config,
             use_padding=self.single_job_shop_graph_env.use_padding,

@@ -21,7 +21,7 @@ from job_shop_lib.dispatching.feature_observers import (
 def shortest_processing_time_rule(dispatcher: Dispatcher) -> Operation:
     """Dispatches the operation with the shortest duration."""
     return min(
-        dispatcher.available_operations(),
+        dispatcher.ready_operations(),
         key=lambda operation: operation.duration,
     )
 
@@ -29,7 +29,7 @@ def shortest_processing_time_rule(dispatcher: Dispatcher) -> Operation:
 def first_come_first_served_rule(dispatcher: Dispatcher) -> Operation:
     """Dispatches the operation with the lowest position in job."""
     return min(
-        dispatcher.available_operations(),
+        dispatcher.ready_operations(),
         key=lambda operation: operation.position_in_job,
     )
 
@@ -41,7 +41,7 @@ def most_work_remaining_rule(dispatcher: Dispatcher) -> Operation:
         job_remaining_work[operation.job_id] += operation.duration
 
     return max(
-        dispatcher.available_operations(),
+        dispatcher.ready_operations(),
         key=lambda operation: job_remaining_work[operation.job_id],
     )
 
@@ -53,14 +53,14 @@ def most_operations_remaining_rule(dispatcher: Dispatcher) -> Operation:
         job_remaining_operations[operation.job_id] += 1
 
     return max(
-        dispatcher.available_operations(),
+        dispatcher.ready_operations(),
         key=lambda operation: job_remaining_operations[operation.job_id],
     )
 
 
 def random_operation_rule(dispatcher: Dispatcher) -> Operation:
     """Dispatches a random operation."""
-    return random.choice(dispatcher.available_operations())
+    return random.choice(dispatcher.ready_operations())
 
 
 def score_based_rule(
@@ -80,7 +80,7 @@ def score_based_rule(
     def rule(dispatcher: Dispatcher) -> Operation:
         scores = score_function(dispatcher)
         return max(
-            dispatcher.available_operations(),
+            dispatcher.ready_operations(),
             key=lambda operation: scores[operation.job_id],
         )
 
@@ -102,7 +102,7 @@ def score_based_rule_with_tie_breaker(
     """
 
     def rule(dispatcher: Dispatcher) -> Operation:
-        candidates = dispatcher.available_operations()
+        candidates = dispatcher.ready_operations()
         for scoring_function in score_functions:
             scores = scoring_function(dispatcher)
             best_score = max(scores)
@@ -126,7 +126,7 @@ def shortest_processing_time_score(dispatcher: Dispatcher) -> list[int]:
     """Scores each job based on the duration of the next operation."""
     num_jobs = dispatcher.instance.num_jobs
     scores = [0] * num_jobs
-    for operation in dispatcher.available_operations():
+    for operation in dispatcher.ready_operations():
         scores[operation.job_id] = -operation.duration
     return scores
 
@@ -135,7 +135,7 @@ def first_come_first_served_score(dispatcher: Dispatcher) -> list[int]:
     """Scores each job based on the position of the next operation."""
     num_jobs = dispatcher.instance.num_jobs
     scores = [0] * num_jobs
-    for operation in dispatcher.available_operations():
+    for operation in dispatcher.ready_operations():
         scores[operation.job_id] = operation.operation_id
     return scores
 

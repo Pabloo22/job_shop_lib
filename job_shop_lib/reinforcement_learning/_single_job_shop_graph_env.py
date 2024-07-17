@@ -17,7 +17,7 @@ from job_shop_lib.graphs.graph_updaters import (
 )
 from job_shop_lib.dispatching import (
     Dispatcher,
-    prune_dominated_operations,
+    filter_dominated_operations,
     DispatcherObserverConfig,
 )
 from job_shop_lib.dispatching.feature_observers import (
@@ -83,9 +83,9 @@ class SingleJobShopGraphEnv(gym.Env):
         graph_updater_config: DispatcherObserverConfig[
             type[GraphUpdater]
         ] = DispatcherObserverConfig(class_type=ResidualGraphUpdater),
-        pruning_function: (
+        ready_operations_filter: (
             Callable[[Dispatcher, list[Operation]], list[Operation]] | None
-        ) = prune_dominated_operations,
+        ) = filter_dominated_operations,
         render_mode: str | None = None,
         render_config: RenderConfig | None = None,
         use_padding: bool = True,
@@ -102,7 +102,7 @@ class SingleJobShopGraphEnv(gym.Env):
                 The configuration for the reward function.
             graph_updater_config:
                 The configuration for the graph updater.
-            pruning_function:
+            ready_operations_filter:
                 The function to use for pruning dominated operations.
             render_mode:
                 The mode for rendering the environment ("human", "save_video",
@@ -118,7 +118,8 @@ class SingleJobShopGraphEnv(gym.Env):
         self.initial_job_shop_graph = deepcopy(job_shop_graph)
 
         self.dispatcher = Dispatcher(
-            job_shop_graph.instance, pruning_function=pruning_function
+            job_shop_graph.instance,
+            ready_operations_filter=ready_operations_filter,
         )
 
         # Observers added to track the environment state
@@ -228,7 +229,7 @@ class SingleJobShopGraphEnv(gym.Env):
         truncated = False
         info: dict[str, Any] = {
             "feature_names": self.composite_observer.column_names,
-            "available_operations": self.dispatcher.available_operations(),
+            "available_operations": self.dispatcher.ready_operations(),
         }
         return obs, reward, done, truncated, info
 
