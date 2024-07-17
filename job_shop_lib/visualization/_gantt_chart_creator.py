@@ -1,6 +1,6 @@
 """Home of the `GanttChartCreator` class and its configuration types."""
 
-from typing import TypedDict, Required
+from typing import TypedDict
 
 import matplotlib.pyplot as plt
 
@@ -24,15 +24,25 @@ class GanttChartWrapperConfig(TypedDict, total=False):
     show_available_operations: bool
 
 
-class GifConfig(TypedDict, total=False):
-    """Configuration for creating the GIF using the `create_gannt_chart_video`
-    function."""
+# We can't use Required here because it's not available in Python 3.10
+class _GifConfigRequired(TypedDict):
+    """Required configuration for creating the GIF."""
 
-    gif_path: Required[str | None]
+    gif_path: str | None
+
+
+class _GifConfigOptional(TypedDict, total=False):
+    """Optional configuration for creating the GIF."""
+
     fps: int
     remove_frames: bool
     frames_dir: str | None
     plot_current_time: bool
+
+
+class GifConfig(_GifConfigRequired, _GifConfigOptional):
+    """Configuration for creating the GIF using the `create_gannt_chart_video`
+    function."""
 
 
 class VideoConfig(TypedDict, total=False):
