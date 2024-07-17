@@ -6,7 +6,7 @@
 Welcome to JobShopLib's documentation!
 ======================================
 
-**Version:** 1.0.0-beta.1
+**Version:** 1.0.0-alpha.1
 
 JobShopLib is a Python package for creating, solving, and visualizing
 Job Shop Scheduling Problems (JSSP).
