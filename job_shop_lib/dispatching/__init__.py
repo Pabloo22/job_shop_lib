@@ -1,52 +1,56 @@
-"""Package containing all the functionality to solve the Job Shop Scheduling
-Problem step-by-step."""
+"""Contains classes and functions to solve the Job Shop Scheduling
+Problem step-by-step.
 
-from job_shop_lib.dispatching.dispatcher import Dispatcher, DispatcherObserver
-from job_shop_lib.dispatching.history_tracker import HistoryTracker
-from job_shop_lib.dispatching.dispatching_rules import (
-    shortest_processing_time_rule,
-    first_come_first_served_rule,
-    most_work_remaining_rule,
-    most_operations_remaining_rule,
-    random_operation_rule,
+.. autosummary::
+    :nosignatures:
+
+    Dispatcher
+    DispatcherObserver
+    HistoryObserver
+    UnscheduledOperationsObserver
+    ReadyOperationsFilter
+    DispatcherObserverConfig
+    filter_dominated_operations
+    filter_non_immediate_machines
+    create_composite_operation_filter
+    ReadyOperationsFilterType
+    ready_operations_filter_factory
+
+Dispatching refers to the decision-making process of selecting which job
+should be processed next on a particular machine when that machine becomes
+available.
+"""
+
+from ._dispatcher import Dispatcher, DispatcherObserver
+from ._history_observer import (
+    HistoryObserver,
 )
-from job_shop_lib.dispatching.pruning_functions import (
-    prune_dominated_operations,
-    prune_non_immediate_machines,
-    create_composite_pruning_function,
+from ._unscheduled_operations_observer import (
+    UnscheduledOperationsObserver,
 )
-from job_shop_lib.dispatching.factories import (
-    PruningFunction,
-    DispatchingRule,
-    MachineChooser,
-    dispatching_rule_factory,
-    machine_chooser_factory,
-    pruning_function_factory,
-    composite_pruning_function_factory,
+from ._ready_operation_filters import (
+    filter_dominated_operations,
+    filter_non_immediate_machines,
+    ReadyOperationsFilter,
 )
-from job_shop_lib.dispatching.dispatching_rule_solver import (
-    DispatchingRuleSolver,
+from ._dispatcher_observer_config import DispatcherObserverConfig
+from ._factories import (
+    ReadyOperationsFilterType,
+    ready_operations_filter_factory,
+    create_composite_operation_filter,
 )
 
 
 __all__ = [
-    "dispatching_rule_factory",
-    "machine_chooser_factory",
-    "shortest_processing_time_rule",
-    "first_come_first_served_rule",
-    "most_work_remaining_rule",
-    "most_operations_remaining_rule",
-    "random_operation_rule",
-    "DispatchingRule",
-    "MachineChooser",
     "Dispatcher",
-    "DispatchingRuleSolver",
-    "prune_dominated_operations",
-    "prune_non_immediate_machines",
-    "create_composite_pruning_function",
-    "PruningFunction",
-    "pruning_function_factory",
-    "composite_pruning_function_factory",
+    "filter_dominated_operations",
+    "filter_non_immediate_machines",
+    "create_composite_operation_filter",
+    "ReadyOperationsFilterType",
+    "ready_operations_filter_factory",
     "DispatcherObserver",
-    "HistoryTracker",
+    "HistoryObserver",
+    "DispatcherObserverConfig",
+    "UnscheduledOperationsObserver",
+    "ReadyOperationsFilter",
 ]

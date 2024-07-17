@@ -1,4 +1,4 @@
-from job_shop_lib.graphs.build_agent_task_graph import (
+from job_shop_lib.graphs._build_agent_task_graph import (
     build_complete_agent_task_graph,
     build_agent_task_graph_with_jobs,
     build_agent_task_graph,

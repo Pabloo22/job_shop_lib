@@ -6,4 +6,10 @@ test:
 	poetry run pytest --cov=job_shop_lib --cov-report lcov:lcov.info  --mpl
 
 poetry_install_all:
-	poetry install --with notebooks --with test --with lint --all-extras
+	poetry install --with notebooks --with test --with lint --with docs --all-extras
+
+html_docs:
+	cd docs && make html
+
+clean_docs:
+	cd docs && make clean

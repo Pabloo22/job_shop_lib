@@ -1,5 +1,17 @@
 import pytest
 from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib.reinforcement_learning import (
+    SingleJobShopGraphEnv,
+    MultiJobShopGraphEnv,
+)
+from job_shop_lib.dispatching import DispatcherObserverConfig
+from job_shop_lib.dispatching.feature_observers import (
+    FeatureObserverType,
+    FeatureType,
+)
+from job_shop_lib.generation import GeneralInstanceGenerator
+from job_shop_lib.graphs import build_disjunctive_graph, build_agent_task_graph
+from job_shop_lib.benchmarking import load_benchmark_instance
 
 
 @pytest.fixture
@@ -54,3 +66,68 @@ def irregular_job_shop_instance():
         name="Irregular",
     )
     return instance
+
+
+@pytest.fixture
+def single_job_shop_graph_env_ft06() -> SingleJobShopGraphEnv:
+    instance = load_benchmark_instance("ft06")
+    job_shop_graph = build_disjunctive_graph(instance)
+    feature_observer_configs = [
+        DispatcherObserverConfig(
+            FeatureObserverType.IS_READY,
+            kwargs={"feature_types": [FeatureType.JOBS]},
+        )
+    ]
+
+    env = SingleJobShopGraphEnv(
+        job_shop_graph=job_shop_graph,
+        feature_observer_configs=feature_observer_configs,
+        render_mode="save_video",
+        render_config={"video_config": {"fps": 4}},
+    )
+    return env
+
+
+@pytest.fixture
+def single_job_shop_graph_env_ft06_agent_task() -> SingleJobShopGraphEnv:
+    instance = load_benchmark_instance("ft06")
+    job_shop_graph = build_agent_task_graph(instance)
+    feature_observer_configs = [
+        DispatcherObserverConfig(
+            FeatureObserverType.IS_READY,
+            kwargs={"feature_types": [FeatureType.JOBS]},
+        )
+    ]
+
+    env = SingleJobShopGraphEnv(
+        job_shop_graph=job_shop_graph,
+        feature_observer_configs=feature_observer_configs,
+        render_mode="save_video",
+        render_config={"video_config": {"fps": 4}},
+    )
+    return env
+
+
+@pytest.fixture
+def multi_job_shop_graph_env() -> MultiJobShopGraphEnv:
+    generator = GeneralInstanceGenerator(
+        num_jobs=(3, 6),
+        num_machines=(3, 5),
+        allow_less_jobs_than_machines=False,
+    )
+    feature_observer_configs = [
+        DispatcherObserverConfig(
+            FeatureObserverType.IS_READY,
+            kwargs={"feature_types": [FeatureType.JOBS]},
+        )
+    ]
+
+    env = MultiJobShopGraphEnv(
+        instance_generator=generator,
+        feature_observer_configs=feature_observer_configs,
+        graph_initializer=build_agent_task_graph,
+        render_mode="human",
+        render_config={"video_config": {"fps": 4}},
+    )
+
+    return env
