@@ -27,7 +27,8 @@ jobs:
 
     - name: Build Documentation
       run: |
-        make html_docs
+        cd docs
+        poetry run make html
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
