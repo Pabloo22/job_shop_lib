@@ -23,6 +23,7 @@ Google Colab notebook for a quick start guide!
 
     install
     examples
+    profiling
     api
 
 Indices and tables
