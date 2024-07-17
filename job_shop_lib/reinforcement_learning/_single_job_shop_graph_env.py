@@ -36,35 +36,61 @@ from job_shop_lib.reinforcement_learning import (
 
 
 class SingleJobShopGraphEnv(gym.Env):
-    """A Gymnasium environment for solving one particular instance of the
-    Job Shop Scheduling Problem represented as a graph.
+    """A Gymnasium environment for solving a specific instance of the Job Shop
+    Scheduling Problem represented as a graph.
 
-    The observation space is a dictionary with the following keys
-        and values:
-        - "removed_nodes": A binary vector indicating which nodes have been
-            removed from the graph. It uses the MultiBinary space. The length
-            of the vector is equal to the number of nodes in the graph.
-            A value of 1 indicates that the node has been removed.
-        - "edge_list": A matrix with the edges of the graph. It uses the
-            MultiDiscrete space. The matrix has two rows and as many columns
-            as edges in the graph. Each column contains the indices of the
-            nodes connected by the edge.
-        - The keys of the composite observer features and their corresponding
-            matrices. The matrices are stored as Box spaces with shape equal to
-            the shape of the matrix and unbounded values. It could be any of
-            the following:
-            - "operations"
-            - "jobs"
-            - "machines"
+    This environment manages the scheduling process for a single Job Shop
+    instance, using a graph representation and various observers to track the
+    state and compute rewards.
 
-        Keys can be accessed using the `ObservationSpaceKey` enumeration.
+    Observation Space:
+        A dictionary with the following keys:
+        - "removed_nodes": Binary vector indicating removed graph nodes.
+        - "edge_list": Matrix of graph edges in COO format.
+        - Feature matrices: Keys corresponding to the composite observer
+          features (e.g., "operations", "jobs", "machines").
 
-    Render modes:
-        - human: Renders the current Gannt chart.
-        - save_video: Saves a video of the Gantt chart. Used only if the
-            schedule is completed.
-        - save_gif: Saves a GIF of the Gantt chart. Used only if the schedule
-            is completed.
+    Action Space:
+        MultiDiscrete space representing (job_id, machine_id) pairs.
+
+    Render Modes:
+        - "human": Displays the current Gantt chart.
+        - "save_video": Saves a video of the complete Gantt chart.
+        - "save_gif": Saves a GIF of the complete Gantt chart.
+
+    Attributes:
+        dispatcher:
+            Manages the scheduling process. See
+            :class:`~job_shop_lib.dispatching.Dispatcher`.
+        composite_observer:
+            A :class:`~job_shop_lib.dispatching.feature_observers.
+            CompositeFeatureObserver` which aggregates features from multiple
+            observers.
+        graph_updater:
+            Updates the graph representation after each action. See
+            :class:`~job_shop_lib.graphs.GraphUpdater`.
+        reward_function:
+            Computes rewards for actions taken. See
+            :class:`~job_shop_lib.reinforcement_learning.RewardObserver`.
+        action_space:
+            Defines the action space. The action is a tuple of two integers
+            (job_id, machine_id). The machine_id can be -1 if the selected
+            operation can only be scheduled in one machine.
+        observation_space:
+            Defines the observation space. The observation is a dictionary
+            with the following keys:
+            - "removed_nodes": Binary vector indicating removed graph nodes.
+            - "edge_list": Matrix of graph edges in COO format.
+            - Feature matrices: Keys corresponding to the composite observer
+                features (e.g., "operations", "jobs", "machines").
+        render_mode:
+            The mode for rendering the environment ("human", "save_video",
+            "save_gif").
+        gantt_chart_creator:
+            Creates Gantt chart visualizations. See
+            :class:`~job_shop_lib.visualization.GanttChartCreator`.
+        use_padding:
+            Whether to use padding in observations. Padding maintains the
     """
 
     metadata = {"render_modes": ["human", "save_video", "save_gif"]}
@@ -214,7 +240,12 @@ class SingleJobShopGraphEnv(gym.Env):
             - The reward obtained.
             - Whether the environment is done.
             - Whether the episode was truncated (always False).
-            - Additional information (empty dictionary).
+            - A dictionary with additional information. The dictionary
+              contains the following keys:
+                - "feature_names": The names of the features in the
+                  observation.
+                - "available_operations": The operations that are ready to be
+                  scheduled.
         """
         job_id, machine_id = action
         operation = self.dispatcher.next_operation(job_id)
@@ -262,7 +293,16 @@ class SingleJobShopGraphEnv(gym.Env):
         return edge_index
 
     def render(self):
-        """Renders the environment."""
+        """Renders the environment.
+
+        The rendering mode is set by the `render_mode` attribute:
+
+        - human: Renders the current Gannt chart.
+        - save_video: Saves a video of the Gantt chart. Used only if the
+            schedule is completed.
+        - save_gif: Saves a GIF of the Gantt chart. Used only if the schedule
+            is completed.
+        """
         if self.render_mode == "human":
             self.gantt_chart_creator.plot_gantt_chart()
             plt.show(block=False)

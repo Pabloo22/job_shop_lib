@@ -193,7 +193,7 @@ class Dispatcher:
                 A function that filters out operations that are not ready to
                 be scheduled. The function should take the dispatcher and a
                 list of operations as input and return a list of operations
-                that are ready to be scheduled. If `None`, no filtering is
+                that are ready to be scheduled. If ``None``, no filtering is
                 done.
         """
 
@@ -254,6 +254,7 @@ class Dispatcher:
         available time for the machine and the next available time for the
         job to which the operation belongs. The operation is then scheduled
         on the machine and the tracking attributes are updated.
+
         Args:
             operation:
                 The operation to be scheduled.
@@ -262,7 +263,7 @@ class Dispatcher:
                 scheduled.
 
         Raises:
-            ValueError: If the operation is not ready to be scheduled.
+            ValidationError: If the operation is not ready to be scheduled.
         """
 
         if not self.is_operation_ready(operation):
@@ -308,7 +309,7 @@ class Dispatcher:
                 The operation to be scheduled.
             machine_id:
                 The id of the machine on which the operation is to be
-                scheduled. If None, the start time is computed based on the
+                scheduled. If ``None``, the start time is computed based on the
                 next available time for the operation on any machine.
         """
         return max(
@@ -441,7 +442,7 @@ class Dispatcher:
 
     @_dispatcher_cache
     def available_machines(self) -> list[int]:
-        """Returns the list of available machines."""
+        """Returns the list of ready machines."""
         available_operations = self.ready_operations()
         available_machines = set()
         for operation in available_operations:
@@ -450,7 +451,7 @@ class Dispatcher:
 
     @_dispatcher_cache
     def available_jobs(self) -> list[int]:
-        """Returns the list of available jobs."""
+        """Returns the list of ready jobs."""
         available_operations = self.ready_operations()
         available_jobs = set(
             operation.job_id for operation in available_operations
@@ -461,7 +462,7 @@ class Dispatcher:
         """Calculates the earliest start time for a given operation based on
         machine and job constraints.
 
-        This method is different from the `start_time` method in that it
+        This method is different from the ``start_time`` method in that it
         takes into account every machine that can process the operation, not
         just the one that will process it. However, it also assumes that
         the operation is ready to be scheduled in the job in favor of

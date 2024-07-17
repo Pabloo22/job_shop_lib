@@ -1,4 +1,4 @@
-"""Home of the `GraphBuilderObserver` class."""
+"""Home of the `GraphUpdater` class."""
 
 from abc import abstractmethod
 from copy import deepcopy
@@ -16,16 +16,13 @@ class GraphUpdater(DispatcherObserver):
     each scheduled operation.
 
     Attributes:
-        dispatcher:
-            The dispatcher instance to observe.
-        graph_initializer:
-            A function that builds the initial job shop graph from a job shop
-            instance.
-        graph_updater:
-            A function that updates the job shop graph based on the
-            dispatcher state and a scheduled operation.
+        initial_job_shop_graph:
+            The initial job shop graph. This is a copy of the graph that was
+            received when the observer was created. It is used to reset the
+            graph to its initial state.
         job_shop_graph:
-            The job shop graph being managed and updated.
+            The current job shop graph. This is the graph that is updated
+            after each scheduled operation.
     """
 
     def __init__(
@@ -35,19 +32,18 @@ class GraphUpdater(DispatcherObserver):
         *,
         subscribe: bool = True,
     ):
-        """
+        """Initializes the class.
+
         Args:
             dispatcher:
                 The dispatcher instance to observe.
-            graph_initializer:
-                A function that builds the initial job shop graph from a job
-                shop instance.
-            graph_updater:
-                A function that updates the job shop graph based on the
-                dispatcher state and a scheduled operation.
+            job_shop_graph:
+                The job shop graph to update.
             subscribe:
-                If True, automatically subscribes the observer to the
-                dispatcher. Defaults to True.
+                Whether to subscribe to the dispatcher. If ``True``, the
+                observer will subscribe to the dispatcher when it is
+                initialized. If ``False``, the observer will not subscribe
+                to the dispatcher.
         """
         super().__init__(dispatcher, subscribe=subscribe)
         self.initial_job_shop_graph = deepcopy(job_shop_graph)

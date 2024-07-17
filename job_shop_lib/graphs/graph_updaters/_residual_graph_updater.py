@@ -16,7 +16,19 @@ from job_shop_lib.dispatching import DispatcherObserver
 
 
 class ResidualGraphUpdater(GraphUpdater):
-    """Updates the residual graph based on the completed operations."""
+    """Updates the residual graph based on the completed operations.
+
+    This observer updates the residual graph by removing the completed
+    operation, machine and job nodes from the graph. It subscribes to the
+    :class:`~job_shop_lib.dispatching.feature_observers.IsCompletedObserver`
+    to determine which operations, machines and jobs have been completed.
+
+    Attributes:
+        remove_completed_machine_nodes:
+            If True, removes completed machine nodes from the graph.
+        remove_completed_job_nodes:
+            If True, removes completed job nodes from the graph.
+    """
 
     def __init__(
         self,
@@ -59,9 +71,6 @@ class ResidualGraphUpdater(GraphUpdater):
             subscribe=subscribe,
         )
 
-        self.remove_completed_machine_nodes = remove_completed_machine_nodes
-        self.remove_completed_job_nodes = remove_completed_job_nodes
-
     def _initialize_is_completed_observer_attribute(
         self, dispatcher: Dispatcher
     ):
@@ -88,7 +97,9 @@ class ResidualGraphUpdater(GraphUpdater):
 
     @property
     def is_completed_observer(self) -> IsCompletedObserver:
-        """Returns the `IsCompletedObserver` instance."""
+        """Returns the :class:`~job_shop_lib.dispatching.feature_observers.
+        IsCompletedObserver` instance."""
+
         if self._is_completed_observer is None:
             raise UninitializedAttributeError(
                 "The `is_completed_observer` attribute has not been "

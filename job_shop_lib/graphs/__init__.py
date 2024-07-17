@@ -1,4 +1,15 @@
-"""Package for graph related classes and functions."""
+"""Package for graph related classes and functions.
+
+.. autosummary::
+    JobShopGraph
+    Node
+    NodeType
+    build_disjunctive_graph
+    build_agent_task_graph
+    build_complete_agent_task_graph
+    build_agent_task_graph_with_jobs
+
+"""
 
 from job_shop_lib.graphs._constants import EdgeType, NodeType
 from job_shop_lib.graphs._node import Node

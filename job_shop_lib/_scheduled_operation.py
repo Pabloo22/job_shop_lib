@@ -9,26 +9,29 @@ class ScheduledOperation:
 
     Attributes:
         operation:
-            The `Operation` object that is scheduled.
+            The :class:`Operation` object that is scheduled.
         start_time:
             The time at which the operation is scheduled to start.
-        machine_id:
-            The id of the machine on which the operation is scheduled.
+
     """
 
     __slots__ = ("operation", "start_time", "_machine_id")
 
     def __init__(self, operation: Operation, start_time: int, machine_id: int):
-        """Initializes the object with the given operation, start time, and
-        machine id.
+        """Initializes a new instance of the :class:`ScheduledOperation` class.
 
         Args:
             operation:
-                The `Operation` object that is scheduled.
+                The :class:`Operation` object that is scheduled.
             start_time:
                 The time at which the operation is scheduled to start.
             machine_id:
                 The id of the machine on which the operation is scheduled.
+
+        Raises:
+            ValidationError:
+                If the given machine_id is not in the list of valid machines
+                for the operation.
         """
         self.operation = operation
         self.start_time = start_time

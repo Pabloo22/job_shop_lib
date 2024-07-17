@@ -2,15 +2,19 @@
 Problem step-by-step.
 
 .. autosummary::
+    :nosignatures:
 
-        Dispatcher
-        DispatcherObserver
-        HistoryObserver
-        DispatchingRule
-        MachineChooser
-        DispatchingRuleSolver
-        PruningFunction
-        DispatcherObserverConfig
+    Dispatcher
+    DispatcherObserver
+    HistoryObserver
+    UnscheduledOperationsObserver
+    ReadyOperationsFilter
+    DispatcherObserverConfig
+    filter_dominated_operations
+    filter_non_immediate_machines
+    create_composite_operation_filter
+    ReadyOperationsFilterType
+    ready_operations_filter_factory
 
 Dispatching refers to the decision-making process of selecting which job
 should be processed next on a particular machine when that machine becomes

@@ -1,4 +1,15 @@
 """Contains the main data structures and base classes.
+
+.. autosummary::
+    :nosignatures:
+
+    Operation
+    JobShopInstance
+    ScheduledOperation
+    Schedule
+    Solver
+    BaseSolver
+
 """
 
 from job_shop_lib._operation import Operation
