@@ -15,3 +15,4 @@ Examples
     examples/08-Feature-Observers
     examples/09-SingleJobShopGraphEnv
     examples/10-MultiJobShopGraphEnv
+    examples/unscheduled_operations
