@@ -1,6 +1,6 @@
 README.rst
 
-docs/source/examples/*_frames/
+docs/source/examples/output/*_frames/
 /exploration_notebooks/
 # Byte-compiled / optimized / DLL files
 __pycache__/
