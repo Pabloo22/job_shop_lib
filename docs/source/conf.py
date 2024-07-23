@@ -44,7 +44,7 @@ autodoc_default_options = {
     "undoc-members": True,
     "show-inheritance": True,
     "imported-members": False,
-    "special-members": "__init__, __call__",
+    "special-members": "__call__",
 }
 add_function_parentheses = True  # pylint: disable=invalid-name
 modindex_common_prefix = ["job_shop_lib."]
