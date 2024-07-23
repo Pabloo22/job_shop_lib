@@ -18,6 +18,9 @@ See
 `this <https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing>`__
 Google Colab notebook for a quick start guide!
 
+Contents
+--------
+
 .. toctree::
     :maxdepth: 3
 
