@@ -1,4 +1,9 @@
+# Development files
+claude_engineer.py
 README.rst
+
+# Prompt files
+prompts/
 
 docs/source/examples/output/*_frames/
 /exploration_notebooks/
