@@ -23,30 +23,34 @@ class Operation:
         necessary to multiply all durations by a sufficiently large integer so
         that every duration is an integer.
 
-    Attributes:
-        machines: A list of machine ids that can perform the operation.
-        duration: The time it takes to perform the operation.
+    Args:
+        machines:
+            A list of machine ids that can perform the operation. If
+            only one machine can perform the operation, it can be passed as
+            an integer.
+        duration:
+            The time it takes to perform the operation.
     """
 
-    __slots__ = (
-        "machines",
-        "duration",
-        "job_id",
-        "position_in_job",
-        "operation_id",
-    )
+    __slots__ = {
+        "machines": (
+            "A list of machine ids that can perform the operation. If "
+            "only one machine can perform the operation, it can be passed as "
+            "an integer."
+        ),
+        "duration": (
+            "The time it takes to perform the operation. Often referred"
+            " to as the processing time."
+        ),
+        "job_id": "The id of the job the operation belongs to.",
+        "position_in_job": "The index of the operation in the job.",
+        "operation_id": (
+            "The id of the operation. This is unique within a "
+            ":class:`JobShopInstance`."
+        ),
+    }
 
     def __init__(self, machines: int | list[int], duration: int):
-        """Initializes the object with the given machines and duration.
-
-        Args:
-            machines:
-                A list of machine ids that can perform the operation. If
-                only one machine can perform the operation, it can be passed as
-                an integer.
-            duration:
-                The time it takes to perform the operation.
-        """
         self.machines = [machines] if isinstance(machines, int) else machines
         self.duration = duration
 

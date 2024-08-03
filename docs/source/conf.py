@@ -41,10 +41,12 @@ autosummary_generate_overwrite = True  # pylint: disable=invalid-name
 autodoc_mock_imports = ["ortools"]
 autodoc_default_options = {
     "members": True,
+    "member-order": "bysource",
     "undoc-members": True,
     "show-inheritance": True,
     "imported-members": False,
     "special-members": "__call__",
+    "exclude-members": "__weakref__, __dict__, __module__",
 }
 add_function_parentheses = True  # pylint: disable=invalid-name
 modindex_common_prefix = ["job_shop_lib."]
@@ -56,34 +58,6 @@ autodoc_typehints_format = "short"
 napoleon_include_init_with_doc = True  # pylint: disable=invalid-name
 napoleon_preprocess_types = True  # pylint: disable=invalid-name
 
-napoleon_type_aliases = {
-    "`Dispatcher`": ":class:`~job_shop_lib.dispatching.Dispatcher`",
-    "`DispatcherObserver`": (
-        ":class:`~job_shop_lib.dispatching.DispatcherObserver`"
-    ),
-    "`FeatureType`": (
-        ":class:`~job_shop_lib.dispatching.feature_observers.FeatureType`"
-    ),
-    "`GraphUpdater`": (
-        ":class:`~job_shop_lib.graphs.graph_updaters.GraphUpdater`"
-    ),
-    "`IsCompletedObserver`": (
-        ":class:`~job_shop_lib.dispatching.feature_observers"
-        ".IsCompletedObserver`"
-    ),
-    "`JobShopGraph`": ":class:`~job_shop_lib.graphs.JobShopGraph`",
-    "`Operation`": ":class:`~job_shop_lib.Operation`",
-    "`ScheduledOperation`": ":class:`~job_shop_lib.ScheduledOperation`",
-    "`NodeType`": ":class:`~job_shop_lib.graphs.NodeType`",
-    "`ValidationError`": ":class:`~job_shop_lib.exceptions.ValidationError`",
-    "`UninitializedAttributeError`": (
-        ":class:`~job_shop_lib.exceptions.UninitializedAttributeError`"
-    ),
-    "`remove_completed_operations`": (
-        ":func:`~job_shop_lib.graphs.graph_updaters"
-        ".remove_completed_operations`"
-    ),
-}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

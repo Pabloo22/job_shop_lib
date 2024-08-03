@@ -25,21 +25,22 @@ class Schedule:
         is_complete
         add
         reset
-
-    Attributes:
-        instance:
-            The :class:`JobShopInstance` object that the schedule is for.
-        metadata:
-            A dictionary with additional information about the schedule. It
-            can be used to store information about the algorithm that generated
-            the schedule, for example.
     """
 
-    __slots__ = (
-        "instance",
-        "_schedule",
-        "metadata",
-    )
+    __slots__ = {
+        "instance": (
+            "The :class:`JobShopInstance` object that the schedule is for."
+        ),
+        "_schedule": (
+            "A list of lists of :class:`ScheduledOperation` objects. "
+            "Each list represents the order of operations on a machine."
+        ),
+        "metadata": (
+            "A dictionary with additional information about the "
+            "schedule. It can be used to store information about the "
+            "algorithm that generated the schedule, for example."
+        ),
+    }
 
     def __init__(
         self,

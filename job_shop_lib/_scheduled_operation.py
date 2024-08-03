@@ -5,17 +5,15 @@ from job_shop_lib.exceptions import ValidationError
 
 
 class ScheduledOperation:
-    """Data structure to store a scheduled operation.
+    """Data structure to store a scheduled operation."""
 
-    Attributes:
-        operation:
-            The :class:`Operation` object that is scheduled.
-        start_time:
-            The time at which the operation is scheduled to start.
-
-    """
-
-    __slots__ = ("operation", "start_time", "_machine_id")
+    __slots__ = {
+        "operation": "The :class:`Operation` object that is scheduled.",
+        "start_time": "The time at which the operation is scheduled to start.",
+        "_machine_id": (
+            "The id of the machine on which the operation is scheduled."
+        ),
+    }
 
     def __init__(self, operation: Operation, start_time: int, machine_id: int):
         """Initializes a new instance of the :class:`ScheduledOperation` class.
