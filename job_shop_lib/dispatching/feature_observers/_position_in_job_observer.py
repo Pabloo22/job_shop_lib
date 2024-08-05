@@ -8,10 +8,15 @@ from job_shop_lib.dispatching.feature_observers import (
 
 
 class PositionInJobObserver(FeatureObserver):
-    """Observer that adds a feature indicating the position of
+    """Adds a feature indicating the position of
     operations in their respective jobs.
 
-    Positions are adjusted dynamically as operations are scheduled.
+    Positions are adjusted dynamically as operations are scheduled. In other
+    words, the position of an operation is the number of unscheduled operations
+    that precede it in the job.
+
+    It only supports the :meth:`~job_shop_lib.FeatureType.OPERATIONS` feature
+    type.
     """
 
     _supported_feature_types = [FeatureType.OPERATIONS]

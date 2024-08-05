@@ -12,7 +12,7 @@ from job_shop_lib.dispatching.feature_observers import (
 class DurationObserver(FeatureObserver):
     """Measures the remaining duration of operations, machines, and jobs.
 
-    The duration of an :class:`Operation` is:
+    The duration of an :class:`~job_shop_lib.Operation` is:
         - if the operation has not been scheduled, it is the duration of the
           operation.
         - if the operation has been scheduled, it is the remaining duration of
@@ -22,8 +22,21 @@ class DurationObserver(FeatureObserver):
           manually if needed. We do not update the duration of completed
           operations to save computation time.
 
-    The duration of a Machine or Job is the sum of the durations of the
+    The duration of a machine or job is the sum of the durations of the
     unscheduled operations that belong to the machine or job.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` to observe.
+        subscribe:
+            If ``True``, the observer is subscribed to the dispatcher upon
+            initialization. Otherwise, the observer must be subscribed later
+            or manually updated.
+        feature_types:
+            A list of :class:`FeatureType` or a single :class:`FeatureType`
+            that specifies the types of features to observe. They must be a
+            subset of the class attribute :attr:`supported_feature_types`.
+            If ``None``, all supported feature types are tracked.
     """
 
     def initialize_features(self):

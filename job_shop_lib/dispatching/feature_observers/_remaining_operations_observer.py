@@ -12,7 +12,7 @@ class RemainingOperationsObserver(FeatureObserver):
     """Adds a feature indicating the number of remaining operations for each
     job and machine.
 
-    It does not support :class:`FeatureType.OPERATIONS`.
+    It does not support :meth:`FeatureType.OPERATIONS`.
     """
 
     _supported_feature_types = [FeatureType.MACHINES, FeatureType.JOBS]

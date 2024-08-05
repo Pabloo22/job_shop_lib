@@ -13,8 +13,8 @@ job, and the global node is connected to all machine and job nodes.
 
 References:
 - Junyoung Park, Sanjar Bakhtiyar, and Jinkyoo Park. Schedulenet: Learn to
-solve multi-agent scheduling problems with reinforcement learning. ArXiv,
-abs/2106.03051, 2021.
+  solve multi-agent scheduling problems with reinforcement learning. ArXiv,
+  abs/2106.03051, 2021.
 """
 
 import itertools

@@ -15,8 +15,38 @@ from job_shop_lib.dispatching.feature_observers import (
 
 
 class IsCompletedObserver(FeatureObserver):
-    """Observer that adds a binary feature indicating whether each operation,
-    machine, or job has been completed."""
+    """Adds a binary feature indicating whether each operation,
+    machine, or job has been completed.
+
+    An operation is considered completed if it has been scheduled and the
+    current time is greater than or equal to the sum of the operation's start
+    time and duration.
+
+    A machine or job is considered completed if all of its operations have been
+    completed.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` to observe.
+        feature_types:
+            A list of :class:`FeatureType` or a single :class:`FeatureType`
+            that specifies the types of features to observe. They must be a
+            subset of the class attribute :attr:`supported_feature_types`.
+            If ``None``, all supported feature types are tracked.
+        subscribe:
+            If ``True``, the observer is subscribed to the dispatcher upon
+            initialization. Otherwise, the observer must be subscribed later
+            or manually updated.
+    """
+
+    __slots__ = {
+        "remaining_ops_per_machine": (
+            "The number of unscheduled operations per machine."
+        ),
+        "remaining_ops_per_job": (
+            "The number of unscheduled operations per job."
+        ),
+    }
 
     def __init__(
         self,

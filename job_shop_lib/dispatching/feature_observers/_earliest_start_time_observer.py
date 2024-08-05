@@ -1,6 +1,7 @@
 """Home of the `EarliestStartTimeObserver` class."""
 
 import numpy as np
+from numpy.typing import NDArray
 
 from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.feature_observers import (
@@ -12,14 +13,62 @@ from job_shop_lib import ScheduledOperation
 
 class EarliestStartTimeObserver(FeatureObserver):
     """Observer that adds a feature indicating the earliest start time of
-    each operation, machine, and job in the graph."""
+    each operation, machine, and job in the graph.
 
-    __slots__ = (
-        "earliest_start_times",
-        "_job_ids",
-        "_positions",
-        "machine_ids",
-    )
+    The earliest start time of an operation refers to the earliest time at
+    which the operation could potentially start without violating any
+    constraints. This time is normalized by the current time (i.e., the
+    difference between the earliest start time and the current time).
+
+    The earliest start time of a machine is the earliest start time of the
+    next operation that can be scheduled on that machine.
+
+    Finally, the earliest start time of a job is the earliest start time of the
+    next operation in the job.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` to observe.
+        subscribe:
+            If ``True``, the observer is subscribed to the dispatcher upon
+            initialization. Otherwise, the observer must be subscribed later
+            or manually updated.
+        feature_types:
+            A list of :class:`FeatureType` or a single :class:`FeatureType`
+            that specifies the types of features to observe. They must be a
+            subset of the class attribute :attr:`supported_feature_types`.
+            If ``None``, all supported feature types are tracked.
+    """
+
+    __slots__ = {
+        "earliest_start_times": (
+            "A 2D numpy array with the earliest start "
+            "times of each operation. The array has "
+            "shape (``num_jobs``, ``max_operations_per_job``). "
+            "The value at index (i, j) is the earliest start "
+            "time of the j-th operation in the i-th job. "
+            "If a job has fewer than the maximum number of "
+            "operations in a job, the remaining values are "
+            "set to ``np.nan``. Similarly to "
+            ":class:`~job_shop_lib.JobShopInstance`'s "
+            ":meth:`~job_shop_lib.JobShopInstance.durations_matrix_array` "
+            "method."
+        ),
+        "_job_ids": (
+            "An array that stores the job IDs for each operation in the "
+            "dispatcher's instance. The array has shape "
+            "(``num_machines``, ``max_operations_per_machine``)."
+        ),
+        "_positions": (
+            "An array that stores the positions of each operation in their "
+            "respective jobs. The array has shape "
+            "(``num_machines``, ``max_operations_per_machine``)."
+        ),
+        "_is_regular_instance": (
+            "Whether the dispatcher's instance is a regular "
+            "instance, where each job has the same number of operations."
+        ),
+    }
 
     def __init__(
         self,
@@ -32,9 +81,9 @@ class EarliestStartTimeObserver(FeatureObserver):
         # Earliest start times initialization
         # -------------------------------
         squared_duration_matrix = dispatcher.instance.durations_matrix_array
-        self.earliest_start_times = np.hstack(
+        self.earliest_start_times: NDArray[np.float32] = np.hstack(
             (
-                np.zeros((squared_duration_matrix.shape[0], 1)),
+                np.zeros((squared_duration_matrix.shape[0], 1), dtype=float),
                 np.cumsum(squared_duration_matrix[:, :-1], axis=1),
             )
         )
@@ -70,7 +119,7 @@ class EarliestStartTimeObserver(FeatureObserver):
 
     def update(self, scheduled_operation: ScheduledOperation):
         """Recomputes the earliest start times and calls the
-        `initialize_features` method.
+        ``initialize_features`` method.
 
         The earliest start times is computed as the cumulative sum of the
         previous unscheduled operations in the job plus the maximum of the
@@ -78,6 +127,9 @@ class EarliestStartTimeObserver(FeatureObserver):
         time of the machine(s) the operation is assigned.
 
         After that, we substract the current time.
+
+        Args:
+            scheduled_operation: The operation that has been scheduled.
         """
         # We compute the gap that the current scheduled operation could be
         # adding to each job.

@@ -9,7 +9,7 @@ from job_shop_lib.graphs._constants import NodeType
 
 
 class Node:
-    """Data structure to represent a node in the `JobShopGraph`.
+    """Represents a node in the :class:`JobShopGraph`.
 
     A node is hashable by its id. The id is assigned when the node is added to
     the graph. The id must be unique for each node in the graph, and should be
@@ -18,11 +18,15 @@ class Node:
     Depending on the type of the node, it can have different attributes. The
     following table shows the attributes of each type of node:
 
-    Node Type       | Required Attribute
-    ----------------|---------------------
-    OPERATION       | `operation`
-    MACHINE         | `machine_id`
-    JOB             | `job_id`
+    +----------------+---------------------+
+    | Node Type      | Required Attribute  |
+    +================+=====================+
+    | OPERATION      | ``operation``       |
+    +----------------+---------------------+
+    | MACHINE        | ``machine_id``      |
+    +----------------+---------------------+
+    | JOB            | ``job_id``          |
+    +----------------+---------------------+
 
     In terms of equality, two nodes are equal if they have the same id.
     Additionally, one node is equal to an integer if the integer is equal to
@@ -31,25 +35,47 @@ class Node:
     This allows for using the node as a key in a dictionary, at the same time
     we can use its id to index that dictionary. Example:
 
-    ```python
-    node = Node(NodeType.SOURCE)
-    node.node_id = 1
-    graph = {node: "some value"}
-    print(graph[node])  # "some value"
-    print(graph[1])  # "some value"
-    ```
+    .. code-block:: python
 
-    Attributes:
+        node = Node(NodeType.SOURCE)
+        node.node_id = 1
+        graph = {node: "some value"}
+        print(graph[node])  # "some value"
+        print(graph[1])  # "some value"
+
+    Args:
         node_type:
-            The type of the node. It can be one of the following:
-            - NodeType.OPERATION
-            - NodeType.MACHINE
-            - NodeType.JOB
-            - NodeType.GLOBAL
-            ...
+            The type of the node. See :class:`NodeType` for theavailable types.
+        operation:
+            The operation of the node. Required if ``node_type`` is
+            :attr:`NodeType.OPERATION`.
+        machine_id:
+            The id of the machine. Required if ``node_type`` is
+            :attr:`NodeType.MACHINE`.
+        job_id:
+            The id of the job. Required if ``node_type`` is
+            :attr:`NodeType.JOB`.
+
+    Raises:
+        ValidationError:
+            If the ``node_type`` is :attr:`NodeType.OPERATION`,
+            :attr:`NodeType.MACHINE`, or :attr:`NodeType.JOB` and the
+            corresponding ``operation``, ``machine_id``, or ``job_id`` is
+            ``None``, respectively.
+
     """
 
-    __slots__ = "node_type", "_node_id", "_operation", "_machine_id", "_job_id"
+    __slots__ = {
+        "node_type": "The type of the node.",
+        "_node_id": "Unique identifier for the node.",
+        "_operation": (
+            "The operation associated with the node."
+        ),
+        "_machine_id": (
+            "The machine ID associated with the node."
+        ),
+        "_job_id": "The job ID associated with the node.",
+    }
 
     def __init__(
         self,
@@ -58,34 +84,6 @@ class Node:
         machine_id: int | None = None,
         job_id: int | None = None,
     ):
-        """Initializes the node with the given attributes.
-
-        Args:
-            node_type:
-                The type of the node. It can be one of the following:
-                - NodeType.OPERATION
-                - NodeType.MACHINE
-                - NodeType.JOB
-                - NodeType.GLOBAL
-                ...
-            operation:
-                The operation of the node. It should be provided if the
-                `node_type` is NodeType.OPERATION.
-            machine_id:
-                The id of the machine of the node. It should be provided if the
-                node_type is NodeType.MACHINE.
-            job_id:
-                The id of the job of the node. It should be provided if the
-                node_type is NodeType.JOB.
-
-        Raises:
-            ValidationError:
-                If the node_type is OPERATION and operation is None.
-            ValidationError:
-                If the node_type is MACHINE and machine_id is None.
-            ValidationError:
-                If the node_type is JOB and job_id is None.
-        """
         if node_type == NodeType.OPERATION and operation is None:
             raise ValidationError("Operation node must have an operation.")
 
@@ -95,7 +93,7 @@ class Node:
         if node_type == NodeType.JOB and job_id is None:
             raise ValidationError("Job node must have a job_id.")
 
-        self.node_type = node_type
+        self.node_type: NodeType = node_type
         self._node_id: int | None = None
 
         self._operation = operation
@@ -119,7 +117,11 @@ class Node:
     def operation(self) -> Operation:
         """Returns the operation of the node.
 
-        This property is mandatory for nodes of type `OPERATION`.
+        This property is mandatory for nodes of type
+        :class:`NodeType.OPERATION`.
+
+        Raises:
+            UninitializedAttributeError: If the node has no operation.
         """
         if self._operation is None:
             raise UninitializedAttributeError("Node has no operation.")
@@ -130,9 +132,12 @@ class Node:
         """Returns the `machine_id` of the node.
 
         This property is mandatory for nodes of type `MACHINE`.
+
+        Raises:
+            UninitializedAttributeError: If the node has no ``machine_id``.
         """
         if self._machine_id is None:
-            raise UninitializedAttributeError("Node has no `machine_id`.")
+            raise UninitializedAttributeError("Node has no ``machine_id``.")
         return self._machine_id
 
     @property
@@ -140,6 +145,9 @@ class Node:
         """Returns the `job_id` of the node.
 
         This property is mandatory for nodes of type `JOB`.
+
+        Raises:
+            UninitializedAttributeError: If the node has no `job_id`.
         """
         if self._job_id is None:
             raise UninitializedAttributeError("Node has no `job_id`.")
