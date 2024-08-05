@@ -31,8 +31,8 @@ class ScheduledOperation:
                 If the given machine_id is not in the list of valid machines
                 for the operation.
         """
-        self.operation = operation
-        self.start_time = start_time
+        self.operation: Operation = operation
+        self.start_time: int = start_time
         self._machine_id = machine_id
         self.machine_id = machine_id  # Validate machine_id
 
