@@ -1,4 +1,4 @@
-﻿job\_shop\_lib.graphs
+job\_shop\_lib.graphs
 =====================
 
 .. automodule:: job_shop_lib.graphs

@@ -1,5 +1,7 @@
 """Package for graph related classes and functions.
 
+The main classes and functions available in this package are:
+
 .. autosummary::
     JobShopGraph
     Node

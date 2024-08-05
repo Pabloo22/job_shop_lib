@@ -8,14 +8,18 @@ from job_shop_lib.dispatching.feature_observers import (
 
 
 class IsScheduledObserver(FeatureObserver):
-    """Observer that updates features based on scheduling operations.
+    """Updates features based on scheduling operations.
 
     This observer tracks which operations have been scheduled and updates
-    feature matrices accordingly. It updates a feature in the
-    `FeatureType.OPERATIONS` matrix to indicate that an operation has been
-    scheduled. Additionally, it counts the number of uncompleted but
+    feature matrices accordingly.
+
+    It updates a feature in the
+    :meth:`FeatureType.OPERATIONS` matrix to indicate that an operation has
+    been scheduled.
+
+    Additionally, it counts the number of uncompleted but
     scheduled operations for each machine and job, updating the respective
-    `FeatureType.MACHINES` and `FeatureType.JOBS` feature matrices.
+    :meth:`FeatureType.MACHINES` and :meth:`FeatureType.JOBS` feature matrices.
     """
 
     def update(self, scheduled_operation: ScheduledOperation):
