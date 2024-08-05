@@ -20,15 +20,27 @@ class JobShopInstance:
     computations.
 
     Attributes:
-        jobs:
+        jobs (list[list[Operation]]):
             A list of lists of operations. Each list of operations represents
             a job, and the operations are ordered by their position in the job.
             The `job_id`, `position_in_job`, and `operation_id` attributes of
             the operations are set when the instance is created.
+        name (str):
+            A string with the name of the instance.
+        metadata (dict[str, Any]):
+            A dictionary with additional information about the instance.
+
+    Args:
+        jobs:
+            A list of lists of operations. Each list of operations
+            represents a job, and the operations are ordered by their
+            position in the job. The `job_id`, `position_in_job`, and
+            `operation_id` attributes of the operations are set when the
+            instance is created.
         name:
             A string with the name of the instance.
-        metadata:
-            A dictionary with additional information about the instance.
+        **metadata:
+            Additional information about the instance.
     """
 
     def __init__(
@@ -37,20 +49,6 @@ class JobShopInstance:
         name: str = "JobShopInstance",
         **metadata: Any,
     ):
-        """Initializes the instance based on a list of lists of operations.
-
-        Args:
-            jobs:
-                A list of lists of operations. Each list of operations
-                represents a job, and the operations are ordered by their
-                position in the job. The `job_id`, `position_in_job`, and
-                `operation_id` attributes of the operations are set when the
-                instance is created.
-            name:
-                A string with the name of the instance.
-            **metadata:
-                Additional information about the instance.
-        """
         self.jobs: list[list[Operation]] = jobs
         self.set_operation_attributes()
         self.name: str = name

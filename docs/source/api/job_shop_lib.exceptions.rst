@@ -4,19 +4,6 @@ job\_shop\_lib.exceptions
 .. automodule:: job_shop_lib.exceptions
 
    
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-   
-   
    .. rubric:: Exceptions
 
    .. autosummary::
@@ -26,7 +13,3 @@ job\_shop\_lib.exceptions
       UninitializedAttributeError
       ValidationError
    
-   
-
-
-
