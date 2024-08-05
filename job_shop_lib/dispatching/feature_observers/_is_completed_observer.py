@@ -67,7 +67,7 @@ class IsCompletedObserver(FeatureObserver):
             )
 
         feature_types_list = self._get_feature_types_list(feature_types)
-        self.remaining_ops_observer = self.dispatcher.create_or_get_observer(
+        self.remaining_ops_observer = dispatcher.create_or_get_observer(
             RemainingOperationsObserver,
             condition=_has_same_features,
             feature_types=feature_types,
