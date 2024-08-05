@@ -51,10 +51,10 @@ class JobShopInstance:
             **metadata:
                 Additional information about the instance.
         """
-        self.jobs = jobs
+        self.jobs: list[list[Operation]] = jobs
         self.set_operation_attributes()
-        self.name = name
-        self.metadata = metadata
+        self.name: str = name
+        self.metadata: dict[str, Any] = metadata
 
     def set_operation_attributes(self):
         """Sets the job_id and position of each operation."""

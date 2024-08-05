@@ -46,7 +46,7 @@ class Schedule:
         self,
         instance: JobShopInstance,
         schedule: list[list[ScheduledOperation]] | None = None,
-        **metadata,
+        **metadata: Any,
     ):
         """Initializes the object with the given instance and schedule.
 
@@ -65,9 +65,9 @@ class Schedule:
 
         Schedule.check_schedule(schedule)
 
-        self.instance = instance
+        self.instance: JobShopInstance = instance
         self._schedule = schedule
-        self.metadata = metadata
+        self.metadata: dict[str, Any] = metadata
 
     def __repr__(self) -> str:
         return str(self.schedule)
