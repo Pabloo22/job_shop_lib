@@ -51,8 +51,10 @@ class Operation:
     }
 
     def __init__(self, machines: int | list[int], duration: int):
-        self.machines = [machines] if isinstance(machines, int) else machines
-        self.duration = duration
+        self.machines: list[int] = (
+            [machines] if isinstance(machines, int) else machines
+        )
+        self.duration: int = duration
 
         # Defined outside the class by the JobShopInstance class:
         self.job_id: int = -1
@@ -64,8 +66,8 @@ class Operation:
         """Returns the id of the machine associated with the operation.
 
         Raises:
-            UninitializedAttributeError: If the operation has multiple machines
-            in its list.
+            UninitializedAttributeError:
+                If the operation has multiple machines in its list.
         """
         if len(self.machines) > 1:
             raise UninitializedAttributeError(
