@@ -1,0 +1,975 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="job_shop_lib.reinforcement_learning" href="job_shop_lib.reinforcement_learning.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.07.18 -->
+        <title>job_shop_lib.visualization - JobShopLib documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">JobShopLib  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../_static/logo_no_bg_resized_fixed.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">JobShopLib  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/00-Getting-Started.html">Getting Started to Job Shop Lib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/01-How-Solutions-are-Represented.html">How Solutions are Represented</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/02-Solving-the-Problem.html">Solving the Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/03-Dispatching-Rules.html">Dispatching Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/04-Disjunctive-Graph.html">Disjunctive Graph representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/05-Load-Benchmark-Instances.html">Load Benchmark Instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/06-Save-Gif.html">Gannt Chart Creation: How to Save GIFs and Videos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/07-Agent-Task-Graph.html">The Agent-Task Graph representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/08-Feature-Observers.html">Feature Observers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/09-SingleJobShopGraphEnv.html">RL Graph Environment: Learning from one instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/10-MultiJobShopGraphEnv.html">RL Graph Environment: Learning from many instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/unscheduled_operations.html">Comparing Performance: Dispatcher Method vs. Observer Method for Unscheduled Operations</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="job_shop_lib.html">job_shop_lib</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of job_shop_lib</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="job_shop_lib.benchmarking.html">job_shop_lib.benchmarking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="job_shop_lib.constraint_programming.html">job_shop_lib.constraint_programming</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="job_shop_lib.dispatching.html">job_shop_lib.dispatching</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of job_shop_lib.dispatching</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="job_shop_lib.dispatching.feature_observers.html">job_shop_lib.dispatching.feature_observers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="job_shop_lib.dispatching.rules.html">job_shop_lib.dispatching.rules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="job_shop_lib.exceptions.html">job_shop_lib.exceptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="job_shop_lib.generation.html">job_shop_lib.generation</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="job_shop_lib.graphs.html">job_shop_lib.graphs</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of job_shop_lib.graphs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="job_shop_lib.graphs.graph_updaters.html">job_shop_lib.graphs.graph_updaters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="job_shop_lib.reinforcement_learning.html">job_shop_lib.reinforcement_learning</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">job_shop_lib.visualization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/job_shop_lib.visualization.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-job_shop_lib.visualization">
+<span id="job-shop-lib-visualization"></span><h1>job_shop_lib.visualization<a class="headerlink" href="#module-job_shop_lib.visualization" title="Link to this heading">¶</a></h1>
+<p>Package for visualization.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.plot_gantt_chart">
+<span class="sig-name descname"><span class="pre">plot_gantt_chart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schedule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_x_ticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart.html#plot_gantt_chart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.plot_gantt_chart" title="Link to this definition">¶</a></dt>
+<dd><p>Plots a Gantt chart for the schedule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>schedule</strong> (<a class="reference internal" href="job_shop_lib.html#job_shop_lib.Schedule" title="job_shop_lib._schedule.Schedule"><em>Schedule</em></a>) -- The schedule to plot.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em>) -- The title of the plot. If not provided, the title:
+<cite>f&quot;Gantt Chart for {schedule.instance.name} instance&quot;</cite>
+is used.</p></li>
+<li><p><strong>cmap_name</strong> (<em>str</em>) -- The name of the colormap to use. Default is &quot;viridis&quot;.</p></li>
+<li><p><strong>xlim</strong> (<em>int</em><em> | </em><em>None</em>) -- The maximum value for the x-axis. If not provided, the makespan of
+the schedule is used.</p></li>
+<li><p><strong>number_of_x_ticks</strong> (<em>int</em>) -- The number of ticks to use in the x-axis.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>tuple</em>[<em>Figure</em>, <em>Axes</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.create_gantt_chart_video">
+<span class="sig-name descname"><span class="pre">create_gantt_chart_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frames_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_current_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schedule_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_video_and_gif_creation.html#create_gantt_chart_video"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.create_gantt_chart_video" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a GIF of the schedule being built by the given solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instance</strong> (<a class="reference internal" href="job_shop_lib.html#job_shop_lib.JobShopInstance" title="job_shop_lib._job_shop_instance.JobShopInstance"><em>JobShopInstance</em></a>) -- The instance of the job shop problem to be scheduled.</p></li>
+<li><p><strong>video_path</strong> (<em>str</em><em> | </em><em>None</em>) -- The path to save the video file.</p></li>
+<li><p><strong>solver</strong> (<a class="reference internal" href="job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleSolver" title="job_shop_lib.dispatching.rules._dispatching_rule_solver.DispatchingRuleSolver"><em>DispatchingRuleSolver</em></a><em> | </em><em>None</em>) -- The dispatching rule solver to use. If not provided, the history
+of scheduled operations should be provided.</p></li>
+<li><p><strong>plot_function</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Schedule" title="job_shop_lib._schedule.Schedule"><em>Schedule</em></a><em>, </em><em>int</em><em> | </em><em>None</em><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>] </em><em>| </em><em>None</em><em>, </em><em>int</em><em> | </em><em>None</em><em>]</em><em>, </em><em>Figure</em><em>] </em><em>| </em><em>None</em>) -- A function that plots a Gantt chart for a schedule. It
+should take a <cite>Schedule</cite> object and the makespan of the schedule as
+input and return a <cite>Figure</cite> object. If not provided, a default
+function is used.</p></li>
+<li><p><strong>fps</strong> (<em>int</em>) -- The number of frames per second in the GIF.</p></li>
+<li><p><strong>remove_frames</strong> (<em>bool</em>) -- Whether to remove the frames after creating the GIF.</p></li>
+<li><p><strong>frames_dir</strong> (<em>str</em><em> | </em><em>None</em>) -- The directory to save the frames in. If not provided,
+<cite>name_without_the_extension</cite> + &quot;_frames&quot;` is used.</p></li>
+<li><p><strong>plot_current_time</strong> (<em>bool</em>) -- Whether to plot a vertical line at the current time.</p></li>
+<li><p><strong>schedule_history</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.ScheduledOperation" title="job_shop_lib._scheduled_operation.ScheduledOperation"><em>ScheduledOperation</em></a><em>] </em><em>| </em><em>None</em>) -- A sequence of scheduled operations. If not provided, the solver
+will be used to generate the history.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.create_gif">
+<span class="sig-name descname"><span class="pre">create_gif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gif_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frames_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_current_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schedule_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_video_and_gif_creation.html#create_gif"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.create_gif" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a GIF of the schedule being built by the given solver.</p>
+<p>Deprecated since version 0.6.0: Use <cite>create_gif_or_video</cite> instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gif_path</strong> (<em>str</em><em> | </em><em>None</em>) -- The path to save the GIF file. It should end with &quot;.gif&quot;. If not
+provided, the name of the instance is used. It will be made an
+optional argument in version 1.0.0.</p></li>
+<li><p><strong>instance</strong> (<a class="reference internal" href="job_shop_lib.html#job_shop_lib.JobShopInstance" title="job_shop_lib._job_shop_instance.JobShopInstance"><em>JobShopInstance</em></a>) -- The instance of the job shop problem to be scheduled.</p></li>
+<li><p><strong>solver</strong> (<a class="reference internal" href="job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleSolver" title="job_shop_lib.dispatching.rules._dispatching_rule_solver.DispatchingRuleSolver"><em>DispatchingRuleSolver</em></a><em> | </em><em>None</em>) -- The dispatching rule solver to use. If not provided, the history
+of scheduled operations should be provided.</p></li>
+<li><p><strong>plot_function</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Schedule" title="job_shop_lib._schedule.Schedule"><em>Schedule</em></a><em>, </em><em>int</em><em> | </em><em>None</em><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>] </em><em>| </em><em>None</em><em>, </em><em>int</em><em> | </em><em>None</em><em>]</em><em>, </em><em>Figure</em><em>] </em><em>| </em><em>None</em>) -- A function that plots a Gantt chart for a schedule. It
+should take a <cite>Schedule</cite> object and the makespan of the schedule as
+input and return a <cite>Figure</cite> object. If not provided, a default
+function is used.</p></li>
+<li><p><strong>fps</strong> (<em>int</em>) -- The number of frames per second in the GIF.</p></li>
+<li><p><strong>remove_frames</strong> (<em>bool</em>) -- Whether to remove the frames after creating the GIF.</p></li>
+<li><p><strong>frames_dir</strong> (<em>str</em><em> | </em><em>None</em>) -- The directory to save the frames in. If not provided,
+<cite>gif_path.replace(&quot;.gif&quot;, &quot;&quot;) + &quot;_frames&quot;</cite> is used.</p></li>
+<li><p><strong>plot_current_time</strong> (<em>bool</em>) -- Whether to plot a vertical line at the current time.</p></li>
+<li><p><strong>schedule_history</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.ScheduledOperation" title="job_shop_lib._scheduled_operation.ScheduledOperation"><em>ScheduledOperation</em></a><em>] </em><em>| </em><em>None</em>) -- A sequence of scheduled operations. If not provided, the solver
+will be used to generate the history.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.create_gantt_chart_frames">
+<span class="sig-name descname"><span class="pre">create_gantt_chart_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frames_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_current_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schedule_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_video_and_gif_creation.html#create_gantt_chart_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.create_gantt_chart_frames" title="Link to this definition">¶</a></dt>
+<dd><p>Creates frames of the Gantt chart for the schedule being built.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frames_dir</strong> (<em>str</em>) -- The directory to save the frames in.</p></li>
+<li><p><strong>instance</strong> (<a class="reference internal" href="job_shop_lib.html#job_shop_lib.JobShopInstance" title="job_shop_lib._job_shop_instance.JobShopInstance"><em>JobShopInstance</em></a>) -- The instance of the job shop problem to be scheduled.</p></li>
+<li><p><strong>solver</strong> (<a class="reference internal" href="job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleSolver" title="job_shop_lib.dispatching.rules._dispatching_rule_solver.DispatchingRuleSolver"><em>DispatchingRuleSolver</em></a><em> | </em><em>None</em>) -- The dispatching rule solver to use. If not provided, the history
+of scheduled operations should be provided.</p></li>
+<li><p><strong>plot_function</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Schedule" title="job_shop_lib._schedule.Schedule"><em>Schedule</em></a><em>, </em><em>int</em><em> | </em><em>None</em><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>] </em><em>| </em><em>None</em><em>, </em><em>int</em><em> | </em><em>None</em><em>]</em><em>, </em><em>Figure</em><em>]</em>) -- A function that plots a Gantt chart for a schedule. It
+should take a <cite>Schedule</cite> object and the makespan of the schedule as
+input and return a <cite>Figure</cite> object.</p></li>
+<li><p><strong>plot_current_time</strong> (<em>bool</em>) -- Whether to plot a vertical line at the current time.</p></li>
+<li><p><strong>scheduled_history</strong> -- A sequence of scheduled operations. If not provided, the solver</p></li>
+<li><p><strong>schedule_history</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.ScheduledOperation" title="job_shop_lib._scheduled_operation.ScheduledOperation"><em>ScheduledOperation</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.plot_gantt_chart_wrapper">
+<span class="sig-name descname"><span class="pre">plot_gantt_chart_wrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_available_operations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_video_and_gif_creation.html#plot_gantt_chart_wrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.plot_gantt_chart_wrapper" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a function that plots a Gantt chart for an unfinished schedule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em>) -- The title of the Gantt chart.</p></li>
+<li><p><strong>cmap</strong> (<em>str</em>) -- The name of the colormap to use.</p></li>
+<li><p><strong>show_available_operations</strong> (<em>bool</em>) -- Whether to show the available operations in the Gantt chart.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A function that plots a Gantt chart for a schedule. The function takes
+the following arguments:
+- schedule: The schedule to plot.
+- makespan: The makespan of the schedule.
+- available_operations: A list of available operations. If None,</p>
+<blockquote>
+<div><p>the available operations are not shown.</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>current_time: The current time in the schedule. If provided, a</dt><dd><p>red vertical line is plotted at this time.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Callable</em>[[<a class="reference internal" href="job_shop_lib.html#job_shop_lib.Schedule" title="job_shop_lib._schedule.Schedule"><em>Schedule</em></a>, <em>int</em> | <em>None</em>, <em>list</em>[<a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a>] | <em>None</em>, <em>int</em> | <em>None</em>], <em>Figure</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.create_gif_from_frames">
+<span class="sig-name descname"><span class="pre">create_gif_from_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frames_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gif_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_video_and_gif_creation.html#create_gif_from_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.create_gif_from_frames" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a GIF or video from the frames in the given directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frames_dir</strong> (<em>str</em>) -- The directory containing the frames to be used in the GIF.</p></li>
+<li><p><strong>gif_path</strong> (<em>str</em>) -- The path to save the GIF file. It should end with &quot;.gif&quot;.</p></li>
+<li><p><strong>fps</strong> (<em>int</em>) -- The number of frames per second in the GIF.</p></li>
+<li><p><strong>loop</strong> (<em>int</em>) -- The number of times the GIF should loop. Default is 0, which means
+the GIF will loop indefinitely. If set to 1, the GIF will loop
+once. Added in version 0.6.0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.create_video_from_frames">
+<span class="sig-name descname"><span class="pre">create_video_from_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frames_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gif_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">macro_block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_video_and_gif_creation.html#create_video_from_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.create_video_from_frames" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a GIF or video from the frames in the given directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frames_dir</strong> (<em>str</em>) -- The directory containing the frames to be used in the video.</p></li>
+<li><p><strong>gif_path</strong> (<em>str</em>) -- The path to save the video.</p></li>
+<li><p><strong>fps</strong> (<em>int</em>) -- The number of frames per second.</p></li>
+<li><p><strong>macro_block_size</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.plot_disjunctive_graph">
+<span class="sig-name descname"><span class="pre">plot_disjunctive_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_shop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(6,</span> <span class="pre">4)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrow_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">35</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_font_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Dark2_r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_disjunctive_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_disjunctive_graph.html#plot_disjunctive_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.plot_disjunctive_graph" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a plot of the disjunctive graph of the instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job_shop</strong> (<a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph" title="job_shop_lib.graphs._job_shop_graph.JobShopGraph"><em>JobShopGraph</em></a><em> | </em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.JobShopInstance" title="job_shop_lib._job_shop_instance.JobShopInstance"><em>JobShopInstance</em></a>)</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>node_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>layout</strong> (<em>Callable</em><em>[</em><em>[</em><em>Graph</em><em>]</em><em>, </em><em>dict</em><em>[</em><em>str</em><em>, </em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>edge_width</strong> (<em>int</em>)</p></li>
+<li><p><strong>font_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>arrow_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>node_font_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>color_map</strong> (<em>str</em>)</p></li>
+<li><p><strong>draw_disjunctive_edges</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.plot_agent_task_graph">
+<span class="sig-name descname"><span class="pre">plot_agent_task_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_shop_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tab10'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_agent_task_graph.html#plot_agent_task_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.plot_agent_task_graph" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a plot of the agent-task graph of the instance.</p>
+<p>Machine and job nodes are represented by squares, and the operation nodes
+are represented by circles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job_shop_graph</strong> (<a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph" title="job_shop_lib.graphs._job_shop_graph.JobShopGraph"><em>JobShopGraph</em></a>) -- The job shop graph instance. It should be already initialized with
+the instance with a valid agent-task graph representation.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>layout</strong> (<em>dict</em><em>[</em><a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.Node" title="job_shop_lib.graphs._node.Node"><em>Node</em></a><em>, </em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>color_map_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>node_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>)</p></li>
+<li><p><strong>add_legend</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The figure of the plot. This figure can be used to save the plot to a
+file or to show it in a Jupyter notebook.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.three_columns_layout">
+<span class="sig-name descname"><span class="pre">three_columns_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_shop_graph</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leftmost_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rightmost_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topmost_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bottommost_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_agent_task_graph.html#three_columns_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.three_columns_layout" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the layout of the agent-task graph.</p>
+<p>The layout is organized in a grid manner. For example, for a JobShopGraph
+representing a job shop instance with 2 machines and 3 jobs, the layout
+would be:</p>
+<p>0:  -       O_11      -
+1:  -       O_12      J1
+2:  -       O_13      -
+3:  M1      O_21      -
+4:  -       O_22      J2
+5:  -       O_23      -
+6:  M2      O_31      -
+7:  -       O_32      J3
+8:  -       O_33      -
+9:  -        -        -
+10: -        G        -
+Where M1 and M2 are the machine nodes, J1, J2, and J3 are the job
+nodes, O_ij are the operation nodes, and G is the global node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job_shop_graph</strong> (<a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph" title="job_shop_lib.graphs._job_shop_graph.JobShopGraph"><em>JobShopGraph</em></a>) -- The job shop graph instance. It should be already initialized with
+the instance with a valid agent-task graph representation.</p></li>
+<li><p><strong>leftmost_position</strong> (<em>float</em>) -- The center position of the leftmost column of the layout. It should
+be a float between 0 and 1. The default is 0.1.</p></li>
+<li><p><strong>rightmost_position</strong> (<em>float</em>) -- The center position of the rightmost column of the layout. It
+should be a float between 0 and 1. The default is 0.9.</p></li>
+<li><p><strong>topmost_position</strong> (<em>float</em>) -- The center position of the topmost node of the layout. It should be
+a float between 0 and 1. The default is 0.9.</p></li>
+<li><p><strong>bottommost_position</strong> (<em>float</em>) -- The center position of the bottommost node of the layout. It should
+be a float between 0 and 1. The default is 0.1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary with the position of each node in the graph. The keys are
+the node ids, and the values are tuples with the x and y coordinates.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>dict</em>[<a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.Node" title="job_shop_lib.graphs._node.Node"><em>Node</em></a>, <em>tuple</em>[<em>float</em>, <em>float</em>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GanttChartCreator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispatcher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gantt_chart_wrapper_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gif_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#GanttChartCreator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Facade class that centralizes the creation of Gantt charts, videos
+and GIFs.</p>
+<p>It leverages a <cite>HistoryObserver</cite> to keep track of the operations being
+scheduled and provides methods to plot the current state
+of the schedule as a Gantt chart and to create a GIF that shows the
+evolution of the schedule over time.</p>
+<p>It adds a new <cite>HistoryObserver</cite> to the dispatcher if it does
+not have one already. Otherwise, it uses the observer already present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dispatcher</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><em>Dispatcher</em></a>)</p></li>
+<li><p><strong>gantt_chart_wrapper_config</strong> (<a class="reference internal" href="#job_shop_lib.visualization.GanttChartWrapperConfig" title="job_shop_lib.visualization._gantt_chart_creator.GanttChartWrapperConfig"><em>GanttChartWrapperConfig</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>gif_config</strong> (<a class="reference internal" href="#job_shop_lib.visualization.GifConfig" title="job_shop_lib.visualization._gantt_chart_creator.GifConfig"><em>GifConfig</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>video_config</strong> (<a class="reference internal" href="#job_shop_lib.visualization.VideoConfig" title="job_shop_lib.visualization._gantt_chart_creator.VideoConfig"><em>VideoConfig</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.history_observer">
+<span class="sig-name descname"><span class="pre">history_observer</span></span><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.history_observer" title="Link to this definition">¶</a></dt>
+<dd><p>The history observer observing the dispatcher's state.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.gantt_chart_config">
+<span class="sig-name descname"><span class="pre">gantt_chart_config</span></span><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.gantt_chart_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for plotting the Gantt chart.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.gif_config">
+<span class="sig-name descname"><span class="pre">gif_config</span></span><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.gif_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for creating the GIF.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.gantt_chart_wrapper_config">
+<span class="sig-name descname"><span class="pre">gantt_chart_wrapper_config</span></span><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.gantt_chart_wrapper_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for the Gantt chart wrapper function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.video_config">
+<span class="sig-name descname"><span class="pre">video_config</span></span><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.video_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for creating the video.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.plot_function">
+<span class="sig-name descname"><span class="pre">plot_function</span></span><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.plot_function" title="Link to this definition">¶</a></dt>
+<dd><p>The function used to plot the Gantt chart when creating the GIF
+or video. Created using the <cite>plot_gantt_chart_wrapper</cite> function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispatcher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gantt_chart_wrapper_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gif_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#GanttChartCreator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initializes the GanttChartCreator with the given configurations
+and history observer.</p>
+<p>This class adds a new <cite>HistoryObserver</cite> to the dispatcher if it does
+not have one already. Otherwise, it uses the observer already present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dispatcher</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><em>Dispatcher</em></a>) -- The <cite>Dispatcher</cite> class that will be tracked using a
+<cite>HistoryObserver</cite>.</p></li>
+<li><p><strong>gantt_chart_wrapper_config</strong> (<a class="reference internal" href="#job_shop_lib.visualization.GanttChartWrapperConfig" title="job_shop_lib.visualization._gantt_chart_creator.GanttChartWrapperConfig"><em>GanttChartWrapperConfig</em></a><em> | </em><em>None</em>) -- <p>Configuration for the Gantt chart wrapper function. Valid keys
+are:
+- title: The title of the Gantt chart.
+- cmap: The name of the colormap to use.
+- show_available_operations: Whether to show available</p>
+<blockquote>
+<div><p>operations in each step.</p>
+</div></blockquote>
+<p>If <cite>title</cite> or <cite>cmap</cite> are not provided here and
+<cite>infer_gantt_chart_config</cite> is set to True, the values from
+<cite>gantt_chart_config</cite> will be used if they are present.</p>
+</p></li>
+<li><p><strong>gif_config</strong> (<a class="reference internal" href="#job_shop_lib.visualization.GifConfig" title="job_shop_lib.visualization._gantt_chart_creator.GifConfig"><em>GifConfig</em></a><em> | </em><em>None</em>) -- <p>Configuration for creating the GIF. Defaults to None.
+Valid keys are:
+- gif_path: The path to save the GIF.
+- fps: The frames per second of the GIF.
+- remove_frames: Whether to remove the frames after creating</p>
+<blockquote>
+<div><p>the GIF.</p>
+</div></blockquote>
+<ul>
+<li><p>frames_dir: The directory to store the frames.</p></li>
+<li><dl class="simple">
+<dt>plot_current_time: Whether to plot the current time in the</dt><dd><p>Gantt chart.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+<li><p><strong>video_config</strong> (<a class="reference internal" href="#job_shop_lib.visualization.VideoConfig" title="job_shop_lib.visualization._gantt_chart_creator.VideoConfig"><em>VideoConfig</em></a><em> | </em><em>None</em>) -- <p>Configuration for creating the video. Defaults to None.
+Valid keys are:
+- video_path: The path to save the video.
+- fps: The frames per second of the video.
+- remove_frames: Whether to remove the frames after creating</p>
+<blockquote>
+<div><p>the video.</p>
+</div></blockquote>
+<ul>
+<li><p>frames_dir: The directory to store the frames.</p></li>
+<li><dl class="simple">
+<dt>plot_current_time: Whether to plot the current time in the</dt><dd><p>Gantt chart.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.instance">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instance</span></span><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.instance" title="Link to this definition">¶</a></dt>
+<dd><p>The instance being scheduled.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.schedule">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">schedule</span></span><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.schedule" title="Link to this definition">¶</a></dt>
+<dd><p>The current schedule.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.dispatcher">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dispatcher</span></span><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.dispatcher" title="Link to this definition">¶</a></dt>
+<dd><p>The dispatcher being observed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.plot_gantt_chart">
+<span class="sig-name descname"><span class="pre">plot_gantt_chart</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#GanttChartCreator.plot_gantt_chart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.plot_gantt_chart" title="Link to this definition">¶</a></dt>
+<dd><p>Plots the current Gantt chart of the schedule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The figure and axes of the plotted Gantt chart.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>tuple</em>[plt.Figure, plt.Axes]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.create_gif">
+<span class="sig-name descname"><span class="pre">create_gif</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#GanttChartCreator.create_gif"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.create_gif" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a GIF of the schedule being built using the recorded
+history.</p>
+<p>This method uses the history of scheduled operations recorded by the
+<cite>HistoryTracker</cite> to create a GIF that shows the progression of the
+scheduling process.</p>
+<p>The GIF creation process involves:
+- Using the history of scheduled operations to generate frames for</p>
+<blockquote>
+<div><p>each step of the schedule.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Creating a GIF from these frames.</p></li>
+<li><p>Optionally, removing the frames after the GIF is created.</p></li>
+</ul>
+<p>The configuration for the GIF creation can be customized through the
+<cite>gif_config</cite> attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartCreator.create_video">
+<span class="sig-name descname"><span class="pre">create_video</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#GanttChartCreator.create_video"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.GanttChartCreator.create_video" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a video of the schedule being built using the recorded
+history.</p>
+<p>This method uses the history of scheduled operations recorded by the
+<cite>HistoryTracker</cite> to create a video that shows the progression of the
+scheduling process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartWrapperConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GanttChartWrapperConfig</span></span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#GanttChartWrapperConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.GanttChartWrapperConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Configuration for creating the plot function with the
+<cite>plot_gantt_chart_wrapper</cite> function.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartWrapperConfig.title">
+<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.visualization.GanttChartWrapperConfig.title" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartWrapperConfig.cmap">
+<span class="sig-name descname"><span class="pre">cmap</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#job_shop_lib.visualization.GanttChartWrapperConfig.cmap" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GanttChartWrapperConfig.show_available_operations">
+<span class="sig-name descname"><span class="pre">show_available_operations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.visualization.GanttChartWrapperConfig.show_available_operations" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GifConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GifConfig</span></span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#GifConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.GifConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>Configuration for creating the GIF using the <cite>create_gannt_chart_video</cite>
+function.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GifConfig.gif_path">
+<span class="sig-name descname"><span class="pre">gif_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.visualization.GifConfig.gif_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GifConfig.fps">
+<span class="sig-name descname"><span class="pre">fps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#job_shop_lib.visualization.GifConfig.fps" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GifConfig.remove_frames">
+<span class="sig-name descname"><span class="pre">remove_frames</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.visualization.GifConfig.remove_frames" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GifConfig.frames_dir">
+<span class="sig-name descname"><span class="pre">frames_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.visualization.GifConfig.frames_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.GifConfig.plot_current_time">
+<span class="sig-name descname"><span class="pre">plot_current_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.visualization.GifConfig.plot_current_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.VideoConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VideoConfig</span></span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#VideoConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.visualization.VideoConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Configuration for creating the video using the
+<cite>create_gannt_chart_video</cite> function.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.VideoConfig.video_path">
+<span class="sig-name descname"><span class="pre">video_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.visualization.VideoConfig.video_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.VideoConfig.fps">
+<span class="sig-name descname"><span class="pre">fps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#job_shop_lib.visualization.VideoConfig.fps" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.VideoConfig.remove_frames">
+<span class="sig-name descname"><span class="pre">remove_frames</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.visualization.VideoConfig.remove_frames" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.VideoConfig.frames_dir">
+<span class="sig-name descname"><span class="pre">frames_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.visualization.VideoConfig.frames_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.visualization.VideoConfig.plot_current_time">
+<span class="sig-name descname"><span class="pre">plot_current_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.visualization.VideoConfig.plot_current_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="job_shop_lib.reinforcement_learning.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">job_shop_lib.reinforcement_learning</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; MIT License
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">job_shop_lib.visualization</a><ul>
+<li><a class="reference internal" href="#job_shop_lib.visualization.plot_gantt_chart"><code class="docutils literal notranslate"><span class="pre">plot_gantt_chart()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.create_gantt_chart_video"><code class="docutils literal notranslate"><span class="pre">create_gantt_chart_video()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.create_gif"><code class="docutils literal notranslate"><span class="pre">create_gif()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.create_gantt_chart_frames"><code class="docutils literal notranslate"><span class="pre">create_gantt_chart_frames()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.plot_gantt_chart_wrapper"><code class="docutils literal notranslate"><span class="pre">plot_gantt_chart_wrapper()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.create_gif_from_frames"><code class="docutils literal notranslate"><span class="pre">create_gif_from_frames()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.create_video_from_frames"><code class="docutils literal notranslate"><span class="pre">create_video_from_frames()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.plot_disjunctive_graph"><code class="docutils literal notranslate"><span class="pre">plot_disjunctive_graph()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.plot_agent_task_graph"><code class="docutils literal notranslate"><span class="pre">plot_agent_task_graph()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.three_columns_layout"><code class="docutils literal notranslate"><span class="pre">three_columns_layout()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.history_observer"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.history_observer</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.gantt_chart_config"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.gantt_chart_config</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.gif_config"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.gif_config</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.gantt_chart_wrapper_config"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.gantt_chart_wrapper_config</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.video_config"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.video_config</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.plot_function"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.plot_function</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.__init__"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.instance"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.instance</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.schedule"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.schedule</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.dispatcher"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.dispatcher</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.plot_gantt_chart"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.plot_gantt_chart()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.create_gif"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.create_gif()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartCreator.create_video"><code class="docutils literal notranslate"><span class="pre">GanttChartCreator.create_video()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartWrapperConfig"><code class="docutils literal notranslate"><span class="pre">GanttChartWrapperConfig</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartWrapperConfig.title"><code class="docutils literal notranslate"><span class="pre">GanttChartWrapperConfig.title</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartWrapperConfig.cmap"><code class="docutils literal notranslate"><span class="pre">GanttChartWrapperConfig.cmap</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GanttChartWrapperConfig.show_available_operations"><code class="docutils literal notranslate"><span class="pre">GanttChartWrapperConfig.show_available_operations</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GifConfig"><code class="docutils literal notranslate"><span class="pre">GifConfig</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GifConfig.gif_path"><code class="docutils literal notranslate"><span class="pre">GifConfig.gif_path</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GifConfig.fps"><code class="docutils literal notranslate"><span class="pre">GifConfig.fps</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GifConfig.remove_frames"><code class="docutils literal notranslate"><span class="pre">GifConfig.remove_frames</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GifConfig.frames_dir"><code class="docutils literal notranslate"><span class="pre">GifConfig.frames_dir</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.GifConfig.plot_current_time"><code class="docutils literal notranslate"><span class="pre">GifConfig.plot_current_time</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.VideoConfig"><code class="docutils literal notranslate"><span class="pre">VideoConfig</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.visualization.VideoConfig.video_path"><code class="docutils literal notranslate"><span class="pre">VideoConfig.video_path</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.VideoConfig.fps"><code class="docutils literal notranslate"><span class="pre">VideoConfig.fps</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.VideoConfig.remove_frames"><code class="docutils literal notranslate"><span class="pre">VideoConfig.remove_frames</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.VideoConfig.frames_dir"><code class="docutils literal notranslate"><span class="pre">VideoConfig.frames_dir</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.visualization.VideoConfig.plot_current_time"><code class="docutils literal notranslate"><span class="pre">VideoConfig.plot_current_time</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>

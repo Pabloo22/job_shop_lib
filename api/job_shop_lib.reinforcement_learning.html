@@ -1,0 +1,1371 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="job_shop_lib.visualization" href="job_shop_lib.visualization.html" /><link rel="prev" title="job_shop_lib.graphs.graph_updaters" href="job_shop_lib.graphs.graph_updaters.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.07.18 -->
+        <title>job_shop_lib.reinforcement_learning - JobShopLib documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">JobShopLib  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../_static/logo_no_bg_resized_fixed.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">JobShopLib  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/00-Getting-Started.html">Getting Started to Job Shop Lib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/01-How-Solutions-are-Represented.html">How Solutions are Represented</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/02-Solving-the-Problem.html">Solving the Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/03-Dispatching-Rules.html">Dispatching Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/04-Disjunctive-Graph.html">Disjunctive Graph representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/05-Load-Benchmark-Instances.html">Load Benchmark Instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/06-Save-Gif.html">Gannt Chart Creation: How to Save GIFs and Videos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/07-Agent-Task-Graph.html">The Agent-Task Graph representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/08-Feature-Observers.html">Feature Observers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/09-SingleJobShopGraphEnv.html">RL Graph Environment: Learning from one instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/10-MultiJobShopGraphEnv.html">RL Graph Environment: Learning from many instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/unscheduled_operations.html">Comparing Performance: Dispatcher Method vs. Observer Method for Unscheduled Operations</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="job_shop_lib.html">job_shop_lib</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of job_shop_lib</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="job_shop_lib.benchmarking.html">job_shop_lib.benchmarking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="job_shop_lib.constraint_programming.html">job_shop_lib.constraint_programming</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="job_shop_lib.dispatching.html">job_shop_lib.dispatching</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of job_shop_lib.dispatching</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="job_shop_lib.dispatching.feature_observers.html">job_shop_lib.dispatching.feature_observers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="job_shop_lib.dispatching.rules.html">job_shop_lib.dispatching.rules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="job_shop_lib.exceptions.html">job_shop_lib.exceptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="job_shop_lib.generation.html">job_shop_lib.generation</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="job_shop_lib.graphs.html">job_shop_lib.graphs</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of job_shop_lib.graphs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="job_shop_lib.graphs.graph_updaters.html">job_shop_lib.graphs.graph_updaters</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">job_shop_lib.reinforcement_learning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="job_shop_lib.visualization.html">job_shop_lib.visualization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/job_shop_lib.reinforcement_learning.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-job_shop_lib.reinforcement_learning">
+<span id="job-shop-lib-reinforcement-learning"></span><h1>job_shop_lib.reinforcement_learning<a class="headerlink" href="#module-job_shop_lib.reinforcement_learning" title="Link to this heading">¶</a></h1>
+<p>Package for reinforcement learning components.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationSpaceKey">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObservationSpaceKey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_types_and_constants.html#ObservationSpaceKey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Enumeration of the keys for the observation space dictionary.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationSpaceKey.REMOVED_NODES">
+<span class="sig-name descname"><span class="pre">REMOVED_NODES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'removed_nodes'</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey.REMOVED_NODES" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationSpaceKey.EDGE_INDEX">
+<span class="sig-name descname"><span class="pre">EDGE_INDEX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'edge_index'</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey.EDGE_INDEX" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationSpaceKey.OPERATIONS">
+<span class="sig-name descname"><span class="pre">OPERATIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'operations'</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey.OPERATIONS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationSpaceKey.JOBS">
+<span class="sig-name descname"><span class="pre">JOBS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'jobs'</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey.JOBS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationSpaceKey.MACHINES">
+<span class="sig-name descname"><span class="pre">MACHINES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'machines'</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey.MACHINES" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.RewardObserver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RewardObserver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispatcher</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscribe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_reward_observers.html#RewardObserver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.RewardObserver" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserver" title="job_shop_lib.dispatching._dispatcher.DispatcherObserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">DispatcherObserver</span></code></a></p>
+<p>Base class for all reward functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dispatcher</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><em>Dispatcher</em></a>)</p></li>
+<li><p><strong>subscribe</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.RewardObserver.rewards">
+<span class="sig-name descname"><span class="pre">rewards</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.RewardObserver.rewards" title="Link to this definition">¶</a></dt>
+<dd><p>List of rewards calculated for each operation scheduled by the
+dispatcher.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.RewardObserver.last_reward">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_reward</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.RewardObserver.last_reward" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the reward of the last step or 0 if no rewards have been
+calculated.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.RewardObserver.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_reward_observers.html#RewardObserver.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.RewardObserver.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Sets rewards attribute to a new empty list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MakespanReward">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MakespanReward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispatcher</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscribe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_reward_observers.html#MakespanReward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MakespanReward" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver" title="job_shop_lib.reinforcement_learning._reward_observers.RewardObserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">RewardObserver</span></code></a></p>
+<p>Dense reward function based on the negative makespan of the schedule.</p>
+<p>The reward is calculated as the difference between the makespan of the
+schedule before and after the last operation was scheduled. The makespan
+is the time at which the last operation is completed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dispatcher</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><em>Dispatcher</em></a>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MakespanReward.current_makespan">
+<span class="sig-name descname"><span class="pre">current_makespan</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MakespanReward.current_makespan" title="Link to this definition">¶</a></dt>
+<dd><p>Makespan of the schedule after the last operation was scheduled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MakespanReward.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_reward_observers.html#MakespanReward.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MakespanReward.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Sets rewards attribute to a new empty list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MakespanReward.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheduled_operation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_reward_observers.html#MakespanReward.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MakespanReward.update" title="Link to this definition">¶</a></dt>
+<dd><p>Called when an operation is scheduled on a machine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>scheduled_operation</strong> (<a class="reference internal" href="job_shop_lib.html#job_shop_lib.ScheduledOperation" title="job_shop_lib._scheduled_operation.ScheduledOperation"><em>ScheduledOperation</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.IdleTimeReward">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IdleTimeReward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispatcher</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscribe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_reward_observers.html#IdleTimeReward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.IdleTimeReward" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver" title="job_shop_lib.reinforcement_learning._reward_observers.RewardObserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">RewardObserver</span></code></a></p>
+<p>Dense reward function based on the negative idle time of the schedule.</p>
+<p>The reward is calculated as the difference between the idle time of the
+schedule before and after the last operation was scheduled. The idle time
+is the sum of the time between the end of the last operation and the start
+of the next operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dispatcher</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><em>Dispatcher</em></a>)</p></li>
+<li><p><strong>subscribe</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.IdleTimeReward.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheduled_operation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_reward_observers.html#IdleTimeReward.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.IdleTimeReward.update" title="Link to this definition">¶</a></dt>
+<dd><p>Called when an operation is scheduled on a machine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>scheduled_operation</strong> (<a class="reference internal" href="job_shop_lib.html#job_shop_lib.ScheduledOperation" title="job_shop_lib._scheduled_operation.ScheduledOperation"><em>ScheduledOperation</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.GanttChartWrapperConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GanttChartWrapperConfig</span></span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#GanttChartWrapperConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Configuration for creating the plot function with the
+<cite>plot_gantt_chart_wrapper</cite> function.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.title">
+<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.title" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.cmap">
+<span class="sig-name descname"><span class="pre">cmap</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.cmap" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.show_available_operations">
+<span class="sig-name descname"><span class="pre">show_available_operations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.show_available_operations" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.GifConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GifConfig</span></span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#GifConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.GifConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>Configuration for creating the GIF using the <cite>create_gannt_chart_video</cite>
+function.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.GifConfig.gif_path">
+<span class="sig-name descname"><span class="pre">gif_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.GifConfig.gif_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.GifConfig.fps">
+<span class="sig-name descname"><span class="pre">fps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.GifConfig.fps" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.GifConfig.remove_frames">
+<span class="sig-name descname"><span class="pre">remove_frames</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.GifConfig.remove_frames" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.GifConfig.frames_dir">
+<span class="sig-name descname"><span class="pre">frames_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.GifConfig.frames_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.GifConfig.plot_current_time">
+<span class="sig-name descname"><span class="pre">plot_current_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.GifConfig.plot_current_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.VideoConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VideoConfig</span></span><a class="reference internal" href="../_modules/job_shop_lib/visualization/_gantt_chart_creator.html#VideoConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.VideoConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Configuration for creating the video using the
+<cite>create_gannt_chart_video</cite> function.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.VideoConfig.video_path">
+<span class="sig-name descname"><span class="pre">video_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.VideoConfig.video_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.VideoConfig.fps">
+<span class="sig-name descname"><span class="pre">fps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.VideoConfig.fps" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.VideoConfig.remove_frames">
+<span class="sig-name descname"><span class="pre">remove_frames</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.VideoConfig.remove_frames" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.VideoConfig.frames_dir">
+<span class="sig-name descname"><span class="pre">frames_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.VideoConfig.frames_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.VideoConfig.plot_current_time">
+<span class="sig-name descname"><span class="pre">plot_current_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.VideoConfig.plot_current_time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SingleJobShopGraphEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_shop_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_observer_configs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_function_config=DispatcherObserverConfig(class_type=&lt;class</span> <span class="pre">'job_shop_lib.reinforcement_learning._reward_observers.MakespanReward'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs={})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_updater_config=DispatcherObserverConfig(class_type=&lt;class</span> <span class="pre">'job_shop_lib.graphs.graph_updaters._residual_graph_updater.ResidualGraphUpdater'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs={})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ready_operations_filter=&lt;function</span> <span class="pre">filter_dominated_operations&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render_mode=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render_config=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_padding=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_single_job_shop_graph_env.html#SingleJobShopGraphEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Env</span></code></p>
+<p>A Gymnasium environment for solving a specific instance of the Job Shop
+Scheduling Problem represented as a graph.</p>
+<p>This environment manages the scheduling process for a single Job Shop
+instance, using a graph representation and various observers to track the
+state and compute rewards.</p>
+<dl>
+<dt>Observation Space:</dt><dd><p>A dictionary with the following keys:
+- &quot;removed_nodes&quot;: Binary vector indicating removed graph nodes.
+- &quot;edge_list&quot;: Matrix of graph edges in COO format.
+- Feature matrices: Keys corresponding to the composite observer</p>
+<blockquote>
+<div><p>features (e.g., &quot;operations&quot;, &quot;jobs&quot;, &quot;machines&quot;).</p>
+</div></blockquote>
+</dd>
+<dt>Action Space:</dt><dd><p>MultiDiscrete space representing (job_id, machine_id) pairs.</p>
+</dd>
+<dt>Render Modes:</dt><dd><ul class="simple">
+<li><p>&quot;human&quot;: Displays the current Gantt chart.</p></li>
+<li><p>&quot;save_video&quot;: Saves a video of the complete Gantt chart.</p></li>
+<li><p>&quot;save_gif&quot;: Saves a GIF of the complete Gantt chart.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job_shop_graph</strong> (<a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph" title="job_shop_lib.graphs._job_shop_graph.JobShopGraph"><em>JobShopGraph</em></a>)</p></li>
+<li><p><strong>feature_observer_configs</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver" title="job_shop_lib.dispatching.feature_observers._feature_observer.FeatureObserver"><em>FeatureObserver</em></a><em>]</em><em>] </em><em>| </em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType" title="job_shop_lib.dispatching.feature_observers._factory.FeatureObserverType"><em>FeatureObserverType</em></a><em>] </em><em>| </em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>str</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>reward_function_config</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver" title="job_shop_lib.reinforcement_learning._reward_observers.RewardObserver"><em>RewardObserver</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>graph_updater_config</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.GraphUpdater" title="job_shop_lib.graphs.graph_updaters._graph_updater.GraphUpdater"><em>GraphUpdater</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>ready_operations_filter</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><em>Dispatcher</em></a><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>]</em><em>]</em><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>render_mode</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>render_config</strong> (<a class="reference internal" href="#job_shop_lib.reinforcement_learning.RenderConfig" title="job_shop_lib.reinforcement_learning._types_and_constants.RenderConfig"><em>RenderConfig</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>use_padding</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.dispatcher">
+<span class="sig-name descname"><span class="pre">dispatcher</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.dispatcher" title="Link to this definition">¶</a></dt>
+<dd><p>Manages the scheduling process. See
+<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching.Dispatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dispatcher</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.composite_observer">
+<span class="sig-name descname"><span class="pre">composite_observer</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.composite_observer" title="Link to this definition">¶</a></dt>
+<dd><p>A <code class="xref py py-class docutils literal notranslate">
+<span class="pre">CompositeFeatureObserver</span></code> which aggregates features from multiple
+observers.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.graph_updater">
+<span class="sig-name descname"><span class="pre">graph_updater</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.graph_updater" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the graph representation after each action. See
+<code class="xref py py-class docutils literal notranslate"><span class="pre">GraphUpdater</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.reward_function">
+<span class="sig-name descname"><span class="pre">reward_function</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.reward_function" title="Link to this definition">¶</a></dt>
+<dd><p>Computes rewards for actions taken. See
+<a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver" title="job_shop_lib.reinforcement_learning.RewardObserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">RewardObserver</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.action_space">
+<span class="sig-name descname"><span class="pre">action_space</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.action_space" title="Link to this definition">¶</a></dt>
+<dd><p>Defines the action space. The action is a tuple of two integers
+(job_id, machine_id). The machine_id can be -1 if the selected
+operation can only be scheduled in one machine.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.observation_space">
+<span class="sig-name descname"><span class="pre">observation_space</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.observation_space" title="Link to this definition">¶</a></dt>
+<dd><p>Defines the observation space. The observation is a dictionary
+with the following keys:
+- &quot;removed_nodes&quot;: Binary vector indicating removed graph nodes.
+- &quot;edge_list&quot;: Matrix of graph edges in COO format.
+- Feature matrices: Keys corresponding to the composite observer</p>
+<blockquote>
+<div><p>features (e.g., &quot;operations&quot;, &quot;jobs&quot;, &quot;machines&quot;).</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.render_mode">
+<span class="sig-name descname"><span class="pre">render_mode</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.render_mode" title="Link to this definition">¶</a></dt>
+<dd><p>The mode for rendering the environment (&quot;human&quot;, &quot;save_video&quot;,
+&quot;save_gif&quot;).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.gantt_chart_creator">
+<span class="sig-name descname"><span class="pre">gantt_chart_creator</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.gantt_chart_creator" title="Link to this definition">¶</a></dt>
+<dd><p>Creates Gantt chart visualizations. See
+<a class="reference internal" href="job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator" title="job_shop_lib.visualization.GanttChartCreator"><code class="xref py py-class docutils literal notranslate"><span class="pre">GanttChartCreator</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.use_padding">
+<span class="sig-name descname"><span class="pre">use_padding</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.use_padding" title="Link to this definition">¶</a></dt>
+<dd><p>Whether to use padding in observations. Padding maintains the</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'render_modes':</span> <span class="pre">['human',</span> <span class="pre">'save_video',</span> <span class="pre">'save_gif']}</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.metadata" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_shop_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_observer_configs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_function_config=DispatcherObserverConfig(class_type=&lt;class</span> <span class="pre">'job_shop_lib.reinforcement_learning._reward_observers.MakespanReward'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs={})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_updater_config=DispatcherObserverConfig(class_type=&lt;class</span> <span class="pre">'job_shop_lib.graphs.graph_updaters._residual_graph_updater.ResidualGraphUpdater'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs={})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ready_operations_filter=&lt;function</span> <span class="pre">filter_dominated_operations&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render_mode=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render_config=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_padding=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_single_job_shop_graph_env.html#SingleJobShopGraphEnv.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initializes the SingleJobShopGraphEnv environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job_shop_graph</strong> (<a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph" title="job_shop_lib.graphs._job_shop_graph.JobShopGraph"><em>JobShopGraph</em></a>) -- The JobShopGraph instance representing the job shop problem.</p></li>
+<li><p><strong>feature_observer_configs</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver" title="job_shop_lib.dispatching.feature_observers._feature_observer.FeatureObserver"><em>FeatureObserver</em></a><em>]</em><em>] </em><em>| </em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType" title="job_shop_lib.dispatching.feature_observers._factory.FeatureObserverType"><em>FeatureObserverType</em></a><em>] </em><em>| </em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>str</em><em>]</em><em>]</em>) -- A list of FeatureObserverConfig instances for the feature
+observers.</p></li>
+<li><p><strong>reward_function_config</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver" title="job_shop_lib.reinforcement_learning._reward_observers.RewardObserver"><em>RewardObserver</em></a><em>]</em><em>]</em>) -- The configuration for the reward function.</p></li>
+<li><p><strong>graph_updater_config</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.GraphUpdater" title="job_shop_lib.graphs.graph_updaters._graph_updater.GraphUpdater"><em>GraphUpdater</em></a><em>]</em><em>]</em>) -- The configuration for the graph updater.</p></li>
+<li><p><strong>ready_operations_filter</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><em>Dispatcher</em></a><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>]</em><em>]</em><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>]</em><em>] </em><em>| </em><em>None</em>) -- The function to use for pruning dominated operations.</p></li>
+<li><p><strong>render_mode</strong> (<em>str</em><em> | </em><em>None</em>) -- The mode for rendering the environment (&quot;human&quot;, &quot;save_video&quot;,
+&quot;save_gif&quot;).</p></li>
+<li><p><strong>render_config</strong> (<a class="reference internal" href="#job_shop_lib.reinforcement_learning.RenderConfig" title="job_shop_lib.reinforcement_learning._types_and_constants.RenderConfig"><em>RenderConfig</em></a><em> | </em><em>None</em>) -- Configuration for rendering (e.g., paths for saving videos
+or GIFs).</p></li>
+<li><p><strong>use_padding</strong> (<em>bool</em>) -- Whether to use padding for the edge index.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.instance">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="job_shop_lib.html#job_shop_lib.JobShopInstance" title="job_shop_lib._job_shop_instance.JobShopInstance"><span class="pre">JobShopInstance</span></a></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.instance" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the instance the environment is working on.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.job_shop_graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">job_shop_graph</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph" title="job_shop_lib.graphs._job_shop_graph.JobShopGraph"><span class="pre">JobShopGraph</span></a></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.job_shop_graph" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the job shop graph.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_single_job_shop_graph_env.html#SingleJobShopGraphEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Resets the environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>options</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>tuple</em>[<a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationDict" title="job_shop_lib.reinforcement_learning._types_and_constants.ObservationDict"><em>ObservationDict</em></a>, <em>dict</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_single_job_shop_graph_env.html#SingleJobShopGraphEnv.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.step" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a step in the environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>action</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) -- The action to take. The action is a tuple of two integers
+(job_id, machine_id):
+the job ID and the machine ID in which to schedule the
+operation.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul>
+<li><p>The observation of the environment.</p></li>
+<li><p>The reward obtained.</p></li>
+<li><p>Whether the environment is done.</p></li>
+<li><p>Whether the episode was truncated (always False).</p></li>
+<li><p>A dictionary with additional information. The dictionary
+contains the following keys:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>&quot;feature_names&quot;: The names of the features in the
+observation.</p></li>
+<li><p>&quot;available_operations&quot;: The operations that are ready to be
+scheduled.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing the following elements</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.get_observation">
+<span class="sig-name descname"><span class="pre">get_observation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_single_job_shop_graph_env.html#SingleJobShopGraphEnv.get_observation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.get_observation" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current observation of the environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationDict" title="job_shop_lib.reinforcement_learning._types_and_constants.ObservationDict"><em>ObservationDict</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_single_job_shop_graph_env.html#SingleJobShopGraphEnv.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.render" title="Link to this definition">¶</a></dt>
+<dd><p>Renders the environment.</p>
+<p>The rendering mode is set by the <cite>render_mode</cite> attribute:</p>
+<ul class="simple">
+<li><p>human: Renders the current Gannt chart.</p></li>
+<li><dl class="simple">
+<dt>save_video: Saves a video of the Gantt chart. Used only if the</dt><dd><p>schedule is completed.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>save_gif: Saves a GIF of the Gantt chart. Used only if the schedule</dt><dd><p>is completed.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.RenderConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RenderConfig</span></span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_types_and_constants.html#RenderConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.RenderConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Configuration needed to initialize the <cite>GanttChartCreator</cite> class.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.RenderConfig.gantt_chart_wrapper_config">
+<span class="sig-name descname"><span class="pre">gantt_chart_wrapper_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartWrapperConfig" title="job_shop_lib.visualization._gantt_chart_creator.GanttChartWrapperConfig"><span class="pre">GanttChartWrapperConfig</span></a></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.RenderConfig.gantt_chart_wrapper_config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.RenderConfig.video_config">
+<span class="sig-name descname"><span class="pre">video_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="job_shop_lib.visualization.html#job_shop_lib.visualization.VideoConfig" title="job_shop_lib.visualization._gantt_chart_creator.VideoConfig"><span class="pre">VideoConfig</span></a></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.RenderConfig.video_config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.RenderConfig.gif_config">
+<span class="sig-name descname"><span class="pre">gif_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="job_shop_lib.visualization.html#job_shop_lib.visualization.GifConfig" title="job_shop_lib.visualization._gantt_chart_creator.GifConfig"><span class="pre">GifConfig</span></a></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.RenderConfig.gif_config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObservationDict</span></span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_types_and_constants.html#ObservationDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationDict" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A dictionary containing the observation of the environment.</p>
+<dl class="simple">
+<dt>Required fields:</dt><dd><p>removed_nodes (np.ndarray): Binary vector indicating removed nodes.
+edge_index (np.ndarray): Edge list in COO format.</p>
+</dd>
+<dt>Optional fields:</dt><dd><p>operations (np.ndarray): Matrix of operation features.
+jobs (np.ndarray): Matrix of job features.
+machines (np.ndarray): Matrix of machine features.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationDict.removed_nodes">
+<span class="sig-name descname"><span class="pre">removed_nodes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationDict.removed_nodes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationDict.edge_index">
+<span class="sig-name descname"><span class="pre">edge_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationDict.edge_index" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationDict.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationDict.operations" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationDict.jobs">
+<span class="sig-name descname"><span class="pre">jobs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationDict.jobs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.ObservationDict.machines">
+<span class="sig-name descname"><span class="pre">machines</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.ObservationDict.machines" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.add_padding">
+<span class="sig-name descname"><span class="pre">add_padding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_utils.html#add_padding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.add_padding" title="Link to this definition">¶</a></dt>
+<dd><p>Adds padding to the array.</p>
+<p>Pads the input array to the specified output shape with a given padding
+value. If the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> is not specified, the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> of the input array
+is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<em>ndarray</em><em>[</em><em>Any</em><em>, </em><em>dtype</em><em>[</em><em>Any</em><em>]</em><em>]</em>) -- The input array to be padded.</p></li>
+<li><p><strong>output_shape</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>) -- The desired shape of the output array.</p></li>
+<li><p><strong>padding_value</strong> (<em>float</em>) -- The value to use for padding. Defaults to -1.</p></li>
+<li><p><strong>dtype</strong> (<em>type</em><em>[</em><em>T</em><em>] </em><em>| </em><em>None</em>) -- The data type for the output array. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>, in which
+case the dtype of the input array is used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The padded array with the specified output shape.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="job_shop_lib.exceptions.html#job_shop_lib.exceptions.ValidationError" title="job_shop_lib.exceptions.ValidationError"><strong>ValidationError</strong></a> -- If the output shape is smaller than the input shape.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em>[<em>Any</em>, <em>dtype</em>[<em>T</em>]]</p>
+</dd>
+</dl>
+<p>Examples:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">add_padding</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">array([[ 1,  2, -1],</span>
+<span class="go">       [ 3,  4, -1],</span>
+<span class="go">       [-1, -1, -1]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">add_padding</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">padding_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">array([[1, 2, 0],</span>
+<span class="go">       [3, 4, 0],</span>
+<span class="go">       [0, 0, 0]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bool_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">add_padding</span><span class="p">(</span><span class="n">bool_array</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">padding_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="go">array([[1, 0, 0],</span>
+<span class="go">       [0, 1, 0],</span>
+<span class="go">       [0, 0, 0]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">add_padding</span><span class="p">(</span><span class="n">bool_array</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="go">array([[ 1,  0, -1],</span>
+<span class="go">       [ 0,  1, -1],</span>
+<span class="go">       [-1, -1, -1]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultiJobShopGraphEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance_generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_observer_configs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_initializer=&lt;function</span> <span class="pre">build_agent_task_graph&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_updater_config=DispatcherObserverConfig(class_type=&lt;class</span> <span class="pre">'job_shop_lib.graphs.graph_updaters._residual_graph_updater.ResidualGraphUpdater'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs={})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ready_operations_filter=&lt;function</span> <span class="pre">filter_dominated_operations&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_function_config=DispatcherObserverConfig(class_type=&lt;class</span> <span class="pre">'job_shop_lib.reinforcement_learning._reward_observers.MakespanReward'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs={})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render_mode=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render_config=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_padding=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_multi_job_shop_graph_env.html#MultiJobShopGraphEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Env</span></code></p>
+<p>Gymnasium environment for solving multiple Job Shop Scheduling Problems
+using reinforcement learning and Graph Neural Networks.</p>
+<p>This environment generates a new Job Shop Scheduling Problem instance
+for each reset, creates a graph representation, and manages the scheduling
+process using a <a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching.Dispatcher"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dispatcher</span></code></a>.</p>
+<p>The observation space includes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>removed_nodes: Binary vector indicating removed nodes.</p></li>
+<li><p>edge_index: Edge list in COO format.</p></li>
+<li><p>operations: Matrix of operation features.</p></li>
+<li><p>jobs: Matrix of job features (if applicable).</p></li>
+<li><p>machines: Matrix of machine features (if applicable).</p></li>
+</ul>
+</div></blockquote>
+<p>Internally, the class creates a
+<a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv" title="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv</span></code></a>
+environment to manage the scheduling process for each
+<a class="reference internal" href="job_shop_lib.html#job_shop_lib.JobShopInstance" title="job_shop_lib.JobShopInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">JobShopInstance</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instance_generator</strong> (<a class="reference internal" href="job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator" title="job_shop_lib.generation._instance_generator.InstanceGenerator"><em>InstanceGenerator</em></a>)</p></li>
+<li><p><strong>feature_observer_configs</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver" title="job_shop_lib.dispatching.feature_observers._feature_observer.FeatureObserver"><em>FeatureObserver</em></a><em>]</em><em>] </em><em>| </em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType" title="job_shop_lib.dispatching.feature_observers._factory.FeatureObserverType"><em>FeatureObserverType</em></a><em>] </em><em>| </em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>str</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>graph_initializer</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.JobShopInstance" title="job_shop_lib._job_shop_instance.JobShopInstance"><em>JobShopInstance</em></a><em>]</em><em>, </em><a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph" title="job_shop_lib.graphs._job_shop_graph.JobShopGraph"><em>JobShopGraph</em></a><em>]</em>)</p></li>
+<li><p><strong>graph_updater_config</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.GraphUpdater" title="job_shop_lib.graphs.graph_updaters._graph_updater.GraphUpdater"><em>GraphUpdater</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>ready_operations_filter</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><em>Dispatcher</em></a><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>]</em><em>]</em><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>reward_function_config</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver" title="job_shop_lib.reinforcement_learning._reward_observers.RewardObserver"><em>RewardObserver</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>render_mode</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>render_config</strong> (<a class="reference internal" href="#job_shop_lib.reinforcement_learning.RenderConfig" title="job_shop_lib.reinforcement_learning._types_and_constants.RenderConfig"><em>RenderConfig</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>use_padding</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.instance_generator">
+<span class="sig-name descname"><span class="pre">instance_generator</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.instance_generator" title="Link to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator" title="job_shop_lib.generation.InstanceGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">InstanceGenerator</span></code></a> that
+generates a new problem instance on each reset.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.action_space">
+<span class="sig-name descname"><span class="pre">action_space</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.action_space" title="Link to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">gymnasium.spaces.Discrete</span></code>) action space with size equal to
+the maximum number of jobs.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.observation_space">
+<span class="sig-name descname"><span class="pre">observation_space</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.observation_space" title="Link to this definition">¶</a></dt>
+<dd><p>Dictionary of observation spaces. Keys are defined in
+<a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey" title="job_shop_lib.reinforcement_learning.ObservationSpaceKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservationSpaceKey</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.single_job_shop_graph_env">
+<span class="sig-name descname"><span class="pre">single_job_shop_graph_env</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.single_job_shop_graph_env" title="Link to this definition">¶</a></dt>
+<dd><p>Environment for a specific Job Shop Scheduling Problem instance.
+See <a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv" title="job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.graph_initializer">
+<span class="sig-name descname"><span class="pre">graph_initializer</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.graph_initializer" title="Link to this definition">¶</a></dt>
+<dd><p>Function to create the initial graph representation. It should
+take a <a class="reference internal" href="job_shop_lib.html#job_shop_lib.JobShopInstance" title="job_shop_lib.JobShopInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">JobShopInstance</span></code></a> as input and return
+a <a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph" title="job_shop_lib.graphs.JobShopGraph"><code class="xref py py-class docutils literal notranslate"><span class="pre">JobShopGraph</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_mode">
+<span class="sig-name descname"><span class="pre">render_mode</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_mode" title="Link to this definition">¶</a></dt>
+<dd><p>Rendering mode for visualization. Supported modes are:
+- human: Renders the current Gannt chart.
+- save_video: Saves a video of the Gantt chart. Used only if the</p>
+<blockquote>
+<div><p>schedule is completed.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>save_gif: Saves a GIF of the Gantt chart. Used only if the
+schedule is completed.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_config">
+<span class="sig-name descname"><span class="pre">render_config</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for rendering. See
+<code class="xref py py-class docutils literal notranslate"><span class="pre">RenderConfig</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.feature_observer_configs">
+<span class="sig-name descname"><span class="pre">feature_observer_configs</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.feature_observer_configs" title="Link to this definition">¶</a></dt>
+<dd><p>List of <a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching.DispatcherObserverConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">DispatcherObserverConfig</span></code></a>
+for feature observers.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reward_function_config">
+<span class="sig-name descname"><span class="pre">reward_function_config</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reward_function_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for the reward function. See
+<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching.DispatcherObserverConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">DispatcherObserverConfig</span></code></a> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">RewardObserver</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.graph_updater_config">
+<span class="sig-name descname"><span class="pre">graph_updater_config</span></span><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.graph_updater_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for the graph updater. The graph updater is used to
+update the graph representation after each action. See
+<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching.DispatcherObserverConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">DispatcherObserverConfig</span></code></a> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">GraphUpdater</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance_generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_observer_configs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_initializer=&lt;function</span> <span class="pre">build_agent_task_graph&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_updater_config=DispatcherObserverConfig(class_type=&lt;class</span> <span class="pre">'job_shop_lib.graphs.graph_updaters._residual_graph_updater.ResidualGraphUpdater'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs={})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ready_operations_filter=&lt;function</span> <span class="pre">filter_dominated_operations&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_function_config=DispatcherObserverConfig(class_type=&lt;class</span> <span class="pre">'job_shop_lib.reinforcement_learning._reward_observers.MakespanReward'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs={})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render_mode=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">render_config=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_padding=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_multi_job_shop_graph_env.html#MultiJobShopGraphEnv.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initializes the environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instance_generator</strong> (<a class="reference internal" href="job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator" title="job_shop_lib.generation._instance_generator.InstanceGenerator"><em>InstanceGenerator</em></a>) -- A <a class="reference internal" href="job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator" title="job_shop_lib.generation.InstanceGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">InstanceGenerator</span></code></a> that
+generates a new problem instance on each reset.</p></li>
+<li><p><strong>feature_observer_configs</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver" title="job_shop_lib.dispatching.feature_observers._feature_observer.FeatureObserver"><em>FeatureObserver</em></a><em>]</em><em>] </em><em>| </em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType" title="job_shop_lib.dispatching.feature_observers._factory.FeatureObserverType"><em>FeatureObserverType</em></a><em>] </em><em>| </em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>str</em><em>]</em><em>]</em>) -- Configurations for feature observers. Each configuration
+should be a
+<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching.DispatcherObserverConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">DispatcherObserverConfig</span></code></a>
+with a class type that inherits from
+<code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureObserver</span></code> or a string
+or enum that represents a built-in feature observer.</p></li>
+<li><p><strong>graph_initializer</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.JobShopInstance" title="job_shop_lib._job_shop_instance.JobShopInstance"><em>JobShopInstance</em></a><em>]</em><em>, </em><a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph" title="job_shop_lib.graphs._job_shop_graph.JobShopGraph"><em>JobShopGraph</em></a><em>]</em>) -- Function to create the initial graph representation.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default graph initializer is used:
+<a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.build_agent_task_graph" title="job_shop_lib.graphs.build_agent_task_graph"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_agent_task_graph()</span></code></a>.</p></li>
+<li><p><strong>graph_updater_config</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.GraphUpdater" title="job_shop_lib.graphs.graph_updaters._graph_updater.GraphUpdater"><em>GraphUpdater</em></a><em>]</em><em>]</em>) -- Configuration for the graph updater. The graph updater is used
+to update the graph representation after each action. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, the default graph updater is used:
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ResidualGraphUpdater</span></code>.</p></li>
+<li><p><strong>ready_operations_filter</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><em>Dispatcher</em></a><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>]</em><em>]</em><em>, </em><em>list</em><em>[</em><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><em>Operation</em></a><em>]</em><em>]</em>) -- Function to filter ready operations. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default
+filter is used:
+<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.filter_dominated_operations" title="job_shop_lib.dispatching.filter_dominated_operations"><code class="xref py py-func docutils literal notranslate"><span class="pre">filter_dominated_operations()</span></code></a>.</p></li>
+<li><p><strong>reward_function_config</strong> (<a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig" title="job_shop_lib.dispatching._dispatcher_observer_config.DispatcherObserverConfig"><em>DispatcherObserverConfig</em></a><em>[</em><em>type</em><em>[</em><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver" title="job_shop_lib.reinforcement_learning._reward_observers.RewardObserver"><em>RewardObserver</em></a><em>]</em><em>]</em>) -- Configuration for the reward function. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the default
+reward function is used:
+<code class="xref py py-class docutils literal notranslate"><span class="pre">MakespanReward</span></code>.</p></li>
+<li><p><strong>render_mode</strong> (<em>str</em><em> | </em><em>None</em>) -- <p>Rendering mode for visualization. Supported modes are:
+- human: Renders the current Gannt chart.
+- save_video: Saves a video of the Gantt chart. Used only if</p>
+<blockquote>
+<div><p>the schedule is completed.</p>
+</div></blockquote>
+<ul>
+<li><p>save_gif: Saves a GIF of the Gantt chart. Used only if the
+schedule is completed.</p></li>
+</ul>
+</p></li>
+<li><p><strong>render_config</strong> (<a class="reference internal" href="#job_shop_lib.reinforcement_learning.RenderConfig" title="job_shop_lib.reinforcement_learning._types_and_constants.RenderConfig"><em>RenderConfig</em></a><em> | </em><em>None</em>) -- Configuration for rendering. See
+<code class="xref py py-class docutils literal notranslate"><span class="pre">RenderConfig</span></code>.</p></li>
+<li><p><strong>use_padding</strong> (<em>bool</em>) -- Whether to use padding in observations. If True, all matrices
+are padded to fixed sizes based on the maximum instance size.
+Values are padded with -1, except for the &quot;removed_nodes&quot; key,
+which is padded with <code class="docutils literal notranslate"><span class="pre">True</span></code>, indicating that the node is
+removed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.dispatcher">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dispatcher</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><span class="pre">Dispatcher</span></a></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.dispatcher" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current dispatcher instance.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reward_function">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reward_function</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver" title="job_shop_lib.reinforcement_learning._reward_observers.RewardObserver"><span class="pre">RewardObserver</span></a></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reward_function" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current reward function instance.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.ready_operations_filter">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ready_operations_filter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher" title="job_shop_lib.dispatching._dispatcher.Dispatcher"><span class="pre">Dispatcher</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><span class="pre">Operation</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="job_shop_lib.html#job_shop_lib.Operation" title="job_shop_lib._operation.Operation"><span class="pre">Operation</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.ready_operations_filter" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current ready operations filter.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.use_padding">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">use_padding</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.use_padding" title="Link to this definition">¶</a></dt>
+<dd><p>Returns whether the padding is used.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.job_shop_graph">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">job_shop_graph</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph" title="job_shop_lib.graphs._job_shop_graph.JobShopGraph"><span class="pre">JobShopGraph</span></a></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.job_shop_graph" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current job shop graph.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.instance">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="job_shop_lib.html#job_shop_lib.JobShopInstance" title="job_shop_lib._job_shop_instance.JobShopInstance"><span class="pre">JobShopInstance</span></a></em><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.instance" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current job shop instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_multi_job_shop_graph_env.html#MultiJobShopGraphEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Resets the environment and returns the initial observation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> (<em>int</em><em> | </em><em>None</em>) -- Random seed for reproducibility.</p></li>
+<li><p><strong>options</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) -- Additional options for reset (currently unused).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>ObservationDict: The initial observation of the environment.</p></li>
+<li><p>dict: An info dictionary containing additional information about
+the reset state. This may include details about the generated
+instance or initial graph structure.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_multi_job_shop_graph_env.html#MultiJobShopGraphEnv.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.step" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a step in the environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>action</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) -- The action to take. The action is a tuple of two integers
+(job_id, machine_id):
+the job ID and the machine ID in which to schedule the
+operation.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul>
+<li><p>The observation of the environment.</p></li>
+<li><p>The reward obtained.</p></li>
+<li><p>Whether the environment is done.</p></li>
+<li><p>Whether the episode was truncated (always False).</p></li>
+<li><p>A dictionary with additional information. The dictionary
+contains the following keys:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>&quot;feature_names&quot;: The names of the features in the
+observation.</p></li>
+<li><p>&quot;available_operations&quot;: The operations that are ready to be
+scheduled.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing the following elements</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/job_shop_lib/reinforcement_learning/_multi_job_shop_graph_env.html#MultiJobShopGraphEnv.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the render frames as specified by <a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_mode" title="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_mode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">render_mode</span></code></a> during the initialization of the environment.</p>
+<p>The environment's <code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code> render modes (<cite>env.metadata[&quot;render_modes&quot;]</cite>) should contain the possible
+ways to implement the render modes. In addition, list versions for most render modes is achieved through
+<cite>gymnasium.make</cite> which automatically applies a wrapper to collect rendered frames.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As the <a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_mode" title="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_mode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">render_mode</span></code></a> is known during <code class="docutils literal notranslate"><span class="pre">__init__</span></code>, the objects used to render the environment state
+should be initialised in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.</p>
+</div>
+<p>By convention, if the <a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_mode" title="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_mode"><code class="xref py py-attr docutils literal notranslate"><span class="pre">render_mode</span></code></a> is:</p>
+<ul class="simple">
+<li><p>None (default): no render is computed.</p></li>
+<li><p>&quot;human&quot;: The environment is continuously rendered in the current display or terminal, usually for human consumption.
+This rendering should occur during <a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.step" title="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">step()</span></code></a> and <a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render" title="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">render()</span></code></a> doesn't need to be called. Returns <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p>&quot;rgb_array&quot;: Return a single frame representing the current state of the environment.
+A frame is a <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> with shape <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">3)</span></code> representing RGB values for an x-by-y pixel image.</p></li>
+<li><p>&quot;ansi&quot;: Return a strings (<code class="docutils literal notranslate"><span class="pre">str</span></code>) or <code class="docutils literal notranslate"><span class="pre">StringIO.StringIO</span></code> containing a terminal-style text representation
+for each time step. The text can include newlines and ANSI escape sequences (e.g. for colors).</p></li>
+<li><p>&quot;rgb_array_list&quot; and &quot;ansi_list&quot;: List based version of render modes are possible (except Human) through the
+wrapper, <code class="xref py py-class docutils literal notranslate"><span class="pre">gymnasium.wrappers.RenderCollection</span></code> that is automatically applied during <code class="docutils literal notranslate"><span class="pre">gymnasium.make(...,</span> <span class="pre">render_mode=&quot;rgb_array_list&quot;)</span></code>.
+The frames collected are popped after <a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render" title="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">render()</span></code></a> is called or <a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reset" title="job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure that your class's <code class="xref py py-attr docutils literal notranslate"><span class="pre">metadata</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;render_modes&quot;</span></code> key includes the list of supported modes.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.25.0: </span>The render function was changed to no longer accept parameters, rather these parameters should be specified
+in the environment initialised, i.e., <code class="docutils literal notranslate"><span class="pre">gymnasium.make(&quot;CartPole-v1&quot;,</span> <span class="pre">render_mode=&quot;human&quot;)</span></code></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>None</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="job_shop_lib.visualization.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">job_shop_lib.visualization</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="job_shop_lib.graphs.graph_updaters.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">job_shop_lib.graphs.graph_updaters</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; MIT License
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">job_shop_lib.reinforcement_learning</a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey"><code class="docutils literal notranslate"><span class="pre">ObservationSpaceKey</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey.REMOVED_NODES"><code class="docutils literal notranslate"><span class="pre">ObservationSpaceKey.REMOVED_NODES</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey.EDGE_INDEX"><code class="docutils literal notranslate"><span class="pre">ObservationSpaceKey.EDGE_INDEX</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey.OPERATIONS"><code class="docutils literal notranslate"><span class="pre">ObservationSpaceKey.OPERATIONS</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey.JOBS"><code class="docutils literal notranslate"><span class="pre">ObservationSpaceKey.JOBS</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationSpaceKey.MACHINES"><code class="docutils literal notranslate"><span class="pre">ObservationSpaceKey.MACHINES</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver"><code class="docutils literal notranslate"><span class="pre">RewardObserver</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver.rewards"><code class="docutils literal notranslate"><span class="pre">RewardObserver.rewards</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver.last_reward"><code class="docutils literal notranslate"><span class="pre">RewardObserver.last_reward</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RewardObserver.reset"><code class="docutils literal notranslate"><span class="pre">RewardObserver.reset()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MakespanReward"><code class="docutils literal notranslate"><span class="pre">MakespanReward</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MakespanReward.current_makespan"><code class="docutils literal notranslate"><span class="pre">MakespanReward.current_makespan</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MakespanReward.reset"><code class="docutils literal notranslate"><span class="pre">MakespanReward.reset()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MakespanReward.update"><code class="docutils literal notranslate"><span class="pre">MakespanReward.update()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.IdleTimeReward"><code class="docutils literal notranslate"><span class="pre">IdleTimeReward</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.IdleTimeReward.update"><code class="docutils literal notranslate"><span class="pre">IdleTimeReward.update()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig"><code class="docutils literal notranslate"><span class="pre">GanttChartWrapperConfig</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.title"><code class="docutils literal notranslate"><span class="pre">GanttChartWrapperConfig.title</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.cmap"><code class="docutils literal notranslate"><span class="pre">GanttChartWrapperConfig.cmap</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.show_available_operations"><code class="docutils literal notranslate"><span class="pre">GanttChartWrapperConfig.show_available_operations</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.GifConfig"><code class="docutils literal notranslate"><span class="pre">GifConfig</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.GifConfig.gif_path"><code class="docutils literal notranslate"><span class="pre">GifConfig.gif_path</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.GifConfig.fps"><code class="docutils literal notranslate"><span class="pre">GifConfig.fps</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.GifConfig.remove_frames"><code class="docutils literal notranslate"><span class="pre">GifConfig.remove_frames</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.GifConfig.frames_dir"><code class="docutils literal notranslate"><span class="pre">GifConfig.frames_dir</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.GifConfig.plot_current_time"><code class="docutils literal notranslate"><span class="pre">GifConfig.plot_current_time</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.VideoConfig"><code class="docutils literal notranslate"><span class="pre">VideoConfig</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.VideoConfig.video_path"><code class="docutils literal notranslate"><span class="pre">VideoConfig.video_path</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.VideoConfig.fps"><code class="docutils literal notranslate"><span class="pre">VideoConfig.fps</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.VideoConfig.remove_frames"><code class="docutils literal notranslate"><span class="pre">VideoConfig.remove_frames</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.VideoConfig.frames_dir"><code class="docutils literal notranslate"><span class="pre">VideoConfig.frames_dir</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.VideoConfig.plot_current_time"><code class="docutils literal notranslate"><span class="pre">VideoConfig.plot_current_time</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.dispatcher"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.dispatcher</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.composite_observer"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.composite_observer</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.graph_updater"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.graph_updater</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.reward_function"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.reward_function</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.action_space"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.action_space</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.observation_space"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.observation_space</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.render_mode"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.render_mode</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.gantt_chart_creator"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.gantt_chart_creator</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.use_padding"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.use_padding</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.metadata"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.metadata</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.__init__"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.instance"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.instance</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.job_shop_graph"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.job_shop_graph</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.reset"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.reset()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.step"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.step()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.get_observation"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.get_observation()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.render"><code class="docutils literal notranslate"><span class="pre">SingleJobShopGraphEnv.render()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RenderConfig"><code class="docutils literal notranslate"><span class="pre">RenderConfig</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RenderConfig.gantt_chart_wrapper_config"><code class="docutils literal notranslate"><span class="pre">RenderConfig.gantt_chart_wrapper_config</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RenderConfig.video_config"><code class="docutils literal notranslate"><span class="pre">RenderConfig.video_config</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.RenderConfig.gif_config"><code class="docutils literal notranslate"><span class="pre">RenderConfig.gif_config</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationDict"><code class="docutils literal notranslate"><span class="pre">ObservationDict</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationDict.removed_nodes"><code class="docutils literal notranslate"><span class="pre">ObservationDict.removed_nodes</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationDict.edge_index"><code class="docutils literal notranslate"><span class="pre">ObservationDict.edge_index</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationDict.operations"><code class="docutils literal notranslate"><span class="pre">ObservationDict.operations</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationDict.jobs"><code class="docutils literal notranslate"><span class="pre">ObservationDict.jobs</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.ObservationDict.machines"><code class="docutils literal notranslate"><span class="pre">ObservationDict.machines</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.add_padding"><code class="docutils literal notranslate"><span class="pre">add_padding()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv</span></code></a><ul>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.instance_generator"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.instance_generator</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.action_space"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.action_space</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.observation_space"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.observation_space</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.single_job_shop_graph_env"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.single_job_shop_graph_env</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.graph_initializer"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.graph_initializer</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_mode"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.render_mode</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_config"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.render_config</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.feature_observer_configs"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.feature_observer_configs</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reward_function_config"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.reward_function_config</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.graph_updater_config"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.graph_updater_config</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.__init__"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.dispatcher"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.dispatcher</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reward_function"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.reward_function</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.ready_operations_filter"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.ready_operations_filter</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.use_padding"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.use_padding</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.job_shop_graph"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.job_shop_graph</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.instance"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.instance</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reset"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.reset()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.step"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.step()</span></code></a></li>
+<li><a class="reference internal" href="#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render"><code class="docutils literal notranslate"><span class="pre">MultiJobShopGraphEnv.render()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>

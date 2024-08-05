@@ -1,0 +1,1567 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.07.18 --><title>Index - JobShopLib documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">JobShopLib  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/logo_no_bg_resized_fixed.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">JobShopLib  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00-Getting-Started.html">Getting Started to Job Shop Lib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/01-How-Solutions-are-Represented.html">How Solutions are Represented</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/02-Solving-the-Problem.html">Solving the Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/03-Dispatching-Rules.html">Dispatching Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/04-Disjunctive-Graph.html">Disjunctive Graph representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/05-Load-Benchmark-Instances.html">Load Benchmark Instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/06-Save-Gif.html">Gannt Chart Creation: How to Save GIFs and Videos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/07-Agent-Task-Graph.html">The Agent-Task Graph representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/08-Feature-Observers.html">Feature Observers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/09-SingleJobShopGraphEnv.html">RL Graph Environment: Learning from one instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/10-MultiJobShopGraphEnv.html">RL Graph Environment: Learning from many instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/unscheduled_operations.html">Comparing Performance: Dispatcher Method vs. Observer Method for Unscheduled Operations</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/job_shop_lib.html">job_shop_lib</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of job_shop_lib</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/job_shop_lib.benchmarking.html">job_shop_lib.benchmarking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/job_shop_lib.constraint_programming.html">job_shop_lib.constraint_programming</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/job_shop_lib.dispatching.html">job_shop_lib.dispatching</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of job_shop_lib.dispatching</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/job_shop_lib.dispatching.feature_observers.html">job_shop_lib.dispatching.feature_observers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/job_shop_lib.dispatching.rules.html">job_shop_lib.dispatching.rules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/job_shop_lib.exceptions.html">job_shop_lib.exceptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/job_shop_lib.generation.html">job_shop_lib.generation</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/job_shop_lib.graphs.html">job_shop_lib.graphs</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of job_shop_lib.graphs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/job_shop_lib.graphs.graph_updaters.html">job_shop_lib.graphs.graph_updaters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/job_shop_lib.reinforcement_learning.html">job_shop_lib.reinforcement_learning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/job_shop_lib.visualization.html">job_shop_lib.visualization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#J"><strong>J</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a></div>
+</section>
+<section id="_" class="genindex-section">
+  <h2>_</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.BaseSolver.__call__">__call__() (BaseSolver method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.MostWorkRemainingScorer.__call__">(MostWorkRemainingScorer method)</a>
+</li>
+          <li><a href="api/job_shop_lib.constraint_programming.html#job_shop_lib.constraint_programming.ORToolsSolver.__call__">(ORToolsSolver method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.__init__">__init__() (Dispatcher method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserver.__init__">(DispatcherObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleSolver.__init__">(DispatchingRuleSolver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.__init__">(GanttChartCreator method)</a>
+</li>
+          <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.__init__">(GeneralInstanceGenerator method)</a>
+</li>
+          <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.GraphUpdater.__init__">(GraphUpdater method)</a>
+</li>
+          <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.__init__">(InstanceGenerator method)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.__init__">(MultiJobShopGraphEnv method)</a>
+</li>
+          <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.ResidualGraphUpdater.__init__">(ResidualGraphUpdater method)</a>
+</li>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.__init__">(Schedule method)</a>
+</li>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.ScheduledOperation.__init__">(ScheduledOperation method)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.__init__">(SingleJobShopGraphEnv method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.action_space">action_space (MultiJobShopGraphEnv attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.action_space">(SingleJobShopGraphEnv attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.add">add() (Schedule method)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_conjunctive_edges">add_conjunctive_edges() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_disjunctive_edges">add_disjunctive_edges() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.add_edge">add_edge() (JobShopGraph method)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_global_node">add_global_node() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_job_global_edges">add_job_global_edges() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_job_nodes">add_job_nodes() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_machine_global_edges">add_machine_global_edges() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_machine_machine_edges">add_machine_machine_edges() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_machine_nodes">add_machine_nodes() (in module job_shop_lib.graphs)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.add_node">add_node() (JobShopGraph method)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_operation_job_edges">add_operation_job_edges() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_operation_machine_edges">add_operation_machine_edges() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.add_operation_nodes">add_operation_nodes() (JobShopGraph method)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.add_padding">add_padding() (in module job_shop_lib.reinforcement_learning)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_same_job_operations_edges">add_same_job_operations_edges() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_source_sink_edges">add_source_sink_edges() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.add_source_sink_nodes">add_source_sink_nodes() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.allow_less_jobs_than_machines">allow_less_jobs_than_machines (GeneralInstanceGenerator attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.allow_recirculation">allow_recirculation (GeneralInstanceGenerator attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.available_jobs">available_jobs() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.available_machines">available_machines() (Dispatcher method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="B" class="genindex-section">
+  <h2>B</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.BaseSolver">BaseSolver (class in job_shop_lib)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.build_agent_task_graph">build_agent_task_graph() (in module job_shop_lib.graphs)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.build_agent_task_graph_with_jobs">build_agent_task_graph_with_jobs() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.build_complete_agent_task_graph">build_complete_agent_task_graph() (in module job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.build_disjunctive_graph">build_disjunctive_graph() (in module job_shop_lib.graphs)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.check_schedule">check_schedule() (Schedule static method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#id7">class_type (DispatcherObserverConfig attribute)</a>, <a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig.class_type">[1]</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.cmap">cmap (GanttChartWrapperConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartWrapperConfig.cmap">[1]</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.CompositeFeatureObserver.column_names">column_names (CompositeFeatureObserver attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.completed_operations">completed_operations() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType.COMPOSITE">COMPOSITE (FeatureObserverType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.composite_observer">composite_observer (SingleJobShopGraphEnv attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.CompositeFeatureObserver">CompositeFeatureObserver (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.EdgeType.CONJUNCTIVE">CONJUNCTIVE (EdgeType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.create_composite_operation_filter">create_composite_operation_filter() (in module job_shop_lib.dispatching)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.create_gantt_chart_frames">create_gantt_chart_frames() (in module job_shop_lib.visualization)</a>
+</li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.create_gantt_chart_video">create_gantt_chart_video() (in module job_shop_lib.visualization)</a>
+</li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.create_gif">create_gif() (GanttChartCreator method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.create_gif">(in module job_shop_lib.visualization)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.create_gif_from_frames">create_gif_from_frames() (in module job_shop_lib.visualization)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.create_or_get_observer">create_or_get_observer() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.create_random_operation">create_random_operation() (GeneralInstanceGenerator method)</a>
+</li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.create_video">create_video() (GanttChartCreator method)</a>
+</li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.create_video_from_frames">create_video_from_frames() (in module job_shop_lib.visualization)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MakespanReward.current_makespan">current_makespan (MakespanReward attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.current_time">current_time() (Dispatcher method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.EdgeType.DISJUNCTIVE">DISJUNCTIVE (EdgeType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.dispatch">dispatch() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher">Dispatcher (class in job_shop_lib.dispatching)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserver.dispatcher">dispatcher (DispatcherObserver attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.dispatcher">(GanttChartCreator property)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.dispatcher">(MultiJobShopGraphEnv property)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.dispatcher">(SingleJobShopGraphEnv attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserver">DispatcherObserver (class in job_shop_lib.dispatching)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig">DispatcherObserverConfig (class in job_shop_lib.dispatching)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleSolver.dispatching_rule">dispatching_rule (DispatchingRuleSolver attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.dispatching_rule_factory">dispatching_rule_factory() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleSolver">DispatchingRuleSolver (class in job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleType">DispatchingRuleType (class in job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.ReadyOperationsFilterType.DOMINATED_OPERATIONS">DOMINATED_OPERATIONS (ReadyOperationsFilterType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType.DURATION">DURATION (FeatureObserverType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Operation.duration">duration (Operation attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.duration_range">duration_range (GeneralInstanceGenerator attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.duration_range">(InstanceGenerator attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.DurationObserver">DurationObserver (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.durations_matrix">durations_matrix (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.durations_matrix_array">durations_matrix_array (JobShopInstance property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType.EARLIEST_START_TIME">EARLIEST_START_TIME (FeatureObserverType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.earliest_start_time">earliest_start_time() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.EarliestStartTimeObserver.earliest_start_times">earliest_start_times (EarliestStartTimeObserver attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.EarliestStartTimeObserver">EarliestStartTimeObserver (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationDict.edge_index">edge_index (ObservationDict attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationSpaceKey.EDGE_INDEX">EDGE_INDEX (ObservationSpaceKey attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.EdgeType">EdgeType (class in job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.ScheduledOperation.end_time">end_time (ScheduledOperation property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver.feature_dimensions">feature_dimensions (FeatureObserver property)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.feature_observer_configs">feature_observer_configs (MultiJobShopGraphEnv attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.feature_observer_factory">feature_observer_factory() (in module job_shop_lib.dispatching.feature_observers)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.CompositeFeatureObserver.feature_observers">feature_observers (CompositeFeatureObserver attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver.feature_sizes">feature_sizes (FeatureObserver property)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver">FeatureObserver (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType">FeatureObserverType (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.DurationObserver.features">features (DurationObserver attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver.features">(FeatureObserver attribute)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsReadyObserver.features">(IsReadyObserver attribute)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsScheduledObserver.features">(IsScheduledObserver attribute)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.PositionInJobObserver.features">(PositionInJobObserver attribute)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.RemainingOperationsObserver.features">(RemainingOperationsObserver attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.CompositeFeatureObserver.features_as_dataframe">features_as_dataframe (CompositeFeatureObserver property)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureType">FeatureType (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.filter_dominated_operations">filter_dominated_operations() (in module job_shop_lib.dispatching)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.filter_non_immediate_machines">filter_non_immediate_machines() (in module job_shop_lib.dispatching)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.MachineChooserType.FIRST">FIRST (MachineChooserType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleType.FIRST_COME_FIRST_SERVED">FIRST_COME_FIRST_SERVED (DispatchingRuleType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.first_come_first_served_rule">first_come_first_served_rule() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.first_come_first_served_score">first_come_first_served_score() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.GifConfig.fps">fps (GifConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GifConfig.fps">[1]</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.VideoConfig.fps">(VideoConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.VideoConfig.fps">[1]</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.GifConfig.frames_dir">frames_dir (GifConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GifConfig.frames_dir">[1]</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.VideoConfig.frames_dir">(VideoConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.VideoConfig.frames_dir">[1]</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.from_dict">from_dict() (Schedule static method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.CompositeFeatureObserver.from_feature_observer_configs">from_feature_observer_configs() (CompositeFeatureObserver class method)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.from_job_sequences">from_job_sequences() (Schedule static method)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.from_matrices">from_matrices() (JobShopInstance class method)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.from_taillard_file">from_taillard_file() (JobShopInstance class method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.gantt_chart_config">gantt_chart_config (GanttChartCreator attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.gantt_chart_creator">gantt_chart_creator (SingleJobShopGraphEnv attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.gantt_chart_wrapper_config">gantt_chart_wrapper_config (GanttChartCreator attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.RenderConfig.gantt_chart_wrapper_config">(RenderConfig attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator">GanttChartCreator (class in job_shop_lib.visualization)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig">GanttChartWrapperConfig (class in job_shop_lib.reinforcement_learning)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartWrapperConfig">(class in job_shop_lib.visualization)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator">GeneralInstanceGenerator (class in job_shop_lib.generation)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.generate">generate() (GeneralInstanceGenerator method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.generate">(InstanceGenerator method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.get_job_node">get_job_node() (JobShopGraph method)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.get_machine_node">get_machine_node() (JobShopGraph method)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.get_node_by_type_and_id">get_node_by_type_and_id() (JobShopGraph method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.get_observation">get_observation() (SingleJobShopGraphEnv method)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.get_operation_node">get_operation_node() (JobShopGraph method)</a>
+</li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.gif_config">gif_config (GanttChartCreator attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.RenderConfig.gif_config">(RenderConfig attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.GifConfig.gif_path">gif_path (GifConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GifConfig.gif_path">[1]</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.GifConfig">GifConfig (class in job_shop_lib.reinforcement_learning)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GifConfig">(class in job_shop_lib.visualization)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.NodeType.GLOBAL">GLOBAL (NodeType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.graph">graph (JobShopGraph attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.graph_initializer">graph_initializer (MultiJobShopGraphEnv attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.graph_updater">graph_updater (SingleJobShopGraphEnv attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.graph_updater_config">graph_updater_config (MultiJobShopGraphEnv attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.GraphUpdater">GraphUpdater (class in job_shop_lib.graphs.graph_updaters)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="H" class="genindex-section">
+  <h2>H</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.history_observer">history_observer (GanttChartCreator attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.HistoryObserver">HistoryObserver (class in job_shop_lib.dispatching)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.IdleTimeReward">IdleTimeReward (class in job_shop_lib.reinforcement_learning)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.GraphUpdater.initial_job_shop_graph">initial_job_shop_graph (GraphUpdater attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.CompositeFeatureObserver.initialize_features">initialize_features() (CompositeFeatureObserver method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.DurationObserver.initialize_features">(DurationObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.EarliestStartTimeObserver.initialize_features">(EarliestStartTimeObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver.initialize_features">(FeatureObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsCompletedObserver.initialize_features">(IsCompletedObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsReadyObserver.initialize_features">(IsReadyObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.PositionInJobObserver.initialize_features">(PositionInJobObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.RemainingOperationsObserver.initialize_features">(RemainingOperationsObserver method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.html#id0">instance (Dispatcher attribute)</a>, <a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.instance">[1]</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.instance">(GanttChartCreator property)</a>
+</li>
+          <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.instance">(JobShopGraph attribute)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.instance">(MultiJobShopGraphEnv property)</a>
+</li>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.instance">(Schedule attribute)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.instance">(SingleJobShopGraphEnv property)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.instance_generator">instance_generator (MultiJobShopGraphEnv attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator">InstanceGenerator (class in job_shop_lib.generation)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.is_complete">is_complete() (Schedule method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType.IS_COMPLETED">IS_COMPLETED (FeatureObserverType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.ResidualGraphUpdater.is_completed_observer">is_completed_observer (ResidualGraphUpdater property)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.is_flexible">is_flexible (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Operation.is_initialized">is_initialized() (Operation method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.is_ongoing">is_ongoing() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.is_operation_ready">is_operation_ready() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType.IS_READY">IS_READY (FeatureObserverType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.is_removed">is_removed() (JobShopGraph method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType.IS_SCHEDULED">IS_SCHEDULED (FeatureObserverType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.is_scheduled">is_scheduled() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserver.is_singleton">is_singleton (DispatcherObserver property)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsCompletedObserver">IsCompletedObserver (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsReadyObserver">IsReadyObserver (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsScheduledObserver">IsScheduledObserver (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="J" class="genindex-section">
+  <h2>J</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.NodeType.JOB">JOB (NodeType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.job_durations">job_durations (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.Node.job_id">job_id (Node property)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.Operation.job_id">(Operation attribute)</a>
+</li>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.ScheduledOperation.job_id">(ScheduledOperation property)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.job_next_available_time">job_next_available_time (Dispatcher property)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.job_next_operation_index">job_next_operation_index (Dispatcher property)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.GraphUpdater.job_shop_graph">job_shop_graph (GraphUpdater attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.job_shop_graph">(MultiJobShopGraphEnv property)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.job_shop_graph">(SingleJobShopGraphEnv property)</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib
+
+        <ul>
+          <li><a href="api/job_shop_lib.html#module-job_shop_lib">module</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib.benchmarking
+
+        <ul>
+          <li><a href="api/job_shop_lib.benchmarking.html#module-job_shop_lib.benchmarking">module</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib.constraint_programming
+
+        <ul>
+          <li><a href="api/job_shop_lib.constraint_programming.html#module-job_shop_lib.constraint_programming">module</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib.dispatching
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.html#module-job_shop_lib.dispatching">module</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib.dispatching.feature_observers
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#module-job_shop_lib.dispatching.feature_observers">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    job_shop_lib.dispatching.rules
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.rules.html#module-job_shop_lib.dispatching.rules">module</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib.exceptions
+
+        <ul>
+          <li><a href="api/job_shop_lib.exceptions.html#module-job_shop_lib.exceptions">module</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib.generation
+
+        <ul>
+          <li><a href="api/job_shop_lib.generation.html#module-job_shop_lib.generation">module</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib.graphs
+
+        <ul>
+          <li><a href="api/job_shop_lib.graphs.html#module-job_shop_lib.graphs">module</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib.graphs.graph_updaters
+
+        <ul>
+          <li><a href="api/job_shop_lib.graphs.graph_updaters.html#module-job_shop_lib.graphs.graph_updaters">module</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib.reinforcement_learning
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#module-job_shop_lib.reinforcement_learning">module</a>
+</li>
+        </ul></li>
+        <li>
+    job_shop_lib.visualization
+
+        <ul>
+          <li><a href="api/job_shop_lib.visualization.html#module-job_shop_lib.visualization">module</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureType.JOBS">JOBS (FeatureType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.jobs">jobs (JobShopInstance attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationDict.jobs">(ObservationDict attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationSpaceKey.JOBS">JOBS (ObservationSpaceKey attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph">JobShopGraph (class in job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance">JobShopInstance (class in job_shop_lib)</a>
+</li>
+        <li><a href="api/job_shop_lib.exceptions.html#job_shop_lib.exceptions.JobShopLibError">JobShopLibError</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="K" class="genindex-section">
+  <h2>K</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.dispatching.html#id8">kwargs (DispatcherObserverConfig attribute)</a>, <a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserverConfig.kwargs">[1]</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.RewardObserver.last_reward">last_reward (RewardObserver property)</a>
+</li>
+        <li><a href="api/job_shop_lib.benchmarking.html#job_shop_lib.benchmarking.load_all_benchmark_instances">load_all_benchmark_instances() (in module job_shop_lib.benchmarking)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.benchmarking.html#job_shop_lib.benchmarking.load_benchmark_instance">load_benchmark_instance() (in module job_shop_lib.benchmarking)</a>
+</li>
+        <li><a href="api/job_shop_lib.benchmarking.html#job_shop_lib.benchmarking.load_benchmark_json">load_benchmark_json() (in module job_shop_lib.benchmarking)</a>
+</li>
+        <li><a href="api/job_shop_lib.constraint_programming.html#job_shop_lib.constraint_programming.ORToolsSolver.log_search_progress">log_search_progress (ORToolsSolver attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.NodeType.MACHINE">MACHINE (NodeType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleSolver.machine_chooser">machine_chooser (DispatchingRuleSolver attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.machine_chooser_factory">machine_chooser_factory() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.Node.machine_id">machine_id (Node property)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.Operation.machine_id">(Operation property)</a>
+</li>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.ScheduledOperation.machine_id">(ScheduledOperation property)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.machine_loads">machine_loads (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.machine_next_available_time">machine_next_available_time (Dispatcher property)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.MachineChooserType">MachineChooserType (class in job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureType.MACHINES">MACHINES (FeatureType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationDict.machines">machines (ObservationDict attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationSpaceKey.MACHINES">MACHINES (ObservationSpaceKey attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Operation.machines">machines (Operation attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.machines_matrix">machines_matrix (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.machines_matrix_array">machines_matrix_array (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.machines_per_operation">machines_per_operation (GeneralInstanceGenerator attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.makespan">makespan() (Schedule method)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MakespanReward">MakespanReward (class in job_shop_lib.reinforcement_learning)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.max_duration">max_duration (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.max_duration_per_job">max_duration_per_job (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.max_duration_per_machine">max_duration_per_machine (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.max_num_jobs">max_num_jobs (InstanceGenerator property)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.max_num_machines">max_num_machines (InstanceGenerator property)</a>
+</li>
+        <li><a href="api/job_shop_lib.constraint_programming.html#job_shop_lib.constraint_programming.ORToolsSolver.max_time_in_seconds">max_time_in_seconds (ORToolsSolver attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.metadata">metadata (JobShopInstance attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.metadata">(Schedule attribute)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.metadata">(SingleJobShopGraphEnv attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.min_num_jobs">min_num_jobs (InstanceGenerator property)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.min_num_machines">min_num_machines (InstanceGenerator property)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.min_start_time">min_start_time() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.constraint_programming.html#job_shop_lib.constraint_programming.ORToolsSolver.model">model (ORToolsSolver attribute)</a>
+</li>
+        <li>
+    module
+
+        <ul>
+          <li><a href="api/job_shop_lib.html#module-job_shop_lib">job_shop_lib</a>
+</li>
+          <li><a href="api/job_shop_lib.benchmarking.html#module-job_shop_lib.benchmarking">job_shop_lib.benchmarking</a>
+</li>
+          <li><a href="api/job_shop_lib.constraint_programming.html#module-job_shop_lib.constraint_programming">job_shop_lib.constraint_programming</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.html#module-job_shop_lib.dispatching">job_shop_lib.dispatching</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#module-job_shop_lib.dispatching.feature_observers">job_shop_lib.dispatching.feature_observers</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.rules.html#module-job_shop_lib.dispatching.rules">job_shop_lib.dispatching.rules</a>
+</li>
+          <li><a href="api/job_shop_lib.exceptions.html#module-job_shop_lib.exceptions">job_shop_lib.exceptions</a>
+</li>
+          <li><a href="api/job_shop_lib.generation.html#module-job_shop_lib.generation">job_shop_lib.generation</a>
+</li>
+          <li><a href="api/job_shop_lib.graphs.html#module-job_shop_lib.graphs">job_shop_lib.graphs</a>
+</li>
+          <li><a href="api/job_shop_lib.graphs.graph_updaters.html#module-job_shop_lib.graphs.graph_updaters">job_shop_lib.graphs.graph_updaters</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#module-job_shop_lib.reinforcement_learning">job_shop_lib.reinforcement_learning</a>
+</li>
+          <li><a href="api/job_shop_lib.visualization.html#module-job_shop_lib.visualization">job_shop_lib.visualization</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleType.MOST_OPERATIONS_REMAINING">MOST_OPERATIONS_REMAINING (DispatchingRuleType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.most_operations_remaining_rule">most_operations_remaining_rule() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.most_operations_remaining_score">most_operations_remaining_score() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleType.MOST_WORK_REMAINING">MOST_WORK_REMAINING (DispatchingRuleType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.most_work_remaining_rule">most_work_remaining_rule() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.MostWorkRemainingScorer">MostWorkRemainingScorer (class in job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv">MultiJobShopGraphEnv (class in job_shop_lib.reinforcement_learning)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.name">name (JobShopInstance attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.name_suffix">name_suffix (GeneralInstanceGenerator attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.name_suffix">(InstanceGenerator attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.next_operation">next_operation() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.Node">Node (class in job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.Node.node_id">node_id (Node property)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.Node.node_type">node_type (Node attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.nodes">nodes (JobShopGraph property)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.nodes_by_job">nodes_by_job (JobShopGraph property)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.nodes_by_machine">nodes_by_machine (JobShopGraph property)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.nodes_by_type">nodes_by_type (JobShopGraph property)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.NodeType">NodeType (class in job_shop_lib.graphs)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.ReadyOperationsFilterType.NON_IMMEDIATE_MACHINES">NON_IMMEDIATE_MACHINES (ReadyOperationsFilterType attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.non_removed_nodes">non_removed_nodes() (JobShopGraph method)</a>
+</li>
+        <li><a href="api/job_shop_lib.exceptions.html#job_shop_lib.exceptions.NoSolutionFoundError">NoSolutionFoundError</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.num_edges">num_edges (JobShopGraph property)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.num_job_nodes">num_job_nodes (JobShopGraph property)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.num_jobs">num_jobs (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.num_jobs_range">num_jobs_range (GeneralInstanceGenerator attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.num_jobs_range">(InstanceGenerator attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.num_machines">num_machines (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.num_machines_range">num_machines_range (GeneralInstanceGenerator attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.num_machines_range">(InstanceGenerator attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.num_operations">num_operations (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.num_scheduled_operations">num_scheduled_operations (Schedule property)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.UnscheduledOperationsObserver.num_unscheduled_operations">num_unscheduled_operations (UnscheduledOperationsObserver property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.observation_space">observation_space (MultiJobShopGraphEnv attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.observation_space">(SingleJobShopGraphEnv attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationDict">ObservationDict (class in job_shop_lib.reinforcement_learning)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationSpaceKey">ObservationSpaceKey (class in job_shop_lib.reinforcement_learning)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.observer_based_most_work_remaining_rule">observer_based_most_work_remaining_rule() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.ongoing_operations">ongoing_operations() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Operation">Operation (class in job_shop_lib)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.Node.operation">operation (Node property)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.NodeType.OPERATION">OPERATION (NodeType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.ScheduledOperation.operation">operation (ScheduledOperation attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Operation.operation_id">operation_id (Operation attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureType.OPERATIONS">OPERATIONS (FeatureType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationDict.operations">operations (ObservationDict attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationSpaceKey.OPERATIONS">OPERATIONS (ObservationSpaceKey attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.operations_by_machine">operations_by_machine (JobShopInstance property)</a>
+</li>
+        <li><a href="api/job_shop_lib.constraint_programming.html#job_shop_lib.constraint_programming.ORToolsSolver">ORToolsSolver (class in job_shop_lib.constraint_programming)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.plot_agent_task_graph">plot_agent_task_graph() (in module job_shop_lib.visualization)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.GifConfig.plot_current_time">plot_current_time (GifConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GifConfig.plot_current_time">[1]</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.VideoConfig.plot_current_time">(VideoConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.VideoConfig.plot_current_time">[1]</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.plot_disjunctive_graph">plot_disjunctive_graph() (in module job_shop_lib.visualization)</a>
+</li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.plot_function">plot_function (GanttChartCreator attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.plot_gantt_chart">plot_gantt_chart() (GanttChartCreator method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.plot_gantt_chart">(in module job_shop_lib.visualization)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.plot_gantt_chart_wrapper">plot_gantt_chart_wrapper() (in module job_shop_lib.visualization)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType.POSITION_IN_JOB">POSITION_IN_JOB (FeatureObserverType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Operation.position_in_job">position_in_job (Operation attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.ScheduledOperation.position_in_job">(ScheduledOperation property)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.PositionInJobObserver">PositionInJobObserver (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleSolver.pruning_function">pruning_function (DispatchingRuleSolver attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleType.RANDOM">RANDOM (DispatchingRuleType attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.MachineChooserType.RANDOM">(MachineChooserType attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.random_operation_rule">random_operation_rule() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.random_score">random_score() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.raw_ready_operations">raw_ready_operations() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.ready_operations">ready_operations() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#id2">ready_operations_filter (Dispatcher attribute)</a>, <a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.ready_operations_filter">[1]</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.ready_operations_filter">(MultiJobShopGraphEnv property)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.ready_operations_filter_factory">ready_operations_filter_factory() (in module job_shop_lib.dispatching)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.ReadyOperationsFilterType">ReadyOperationsFilterType (class in job_shop_lib.dispatching)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.remaining_duration">remaining_duration() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserverType.REMAINING_OPERATIONS">REMAINING_OPERATIONS (FeatureObserverType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsCompletedObserver.remaining_ops_per_job">remaining_ops_per_job (IsCompletedObserver attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsCompletedObserver.remaining_ops_per_machine">remaining_ops_per_machine (IsCompletedObserver attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.RemainingOperationsObserver">RemainingOperationsObserver (class in job_shop_lib.dispatching.feature_observers)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.ResidualGraphUpdater.remove_completed_job_nodes">remove_completed_job_nodes (ResidualGraphUpdater attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.ResidualGraphUpdater.remove_completed_machine_nodes">remove_completed_machine_nodes (ResidualGraphUpdater attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.remove_completed_operations">remove_completed_operations() (in module job_shop_lib.graphs.graph_updaters)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.GifConfig.remove_frames">remove_frames (GifConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GifConfig.remove_frames">[1]</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.VideoConfig.remove_frames">(VideoConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.VideoConfig.remove_frames">[1]</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.remove_node">remove_node() (JobShopGraph method)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.JobShopGraph.removed_nodes">removed_nodes (JobShopGraph attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationDict.removed_nodes">(ObservationDict attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.ObservationSpaceKey.REMOVED_NODES">REMOVED_NODES (ObservationSpaceKey attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render">render() (MultiJobShopGraphEnv method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.render">(SingleJobShopGraphEnv method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_config">render_config (MultiJobShopGraphEnv attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.render_mode">render_mode (MultiJobShopGraphEnv attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.render_mode">(SingleJobShopGraphEnv attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.RenderConfig">RenderConfig (class in job_shop_lib.reinforcement_learning)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.reset">reset() (Dispatcher method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserver.reset">(DispatcherObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver.reset">(FeatureObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.GraphUpdater.reset">(GraphUpdater method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.HistoryObserver.reset">(HistoryObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsCompletedObserver.reset">(IsCompletedObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsReadyObserver.reset">(IsReadyObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MakespanReward.reset">(MakespanReward method)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reset">(MultiJobShopGraphEnv method)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.RewardObserver.reset">(RewardObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.reset">(Schedule method)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.reset">(SingleJobShopGraphEnv method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.UnscheduledOperationsObserver.reset">(UnscheduledOperationsObserver method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.ResidualGraphUpdater">ResidualGraphUpdater (class in job_shop_lib.graphs.graph_updaters)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reward_function">reward_function (MultiJobShopGraphEnv property)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.reward_function">(SingleJobShopGraphEnv attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.reward_function_config">reward_function_config (MultiJobShopGraphEnv attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.RewardObserver">RewardObserver (class in job_shop_lib.reinforcement_learning)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.RewardObserver.rewards">rewards (RewardObserver attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule">Schedule (class in job_shop_lib)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#id1">schedule (Dispatcher attribute)</a>, <a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.schedule">[1]</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.schedule">(GanttChartCreator property)</a>
+</li>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.schedule">(Schedule property)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.scheduled_operations">scheduled_operations() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.ScheduledOperation">ScheduledOperation (class in job_shop_lib)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.score_based_rule">score_based_rule() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.score_based_rule_with_tie_breaker">score_based_rule_with_tie_breaker() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.GeneralInstanceGenerator.seed">seed (GeneralInstanceGenerator attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.generation.html#job_shop_lib.generation.InstanceGenerator.seed">(InstanceGenerator attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver.set_features_to_zero">set_features_to_zero() (FeatureObserver method)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.set_operation_attributes">set_operation_attributes() (JobShopInstance method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleType.SHORTEST_PROCESSING_TIME">SHORTEST_PROCESSING_TIME (DispatchingRuleType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.shortest_processing_time_rule">shortest_processing_time_rule() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.shortest_processing_time_score">shortest_processing_time_score() (in module job_shop_lib.dispatching.rules)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.show_available_operations">show_available_operations (GanttChartWrapperConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartWrapperConfig.show_available_operations">[1]</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.single_job_shop_graph_env">single_job_shop_graph_env (MultiJobShopGraphEnv attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv">SingleJobShopGraphEnv (class in job_shop_lib.reinforcement_learning)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.NodeType.SINK">SINK (NodeType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.BaseSolver.solve">solve() (BaseSolver method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleSolver.solve">(DispatchingRuleSolver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.constraint_programming.html#job_shop_lib.constraint_programming.ORToolsSolver.solve">(ORToolsSolver method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.constraint_programming.html#job_shop_lib.constraint_programming.ORToolsSolver.solver">solver (ORToolsSolver attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.graphs.html#job_shop_lib.graphs.NodeType.SOURCE">SOURCE (NodeType attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.ScheduledOperation.start_time">start_time (ScheduledOperation attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.start_time">start_time() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.rules.html#job_shop_lib.dispatching.rules.DispatchingRuleSolver.step">step() (DispatchingRuleSolver method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.step">(MultiJobShopGraphEnv method)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.step">(SingleJobShopGraphEnv method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.subscribe">subscribe() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.subscribers">subscribers (Dispatcher attribute)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver.supported_feature_types">supported_feature_types (FeatureObserver property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.three_columns_layout">three_columns_layout() (in module job_shop_lib.visualization)</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.GanttChartWrapperConfig.title">title (GanttChartWrapperConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartWrapperConfig.title">[1]</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.to_dict">to_dict() (JobShopInstance method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.html#job_shop_lib.Schedule.to_dict">(Schedule method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/job_shop_lib.html#job_shop_lib.JobShopInstance.total_duration">total_duration (JobShopInstance property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="U" class="genindex-section">
+  <h2>U</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.uncompleted_operations">uncompleted_operations() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.exceptions.html#job_shop_lib.exceptions.UninitializedAttributeError">UninitializedAttributeError</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.UnscheduledOperationsObserver.unscheduled_operations">unscheduled_operations (UnscheduledOperationsObserver property)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.unscheduled_operations">unscheduled_operations() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.UnscheduledOperationsObserver">UnscheduledOperationsObserver (class in job_shop_lib.dispatching)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.Dispatcher.unsubscribe">unsubscribe() (Dispatcher method)</a>
+</li>
+        <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.DispatcherObserver.update">update() (DispatcherObserver method)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.DurationObserver.update">(DurationObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.EarliestStartTimeObserver.update">(EarliestStartTimeObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.FeatureObserver.update">(FeatureObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.GraphUpdater.update">(GraphUpdater method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.HistoryObserver.update">(HistoryObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.IdleTimeReward.update">(IdleTimeReward method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsCompletedObserver.update">(IsCompletedObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.IsScheduledObserver.update">(IsScheduledObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MakespanReward.update">(MakespanReward method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.PositionInJobObserver.update">(PositionInJobObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.feature_observers.html#job_shop_lib.dispatching.feature_observers.RemainingOperationsObserver.update">(RemainingOperationsObserver method)</a>
+</li>
+          <li><a href="api/job_shop_lib.graphs.graph_updaters.html#job_shop_lib.graphs.graph_updaters.ResidualGraphUpdater.update">(ResidualGraphUpdater method)</a>
+</li>
+          <li><a href="api/job_shop_lib.dispatching.html#job_shop_lib.dispatching.UnscheduledOperationsObserver.update">(UnscheduledOperationsObserver method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.MultiJobShopGraphEnv.use_padding">use_padding (MultiJobShopGraphEnv property)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv.use_padding">(SingleJobShopGraphEnv attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.exceptions.html#job_shop_lib.exceptions.ValidationError">ValidationError</a>
+</li>
+        <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.GanttChartCreator.video_config">video_config (GanttChartCreator attribute)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.RenderConfig.video_config">(RenderConfig attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.VideoConfig.video_path">video_path (VideoConfig attribute)</a>, <a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.VideoConfig.video_path">[1]</a>
+</li>
+        <li><a href="api/job_shop_lib.reinforcement_learning.html#job_shop_lib.reinforcement_learning.VideoConfig">VideoConfig (class in job_shop_lib.reinforcement_learning)</a>
+
+        <ul>
+          <li><a href="api/job_shop_lib.visualization.html#job_shop_lib.visualization.VideoConfig">(class in job_shop_lib.visualization)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; MIT License
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>
