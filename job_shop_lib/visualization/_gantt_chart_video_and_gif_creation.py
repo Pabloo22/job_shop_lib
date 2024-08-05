@@ -263,7 +263,7 @@ def create_gantt_chart_frames(
     """
     if solver is not None and schedule_history is None:
         dispatcher = Dispatcher(
-            instance, ready_operations_filter=solver.pruning_function
+            instance, ready_operations_filter=solver.ready_operations_filter
         )
         history_tracker = HistoryObserver(dispatcher)
         makespan = solver.solve(instance, dispatcher).makespan()

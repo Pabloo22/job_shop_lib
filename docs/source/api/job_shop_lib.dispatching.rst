@@ -1,4 +1,4 @@
-﻿job\_shop\_lib.dispatching
+job\_shop\_lib.dispatching
 ==========================
 
 .. automodule:: job_shop_lib.dispatching

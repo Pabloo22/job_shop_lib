@@ -1,6 +1,11 @@
+# Development files
+claude_engineer.py
 README.rst
 
-docs/source/examples/*_frames/
+# Prompt files
+prompts/
+
+docs/source/examples/output/*_frames/
 /exploration_notebooks/
 # Byte-compiled / optimized / DLL files
 __pycache__/

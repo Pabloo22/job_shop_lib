@@ -13,3 +13,6 @@ html_docs:
 
 clean_docs:
 	cd docs && make clean
+
+claude_engineer:
+	poetry run python claude_engineer.py

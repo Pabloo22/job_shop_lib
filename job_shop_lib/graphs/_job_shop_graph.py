@@ -13,10 +13,10 @@ NODE_ATTR = "node"
 
 # pylint: disable=too-many-instance-attributes
 class JobShopGraph:
-    """Data structure to represent a `JobShopInstance` as a graph.
+    """Represents a :class:`JobShopInstance` as a heterogeneous directed graph.
 
     Provides a comprehensive graph-based representation of a job shop
-    scheduling problem, utilizing the `networkx` library to model the complex
+    scheduling problem, utilizing the ``networkx`` library to model the complex
     relationships between jobs, operations, and machines. This class transforms
     the abstract scheduling problem into a directed graph, where various
     entities (jobs, machines, and operations) are nodes, and the dependencies
@@ -25,25 +25,40 @@ class JobShopGraph:
     This transformation allows for the application of graph algorithms
     to analyze and solve scheduling problems.
 
-    Attributes:
+    Args:
         instance:
-            The job shop instance encapsulated by this graph.
-        graph:
-            The directed graph representing the job shop, where nodes are
-                operations, machines, jobs, or abstract concepts like global,
-                source, and sink, with edges indicating dependencies.
+            The job shop instance that the graph represents.
+        add_operation_nodes:
+            Whether to add nodes of type :class:`NodeType.OPERATION` to the
+            to the graph. If set to ``False``, the graph will be empty, and
+            operation nodes will need to be added manually.
     """
 
-    def __init__(self, instance: JobShopInstance):
-        """Initializes the graph with the given instance.
+    __slots__ = {
+        "instance": "The job shop instance that the graph represents.",
+        "graph": (
+            "The directed graph representing the job shop, where nodes are "
+            "operations, machines, jobs, or abstract concepts like global, "
+            "source, and sink, with edges indicating dependencies."
+        ),
+        "_nodes": "List of all nodes added to the graph.",
+        "_nodes_by_type": "Dictionary mapping node types to lists of nodes.",
+        "_nodes_by_machine": (
+            "List of lists mapping machine ids to operation nodes."
+        ),
+        "_nodes_by_job": "List of lists mapping job ids to operation nodes.",
+        "_next_node_id": (
+            "The id to assign to the next node added to thegraph."
+        ),
+        "removed_nodes": (
+            "List of boolean values indicating whether a node has been "
+            "removed from the graph."
+        ),
+    }
 
-        Nodes of type `OPERATION` are added to the graph based on the
-        operations of the instance.
-
-        Args:
-            instance:
-                The job shop instance that the graph represents.
-        """
+    def __init__(
+        self, instance: JobShopInstance, add_operation_nodes: bool = True
+    ):
         self.graph = nx.DiGraph()
         self.instance = instance
 
@@ -59,7 +74,8 @@ class JobShopGraph:
         ]
         self._next_node_id = 0
         self.removed_nodes: list[bool] = []
-        self._add_operation_nodes()
+        if add_operation_nodes:
+            self.add_operation_nodes()
 
     @property
     def nodes(self) -> list[Node]:
@@ -103,7 +119,7 @@ class JobShopGraph:
         """Number of job nodes in the graph."""
         return len(self._nodes_by_type[NodeType.JOB])
 
-    def _add_operation_nodes(self) -> None:
+    def add_operation_nodes(self) -> None:
         """Adds operation nodes to the graph."""
         for job in self.instance.jobs:
             for operation in job:

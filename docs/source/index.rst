@@ -6,7 +6,8 @@
 Welcome to JobShopLib's documentation!
 ======================================
 
-**Version:** 1.0.0-alpha.1
+**Version:** 1.0.0-alpha.2
+
 
 JobShopLib is a Python package for creating, solving, and visualizing
 Job Shop Scheduling Problems (JSSP).
@@ -18,12 +19,14 @@ See
 `this <https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing>`__
 Google Colab notebook for a quick start guide!
 
+Contents
+--------
+
 .. toctree::
     :maxdepth: 3
 
     install
     examples
-    profiling
     api
 
 Indices and tables

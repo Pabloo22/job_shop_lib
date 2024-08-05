@@ -224,7 +224,7 @@ def test_filter_bad_choices(
     """
     optimized_solver = DispatchingRuleSolver(dispatching_rule=dispatching_rule)
     non_optimized_solver = DispatchingRuleSolver(
-        dispatching_rule=dispatching_rule, pruning_function=None
+        dispatching_rule=dispatching_rule, ready_operations_filter=None
     )
 
     optimized_schedule = optimized_solver.solve(instance)

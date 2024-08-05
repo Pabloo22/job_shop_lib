@@ -7,8 +7,8 @@ from job_shop_lib.dispatching.feature_observers import (
 
 
 class IsReadyObserver(FeatureObserver):
-    """Feature creator that adds a binary feature indicating if the operation
-    is ready to be dispatched."""
+    """Feature creator that adds a binary feature indicating if the operation,
+    machine or job is ready to be dispatched."""
 
     def initialize_features(self):
         self.set_features_to_zero()

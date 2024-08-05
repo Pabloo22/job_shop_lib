@@ -22,22 +22,32 @@ class ORToolsSolver(BaseSolver):
     <https://developers.google.com/optimization/cp/cp_solver>`_ solver.
 
     Attributes:
-        log_search_progress (``bool``):
+        log_search_progress (bool):
             Whether to log the search progress to the console.
-        max_time_in_seconds (``float | None``):
+        max_time_in_seconds (float | None):
             The maximum time in seconds to allow the solver to search for
             a solution. If no solution is found within this time, a
             :class:`~job_shop_lib.exceptions.NoSolutionFoundError` is
             raised. If ``None``, the solver will run until an optimal
             solution is found.
-        model (``cp_model.CpModel``):
+        model (cp_model.CpModel):
             The `OR-Tools' CP-SAT model
             <https://developers.google.com/optimization/reference/python/sat/
             python/cp_model#cp_model.CpModel>`_.
-        solver (``cp_model.CpSolver``):
+        solver (cp_model.CpSolver):
             The `OR-Tools' CP-SAT solver
             <https://developers.google.com/optimization/reference/python/sat/
             python/cp_model#cp_model.CpSolver>`_.
+
+    Args:
+        max_time_in_seconds:
+            The maximum time in seconds to allow the solver to search for
+            a solution. If no solution is found within this time, a
+            :class:`~job_shop_lib.exceptions.NoSolutionFoundError` is
+            raised. If ``None``, the solver will run until an optimal
+            solution is found.
+        log_search_progress:
+            Whether to log the search progress to the console.
     """
 
     def __init__(
@@ -45,18 +55,6 @@ class ORToolsSolver(BaseSolver):
         max_time_in_seconds: float | None = None,
         log_search_progress: bool = False,
     ):
-        """Initializes the solver.
-
-        Args:
-            max_time_in_seconds:
-                The maximum time in seconds to allow the solver to search for
-                a solution. If no solution is found within this time, a
-                :class:`~job_shop_lib.exceptions.NoSolutionFoundError` is
-                raised. If ``None``, the solver will run until an optimal
-                solution is found.
-            log_search_progress:
-                Whether to log the search progress to the console.
-        """
         self.log_search_progress = log_search_progress
         self.max_time_in_seconds = max_time_in_seconds
 
@@ -66,6 +64,23 @@ class ORToolsSolver(BaseSolver):
         self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
 
     def __call__(self, instance: JobShopInstance) -> Schedule:
+        """Equivalent to calling the :meth:`~ORToolsSolver.solve` method.
+
+        This method is necessary because, in JobShopLib, solvers are defined
+        as callables that receive an instance and return a schedule.
+
+        Args:
+            instance: The job shop instance to be solved.
+
+        Returns:
+            The best schedule found by the solver.
+            Its metadata contains the following information:
+
+            * status (``str``): ``"optimal"`` or ``"feasible"``
+            * elapsed_time (``float``): The time taken to solve the problem
+            * makespan (``int``): The total duration of the schedule
+            * solved_by (``str``): ``"ORToolsSolver"``
+        """
         # Re-defined here since we already add metadata to the schedule in
         # the solve method.
         return self.solve(instance)

@@ -24,18 +24,53 @@ from job_shop_lib.dispatching.feature_observers import (
 
 class CompositeFeatureObserver(FeatureObserver):
     """Aggregates features from other FeatureObserver instances subscribed to
-    the same `Dispatcher` by concatenating their feature matrices along the
-    first axis (horizontal concatenation).
+    the same :class:`~job_shop_lib.dispatching.Dispatcher` by concatenating
+    their feature matrices along the first axis (horizontal concatenation).
 
-    Attributes:
+    It provides also a custom ``__str__`` method to display the features
+    in a more readable way.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` to observe.
+        subscribe:
+            If ``True``, the observer is subscribed to the dispatcher upon
+            initialization. Otherwise, the observer must be subscribed later
+            or manually updated.
+        feature_types:
+            A list of :class:`FeatureType` or a single :class:`FeatureType`
+            that specifies the types of features to observe. They must be a
+            subset of the class attribute :attr:`supported_feature_types`.
+            If ``None``, all supported feature types are tracked.
         feature_observers:
-            List of `FeatureObserver` instances to aggregate features from.
-        column_names:
-            Dictionary mapping `FeatureType` to a list of column names for the
-            corresponding feature matrix. Column names are generated based on
-            the class name of the `FeatureObserver` instance that produced the
-            feature.
+            A list of `FeatureObserver` instances to aggregate features from.
+            If ``None``, all feature observers subscribed to the dispatcher are
+            used.
+
+    .. seealso::
+
+        An example using this class can be found in the
+        :doc:`../examples/08-Feature-Observers` example.
+
+        Additionally, the class
+        :class:`~job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv`
+        uses this feature observer to aggregate features from multiple
+        ones.
+
     """
+
+    __slots__ = {
+        "feature_observers": (
+            "List of :class:`FeatureObserver` instances to aggregate features "
+            "from."
+        ),
+        "column_names": (
+            "Dictionary mapping :class:`FeatureType` to a list of column "
+            "names for the corresponding feature matrix. They are generated "
+            "based on the class name of the :class:`FeatureObserver` instance "
+            "that produced the feature."
+        ),
+    }
 
     def __init__(
         self,
@@ -140,7 +175,8 @@ class CompositeFeatureObserver(FeatureObserver):
 
 
 if __name__ == "__main__":
-    from cProfile import Profile
+    # from cProfile import Profile
+    import time
     from job_shop_lib.benchmarking import load_benchmark_instance
     from job_shop_lib.dispatching.rules import DispatchingRuleSolver
     from job_shop_lib.dispatching.feature_observers import (
@@ -164,6 +200,10 @@ if __name__ == "__main__":
         dispatcher_, feature_observers=feature_observers_
     )
     solver = DispatchingRuleSolver(dispatching_rule="random")
-    profiler = Profile()
-    profiler.runcall(solver.solve, dispatcher_.instance, dispatcher_)
-    profiler.print_stats("cumtime")
+    # profiler = Profile()
+    # profiler.runcall(solver.solve, dispatcher_.instance, dispatcher_)
+    # profiler.print_stats("cumtime")
+    start = time.perf_counter()
+    solver.solve(dispatcher_.instance, dispatcher_)
+    end = time.perf_counter()
+    print(f"Time: {end - start}")

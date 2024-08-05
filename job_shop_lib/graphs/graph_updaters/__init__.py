@@ -1,5 +1,15 @@
 """Contains classes and functions for updating the graph representation of the
-job shop scheduling problem."""
+job shop scheduling problem.
+
+Currently, the following classes and utilities are available:
+
+.. autosummary::
+
+    GraphUpdater
+    ResidualGraphUpdater
+    remove_completed_operations
+
+"""
 
 from ._graph_updater import GraphUpdater
 from ._utils import remove_completed_operations

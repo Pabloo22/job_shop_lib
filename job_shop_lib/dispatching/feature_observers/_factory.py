@@ -16,7 +16,11 @@ from job_shop_lib.dispatching.feature_observers import (
 
 
 class FeatureObserverType(str, Enum):
-    """Enumeration of the different feature observers."""
+    """Enumeration of the different feature observers.
+
+    Each feature observer is associated with a string value that can be used
+    to create the feature observer using the factory function.
+    """
 
     IS_READY = "is_ready"
     EARLIEST_START_TIME = "earliest_start_time"

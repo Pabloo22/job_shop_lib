@@ -40,7 +40,7 @@ class DispatchingRuleSolver(BaseSolver):
         machine_chooser: (
             str | Callable[[Dispatcher, Operation], int]
         ) = MachineChooserType.FIRST,
-        pruning_function: (
+        ready_operations_filter: (
             str
             | Callable[[Dispatcher, list[Operation]], list[Operation]]
             | None
@@ -60,25 +60,25 @@ class DispatchingRuleSolver(BaseSolver):
                 of the machine chooser, a MachineChooser enum member, or a
                 callable that takes a dispatcher and an operation and returns
                 the machine id where the operation will be dispatched.
-            pruning_function:
-                The pruning function to use. It can be a string with the name
-                of the pruning function, a PruningFunction enum member, or a
-                callable that takes a dispatcher and a list of operations and
-                returns a list of operations that should be considered for
-                dispatching.
+            ready_operations_filter:
+                The ready operations filter to use. It can be a string with
+                the name of the pruning function, a PruningFunction enum
+                member, or a callable that takes a dispatcher and a list of
+                operations and returns a list of operations that should be
+                considered for dispatching.
         """
         if isinstance(dispatching_rule, str):
             dispatching_rule = dispatching_rule_factory(dispatching_rule)
         if isinstance(machine_chooser, str):
             machine_chooser = machine_chooser_factory(machine_chooser)
-        if isinstance(pruning_function, str):
-            pruning_function = ready_operations_filter_factory(
-                pruning_function
+        if isinstance(ready_operations_filter, str):
+            ready_operations_filter = ready_operations_filter_factory(
+                ready_operations_filter
             )
 
         self.dispatching_rule = dispatching_rule
         self.machine_chooser = machine_chooser
-        self.pruning_function = pruning_function
+        self.ready_operations_filter = ready_operations_filter
 
     def solve(
         self, instance: JobShopInstance, dispatcher: Dispatcher | None = None
@@ -87,7 +87,7 @@ class DispatchingRuleSolver(BaseSolver):
         dispatching rule algorithm."""
         if dispatcher is None:
             dispatcher = Dispatcher(
-                instance, ready_operations_filter=self.pruning_function
+                instance, ready_operations_filter=self.ready_operations_filter
             )
         while not dispatcher.schedule.is_complete():
             self.step(dispatcher)
@@ -110,19 +110,23 @@ class DispatchingRuleSolver(BaseSolver):
 if __name__ == "__main__":
     import time
     import cProfile
-    import pstats
-    from io import StringIO
-    from job_shop_lib.benchmarking import load_benchmark_instance
+    # import pstats
+    # from io import StringIO
+    from job_shop_lib.benchmarking import (
+        # load_benchmark_instance,
+        load_all_benchmark_instances,
+    )
 
     # from job_shop_lib.dispatching.rules._dispatching_rules_functions import (
     #     most_work_remaining_rule_2,
     # )
 
-    ta_instances = [
-        load_benchmark_instance(f"ta{i:02d}") for i in range(1, 81)
-    ]
+    # ta_instances = [
+    #     load_benchmark_instance(f"ta{i:02d}") for i in range(1, 81)
+    # ]
+    ta_instances = load_all_benchmark_instances().values()
     solver = DispatchingRuleSolver(
-        dispatching_rule="most_work_remaining", pruning_function=None
+        dispatching_rule="most_work_remaining", ready_operations_filter=None
     )
 
     start = time.perf_counter()
@@ -131,10 +135,10 @@ if __name__ == "__main__":
     profiler = cProfile.Profile()
 
     # Run the code under profiling
-    profiler.enable()
+    # profiler.enable()
     for instance_ in ta_instances:
         solver.solve(instance_)
-    profiler.disable()
+    # profiler.disable()
 
     end = time.perf_counter()
 
@@ -142,7 +146,7 @@ if __name__ == "__main__":
     print(f"Elapsed time: {end - start:.2f} seconds.")
 
     # Print profiling results
-    s = StringIO()
-    ps = pstats.Stats(profiler, stream=s).sort_stats("cumulative")
-    profiler.print_stats("cumtime")  # Print top 20 time-consuming functions
+    # s = StringIO()
+    # ps = pstats.Stats(profiler, stream=s).sort_stats("cumulative")
+    # profiler.print_stats("cumtime")  # Print top 20 time-consuming functions
     # print(s.getvalue())
