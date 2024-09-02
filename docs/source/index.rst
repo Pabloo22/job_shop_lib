@@ -26,6 +26,7 @@ Contents
     :maxdepth: 3
 
     install
+    tutorial
     examples
     api
 

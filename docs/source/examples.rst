@@ -4,9 +4,6 @@ Examples
 .. toctree::
     :maxdepth: 2
 
-    examples/00-Getting-Started
-    examples/01-How-Solutions-are-Represented
-    examples/02-Solving-the-Problem
     examples/03-Dispatching-Rules
     examples/04-Disjunctive-Graph
     examples/05-Load-Benchmark-Instances
