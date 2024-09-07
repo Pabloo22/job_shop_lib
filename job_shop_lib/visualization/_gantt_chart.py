@@ -20,6 +20,7 @@ def plot_gantt_chart(
     cmap_name: str = "viridis",
     xlim: int | None = None,
     number_of_x_ticks: int = 15,
+    job_labels: None | list[str] = None,
 ) -> tuple[Figure, plt.Axes]:
     """Plots a Gantt chart for the schedule.
 
@@ -37,9 +38,14 @@ def plot_gantt_chart(
             the schedule is used.
         number_of_x_ticks:
             The number of ticks to use in the x-axis.
+        job_labels:
+            A list of labels for each job. If ``None``, the labels are
+            automatically generated as "Job 0", "Job 1", etc.
     """
     fig, ax = _initialize_plot(schedule, title)
-    legend_handles = _plot_machine_schedules(schedule, ax, cmap_name)
+    legend_handles = _plot_machine_schedules(
+        schedule, ax, cmap_name, job_labels
+    )
     _configure_legend(ax, legend_handles)
     _configure_axes(schedule, ax, xlim, number_of_x_ticks)
     return fig, ax
@@ -61,7 +67,10 @@ def _initialize_plot(
 
 
 def _plot_machine_schedules(
-    schedule: Schedule, ax: plt.Axes, cmap_name: str
+    schedule: Schedule,
+    ax: plt.Axes,
+    cmap_name: str,
+    job_labels: list[str] | None,
 ) -> dict[int, Patch]:
     """Plots the schedules for each machine."""
     max_job_id = schedule.instance.num_jobs - 1
@@ -81,10 +90,18 @@ def _plot_machine_schedules(
             )
             if scheduled_op.job_id not in legend_handles:
                 legend_handles[scheduled_op.job_id] = Patch(
-                    facecolor=color, label=f"Job {scheduled_op.job_id}"
+                    facecolor=color,
+                    label=_get_job_label(job_labels, scheduled_op.job_id),
                 )
 
     return legend_handles
+
+
+def _get_job_label(job_labels: list[str] | None, job_id: int) -> str:
+    """Returns the label for the job."""
+    if job_labels is None:
+        return f"Job {job_id}"
+    return job_labels[job_id]
 
 
 def _plot_scheduled_operation(
