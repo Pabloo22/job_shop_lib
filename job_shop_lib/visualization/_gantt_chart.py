@@ -21,6 +21,10 @@ def plot_gantt_chart(
     xlim: int | None = None,
     number_of_x_ticks: int = 15,
     job_labels: None | list[str] = None,
+    machine_labels: None | list[str] = None,
+    legend_title: str = "",
+    x_label: str = "Time units",
+    y_label: str = "Machines",
 ) -> tuple[Figure, plt.Axes]:
     """Plots a Gantt chart for the schedule.
 
@@ -30,7 +34,7 @@ def plot_gantt_chart(
         title:
             The title of the plot. If not provided, the title:
             `f"Gantt Chart for {schedule.instance.name} instance"`
-            is used.
+            is used. To remove the title, provide an empty string.
         cmap_name:
             The name of the colormap to use. Default is "viridis".
         xlim:
@@ -41,23 +45,38 @@ def plot_gantt_chart(
         job_labels:
             A list of labels for each job. If ``None``, the labels are
             automatically generated as "Job 0", "Job 1", etc.
+        machine_labels:
+            A list of labels for each machine. If ``None``, the labels are
+            automatically generated as "0", "1", etc.
+        legend_title:
+            The title of the legend. If not provided, the legend will not have
+            a title.
+        x_label:
+            The label for the x-axis. Default is "Time units". To remove the
+            label, provide an empty string.
+        y_label:
+            The label for the y-axis. Default is "Machines". To remove the
+            label, provide an empty string.
     """
-    fig, ax = _initialize_plot(schedule, title)
+    fig, ax = _initialize_plot(schedule, title, x_label, y_label)
     legend_handles = _plot_machine_schedules(
         schedule, ax, cmap_name, job_labels
     )
-    _configure_legend(ax, legend_handles)
-    _configure_axes(schedule, ax, xlim, number_of_x_ticks)
+    _configure_legend(ax, legend_handles, legend_title)
+    _configure_axes(schedule, ax, xlim, number_of_x_ticks, machine_labels)
     return fig, ax
 
 
 def _initialize_plot(
-    schedule: Schedule, title: str | None
+    schedule: Schedule,
+    title: str | None,
+    x_label: str = "Time units",
+    y_label: str = "Machines",
 ) -> tuple[Figure, plt.Axes]:
     """Initializes the plot."""
     fig, ax = plt.subplots()
-    ax.set_xlabel("Time units")
-    ax.set_ylabel("Machines")
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
     ax.grid(True, which="both", axis="x", linestyle="--", linewidth=0.5)
     ax.yaxis.grid(False)
     if title is None:
@@ -120,7 +139,9 @@ def _plot_scheduled_operation(
     )
 
 
-def _configure_legend(ax: plt.Axes, legend_handles: dict[int, Patch]):
+def _configure_legend(
+    ax: plt.Axes, legend_handles: dict[int, Patch], legend_title: str
+):
     """Configures the legend for the plot."""
     sorted_legend_handles = [
         legend_handles[job_id] for job_id in sorted(legend_handles)
@@ -128,7 +149,8 @@ def _configure_legend(ax: plt.Axes, legend_handles: dict[int, Patch]):
     ax.legend(
         handles=sorted_legend_handles,
         loc="upper left",
-        bbox_to_anchor=(1.01, 1),
+        bbox_to_anchor=(1, 1),
+        title=legend_title,
     )
 
 
@@ -137,6 +159,7 @@ def _configure_axes(
     ax: plt.Axes,
     xlim: Optional[int],
     number_of_x_ticks: int,
+    machine_labels: list[str] | None,
 ):
     """Sets the limits and labels for the axes."""
     num_machines = len(schedule.schedule)
@@ -149,7 +172,9 @@ def _configure_axes(
             for i in range(num_machines)
         ]
     )
-    ax.set_yticklabels([str(i) for i in range(num_machines)])
+    if machine_labels is None:
+        machine_labels = [str(i) for i in range(num_machines)]
+    ax.set_yticklabels(machine_labels)
     makespan = schedule.makespan()
     xlim = xlim if xlim is not None else makespan
     ax.set_xlim(0, xlim)
