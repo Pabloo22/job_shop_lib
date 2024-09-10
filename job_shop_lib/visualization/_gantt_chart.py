@@ -28,12 +28,30 @@ def plot_gantt_chart(
 ) -> tuple[Figure, plt.Axes]:
     """Plots a Gantt chart for the schedule.
 
+    This function generates a Gantt chart that visualizes the schedule of jobs
+    across multiple machines. Each job is represented with a unique color,
+    and operations are plotted as bars on the corresponding machines over time.
+
+    The Gantt chart helps to understand the flow of jobs on machines and
+    visualize the makespan of the schedule, i.e., the time it takes to
+    complete all jobs.
+
+    The Gantt chart includes:
+
+    - X-axis: Time units, representing the progression of the schedule.
+    - Y-axis: Machines, which are assigned jobs at various time slots.
+    - Legend: A list of jobs, labeled and color-coded for clarity.
+
+    .. note::
+        The last tick on the x-axis always represents the makespan for easy
+        identification of the completion time.
+
     Args:
         schedule:
             The schedule to plot.
         title:
             The title of the plot. If not provided, the title:
-            `f"Gantt Chart for {schedule.instance.name} instance"`
+            ``f"Gantt Chart for {schedule.instance.name} instance"``
             is used. To remove the title, provide an empty string.
         cmap_name:
             The name of the colormap to use. Default is "viridis".
@@ -57,6 +75,10 @@ def plot_gantt_chart(
         y_label:
             The label for the y-axis. Default is "Machines". To remove the
             label, provide an empty string.
+
+    Returns:
+        - A ``matplotlib.figure.Figure`` object.
+        - A ``matplotlib.axes.Axes`` object where the Gantt chart is plotted.
     """
     fig, ax = _initialize_plot(schedule, title, x_label, y_label)
     legend_handles = _plot_machine_schedules(
