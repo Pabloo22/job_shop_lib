@@ -13,3 +13,4 @@ Examples
     examples/09-SingleJobShopGraphEnv
     examples/10-MultiJobShopGraphEnv
     examples/11-UnscheduledOperationsObserver
+    examples/12-ReadyOperationsFilter
