@@ -32,6 +32,35 @@ class DispatchingRuleSolver(BaseSolver):
         pruning_function:
             The pruning function to use. It is used to initialize the
             dispatcher object internally when calling the solve method.
+
+    Args:
+        dispatching_rule:
+            The dispatching rule to use. It can be a string with the name
+            of the dispatching rule, a class`DispatchingRuleType` enum member,
+            or a callable that takes a dispatcher and returns the operation to
+            be dispatched next.
+        machine_chooser:
+            The machine chooser to use. It can be a string with the name
+            of the machine chooser, a :class:`MachineChooserType` member, or a
+            callable that takes a dispatcher and an operation and returns
+            the machine id where the operation will be dispatched.
+        ready_operations_filter:
+            The ready operations filter to use. It can be either:
+
+            - a string with the name of the pruning function
+            - a :class`ReadyOperationsFilterType` enum member.
+            - a callable that takes a dispatcher and a list of operations
+              and returns a list of operations that should be considered
+              for dispatching,
+            - a list with names or actual ready operations filters to be used.
+              If a list is provided, a composite filter will be created
+              using the specified filters.
+    
+    .. seealso::
+        - :func:`job_shop_lib.dispatching.rules.dispatching_rule_factory`
+        - :func:`job_shop_lib.dispatching.rules.machine_chooser_factory`
+        - :func:`~job_shop_lib.dispatching.ready_operations_filter_factory`
+        - :func:`~job_shop_lib.dispatching.create_composite_operation_filter`
     """
 
     def __init__(
@@ -53,33 +82,6 @@ class DispatchingRuleSolver(BaseSolver):
             ReadyOperationsFilterType.NON_IDLE_MACHINES,
         ),
     ):
-        """Initializes the solver with the given dispatching rule, machine
-        chooser and pruning function.
-
-        Args:
-            dispatching_rule:
-                The dispatching rule to use. It can be a string with the name
-                of the dispatching rule, a DispatchingRule enum member, or a
-                callable that takes a dispatcher and returns the operation to
-                be dispatched next.
-            machine_chooser:
-                The machine chooser to use. It can be a string with the name
-                of the machine chooser, a MachineChooser enum member, or a
-                callable that takes a dispatcher and an operation and returns
-                the machine id where the operation will be dispatched.
-            ready_operations_filter:
-                The ready operations filter to use. It can be either:
-
-                - a string with the name of the pruning function
-                - a :class`ReadyOperationsFilterType` enum member.
-                - a callable that takes a dispatcher and a list of operations
-                  and returns a list of operations that should be considered
-                  for dispatching,
-                - a list of strings / enum members with the names
-                  of the pruning functions to be used. If a list
-                  is provided, a composite filter will be created
-                  using the specified filters.
-        """
         if isinstance(dispatching_rule, str):
             dispatching_rule = dispatching_rule_factory(dispatching_rule)
         if isinstance(machine_chooser, str):
