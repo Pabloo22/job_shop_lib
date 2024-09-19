@@ -175,7 +175,7 @@ class GanttChartCreator:
         return self.plot_function(
             self.schedule,
             None,
-            self.dispatcher.ready_operations(),
+            self.dispatcher.available_operations(),
             self.dispatcher.current_time(),
         )
 

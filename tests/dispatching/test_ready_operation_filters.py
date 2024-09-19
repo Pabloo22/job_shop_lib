@@ -30,7 +30,7 @@ def test_filter_remove_non_idle_machines(instance: JobShopInstance):
     )
 
     while not dispatcher.schedule.is_complete():
-        available_operations = dispatcher.ready_operations()
+        available_operations = dispatcher.available_operations()
         ongoing_operations = dispatcher.ongoing_operations()
 
         non_idle_machines = set()
@@ -54,7 +54,7 @@ def test_filter_non_immediate_machines(instance: JobShopInstance):
 
     while not dispatcher.schedule.is_complete():
         current_time = dispatcher.current_time()
-        available_operations = dispatcher.ready_operations()
+        available_operations = dispatcher.available_operations()
         operations_per_machine: list[list[Operation]] = [
             [] for _ in range(instance.num_machines)
         ]

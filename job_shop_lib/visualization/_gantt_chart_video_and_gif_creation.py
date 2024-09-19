@@ -322,7 +322,7 @@ def create_gantt_chart_frames(
         fig = plot_function(
             dispatcher.schedule,
             makespan,
-            dispatcher.ready_operations(),
+            dispatcher.available_operations(),
             current_time,
         )
         _save_frame(fig, frames_dir, i)

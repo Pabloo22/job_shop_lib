@@ -96,7 +96,9 @@ def test_cache(example_job_shop_instance: JobShopInstance):
 
     assert dispatcher.current_time() == dispatcher.current_time()
 
-    assert dispatcher.ready_operations() == dispatcher.ready_operations()
+    assert (
+        dispatcher.available_operations() == dispatcher.available_operations()
+    )
     assert (
         dispatcher.uncompleted_operations()
         == dispatcher.uncompleted_operations()
@@ -109,7 +111,9 @@ def test_cache(example_job_shop_instance: JobShopInstance):
     machine_3 = 2
 
     dispatcher.dispatch(job_1[0], machine_1)
-    assert dispatcher.ready_operations() == dispatcher.ready_operations()
+    assert (
+        dispatcher.available_operations() == dispatcher.available_operations()
+    )
     dispatcher.dispatch(job_1[1], machine_2)
     dispatcher.dispatch(job_3[0], machine_3)
     assert (

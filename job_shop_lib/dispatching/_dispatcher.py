@@ -363,7 +363,7 @@ class Dispatcher:
         The current time is the minimum start time of the available
         operations.
         """
-        available_operations = self.ready_operations()
+        available_operations = self.available_operations()
         current_time = self.min_start_time(available_operations)
         return current_time
 
@@ -379,7 +379,7 @@ class Dispatcher:
         return int(min_start_time)
 
     @_dispatcher_cache
-    def ready_operations(self) -> list[Operation]:
+    def available_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing, optionally
         filtering out operations using the filter function.
 
@@ -435,7 +435,7 @@ class Dispatcher:
     @_dispatcher_cache
     def available_machines(self) -> list[int]:
         """Returns the list of ready machines."""
-        available_operations = self.ready_operations()
+        available_operations = self.available_operations()
         available_machines = set()
         for operation in available_operations:
             available_machines.update(operation.machines)
@@ -444,7 +444,7 @@ class Dispatcher:
     @_dispatcher_cache
     def available_jobs(self) -> list[int]:
         """Returns the list of ready jobs."""
-        available_operations = self.ready_operations()
+        available_operations = self.available_operations()
         available_jobs = set(
             operation.job_id for operation in available_operations
         )
