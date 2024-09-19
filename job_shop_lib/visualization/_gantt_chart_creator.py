@@ -10,8 +10,8 @@ from job_shop_lib.dispatching import (
 )
 from job_shop_lib.visualization import (
     create_gantt_chart_video,
-    plot_gantt_chart_wrapper,
-    create_gif,
+    get_partial_gantt_chart_plotter,
+    create_gantt_chart_gif,
 )
 
 
@@ -146,7 +146,7 @@ class GanttChartCreator:
         self.history_observer: HistoryObserver = (
             dispatcher.create_or_get_observer(HistoryObserver)
         )
-        self.plot_function = plot_gantt_chart_wrapper(
+        self.plot_function = get_partial_gantt_chart_plotter(
             **self.gannt_chart_wrapper_config
         )
 
@@ -196,7 +196,7 @@ class GanttChartCreator:
         The configuration for the GIF creation can be customized through the
         `gif_config` attribute.
         """
-        create_gif(
+        create_gantt_chart_gif(
             instance=self.history_observer.dispatcher.instance,
             schedule_history=self.history_observer.history,
             plot_function=self.plot_function,
