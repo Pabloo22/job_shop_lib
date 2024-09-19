@@ -69,6 +69,32 @@ def _get_non_idle_machines(
     return non_idle_machines
 
 
+def filter_non_immediate_operations(
+    dispatcher: Dispatcher, operations: list[Operation]
+) -> list[Operation]:
+    """Filters out all the operations that can't start immediately.
+
+    An operation can start immediately if its earliest start time is the
+    current time.
+
+    The current time is determined by the minimum start time of the
+    operations.
+
+    Args:
+        dispatcher: The dispatcher object.
+        operations: The list of operations to filter.
+    """
+
+    min_start_time = dispatcher.min_start_time(operations)
+    immediate_operations: list[Operation] = []
+    for operation in operations:
+        start_time = dispatcher.earliest_start_time(operation)
+        if start_time == min_start_time:
+            immediate_operations.append(operation)
+
+    return immediate_operations
+
+
 def filter_dominated_operations(
     dispatcher: Dispatcher, operations: list[Operation]
 ) -> list[Operation]:

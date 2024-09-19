@@ -6,6 +6,7 @@ from job_shop_lib.dispatching import (
     Dispatcher,
     filter_non_idle_machines,
     filter_non_immediate_machines,
+    filter_non_immediate_operations,
 )
 from job_shop_lib.dispatching.rules import (
     DispatchingRuleType,
@@ -40,6 +41,24 @@ def test_filter_remove_non_idle_machines(instance: JobShopInstance):
         idle_machines = set(range(instance.num_machines)) - non_idle_machines
         for op in available_operations:
             assert any(m in idle_machines for m in op.machines)
+
+        next_operation = available_operations[0]
+        dispatcher.dispatch(next_operation, next_operation.machines[0])
+
+
+@pytest.mark.parametrize("instance", INSTANCES_TO_TEST)
+def test_filter_remove_non_immediate_operations(instance: JobShopInstance):
+    dispatcher = Dispatcher(
+        instance,
+        ready_operations_filter=filter_non_immediate_operations,
+    )
+
+    while not dispatcher.schedule.is_complete():
+        available_operations = dispatcher.available_operations()
+        current_time = dispatcher.current_time()
+
+        for op in available_operations:
+            assert dispatcher.earliest_start_time(op) == current_time
 
         next_operation = available_operations[0]
         dispatcher.dispatch(next_operation, next_operation.machines[0])
