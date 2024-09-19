@@ -1,6 +1,6 @@
 """Package for visualization."""
 
-from job_shop_lib.visualization._gantt_chart import plot_gantt_chart
+from job_shop_lib.visualization._plot_gantt_chart import plot_gantt_chart
 from job_shop_lib.visualization._gantt_chart_video_and_gif_creation import (
     create_gif,
     create_gantt_chart_video,
