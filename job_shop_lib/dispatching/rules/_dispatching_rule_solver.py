@@ -55,7 +55,7 @@ class DispatchingRuleSolver(BaseSolver):
             - a list with names or actual ready operations filters to be used.
               If a list is provided, a composite filter will be created
               using the specified filters.
-    
+
     .. seealso::
         - :func:`job_shop_lib.dispatching.rules.dispatching_rule_factory`
         - :func:`job_shop_lib.dispatching.rules.machine_chooser_factory`
