@@ -1,12 +1,14 @@
 """Home of the `DispatchingRuleSolver` class."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 
 from job_shop_lib import JobShopInstance, Schedule, Operation, BaseSolver
 from job_shop_lib.dispatching import (
     ready_operations_filter_factory,
     Dispatcher,
     ReadyOperationsFilterType,
+    ReadyOperationsFilter,
+    create_composite_operation_filter,
 )
 from job_shop_lib.dispatching.rules import (
     dispatching_rule_factory,
@@ -41,10 +43,15 @@ class DispatchingRuleSolver(BaseSolver):
             str | Callable[[Dispatcher, Operation], int]
         ) = MachineChooserType.FIRST,
         ready_operations_filter: (
-            str
-            | Callable[[Dispatcher, list[Operation]], list[Operation]]
+            Iterable[ReadyOperationsFilter | str | ReadyOperationsFilterType]
+            | str
+            | ReadyOperationsFilterType
+            | ReadyOperationsFilter
             | None
-        ) = ReadyOperationsFilterType.DOMINATED_OPERATIONS,
+        ) = (
+            ReadyOperationsFilterType.DOMINATED_OPERATIONS,
+            ReadyOperationsFilterType.NON_IDLE_MACHINES,
+        ),
     ):
         """Initializes the solver with the given dispatching rule, machine
         chooser and pruning function.
@@ -61,11 +68,17 @@ class DispatchingRuleSolver(BaseSolver):
                 callable that takes a dispatcher and an operation and returns
                 the machine id where the operation will be dispatched.
             ready_operations_filter:
-                The ready operations filter to use. It can be a string with
-                the name of the pruning function, a PruningFunction enum
-                member, or a callable that takes a dispatcher and a list of
-                operations and returns a list of operations that should be
-                considered for dispatching.
+                The ready operations filter to use. It can be either:
+
+                - a string with the name of the pruning function
+                - a :class`ReadyOperationsFilterType` enum member.
+                - a callable that takes a dispatcher and a list of operations
+                  and returns a list of operations that should be considered
+                  for dispatching,
+                - a list of strings / enum members with the names
+                  of the pruning functions to be used. If a list
+                  is provided, a composite filter will be created
+                  using the specified filters.
         """
         if isinstance(dispatching_rule, str):
             dispatching_rule = dispatching_rule_factory(dispatching_rule)
@@ -73,6 +86,10 @@ class DispatchingRuleSolver(BaseSolver):
             machine_chooser = machine_chooser_factory(machine_chooser)
         if isinstance(ready_operations_filter, str):
             ready_operations_filter = ready_operations_filter_factory(
+                ready_operations_filter
+            )
+        if isinstance(ready_operations_filter, Iterable):
+            ready_operations_filter = create_composite_operation_filter(
                 ready_operations_filter
             )
 
