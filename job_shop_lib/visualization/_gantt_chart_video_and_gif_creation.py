@@ -3,8 +3,7 @@
 import os
 import pathlib
 import shutil
-from collections.abc import Callable
-from typing import Sequence
+from typing import Sequence, Protocol
 
 import imageio
 import matplotlib.pyplot as plt
@@ -23,19 +22,49 @@ from job_shop_lib.dispatching import (
     HistoryObserver,
 )
 from job_shop_lib.dispatching.rules import DispatchingRuleSolver
-from job_shop_lib.visualization._gantt_chart import plot_gantt_chart
+from job_shop_lib.visualization._plot_gantt_chart import plot_gantt_chart
 
 
-PlotFunction = Callable[
-    [Schedule, int | None, list[Operation] | None, int | None], Figure
-]
+# This class serves as a more meaningful type hint than simply:
+# PlotFunction = Callable[
+#     [Schedule, int | None, list[Operation] | None, int | None], Figure
+# ]
+# That's why it doesn't have more methods or attributes. It is a protocol
+# for functions, not for classes.
+# pylint: disable=too-few-public-methods
+class PartialGanttChartPlotter(Protocol):
+    """A protocol for a function that plots an uncompleted Gantt chart
+    for a schedule.
+
+    This kind of functions are created using the
+    :func:`plot_gantt_chart_wrapper` function.
+
+    The function should take the following arguments:
+
+    - schedule: The schedule to plot.
+    - makespan: The makespan of the schedule if known. Can be used to fix the
+      x-axis limits.
+    - available_operations: A list of available operations. If ``None``,
+      the available operations are not shown.
+    - current_time: The current time in the schedule. If provided, a red
+      vertical line is plotted at this time.
+    """
+
+    def __call__(
+        self,
+        schedule: Schedule,
+        makespan: int | None = None,
+        available_operations: list[Operation] | None = None,
+        current_time: int | None = None,
+    ) -> Figure:
+        pass
 
 
-def plot_gantt_chart_wrapper(
+def get_partial_gantt_chart_plotter(
     title: str | None = None,
     cmap: str = "viridis",
     show_available_operations: bool = False,
-) -> PlotFunction:
+) -> PartialGanttChartPlotter:
     """Returns a function that plots a Gantt chart for an unfinished schedule.
 
     Args:
@@ -47,12 +76,13 @@ def plot_gantt_chart_wrapper(
     Returns:
         A function that plots a Gantt chart for a schedule. The function takes
         the following arguments:
+
         - schedule: The schedule to plot.
         - makespan: The makespan of the schedule.
         - available_operations: A list of available operations. If None,
-            the available operations are not shown.
+          the available operations are not shown.
         - current_time: The current time in the schedule. If provided, a
-            red vertical line is plotted at this time.
+          red vertical line is plotted at this time.
 
     """
 
@@ -97,33 +127,30 @@ def plot_gantt_chart_wrapper(
 # Most of the arguments are optional with default values. There is no way to
 # reduce the number of arguments without losing functionality.
 # pylint: disable=too-many-arguments
-def create_gif(
-    gif_path: str | None,
+def create_gantt_chart_gif(
     instance: JobShopInstance,
+    gif_path: str | None = None,
     solver: DispatchingRuleSolver | None = None,
-    plot_function: PlotFunction | None = None,
+    plot_function: PartialGanttChartPlotter | None = None,
     fps: int = 1,
     remove_frames: bool = True,
     frames_dir: str | None = None,
     plot_current_time: bool = True,
     schedule_history: Sequence[ScheduledOperation] | None = None,
 ) -> None:
-    """Creates a GIF of the schedule being built by the given solver.
-
-    Deprecated since version 0.6.0: Use `create_gif_or_video` instead.
+    """Creates a GIF of the schedule being built.
 
     Args:
-        gif_path:
-            The path to save the GIF file. It should end with ".gif". If not
-            provided, the name of the instance is used. It will be made an
-            optional argument in version 1.0.0.
         instance:
             The instance of the job shop problem to be scheduled.
+        gif_path:
+            The path to save the GIF file. It should end with ".gif". If not
+            provided, the name of the instance is used.
         solver:
             The dispatching rule solver to use. If not provided, the history
             of scheduled operations should be provided.
         plot_function:
-            A function that plots a Gantt chart for a schedule. It
+            A :class:`PlotFunction` that plots a Gantt chart for a schedule. It
             should take a `Schedule` object and the makespan of the schedule as
             input and return a `Figure` object. If not provided, a default
             function is used.
@@ -133,7 +160,7 @@ def create_gif(
             Whether to remove the frames after creating the GIF.
         frames_dir:
             The directory to save the frames in. If not provided,
-            `gif_path.replace(".gif", "") + "_frames"` is used.
+            ``gif_path.replace(".gif", "") + "_frames"`` is used.
         plot_current_time:
             Whether to plot a vertical line at the current time.
         schedule_history:
@@ -144,7 +171,7 @@ def create_gif(
         gif_path = f"{instance.name}_gantt_chart.gif"
 
     if plot_function is None:
-        plot_function = plot_gantt_chart_wrapper()
+        plot_function = get_partial_gantt_chart_plotter()
 
     if frames_dir is None:
         # Use the name of the GIF file as the directory name
@@ -173,14 +200,14 @@ def create_gantt_chart_video(
     instance: JobShopInstance,
     video_path: str | None = None,
     solver: DispatchingRuleSolver | None = None,
-    plot_function: PlotFunction | None = None,
+    plot_function: PartialGanttChartPlotter | None = None,
     fps: int = 1,
     remove_frames: bool = True,
     frames_dir: str | None = None,
     plot_current_time: bool = True,
     schedule_history: Sequence[ScheduledOperation] | None = None,
 ) -> None:
-    """Creates a GIF of the schedule being built by the given solver.
+    """Creates a video of the schedule being built.
 
     Args:
         instance:
@@ -192,16 +219,16 @@ def create_gantt_chart_video(
             of scheduled operations should be provided.
         plot_function:
             A function that plots a Gantt chart for a schedule. It
-            should take a `Schedule` object and the makespan of the schedule as
-            input and return a `Figure` object. If not provided, a default
-            function is used.
+            should take a :class:`Schedule` object and the makespan of the
+            schedule as input and return a ``Figure`` object. If not provided,
+            a default function is used.
         fps:
-            The number of frames per second in the GIF.
+            The number of frames per second in the video.
         remove_frames:
-            Whether to remove the frames after creating the GIF.
+            Whether to remove the frames after creating the video.
         frames_dir:
             The directory to save the frames in. If not provided,
-            `name_without_the_extension` + "_frames"` is used.
+            ``name_without_the_extension + "_frames"`` is used.
         plot_current_time:
             Whether to plot a vertical line at the current time.
         schedule_history:
@@ -212,7 +239,7 @@ def create_gantt_chart_video(
         video_path = f"{instance.name}_gantt_chart.mp4"
 
     if plot_function is None:
-        plot_function = plot_gantt_chart_wrapper()
+        plot_function = get_partial_gantt_chart_plotter()
 
     if frames_dir is None:
         extension = video_path.split(".")[-1]
@@ -238,7 +265,7 @@ def create_gantt_chart_frames(
     frames_dir: str,
     instance: JobShopInstance,
     solver: DispatchingRuleSolver | None,
-    plot_function: PlotFunction,
+    plot_function: PartialGanttChartPlotter,
     plot_current_time: bool = True,
     schedule_history: Sequence[ScheduledOperation] | None = None,
 ) -> None:
@@ -295,7 +322,7 @@ def create_gantt_chart_frames(
         fig = plot_function(
             dispatcher.schedule,
             makespan,
-            dispatcher.ready_operations(),
+            dispatcher.available_operations(),
             current_time,
         )
         _save_frame(fig, frames_dir, i)

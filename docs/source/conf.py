@@ -63,7 +63,6 @@ napoleon_preprocess_types = True  # pylint: disable=invalid-name
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "furo"  # pylint: disable=invalid-name
-html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 templates_path = ["_templates"]
 

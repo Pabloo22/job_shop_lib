@@ -32,6 +32,8 @@ from ._ready_operation_filters import (
     filter_dominated_operations,
     filter_non_immediate_machines,
     ReadyOperationsFilter,
+    filter_non_idle_machines,
+    filter_non_immediate_operations,
 )
 from ._dispatcher_observer_config import DispatcherObserverConfig
 from ._factories import (
@@ -53,4 +55,6 @@ __all__ = [
     "DispatcherObserverConfig",
     "UnscheduledOperationsObserver",
     "ReadyOperationsFilter",
+    "filter_non_idle_machines",
+    "filter_non_immediate_operations",
 ]

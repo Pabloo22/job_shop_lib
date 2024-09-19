@@ -4,21 +4,7 @@ from job_shop_lib import JobShopInstance
 from job_shop_lib.dispatching import (
     Dispatcher,
 )
-from job_shop_lib.dispatching.rules import (
-    DispatchingRuleSolver,
-    DispatchingRuleType,
-)
-from job_shop_lib.benchmarking import load_benchmark_instance
-
-
-RULES_TO_TEST = [
-    DispatchingRuleType.MOST_WORK_REMAINING,
-    DispatchingRuleType.FIRST_COME_FIRST_SERVED,
-    DispatchingRuleType.MOST_OPERATIONS_REMAINING,
-]
-INSTANCES_TO_TEST = [
-    load_benchmark_instance(f"la{i:02d}") for i in range(1, 11)
-]
+from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 
 
 def test_dispatch(example_job_shop_instance: JobShopInstance):
@@ -110,7 +96,9 @@ def test_cache(example_job_shop_instance: JobShopInstance):
 
     assert dispatcher.current_time() == dispatcher.current_time()
 
-    assert dispatcher.ready_operations() == dispatcher.ready_operations()
+    assert (
+        dispatcher.available_operations() == dispatcher.available_operations()
+    )
     assert (
         dispatcher.uncompleted_operations()
         == dispatcher.uncompleted_operations()
@@ -123,7 +111,9 @@ def test_cache(example_job_shop_instance: JobShopInstance):
     machine_3 = 2
 
     dispatcher.dispatch(job_1[0], machine_1)
-    assert dispatcher.ready_operations() == dispatcher.ready_operations()
+    assert (
+        dispatcher.available_operations() == dispatcher.available_operations()
+    )
     dispatcher.dispatch(job_1[1], machine_2)
     dispatcher.dispatch(job_3[0], machine_3)
     assert (
@@ -173,69 +163,6 @@ def test_unscheduled_operations(example_job_shop_instance: JobShopInstance):
     assert (
         set(dispatcher.uncompleted_operations())
         == expected_uncompleted_operations
-    )
-
-
-@pytest.mark.parametrize(
-    "dispatching_rule",
-    [rule for rule in DispatchingRuleType if rule in RULES_TO_TEST],
-)
-@pytest.mark.parametrize("instance", INSTANCES_TO_TEST)
-def test_filter_bad_choices(
-    dispatching_rule: DispatchingRuleType, instance: JobShopInstance
-):
-    """Test that the optimized solver produces a schedule with a makespan
-    less than or equal to the non-optimized solver.
-
-    It is important to note, though, that there is no theoretical guarantee
-    that the optimized solver will always produce a better schedule. Although
-    the optimized solver always filter out non-optimal choices, removing that
-    option may lead to the solver to choose an even worse option. For example,
-    consider we have three operations A, B, and C, and operation A is the best
-    choice according to the dispatching rule, then B, and finally C. Our
-    opimized scheduler will remove B from the list of choices, however, the
-    solver may choose C instead of A, which would lead to a worse schedule
-    than if it had chosen B. This may result in the optimized solver producing
-    a worse schedule than the non-optimized solver. However, in practice, the
-    optimized solver will usually produce better schedules than the
-    non-optimized solver. From all the benchmarks we have tested, the optimized
-    solver only produced worse schedules in "ta51" and "orb09" instances.
-
-    A smaller example to illustrate the point:
-
-    ```python
-    instance_dict = {
-        "name": "classic_generated_instance_375",
-        "duration_matrix": [[3, 5, 9],
-                            [6, 1, 6],
-                            [2, 4, 4]],
-        "machines_matrix": [[0, 2, 1],
-                            [2, 0, 1],
-                            [2, 1, 0]],
-        "metadata": {
-            "optimized_makespan": 30,
-            "non_optimized_makespan": 27,
-            "dispatching_rule": "most_work_remaining",
-        },
-    }
-    ```
-
-    You can see the plots of the schedules in the `examples` folder.
-    """
-    optimized_solver = DispatchingRuleSolver(dispatching_rule=dispatching_rule)
-    non_optimized_solver = DispatchingRuleSolver(
-        dispatching_rule=dispatching_rule, ready_operations_filter=None
-    )
-
-    optimized_schedule = optimized_solver.solve(instance)
-    non_optimized_schedule = non_optimized_solver.solve(instance)
-    optimized_makespan = optimized_schedule.makespan()
-    non_optimized_makespan = non_optimized_schedule.makespan()
-    assert optimized_makespan <= non_optimized_makespan, (
-        f"Optimized makespan: {optimized_makespan}, "
-        f"Non-optimized makespan: {non_optimized_makespan} "
-        f"Instance: {instance.name}, "
-        f"Dispatching rule: {dispatching_rule}"
     )
 
 

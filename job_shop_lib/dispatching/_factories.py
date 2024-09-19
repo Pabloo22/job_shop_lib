@@ -13,6 +13,8 @@ from job_shop_lib.dispatching import (
     Dispatcher,
     filter_dominated_operations,
     filter_non_immediate_machines,
+    filter_non_idle_machines,
+    filter_non_immediate_operations,
     ReadyOperationsFilter,
 )
 
@@ -27,6 +29,8 @@ class ReadyOperationsFilterType(str, Enum):
 
     DOMINATED_OPERATIONS = "dominated_operations"
     NON_IMMEDIATE_MACHINES = "non_immediate_machines"
+    NON_IDLE_MACHINES = "non_idle_machines"
+    NON_IMMEDIATE_OPERATIONS = "non_immediate_operations"
 
 
 def create_composite_operation_filter(
@@ -113,6 +117,10 @@ def ready_operations_filter_factory(
         ),
         ReadyOperationsFilterType.NON_IMMEDIATE_MACHINES: (
             filter_non_immediate_machines
+        ),
+        ReadyOperationsFilterType.NON_IDLE_MACHINES: filter_non_idle_machines,
+        ReadyOperationsFilterType.NON_IMMEDIATE_OPERATIONS: (
+            filter_non_immediate_operations
         ),
     }
 

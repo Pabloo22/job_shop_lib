@@ -260,7 +260,7 @@ class SingleJobShopGraphEnv(gym.Env):
         truncated = False
         info: dict[str, Any] = {
             "feature_names": self.composite_observer.column_names,
-            "available_operations": self.dispatcher.ready_operations(),
+            "available_operations": self.dispatcher.available_operations(),
         }
         return obs, reward, done, truncated, info
 
