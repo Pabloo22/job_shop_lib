@@ -156,26 +156,30 @@ class Dispatcher:
     responsible for scheduling the operations on the machines and keeping
     track of the next available time for each machine and job.
 
-    Attributes:
+    Args:
         instance:
-            The instance of the job shop problem to be scheduled.
-        schedule:
-            The schedule of operations on machines.
+            The instance of the job shop problem to be solved.
         ready_operations_filter:
-            A function that filters out operations that are not ready to be
-            scheduled.
+            A function that filters out operations that are not ready to
+            be scheduled. The function should take the dispatcher and a
+            list of operations as input and return a list of operations
+            that are ready to be scheduled. If ``None``, no filtering is
+            done.
     """
 
-    __slots__ = (
-        "instance",
-        "schedule",
-        "_machine_next_available_time",
-        "_job_next_operation_index",
-        "_job_next_available_time",
-        "ready_operations_filter",
-        "subscribers",
-        "_cache",
-    )
+    __slots__ = {
+        "instance": "The instance of the job shop problem to be scheduled.",
+        "schedule": "The schedule of operations on machines.",
+        "_machine_next_available_time": "",
+        "_job_next_operation_index": "",
+        "_job_next_available_time": "",
+        "ready_operations_filter": (
+            "A function that filters out operations that are not ready to be "
+            "scheduled."
+        ),
+        "subscribers": "A list of observers subscribed to the dispatcher.",
+        "_cache": "A dictionary to cache the results of the cached methods.",
+    }
 
     def __init__(
         self,
@@ -184,18 +188,6 @@ class Dispatcher:
             Callable[[Dispatcher, list[Operation]], list[Operation]] | None
         ) = None,
     ) -> None:
-        """Initializes the object with the given instance.
-
-        Args:
-            instance:
-                The instance of the job shop problem to be solved.
-            ready_operations_filter:
-                A function that filters out operations that are not ready to
-                be scheduled. The function should take the dispatcher and a
-                list of operations as input and return a list of operations
-                that are ready to be scheduled. If ``None``, no filtering is
-                done.
-        """
 
         self.instance = instance
         self.schedule = Schedule(self.instance)
