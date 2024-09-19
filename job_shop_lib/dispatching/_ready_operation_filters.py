@@ -15,6 +15,60 @@ ReadyOperationsFilter = Callable[
 ]
 
 
+def filter_non_idle_machines(
+    dispatcher: Dispatcher, operations: list[Operation]
+) -> list[Operation]:
+    """Filters out all the operations associated with non-idle machines.
+
+    A machine is considered idle if there are no ongoing operations
+    currently scheduled on it. This filter removes operations that are
+    associated with machines that are busy (i.e., have at least one
+    uncompleted operation).
+
+    Utilizes :meth:``Dispatcher.ongoing_operations()`` to determine machine
+    statuses.
+
+    Args:
+        dispatcher: The dispatcher object.
+        operations: The list of operations to filter.
+
+    Returns:
+        The list of operations that are associated with idle machines.
+    """
+    current_time = dispatcher.min_start_time(operations)
+    non_idle_machines = _get_non_idle_machines(dispatcher, current_time)
+
+    # Filter operations to keep those that are associated with at least one
+    # idle machine
+    filtered_operations: list[Operation] = []
+    for operation in operations:
+        if all(
+            machine_id in non_idle_machines
+            for machine_id in operation.machines
+        ):
+            continue
+        filtered_operations.append(operation)
+
+    return filtered_operations
+
+
+def _get_non_idle_machines(
+    dispatcher: Dispatcher, current_time: int
+) -> set[int]:
+    """Returns the set of machine ids that are currently busy (i.e., have at
+    least one uncompleted operation)."""
+
+    non_idle_machines = set()
+    for machine_schedule in dispatcher.schedule.schedule:
+        for scheduled_operation in reversed(machine_schedule):
+            is_completed = scheduled_operation.end_time <= current_time
+            if is_completed:
+                break
+            non_idle_machines.add(scheduled_operation.machine_id)
+
+    return non_idle_machines
+
+
 def filter_dominated_operations(
     dispatcher: Dispatcher, operations: list[Operation]
 ) -> list[Operation]:
