@@ -33,7 +33,7 @@ pip install job-shop-lib
 See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing) Google Colab notebook for a quick start guide! 
 
 
-Version 1.0.0 is currently in beta stage and can be installed with:
+Version 1.0.0 is currently in alpha stage and can be installed with:
 
 ```bash
 pip install job-shop-lib==1.0.0a3
