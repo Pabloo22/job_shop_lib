@@ -8,7 +8,7 @@ import numpy as np
 
 from job_shop_lib.dispatching.feature_observers import FeatureType
 from job_shop_lib.visualization import (
-    GanttChartWrapperConfig,
+    PartialGanttChartPlotterConfig,
     GifConfig,
     VideoConfig,
 )
@@ -17,7 +17,7 @@ from job_shop_lib.visualization import (
 class RenderConfig(TypedDict, total=False):
     """Configuration needed to initialize the `GanttChartCreator` class."""
 
-    gantt_chart_wrapper_config: GanttChartWrapperConfig
+    partial_gantt_chart_plotter_config: PartialGanttChartPlotterConfig
     video_config: VideoConfig
     gif_config: GifConfig
 

@@ -22,7 +22,7 @@ from job_shop_lib.reinforcement_learning._types_and_constants import (
     ObservationSpaceKey,
     RenderConfig,
     ObservationDict,
-    GanttChartWrapperConfig,
+    PartialGanttChartPlotterConfig,
     GifConfig,
     VideoConfig,
 )
@@ -48,7 +48,7 @@ __all__ = [
     "RewardObserver",
     "MakespanReward",
     "IdleTimeReward",
-    "GanttChartWrapperConfig",
+    "PartialGanttChartPlotterConfig",
     "GifConfig",
     "VideoConfig",
     "SingleJobShopGraphEnv",

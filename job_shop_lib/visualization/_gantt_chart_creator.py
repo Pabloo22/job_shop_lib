@@ -15,9 +15,18 @@ from job_shop_lib.visualization import (
 )
 
 
-class GanttChartWrapperConfig(TypedDict, total=False):
+class PartialGanttChartPlotterConfig(TypedDict, total=False):
     """Configuration for creating the plot function with the
-    `plot_gantt_chart_wrapper` function."""
+    :func:`get_partial_gantt_chart_plotter` function.
+
+    Attributes:
+        title:
+            The title of the Gantt chart. (optional)
+        cmap:
+            The colormap to use in the Gantt chart. (optional)
+        show_available_operations:
+            Whether to show available operations in each step. (optional)
+    """
 
     title: str | None
     cmap: str
@@ -41,13 +50,31 @@ class _GifConfigOptional(TypedDict, total=False):
 
 
 class GifConfig(_GifConfigRequired, _GifConfigOptional):
-    """Configuration for creating the GIF using the `create_gannt_chart_video`
-    function."""
+    """Configuration for creating the GIF using the
+    func:`create_gantt_chart_gif` function.
+
+    Attributes:
+        gif_path:
+            The path to save the GIF. It must end with '.gif'.
+        fps:
+            The frames per second of the GIF. Defaults to 1. (optional)
+        remove_frames:
+            Whether to remove the frames after creating the GIF. (optional)
+        frames_dir:
+            The directory to store the frames. (optional)
+        plot_current_time:
+            Whether to plot the current time in the Gantt chart. (optional)
+
+    .. seealso::
+
+        - :func:`create_gantt_chart_gif`
+
+    """
 
 
 class VideoConfig(TypedDict, total=False):
     """Configuration for creating the video using the
-    `create_gannt_chart_video` function."""
+    :func:`create_gantt_chart_video` function."""
 
     video_path: str | None
     fps: int
@@ -60,12 +87,12 @@ class GanttChartCreator:
     """Facade class that centralizes the creation of Gantt charts, videos
     and GIFs.
 
-    It leverages a `HistoryObserver` to keep track of the operations being
-    scheduled and provides methods to plot the current state
-    of the schedule as a Gantt chart and to create a GIF that shows the
-    evolution of the schedule over time.
+    It leverages a :class:`HistoryObserver` to keep track of the operations
+    being scheduled and provides methods to plot the current state
+    of the schedule as a Gantt chart and to create a GIF or video that shows
+    the evolution of the schedule over time.
 
-    It adds a new `HistoryObserver` to the dispatcher if it does
+    It adds a new :class:`HistoryObserver` to the dispatcher if it does
     not have one already. Otherwise, it uses the observer already present.
 
     Attributes:
@@ -81,72 +108,80 @@ class GanttChartCreator:
             Configuration for creating the video.
         plot_function:
             The function used to plot the Gantt chart when creating the GIF
-            or video. Created using the `plot_gantt_chart_wrapper` function.
+            or video. Created using the :func:`get_partial_gantt_chart_plotter`
+            function.
+
+    Args:
+        dispatcher:
+            The :class:`Dispatcher` class that will be tracked using a
+            :class:`HistoryObserver`.
+        partial_gantt_chart_plotter_config:
+            Configuration for the Gantt chart wrapper function through the
+            :class:`PartialGanttChartPlotterConfig` class. Defaults to
+            ``None``. Valid keys are:
+
+            - title: The title of the Gantt chart.
+            - cmap: The name of the colormap to use.
+            - show_available_operations: Whether to show available
+                operations in each step.
+
+            If ``title`` or ``cmap`` are not provided here and
+            ``infer_gantt_chart_config`` is set to ``True``, the values from
+            ``gantt_chart_config`` will be used if they are present.
+
+            .. seealso::
+
+                - :class:`PartialGanttChartPlotterConfig`
+                - :func:`get_partial_gantt_chart_plotter`
+                - :class:`PartialGanttChartPlotter`
+
+        gif_config:
+            Configuration for creating the GIF. Defaults to ``None``.
+            Valid keys are:
+
+            - gif_path: The path to save the GIF.
+            - fps: The frames per second of the GIF.
+            - remove_frames: Whether to remove the frames after creating
+                the GIF.
+            - frames_dir: The directory to store the frames.
+            - plot_current_time: Whether to plot the current time in the
+                Gantt chart.
+        video_config:
+            Configuration for creating the video. Defaults to ``None``.
+            Valid keys are:
+
+            - video_path: The path to save the video.
+            - fps: The frames per second of the video.
+            - remove_frames: Whether to remove the frames after creating
+                the video.
+            - frames_dir: The directory to store the frames.
+            - plot_current_time: Whether to plot the current time in the
+                Gantt chart.
     """
 
     def __init__(
         self,
         dispatcher: Dispatcher,
-        gantt_chart_wrapper_config: GanttChartWrapperConfig | None = None,
+        partial_gantt_chart_plotter_config: (
+            PartialGanttChartPlotterConfig | None
+        ) = None,
         gif_config: GifConfig | None = None,
         video_config: VideoConfig | None = None,
     ):
-        """Initializes the GanttChartCreator with the given configurations
-        and history observer.
-
-        This class adds a new `HistoryObserver` to the dispatcher if it does
-        not have one already. Otherwise, it uses the observer already present.
-
-        Args:
-            dispatcher:
-                The `Dispatcher` class that will be tracked using a
-                `HistoryObserver`.
-            gantt_chart_wrapper_config:
-                Configuration for the Gantt chart wrapper function. Valid keys
-                are:
-                - title: The title of the Gantt chart.
-                - cmap: The name of the colormap to use.
-                - show_available_operations: Whether to show available
-                    operations in each step.
-
-                If `title` or `cmap` are not provided here and
-                `infer_gantt_chart_config` is set to True, the values from
-                `gantt_chart_config` will be used if they are present.
-            gif_config:
-                Configuration for creating the GIF. Defaults to None.
-                Valid keys are:
-                - gif_path: The path to save the GIF.
-                - fps: The frames per second of the GIF.
-                - remove_frames: Whether to remove the frames after creating
-                    the GIF.
-                - frames_dir: The directory to store the frames.
-                - plot_current_time: Whether to plot the current time in the
-                    Gantt chart.
-            video_config:
-                Configuration for creating the video. Defaults to None.
-                Valid keys are:
-                - video_path: The path to save the video.
-                - fps: The frames per second of the video.
-                - remove_frames: Whether to remove the frames after creating
-                    the video.
-                - frames_dir: The directory to store the frames.
-                - plot_current_time: Whether to plot the current time in the
-                    Gantt chart.
-        """
         if gif_config is None:
             gif_config = {"gif_path": None}
-        if gantt_chart_wrapper_config is None:
-            gantt_chart_wrapper_config = {}
+        if partial_gantt_chart_plotter_config is None:
+            partial_gantt_chart_plotter_config = {}
         if video_config is None:
             video_config = {}
 
         self.gif_config = gif_config
-        self.gannt_chart_wrapper_config = gantt_chart_wrapper_config
+        self.gannt_chart_wrapper_config = partial_gantt_chart_plotter_config
         self.video_config = video_config
         self.history_observer: HistoryObserver = (
             dispatcher.create_or_get_observer(HistoryObserver)
         )
-        self.plot_function = get_partial_gantt_chart_plotter(
+        self.partial_gantt_chart_plotter = get_partial_gantt_chart_plotter(
             **self.gannt_chart_wrapper_config
         )
 
@@ -169,37 +204,38 @@ class GanttChartCreator:
         """Plots the current Gantt chart of the schedule.
 
         Returns:
-            tuple[plt.Figure, plt.Axes]:
-                The figure and axes of the plotted Gantt chart.
+            The figure of the plotted Gantt chart.
         """
-        return self.plot_function(
+        a = self.partial_gantt_chart_plotter(
             self.schedule,
             None,
             self.dispatcher.available_operations(),
             self.dispatcher.current_time(),
         )
+        return a
 
     def create_gif(self) -> None:
         """Creates a GIF of the schedule being built using the recorded
         history.
 
         This method uses the history of scheduled operations recorded by the
-        `HistoryTracker` to create a GIF that shows the progression of the
-        scheduling process.
+        :class:`HistoryTracker` to create a GIF that shows the progression of
+        the scheduling process.
 
         The GIF creation process involves:
+
         - Using the history of scheduled operations to generate frames for
             each step of the schedule.
         - Creating a GIF from these frames.
         - Optionally, removing the frames after the GIF is created.
 
         The configuration for the GIF creation can be customized through the
-        `gif_config` attribute.
+        ``gif_config`` attribute.
         """
         create_gantt_chart_gif(
             instance=self.history_observer.dispatcher.instance,
             schedule_history=self.history_observer.history,
-            plot_function=self.plot_function,
+            plot_function=self.partial_gantt_chart_plotter,
             **self.gif_config
         )
 
@@ -214,6 +250,6 @@ class GanttChartCreator:
         create_gantt_chart_video(
             instance=self.history_observer.dispatcher.instance,
             schedule_history=self.history_observer.history,
-            plot_function=self.plot_function,
+            plot_function=self.partial_gantt_chart_plotter,
             **self.video_config
         )
