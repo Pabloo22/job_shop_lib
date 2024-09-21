@@ -45,6 +45,7 @@ class SingleJobShopGraphEnv(gym.Env):
 
     Observation Space:
         A dictionary with the following keys:
+
         - "removed_nodes": Binary vector indicating removed graph nodes.
         - "edge_list": Matrix of graph edges in COO format.
         - Feature matrices: Keys corresponding to the composite observer
@@ -91,6 +92,29 @@ class SingleJobShopGraphEnv(gym.Env):
             :class:`~job_shop_lib.visualization.GanttChartCreator`.
         use_padding:
             Whether to use padding in observations. Padding maintains the
+            observation space shape when the number of nodes changes.
+
+    Args:
+        job_shop_graph:
+            The JobShopGraph instance representing the job shop problem.
+        feature_observer_configs:
+            A list of FeatureObserverConfig instances for the feature
+            observers.
+        reward_function_config:
+            The configuration for the reward function.
+        graph_updater_config:
+            The configuration for the graph updater.
+        ready_operations_filter:
+            The function to use for pruning dominated operations.
+        render_mode:
+            The mode for rendering the environment ("human", "save_video",
+            "save_gif").
+        render_config:
+            Configuration for rendering (e.g., paths for saving videos
+            or GIFs). See :class:`~job_shop_lib.visualization.RenderConfig`.
+        use_padding:
+            Whether to use padding in observations. Padding maintains the
+            observation space shape when the number of nodes changes.
     """
 
     metadata = {"render_modes": ["human", "save_video", "save_gif"]}
@@ -116,29 +140,6 @@ class SingleJobShopGraphEnv(gym.Env):
         render_config: RenderConfig | None = None,
         use_padding: bool = True,
     ) -> None:
-        """Initializes the SingleJobShopGraphEnv environment.
-
-        Args:
-            job_shop_graph:
-                The JobShopGraph instance representing the job shop problem.
-            feature_observer_configs:
-                A list of FeatureObserverConfig instances for the feature
-                observers.
-            reward_function_config:
-                The configuration for the reward function.
-            graph_updater_config:
-                The configuration for the graph updater.
-            ready_operations_filter:
-                The function to use for pruning dominated operations.
-            render_mode:
-                The mode for rendering the environment ("human", "save_video",
-                "save_gif").
-            render_config:
-                Configuration for rendering (e.g., paths for saving videos
-                or GIFs).
-            use_padding:
-                Whether to use padding for the edge index.
-        """
         super().__init__()
         # Used for resetting the environment
         self.initial_job_shop_graph = deepcopy(job_shop_graph)
