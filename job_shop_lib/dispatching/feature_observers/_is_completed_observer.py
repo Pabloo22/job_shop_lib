@@ -51,6 +51,7 @@ class IsCompletedObserver(FeatureObserver):
     def __init__(
         self,
         dispatcher: Dispatcher,
+        *,
         feature_types: list[FeatureType] | FeatureType | None = None,
         subscribe: bool = True,
     ):
