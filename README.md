@@ -39,7 +39,7 @@ Version 1.0.0 is currently in alpha stage and can be installed with:
 pip install job-shop-lib==1.0.0a3
 ```
 
-Although this version is not stable and may contain breaking changes in subsequent releases, it is recommended to install it to access the new reinforcement learning environments and familiare yourself with new changes (see the [latest pull requests](https://github.com/Pabloo22/job_shop_lib/pulls?q=is%3Apr+is%3Aclosed)). This version is the first one with a [documentation page](https://job-shop-lib.readthedocs.io/en/latest/).
+Although this version is not stable and may contain breaking changes in subsequent releases, it is recommended to install it to access the new reinforcement learning environments and familiarize yourself with new changes (see the [latest pull requests](https://github.com/Pabloo22/job_shop_lib/pulls?q=is%3Apr+is%3Aclosed)). This version is the first one with a [documentation page](https://job-shop-lib.readthedocs.io/en/latest/).
 
 <!-- end installation -->
 
