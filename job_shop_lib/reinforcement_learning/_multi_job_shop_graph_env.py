@@ -42,11 +42,11 @@ class MultiJobShopGraphEnv(gym.Env):
 
     The observation space includes:
 
-        - removed_nodes: Binary vector indicating removed nodes.
-        - edge_index: Edge list in COO format.
-        - operations: Matrix of operation features.
-        - jobs: Matrix of job features (if applicable).
-        - machines: Matrix of machine features (if applicable).
+    - removed_nodes: Binary vector indicating removed nodes.
+    - edge_index: Edge list in COO format.
+    - operations: Matrix of operation features.
+    - jobs: Matrix of job features (if applicable).
+    - machines: Matrix of machine features (if applicable).
 
     Internally, the class creates a
     :class:`~job_shop_lib.reinforcement_learning.SingleJobShopGraphEnv`
@@ -57,29 +57,37 @@ class MultiJobShopGraphEnv(gym.Env):
         instance_generator:
             A :class:`~job_shop_lib.generation.InstanceGenerator` that
             generates a new problem instance on each reset.
+
         action_space:
             :class:`gymnasium.spaces.Discrete`) action space with size equal to
             the maximum number of jobs.
+
         observation_space:
             Dictionary of observation spaces. Keys are defined in
             :class:`~job_shop_lib.reinforcement_learning.ObservationSpaceKey`.
+
         single_job_shop_graph_env:
             Environment for a specific Job Shop Scheduling Problem instance.
             See :class:`SingleJobShopGraphEnv`.
+
         graph_initializer:
             Function to create the initial graph representation. It should
             take a :class:`~job_shop_lib.JobShopInstance` as input and return
             a :class:`~job_shop_lib.graphs.JobShopGraph`.
+
         render_mode:
             Rendering mode for visualization. Supported modes are:
+
             - human: Renders the current Gannt chart.
             - save_video: Saves a video of the Gantt chart. Used only if the
               schedule is completed.
             - save_gif: Saves a GIF of the Gantt chart. Used only if the
               schedule is completed.
+
         render_config:
             Configuration for rendering. See
             :class:`~job_shop_lib.RenderConfig`.
+
         feature_observer_configs:
             List of :class:`~job_shop_lib.dispatching.DispatcherObserverConfig`
             for feature observers.
@@ -87,11 +95,63 @@ class MultiJobShopGraphEnv(gym.Env):
             Configuration for the reward function. See
             :class:`~job_shop_lib.dispatching.DispatcherObserverConfig` and
             :class:`~job_shop_lib.dispatching.RewardObserver`.
+
         graph_updater_config:
             Configuration for the graph updater. The graph updater is used to
             update the graph representation after each action. See
             :class:`~job_shop_lib.dispatching.DispatcherObserverConfig` and
             :class:`~job_shop_lib.graphs.GraphUpdater`.
+    Args:
+        instance_generator:
+            A :class:`~job_shop_lib.generation.InstanceGenerator` that
+            generates a new problem instance on each reset.
+
+        feature_observer_configs:
+            Configurations for feature observers. Each configuration
+            should be a
+            :class:`~job_shop_lib.dispatching.DispatcherObserverConfig`
+            with a class type that inherits from
+            :class:`~job_shop_lib.dispatching.FeatureObserver` or a string
+            or enum that represents a built-in feature observer.
+
+        graph_initializer:
+            Function to create the initial graph representation.
+            If ``None``, the default graph initializer is used:
+            :func:`~job_shop_lib.graphs.build_agent_task_graph`.
+        graph_updater_config:
+            Configuration for the graph updater. The graph updater is used
+            to update the graph representation after each action. If
+            ``None``, the default graph updater is used:
+            :class:`~job_shop_lib.graphs.ResidualGraphUpdater`.
+
+        ready_operations_filter:
+            Function to filter ready operations. If ``None``, the default
+            filter is used:
+            :func:`~job_shop_lib.dispatching.filter_dominated_operations`.
+
+        reward_function_config:
+            Configuration for the reward function. If ``None``, the default
+            reward function is used:
+            :class:`~job_shop_lib.dispatching.MakespanReward`.
+
+        render_mode:
+            Rendering mode for visualization. Supported modes are:
+
+            - human: Renders the current Gannt chart.
+            - save_video: Saves a video of the Gantt chart. Used only if
+                the schedule is completed.
+            - save_gif: Saves a GIF of the Gantt chart. Used only if the
+                schedule is completed.
+        render_config:
+            Configuration for rendering. See
+            :class:`~job_shop_lib.RenderConfig`.
+
+        use_padding:
+            Whether to use padding in observations. If True, all matrices
+            are padded to fixed sizes based on the maximum instance size.
+            Values are padded with -1, except for the "removed_nodes" key,
+            which is padded with ``True``, indicating that the node is
+            removed.
     """
 
     def __init__(
@@ -114,53 +174,6 @@ class MultiJobShopGraphEnv(gym.Env):
         render_config: RenderConfig | None = None,
         use_padding: bool = True,
     ) -> None:
-        """Initializes the environment.
-
-        Args:
-            instance_generator:
-                A :class:`~job_shop_lib.generation.InstanceGenerator` that
-                generates a new problem instance on each reset.
-            feature_observer_configs:
-                Configurations for feature observers. Each configuration
-                should be a
-                :class:`~job_shop_lib.dispatching.DispatcherObserverConfig`
-                with a class type that inherits from
-                :class:`~job_shop_lib.dispatching.FeatureObserver` or a string
-                or enum that represents a built-in feature observer.
-            graph_initializer:
-                Function to create the initial graph representation.
-                If ``None``, the default graph initializer is used:
-                :func:`~job_shop_lib.graphs.build_agent_task_graph`.
-            graph_updater_config:
-                Configuration for the graph updater. The graph updater is used
-                to update the graph representation after each action. If
-                ``None``, the default graph updater is used:
-                :class:`~job_shop_lib.graphs.ResidualGraphUpdater`.
-            ready_operations_filter:
-                Function to filter ready operations. If ``None``, the default
-                filter is used:
-                :func:`~job_shop_lib.dispatching.filter_dominated_operations`.
-            reward_function_config:
-                Configuration for the reward function. If ``None``, the default
-                reward function is used:
-                :class:`~job_shop_lib.dispatching.MakespanReward`.
-            render_mode:
-                Rendering mode for visualization. Supported modes are:
-                - human: Renders the current Gannt chart.
-                - save_video: Saves a video of the Gantt chart. Used only if
-                  the schedule is completed.
-                - save_gif: Saves a GIF of the Gantt chart. Used only if the
-                  schedule is completed.
-            render_config:
-                Configuration for rendering. See
-                :class:`~job_shop_lib.RenderConfig`.
-            use_padding:
-                Whether to use padding in observations. If True, all matrices
-                are padded to fixed sizes based on the maximum instance size.
-                Values are padded with -1, except for the "removed_nodes" key,
-                which is padded with ``True``, indicating that the node is
-                removed.
-        """
         super().__init__()
 
         # Create an instance with the maximum size
@@ -303,16 +316,15 @@ class MultiJobShopGraphEnv(gym.Env):
 
         Returns:
             A tuple containing the following elements:
+
             - The observation of the environment.
             - The reward obtained.
             - Whether the environment is done.
             - Whether the episode was truncated (always False).
             - A dictionary with additional information. The dictionary
-              contains the following keys:
-                - "feature_names": The names of the features in the
-                  observation.
-                - "available_operations": The operations that are ready to be
-                  scheduled.
+              contains the following keys: ``"feature_names"``, The names of the
+              features in the observation; ``"available_operations"``, the
+              operations that are ready to be scheduled.
         """
         obs, reward, done, truncated, info = (
             self.single_job_shop_graph_env.step(action)

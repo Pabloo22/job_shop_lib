@@ -1,7 +1,6 @@
 """Home of the `GanttChartCreator` class and its configuration types."""
 
 from typing import TypedDict
-
 import matplotlib.pyplot as plt
 
 from job_shop_lib.dispatching import (
@@ -16,8 +15,8 @@ from job_shop_lib.visualization import (
 
 
 class PartialGanttChartPlotterConfig(TypedDict, total=False):
-    """Configuration for creating the plot function with the
-    :func:`get_partial_gantt_chart_plotter` function.
+    """A dictionary with the configuration for creating the
+    :class:`PartialGanttChartPlotter` function.
 
     Attributes:
         title:
@@ -26,6 +25,11 @@ class PartialGanttChartPlotterConfig(TypedDict, total=False):
             The colormap to use in the Gantt chart. (optional)
         show_available_operations:
             Whether to show available operations in each step. (optional)
+
+    .. seealso::
+
+        - :class:`PartialGanttChartPlotter`
+        - :func:`get_partial_gantt_chart_plotter`
     """
 
     title: str | None
@@ -33,54 +37,55 @@ class PartialGanttChartPlotterConfig(TypedDict, total=False):
     show_available_operations: bool
 
 
-# We can't use Required here because it's not available in Python 3.10
-class _GifConfigRequired(TypedDict):
-    """Required configuration for creating the GIF."""
-
-    gif_path: str | None
-
-
-class _GifConfigOptional(TypedDict, total=False):
-    """Optional configuration for creating the GIF."""
-
-    fps: int
-    remove_frames: bool
-    frames_dir: str | None
-    plot_current_time: bool
-
-
-class GifConfig(_GifConfigRequired, _GifConfigOptional):
-    """Configuration for creating the GIF using the
-    func:`create_gantt_chart_gif` function.
-
-    Attributes:
-        gif_path:
-            The path to save the GIF. It must end with '.gif'.
-        fps:
-            The frames per second of the GIF. Defaults to 1. (optional)
-        remove_frames:
-            Whether to remove the frames after creating the GIF. (optional)
-        frames_dir:
-            The directory to store the frames. (optional)
-        plot_current_time:
-            Whether to plot the current time in the Gantt chart. (optional)
+class GifConfig(TypedDict, total=False):
+    """A dcitionary with the configuration for creating the GIF using the
+    :func:`create_gantt_chart_gif` function.
 
     .. seealso::
 
-        - :func:`create_gantt_chart_gif`
-
+        :func:`create_gantt_chart_gif`
     """
+
+    gif_path: str | None
+    """The path to save the GIF. It must end with '.gif'."""
+
+    fps: int
+    """The frames per second of the GIF. Defaults to 1."""
+
+    remove_frames: bool
+    """Whether to remove the frames after creating the GIF."""
+
+    frames_dir: str | None
+    """The directory to store the frames."""
+
+    plot_current_time: bool
+    """Whether to plot the current time in the Gantt chart."""
 
 
 class VideoConfig(TypedDict, total=False):
     """Configuration for creating the video using the
-    :func:`create_gantt_chart_video` function."""
+    :func:`create_gantt_chart_video` function.
+
+    .. seealso::
+
+        :func:`create_gantt_chart_video`
+    """
 
     video_path: str | None
+    """The path to save the video. It must end with a valid video extension
+    (e.g., '.mp4')."""
+
     fps: int
+    """The frames per second of the video. Defaults to 1."""
+
     remove_frames: bool
+    """Whether to remove the frames after creating the video."""
+
     frames_dir: str | None
+    """The directory to store the frames."""
+
     plot_current_time: bool
+    """Whether to plot the current time in the Gantt chart."""
 
 
 class GanttChartCreator:
@@ -169,7 +174,7 @@ class GanttChartCreator:
         video_config: VideoConfig | None = None,
     ):
         if gif_config is None:
-            gif_config = {"gif_path": None}
+            gif_config = {}
         if partial_gantt_chart_plotter_config is None:
             partial_gantt_chart_plotter_config = {}
         if video_config is None:

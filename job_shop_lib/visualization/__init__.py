@@ -10,7 +10,6 @@
     plot_disjunctive_graph
     plot_agent_task_graph
     GanttChartCreator
-    GanttChartWrapperConfig
     GifConfig
     VideoConfig
 
