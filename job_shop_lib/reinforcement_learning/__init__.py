@@ -22,9 +22,6 @@ from job_shop_lib.reinforcement_learning._types_and_constants import (
     ObservationSpaceKey,
     RenderConfig,
     ObservationDict,
-    PartialGanttChartPlotterConfig,
-    GifConfig,
-    VideoConfig,
 )
 
 from job_shop_lib.reinforcement_learning._reward_observers import (
@@ -48,9 +45,6 @@ __all__ = [
     "RewardObserver",
     "MakespanReward",
     "IdleTimeReward",
-    "PartialGanttChartPlotterConfig",
-    "GifConfig",
-    "VideoConfig",
     "SingleJobShopGraphEnv",
     "RenderConfig",
     "ObservationDict",
