@@ -23,14 +23,14 @@ class JobShopInstance:
 
     .. autosummary::
         :nosignatures:
-    
+
         from_taillard_file
         to_dict
         from_matrices
         set_operation_attributes
-    
+
     Properties:
-    
+
     .. autosummary::
         :nosignatures:
 
