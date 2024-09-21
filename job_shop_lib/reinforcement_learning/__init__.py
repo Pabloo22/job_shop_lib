@@ -10,9 +10,6 @@
     RewardObserver
     MakespanReward
     IdleTimeReward
-    GanttChartWrapperConfig
-    GifConfig
-    VideoConfig
     RenderConfig
     add_padding
 
