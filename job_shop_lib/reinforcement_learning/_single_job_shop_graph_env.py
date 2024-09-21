@@ -55,6 +55,7 @@ class SingleJobShopGraphEnv(gym.Env):
         MultiDiscrete space representing (job_id, machine_id) pairs.
 
     Render Modes:
+
         - "human": Displays the current Gantt chart.
         - "save_video": Saves a video of the complete Gantt chart.
         - "save_gif": Saves a GIF of the complete Gantt chart.
