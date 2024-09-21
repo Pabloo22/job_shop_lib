@@ -42,11 +42,20 @@ class Operation:
             "The time it takes to perform the operation. Often referred"
             " to as the processing time."
         ),
-        "job_id": "The id of the job the operation belongs to.",
-        "position_in_job": "The index of the operation in the job.",
+        "job_id": (
+            "The id of the job the operation belongs to. Defaults to -1. "
+            "It is usually set by the :class:`JobShopInstance` class after "
+            "initialization."
+        ),
+        "position_in_job": (
+            "The index of the operation in the job. Defaults to -1. "
+            "It is usually set by the :class:`JobShopInstance` class after "
+            "initialization."
+        ),
         "operation_id": (
             "The id of the operation. This is unique within a "
-            ":class:`JobShopInstance`."
+            ":class:`JobShopInstance`. Defaults to -1. It is usually set by "
+            "the :class:`JobShopInstance` class after initialization."
         ),
     }
 
