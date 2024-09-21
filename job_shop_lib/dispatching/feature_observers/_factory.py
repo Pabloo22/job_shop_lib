@@ -1,4 +1,4 @@
-"""Contains factory functions for creating node feature encoders."""
+"""Contains factory functions for creating :class:`FeatureObserver`s."""
 
 from enum import Enum
 
@@ -18,11 +18,12 @@ from job_shop_lib.dispatching.feature_observers import (
 class FeatureObserverType(str, Enum):
     """Enumeration of the different feature observers.
 
-    Each feature observer is associated with a string value that can be used
-    to create the feature observer using the factory function.
+    Each :class:`FeatureObserver` is associated with a string value that can be
+    used to create the :class:`FeatureObserver` using the factory function.
 
     It does not include the :class:`CompositeFeatureObserver` class since this
-    observer is often managed separately from the others.
+    observer is often managed separately from the others. For example, a
+    common use case is to create a list of feature observers and pass them to
     """
 
     IS_READY = "is_ready"
@@ -45,7 +46,7 @@ FeatureObserverConfig = (
 
 
 def feature_observer_factory(
-    feature_creator_type: (
+    feature_observer_type: (
         str
         | FeatureObserverType
         | type[FeatureObserver]
@@ -53,29 +54,29 @@ def feature_observer_factory(
     ),
     **kwargs,
 ) -> FeatureObserver:
-    """Creates and returns a node feature creator based on the specified
-    node feature creator type.
+    """Creates and returns a :class:`FeatureObserver` based on the specified
+    :class:`FeatureObserver` type.
 
     Args:
         feature_creator_type:
-            The type of node feature creator to create.
+            The type of :class:`FeatureObserver` to create.
         **kwargs:
-            Additional keyword arguments to pass to the node
-            feature creator constructor.
+            Additional keyword arguments to pass to the
+            :class:`FeatureObserver` constructor.
 
     Returns:
-        A node feature creator instance.
+        A :class:`FeatureObserver` instance.
     """
-    if isinstance(feature_creator_type, DispatcherObserverConfig):
+    if isinstance(feature_observer_type, DispatcherObserverConfig):
         return feature_observer_factory(
-            feature_creator_type.class_type,
-            **feature_creator_type.kwargs,
+            feature_observer_type.class_type,
+            **feature_observer_type.kwargs,
             **kwargs,
         )
     # if the instance is of type type[FeatureObserver] we can just
     # call the object constructor with the keyword arguments
-    if isinstance(feature_creator_type, type):
-        return feature_creator_type(**kwargs)
+    if isinstance(feature_observer_type, type):
+        return feature_observer_type(**kwargs)
 
     mapping: dict[FeatureObserverType, type[FeatureObserver]] = {
         FeatureObserverType.IS_READY: IsReadyObserver,
@@ -86,5 +87,5 @@ def feature_observer_factory(
         FeatureObserverType.REMAINING_OPERATIONS: RemainingOperationsObserver,
         FeatureObserverType.IS_COMPLETED: IsCompletedObserver,
     }
-    feature_creator = mapping[feature_creator_type]  # type: ignore[index]
-    return feature_creator(**kwargs)
+    feature_observer = mapping[feature_observer_type]  # type: ignore[index]
+    return feature_observer(**kwargs)
