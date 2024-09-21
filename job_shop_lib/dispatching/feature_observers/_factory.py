@@ -20,6 +20,9 @@ class FeatureObserverType(str, Enum):
 
     Each feature observer is associated with a string value that can be used
     to create the feature observer using the factory function.
+
+    It does not include the :class:`CompositeFeatureObserver` class since this
+    observer is often managed separately from the others.
     """
 
     IS_READY = "is_ready"
@@ -29,7 +32,6 @@ class FeatureObserverType(str, Enum):
     POSITION_IN_JOB = "position_in_job"
     REMAINING_OPERATIONS = "remaining_operations"
     IS_COMPLETED = "is_completed"
-    COMPOSITE = "composite"
 
 
 # FeatureObserverConfig = DispatcherObserverConfig[
