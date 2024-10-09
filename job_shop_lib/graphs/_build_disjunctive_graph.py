@@ -18,14 +18,15 @@ each disjunctive edge such that the overall processing time is minimized.
 
 import itertools
 
-from job_shop_lib import JobShopInstance
+from job_shop_lib import JobShopInstance, Schedule
 from job_shop_lib.graphs import JobShopGraph, EdgeType, NodeType, Node
 
 
 def build_disjunctive_graph(instance: JobShopInstance) -> JobShopGraph:
     """Builds and returns a disjunctive graph for the given job shop instance.
 
-    This function creates a complete disjunctive graph from a JobShopInstance.
+    This function creates a complete disjunctive graph from a
+    :JobShopInstance.
     It starts by initializing a JobShopGraph object and proceeds by adding
     disjunctive edges between operations using the same machine, conjunctive
     edges between successive operations in the same job, and finally, special
@@ -40,7 +41,7 @@ def build_disjunctive_graph(instance: JobShopInstance) -> JobShopGraph:
         the graph.
 
     Returns:
-        JobShopGraph: A JobShopGraph object representing the disjunctive graph
+        A :class:`JobShopGraph` object representing the disjunctive graph
         of the job shop scheduling problem.
     """
     graph = JobShopGraph(instance)
@@ -48,6 +49,46 @@ def build_disjunctive_graph(instance: JobShopInstance) -> JobShopGraph:
     add_conjunctive_edges(graph)
     add_source_sink_nodes(graph)
     add_source_sink_edges(graph)
+    return graph
+
+
+def build_solved_disjunctive_graph(schedule: Schedule) -> JobShopGraph:
+    """Builds and returns a disjunctive graph for the given solved schedule.
+
+    This function constructs a disjunctive graph from the given schedule,
+    keeping only the disjunctive edges that represent the chosen ordering
+    of operations on each machine as per the solution schedule.
+
+    Args:
+        schedule (Schedule): The solved schedule that contains the sequencing
+        of operations on each machine.
+
+    Returns:
+        A JobShopGraph object representing the disjunctive graph
+        of the solved job shop scheduling problem.
+    """
+    # Build the base disjunctive graph from the job shop instance
+    graph = JobShopGraph(schedule.instance)
+    add_conjunctive_edges(graph)
+    add_source_sink_nodes(graph)
+    add_source_sink_edges(graph)
+
+    # Iterate over each machine and add only the edges that match the solution
+    # order
+    for machine_schedule in schedule.schedule:
+        # Add the disjunctive edges that reflect the sequence in the solved
+        # schedule
+        nodes = [
+            graph.nodes[scheduled_op.operation.operation_id]
+            for scheduled_op in machine_schedule
+        ]
+        for i in range(len(nodes) - 1):
+            graph.add_edge(
+                nodes[i],
+                nodes[i + 1],
+                type=EdgeType.DISJUNCTIVE,
+            )
+
     return graph
 
 

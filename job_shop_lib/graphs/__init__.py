@@ -7,6 +7,7 @@ The main classes and functions available in this package are:
     Node
     NodeType
     build_disjunctive_graph
+    build_solved_disjunctive_graph
     build_agent_task_graph
     build_complete_agent_task_graph
     build_agent_task_graph_with_jobs
@@ -18,6 +19,7 @@ from job_shop_lib.graphs._node import Node
 from job_shop_lib.graphs._job_shop_graph import JobShopGraph, NODE_ATTR
 from job_shop_lib.graphs._build_disjunctive_graph import (
     build_disjunctive_graph,
+    build_solved_disjunctive_graph,
     add_disjunctive_edges,
     add_conjunctive_edges,
     add_source_sink_nodes,
@@ -62,4 +64,5 @@ __all__ = [
     "add_global_node",
     "add_machine_global_edges",
     "add_job_global_edges",
+    "build_solved_disjunctive_graph",
 ]
