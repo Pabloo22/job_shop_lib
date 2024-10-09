@@ -76,16 +76,13 @@ def build_solved_disjunctive_graph(schedule: Schedule) -> JobShopGraph:
     # Iterate over each machine and add only the edges that match the solution
     # order
     for machine_schedule in schedule.schedule:
-        # Add the disjunctive edges that reflect the sequence in the solved
-        # schedule
-        nodes = [
-            graph.nodes[scheduled_op.operation.operation_id]
-            for scheduled_op in machine_schedule
-        ]
-        for i in range(len(nodes) - 1):
+        for i, scheduled_operation in enumerate(machine_schedule):
+            if i + 1 >= len(machine_schedule):
+                break
+            next_scheduled_operation = machine_schedule[i + 1]
             graph.add_edge(
-                nodes[i],
-                nodes[i + 1],
+                scheduled_operation.operation.operation_id,
+                next_scheduled_operation.operation.operation_id,
                 type=EdgeType.DISJUNCTIVE,
             )
 
