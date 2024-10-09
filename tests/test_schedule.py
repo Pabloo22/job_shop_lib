@@ -106,6 +106,18 @@ def test_from_job_sequences(example_job_shop_instance: JobShopInstance):
     assert schedule.makespan() == 11
 
 
+def test_from_job_sequences_invalid(example_job_shop_instance: JobShopInstance):
+    job_sequences = [
+        [0, 1, 2],
+        [2, 0, 1],
+        [1, 0, 2],
+    ]
+    with pytest.raises(ValidationError):
+        Schedule.from_job_sequences(
+            example_job_shop_instance, job_sequences
+        )
+
+
 def test_to_dict(example_job_shop_instance: JobShopInstance):
     job_sequences = [
         [0, 2, 1],
