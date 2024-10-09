@@ -48,8 +48,55 @@ def plot_disjunctive_graph(
     draw_disjunctive_edges: bool = True,
     conjunctive_patch_label: str = "Conjunctive edges",
     disjunctive_patch_label: str = "Disjunctive edges",
+    legend_text: str = "m = machine_id\nd = duration",
 ) -> plt.Figure:
-    """Returns a plot of the disjunctive graph of the instance."""
+    """Plots the disjunctive graph of the given job shop instance or graph.
+
+    Args:
+        job_shop:
+            The job shop instance or graph to plot. Can be either a
+            :class:`JobShopGraph` or a :class:`JobShopInstance`.
+        figsize:
+            The size of the figure (default is (6, 4)).
+        node_size:
+            The size of the nodes (default is 1600).
+        title:
+            The title of the graph (default is ``None``).
+        layout:
+            The layout of the graph (default is ``None``).
+        edge_width:
+            The width of the edges (default is 2).
+        font_size:
+            The font size of the node labels (default is 10).
+        arrow_size:
+            The size of the arrows (default is 35).
+        alpha:
+            The transparency level of the nodes and edges (default is 0.95).
+        node_font_color:
+            The color of the node labels (default is ``"white"``).
+        color_map:
+            The color map to use for the nodes (default is ``"Dark2_r"``).
+        draw_disjunctive_edges:
+            Whether to draw disjunctive edges (default is ``True``).
+        conjunctive_patch_label:
+            The label for the conjunctive edges in the legend (default is
+            "Conjunctive edges").
+        disjunctive_patch_label:
+            The label for the disjunctive edges in the legend (default is
+            "Disjunctive edges").
+        legend_text:
+            The text to display in the legend after the conjunctive and
+            disjunctive edges labels (default is
+            ``"m = machine_id\nd = duration"``).
+
+    Returns:
+        A matplotlib Figure object representing the disjunctive graph.
+
+    Example:
+        >>> job_shop_instance = JobShopInstance(...)
+        >>> fig = plot_disjunctive_graph(job_shop_instance)
+        >>> fig.show()
+    """
 
     if isinstance(job_shop, JobShopInstance):
         job_shop_graph = build_disjunctive_graph(job_shop)
@@ -180,7 +227,6 @@ def plot_disjunctive_graph(
     )
 
     # Add to the legend the meaning of m and d
-    text = "m = machine_id\nd = duration"
     extra = matplotlib.patches.Rectangle(
         (0, 0),
         1,
@@ -189,7 +235,7 @@ def plot_disjunctive_graph(
         fill=False,
         edgecolor="none",
         linewidth=0,
-        label=text,
+        label=legend_text,
     )
     plt.legend(
         handles=[conjunctive_patch, disjunctive_patch, extra],
