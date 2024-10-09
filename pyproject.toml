@@ -33,6 +33,7 @@ optional = true
 [tool.poetry.group.lint.dependencies]
 flake8 = "^7.0.0"
 mypy = "^1.8.0"
+pydoclint = {extras = ["flake8"], version = "^0.5.9"}
 
 [tool.poetry.group.notebooks]
 optional = true
