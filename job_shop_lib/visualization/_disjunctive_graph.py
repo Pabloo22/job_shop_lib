@@ -46,6 +46,8 @@ def plot_disjunctive_graph(
     node_font_color: str = "white",
     color_map: str = "Dark2_r",
     draw_disjunctive_edges: bool = True,
+    conjunctive_patch_label: str = "Conjunctive edges",
+    disjunctive_patch_label: str = "Disjunctive edges",
 ) -> plt.Figure:
     """Returns a plot of the disjunctive graph of the instance."""
 
@@ -171,10 +173,10 @@ def plot_disjunctive_graph(
     plt.tight_layout()
     # Create a legend to indicate the meaning of the edge colors
     conjunctive_patch = matplotlib.patches.Patch(
-        color="black", label="conjunctive edges"
+        color="black", label=conjunctive_patch_label
     )
     disjunctive_patch = matplotlib.patches.Patch(
-        color="red", label="disjunctive edges"
+        color="red", label=disjunctive_patch_label
     )
 
     # Add to the legend the meaning of m and d
