@@ -1,7 +1,7 @@
 """Module for visualizing the disjunctive graph of a job shop instance."""
 
 import functools
-from typing import Optional, Callable
+from typing import Callable
 import warnings
 import copy
 
@@ -39,8 +39,8 @@ def plot_disjunctive_graph(
     *,
     figsize: tuple[float, float] = (6, 4),
     node_size: int = 1600,
-    title: Optional[str] = None,
-    layout: Optional[Layout] = None,
+    title: str | None = None,
+    layout: Layout | None = None,
     edge_width: int = 2,
     font_size: int = 10,
     arrow_size: int = 35,
