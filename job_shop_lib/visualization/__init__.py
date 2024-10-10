@@ -25,10 +25,10 @@ from job_shop_lib.visualization._gantt_chart_video_and_gif_creation import (
     create_gif_from_frames,
     PartialGanttChartPlotter,
 )
-from job_shop_lib.visualization._disjunctive_graph import (
+from job_shop_lib.visualization._plot_disjunctive_graph import (
     plot_disjunctive_graph,
 )
-from job_shop_lib.visualization._agent_task_graph import (
+from job_shop_lib.visualization._plot_agent_task_graph import (
     plot_agent_task_graph,
     three_columns_layout,
 )
