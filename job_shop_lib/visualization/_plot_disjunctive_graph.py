@@ -31,10 +31,12 @@ Layout = Callable[[nx.Graph], dict[str, tuple[float, float]]]
 # For the "too many arguments" warning no satisfactory solution was
 # found. I believe is still better than using `**kwargs` and losing the
 # function signature or adding a dataclass for configuration (it would add
-# unnecessary complexity).
+# unnecessary complexity). A TypedDict could be used too, but the default
+# values would not be explicit.
 # pylint: disable=too-many-arguments, too-many-locals
 def plot_disjunctive_graph(
     job_shop: JobShopGraph | JobShopInstance,
+    *,
     figsize: tuple[float, float] = (6, 4),
     node_size: int = 1600,
     title: Optional[str] = None,
