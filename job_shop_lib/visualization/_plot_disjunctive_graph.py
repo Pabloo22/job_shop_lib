@@ -2,7 +2,7 @@
 
 import functools
 from typing import Any
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Sequence, Iterable
 import warnings
 import copy
 
@@ -53,7 +53,7 @@ def duration_labeler(node: Node) -> str:
 # unnecessary complexity). A TypedDict could be used too, but the default
 # values would not be explicit.
 # pylint: disable=too-many-arguments, too-many-locals, too-many-statements
-# pylint: disable=too-many-branches
+# pylint: disable=too-many-branches, line-too-long
 def plot_disjunctive_graph(
     job_shop: JobShopGraph | JobShopInstance,
     *,
@@ -70,7 +70,7 @@ def plot_disjunctive_graph(
     disjunctive_edge_color: str = "red",
     conjunctive_edge_color: str = "black",
     layout: Layout | None = None,
-    draw_disjunctive_edges: bool = True,
+    draw_disjunctive_edges: bool | str = True,
     conjunctive_edges_additional_params: dict[str, Any] | None = None,
     disjunctive_edges_additional_params: dict[str, Any] | None = None,
     conjunctive_patch_label: str = "Conjunctive edges",
@@ -108,20 +108,18 @@ def plot_disjunctive_graph(
         alpha:
             The transparency level of the nodes and edges (default is 0.95).
         operation_node_labeler:
-            A function that formats labels for operation nodes (e.g.,
-            "m=machine_id\nd=duration"). Receives a Node and returns a string.
-            The default is a function that returns "m=machine_id\nd=duration",
-            where machine_id and duration are the machine id and duration of
-            the node's operation, respectively. See
-            :class:`~job_shop_lib.graphs.Node` for more information.
+            A function that formats labels for operation nodes. Receives a
+            :class:`~job_shop_lib.graphs.Node` and returns a string.
+            The default is :func:`duration_labeler`, which labels the nodes
+            with their duration.
         node_font_color:
             The color of the node labels (default is ``"white"``).
         color_map:
             The color map to use for the nodes (default is ``"Dark2_r"``).
         disjunctive_edge_color:
-            The color of the disjunctive edges (default is "red").
+            The color of the disjunctive edges (default is ``"red"``).
         conjunctive_edge_color:
-            The color of the conjunctive edges (default is "black").
+            The color of the conjunctive edges (default is ``"black"``).
         layout:
             The layout of the graph (default is ``graphviz_layout`` with
             ``prog="dot"`` and ``args="-Grankdir=LR"``). If not available,
@@ -129,13 +127,19 @@ def plot_disjunctive_graph(
             `pygraphviz documentation
             <https://pygraphviz.github.io/documentation/stable/install.html>`_.
         draw_disjunctive_edges:
-            Whether to draw disjunctive edges (default is ``True``).
+            Whether to draw disjunctive edges (default is ``True``). If
+            ``False``, only conjunctive edges are drawn. If ``"single_edge",``
+            the disjunctive edges are drawn as undirected edges by removing one
+            of the directions. If using this last option is recommended to set
+            the "arrowstyle" parameter to ``"-"`` or ``"<->"`` in the
+            ``disjunctive_edges_additional_params`` to make the edges look
+            better. See `matplotlib documentation on arrow styles <https://matplotlib.org/stable/api/_as_gen/matplotlib.patches.ArrowStyle.html#matplotlib.patches.ArrowStyle>`_
+            and `nx.draw_networkx_edges <https://networkx.org/documentation/stable/reference/generated/networkx.drawing.nx_pylab.draw_networkx_edges.html>`_
+            for more information.
         conjunctive_edges_additional_params:
             Additional parameters to pass to the conjunctive edges when
             drawing them (default is ``None``). See the documentation of
-            `nx.draw_networkx_edges <https://networkx.org/documentation/stable
-            /reference/generated/networkx.drawing.nx_pylab.draw_networkx_edges
-            .html>`_
+            `nx.draw_networkx_edges <https://networkx.org/documentation/stable/reference/generated/networkx.drawing.nx_pylab.draw_networkx_edges.html>`_
             for more information. The parameters that are explicitly set by
             this function and should not be part of this dictionary are
             ``edgelist``, ``pos``, ``width``, ``edge_color``, and
@@ -145,14 +149,14 @@ def plot_disjunctive_graph(
             disjunctive edges (default is ``None``).
         conjunctive_patch_label:
             The label for the conjunctive edges in the legend (default is
-            "Conjunctive edges").
+            ``"Conjunctive edges"``).
         disjunctive_patch_label:
             The label for the disjunctive edges in the legend (default is
-            "Disjunctive edges").
+            ``"Disjunctive edges"``).
         legend_text:
             Text to display in the legend after the conjunctive and
             disjunctive edges labels (default is
-            ``"m = machine_id\nd = duration"``).
+            ``"$p_{ij}=$duration of $O_{ij}$"``).
         show_machine_colors_in_legend:
             Whether to show the colors of the machines in the legend
             (default is ``True``).
@@ -165,11 +169,11 @@ def plot_disjunctive_graph(
         legend_bbox_to_anchor:
             The anchor of the legend box (default is ``(1.01, 1)``).
         start_node_label:
-            The label for the start node (default is "S").
+            The label for the start node (default is ``"$S$"``).
         end_node_label:
-            The label for the end node (default is "T").
+            The label for the end node (default is ``"$T$"``).
         font_family:
-            The font family of the node labels (default is "sans-serif").
+            The font family of the node labels (default is ``"sans-serif"``).
 
     Returns:
         A matplotlib Figure object representing the disjunctive graph.
@@ -181,7 +185,7 @@ def plot_disjunctive_graph(
             job_shop_instance = JobShopInstance(...)  # or a JobShopGraph
             fig = plot_disjunctive_graph(job_shop_instance)
 
-    """
+    """  # noqa: E501
 
     if isinstance(job_shop, JobShopInstance):
         job_shop_graph = build_disjunctive_graph(job_shop)
@@ -247,7 +251,7 @@ def plot_disjunctive_graph(
         for u, v, d in job_shop_graph.graph.edges(data=True)
         if d["type"] == EdgeType.CONJUNCTIVE
     ]
-    disjunctive_edges = [
+    disjunctive_edges: Iterable[tuple[int, int]] = [
         (u, v)
         for u, v, d in job_shop_graph.graph.edges(data=True)
         if d["type"] == EdgeType.DISJUNCTIVE
@@ -268,6 +272,14 @@ def plot_disjunctive_graph(
     )
 
     if draw_disjunctive_edges:
+        if draw_disjunctive_edges == "single_edge":
+            # Filter the disjunctive edges to remove one of the directions
+            disjunctive_edges_filtered = set()
+            for u, v in disjunctive_edges:
+                if u > v:
+                    u, v = v, u
+                disjunctive_edges_filtered.add((u, v))
+            disjunctive_edges = disjunctive_edges_filtered
         nx.draw_networkx_edges(
             job_shop_graph.graph,
             pos,

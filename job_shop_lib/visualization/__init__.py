@@ -27,6 +27,7 @@ from job_shop_lib.visualization._gantt_chart_video_and_gif_creation import (
 )
 from job_shop_lib.visualization._plot_disjunctive_graph import (
     plot_disjunctive_graph,
+    duration_labeler,
 )
 from job_shop_lib.visualization._plot_agent_task_graph import (
     plot_agent_task_graph,
@@ -55,4 +56,5 @@ __all__ = [
     "GifConfig",
     "VideoConfig",
     "PartialGanttChartPlotter",
+    "duration_labeler",
 ]
