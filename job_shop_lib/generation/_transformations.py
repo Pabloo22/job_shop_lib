@@ -111,7 +111,17 @@ class AddDurationNoise(Transformation):
 
 class RemoveJobs(Transformation):
     """Removes jobs randomly until the number of jobs is within a specified
-    range."""
+    range.
+
+    Args:
+        min_jobs:
+            The minimum number of jobs to remain in the instance.
+        max_jobs:
+            The maximum number of jobs to remain in the instance.
+        target_jobs:
+            If specified, the number of jobs to remain in the
+            instance. Overrides ``min_jobs`` and ``max_jobs``.
+    """
 
     def __init__(
         self,
@@ -120,13 +130,6 @@ class RemoveJobs(Transformation):
         target_jobs: int | None = None,
         suffix: str | None = None,
     ):
-        """
-        Args:
-            min_jobs: The minimum number of jobs to remain in the instance.
-            max_jobs: The maximum number of jobs to remain in the instance.
-            target_jobs: If specified, the number of jobs to remain in the
-                instance. Overrides min_jobs and max_jobs.
-        """
         if suffix is None:
             suffix = f"_jobs={min_jobs}-{max_jobs}"
         super().__init__(suffix=suffix)

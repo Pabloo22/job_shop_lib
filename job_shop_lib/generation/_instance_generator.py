@@ -32,6 +32,20 @@ class InstanceGenerator(abc.ABC):
             A suffix to append to each instance's name for identification.
         seed:
             Seed for the random number generator to ensure reproducibility.
+
+    Args:
+        num_jobs:
+            The range of the number of jobs to generate.
+        num_machines:
+            The range of the number of machines available.
+        duration_range:
+            The range of durations for each operation.
+        name_suffix:
+            Suffix for instance names.
+        seed:
+            Seed for the random number generator.
+        iteration_limit:
+            Maximum number of instances to generate in iteration mode.
     """
 
     def __init__(  # pylint: disable=too-many-arguments
@@ -43,23 +57,6 @@ class InstanceGenerator(abc.ABC):
         seed: int | None = None,
         iteration_limit: int | None = None,
     ):
-        """Initializes the instance generator with the given parameters.
-
-        Args:
-            num_jobs:
-                The range of the number of jobs to generate.
-            num_machines:
-                The range of the number of machines available.
-            duration_range:
-                The range of durations for each operation.
-            name_suffix:
-                Suffix for instance names.
-            seed:
-                Seed for the random number generator.
-            iteration_limit:
-                Maximum number of instances to generate in iteration mode.
-        """
-
         if isinstance(num_jobs, int):
             num_jobs = (num_jobs, num_jobs)
         if isinstance(num_machines, int):

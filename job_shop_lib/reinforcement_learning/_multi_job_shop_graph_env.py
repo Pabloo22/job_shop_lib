@@ -322,8 +322,8 @@ class MultiJobShopGraphEnv(gym.Env):
             - Whether the environment is done.
             - Whether the episode was truncated (always False).
             - A dictionary with additional information. The dictionary
-              contains the following keys: ``"feature_names"``, The names of the
-              features in the observation; ``"available_operations"``, the
+              contains the following keys: ``"feature_names"``, The names of
+              the features in the observation; ``"available_operations"``, the
               operations that are ready to be scheduled.
         """
         obs, reward, done, truncated, info = (

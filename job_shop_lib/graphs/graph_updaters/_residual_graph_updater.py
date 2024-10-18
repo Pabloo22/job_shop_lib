@@ -25,9 +25,24 @@ class ResidualGraphUpdater(GraphUpdater):
 
     Attributes:
         remove_completed_machine_nodes:
-            If True, removes completed machine nodes from the graph.
+            If ``True``, removes completed machine nodes from the graph.
         remove_completed_job_nodes:
-            If True, removes completed job nodes from the graph.
+            If ``True``, removes completed job nodes from the graph.
+
+    Args:
+        dispatcher:
+            The dispatcher instance to observe.
+        job_shop_graph:
+            The job shop graph to update.
+        subscribe:
+            If ``True``, automatically subscribes the observer to the
+            dispatcher. Defaults to ``True``.
+        remove_completed_machine_nodes:
+            If ``True``, removes completed machine nodes from the graph.
+            Defaults to ``True``.
+        remove_completed_job_nodes:
+            If ``True``, removes completed job nodes from the graph.
+            Defaults to ``True``.
     """
 
     def __init__(
@@ -39,24 +54,6 @@ class ResidualGraphUpdater(GraphUpdater):
         remove_completed_machine_nodes: bool = True,
         remove_completed_job_nodes: bool = True,
     ):
-        """Initializes the residual graph updater.
-
-        Args:
-            dispatcher:
-                The dispatcher instance to observe.
-            job_shop_graph:
-                The job shop graph to update.
-            subscribe:
-                If True, automatically subscribes the observer to the
-                dispatcher. Defaults to True.
-            remove_completed_machine_nodes:
-                If True, removes completed machine nodes from the graph.
-                Defaults to True.
-            remove_completed_job_nodes:
-                If True, removes completed job nodes from the graph.
-                Defaults to True.
-        """
-
         self._is_completed_observer: None | IsCompletedObserver = None
         self.remove_completed_job_nodes = remove_completed_job_nodes
         self.remove_completed_machine_nodes = remove_completed_machine_nodes

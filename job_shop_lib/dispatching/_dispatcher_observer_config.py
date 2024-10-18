@@ -35,7 +35,7 @@ class DispatcherObserverConfig(Generic[T]):
         kwargs:
             Keyword arguments needed to initialize the class. It must not
             contain the ``dispatcher`` argument.
-    
+
     .. seealso::
 
         - :class:`~job_shop_lib.dispatching.DispatcherObserver`

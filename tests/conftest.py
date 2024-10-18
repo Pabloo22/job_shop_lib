@@ -43,6 +43,7 @@ def example_job_shop_instance():
     )
     return instance
 
+
 @pytest.fixture
 def example_2_job_shop_instance():
     # Cada máquina se representa con un id (empezando por 0)

@@ -29,6 +29,18 @@ class DispatcherObserver(abc.ABC):
         dispatcher:
             The :class:`Dispatcher` instance to observe.
 
+    Args:
+        dispatcher:
+            The :class:`Dispatcher` instance to observe.
+        subscribe:
+            If ``True``, automatically subscribes the observer to the
+            dispatcher when it is initialized. Defaults to ``True``.
+
+    Raises:
+        ValidationError: If ``is_singleton`` is ``True`` and an observer of the
+            same type already exists in the dispatcher's list of
+            subscribers.
+
     Example:
 
     .. code-block:: python
@@ -61,21 +73,6 @@ class DispatcherObserver(abc.ABC):
         *,
         subscribe: bool = True,
     ):
-        """Initializes the observer with the :class:`Dispatcher` and subscribes
-        to it.
-
-        Args:
-            dispatcher:
-                The `Dispatcher` instance to observe.
-            subscribe:
-                If True, automatically subscribes the observer to the
-                dispatcher.
-
-        Raises:
-            ValidationError: If ``is_singleton`` is True and an observer of the
-                same type already exists in the dispatcher's list of
-                subscribers.
-        """
         if self._is_singleton and any(
             isinstance(observer, self.__class__)
             for observer in dispatcher.subscribers

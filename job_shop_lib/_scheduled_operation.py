@@ -5,7 +5,21 @@ from job_shop_lib.exceptions import ValidationError
 
 
 class ScheduledOperation:
-    """Data structure to store a scheduled operation."""
+    """Data structure to store a scheduled operation.
+
+    Args:
+        operation:
+            The :class:`Operation` object that is scheduled.
+        start_time:
+            The time at which the operation is scheduled to start.
+        machine_id:
+            The id of the machine on which the operation is scheduled.
+
+    Raises:
+        ValidationError:
+            If the given machine_id is not in the list of valid machines
+            for the operation.
+    """
 
     __slots__ = {
         "operation": "The :class:`Operation` object that is scheduled.",
@@ -16,21 +30,6 @@ class ScheduledOperation:
     }
 
     def __init__(self, operation: Operation, start_time: int, machine_id: int):
-        """Initializes a new instance of the :class:`ScheduledOperation` class.
-
-        Args:
-            operation:
-                The :class:`Operation` object that is scheduled.
-            start_time:
-                The time at which the operation is scheduled to start.
-            machine_id:
-                The id of the machine on which the operation is scheduled.
-
-        Raises:
-            ValidationError:
-                If the given machine_id is not in the list of valid machines
-                for the operation.
-        """
         self.operation: Operation = operation
         self.start_time: int = start_time
         self._machine_id = machine_id

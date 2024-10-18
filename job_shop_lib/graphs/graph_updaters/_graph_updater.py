@@ -23,6 +23,17 @@ class GraphUpdater(DispatcherObserver):
         job_shop_graph:
             The current job shop graph. This is the graph that is updated
             after each scheduled operation.
+
+    Args:
+        dispatcher:
+            The dispatcher instance to observe.
+        job_shop_graph:
+            The job shop graph to update.
+        subscribe:
+            Whether to subscribe to the dispatcher. If ``True``, the
+            observer will subscribe to the dispatcher when it is
+            initialized. If ``False``, the observer will not subscribe
+            to the dispatcher.
     """
 
     def __init__(
@@ -32,19 +43,6 @@ class GraphUpdater(DispatcherObserver):
         *,
         subscribe: bool = True,
     ):
-        """Initializes the class.
-
-        Args:
-            dispatcher:
-                The dispatcher instance to observe.
-            job_shop_graph:
-                The job shop graph to update.
-            subscribe:
-                Whether to subscribe to the dispatcher. If ``True``, the
-                observer will subscribe to the dispatcher when it is
-                initialized. If ``False``, the observer will not subscribe
-                to the dispatcher.
-        """
         super().__init__(dispatcher, subscribe=subscribe)
         self.initial_job_shop_graph = deepcopy(job_shop_graph)
         self.job_shop_graph = job_shop_graph

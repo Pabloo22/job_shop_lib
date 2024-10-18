@@ -18,14 +18,6 @@ class PartialGanttChartPlotterConfig(TypedDict, total=False):
     """A dictionary with the configuration for creating the
     :class:`PartialGanttChartPlotter` function.
 
-    Attributes:
-        title:
-            The title of the Gantt chart. (optional)
-        cmap:
-            The colormap to use in the Gantt chart. (optional)
-        show_available_operations:
-            Whether to show available operations in each step. (optional)
-
     .. seealso::
 
         - :class:`PartialGanttChartPlotter`
@@ -33,12 +25,17 @@ class PartialGanttChartPlotterConfig(TypedDict, total=False):
     """
 
     title: str | None
+    """The title of the Gantt chart."""
+
     cmap: str
+    """The colormap to use in the Gantt chart."""
+
     show_available_operations: bool
+    """Whether to show available operations in each step."""
 
 
 class GifConfig(TypedDict, total=False):
-    """A dcitionary with the configuration for creating the GIF using the
+    """A dictionary with the configuration for creating the GIF using the
     :func:`create_gantt_chart_gif` function.
 
     .. seealso::
@@ -249,8 +246,8 @@ class GanttChartCreator:
         history.
 
         This method uses the history of scheduled operations recorded by the
-        `HistoryTracker` to create a video that shows the progression of the
-        scheduling process.
+        :class:`HistoryTracker` to create a video that shows the progression
+        of the scheduling process.
         """
         create_gantt_chart_video(
             instance=self.history_observer.dispatcher.instance,
