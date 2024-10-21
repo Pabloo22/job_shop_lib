@@ -6,7 +6,7 @@
 Welcome to JobShopLib's documentation!
 ======================================
 
-**Version:** 1.0.0-a.3
+**Version:** 1.0.0-a.4
 
 
 JobShopLib is a Python package for creating, solving, and visualizing
