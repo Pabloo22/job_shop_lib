@@ -1,12 +1,24 @@
-"""Package for reinforcement learning components."""
+"""Contains reinforcement learning components.
+
+
+.. autosummary::
+
+    SingleJobShopGraphEnv
+    MultiJobShopGraphEnv
+    ObservationDict
+    ObservationSpaceKey
+    RewardObserver
+    MakespanReward
+    IdleTimeReward
+    RenderConfig
+    add_padding
+
+"""
 
 from job_shop_lib.reinforcement_learning._types_and_constants import (
     ObservationSpaceKey,
     RenderConfig,
     ObservationDict,
-    GanttChartWrapperConfig,
-    GifConfig,
-    VideoConfig,
 )
 
 from job_shop_lib.reinforcement_learning._reward_observers import (
@@ -30,9 +42,6 @@ __all__ = [
     "RewardObserver",
     "MakespanReward",
     "IdleTimeReward",
-    "GanttChartWrapperConfig",
-    "GifConfig",
-    "VideoConfig",
     "SingleJobShopGraphEnv",
     "RenderConfig",
     "ObservationDict",

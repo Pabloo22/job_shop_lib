@@ -15,16 +15,47 @@ from job_shop_lib import Operation
 class JobShopInstance:
     """Data structure to store a Job Shop Scheduling Problem instance.
 
-    Additional attributes such as `num_jobs` or `num_machines` can be computed
-    from the instance and are cached for performance if they require expensive
-    computations.
+    Additional attributes such as ``num_machines`` or ``durations_matrix`` can
+    be computed from the instance and are cached for performance if they
+    require expensive computations.
+
+    Methods:
+
+    .. autosummary::
+        :nosignatures:
+
+        from_taillard_file
+        to_dict
+        from_matrices
+        set_operation_attributes
+
+    Properties:
+
+    .. autosummary::
+        :nosignatures:
+
+        num_jobs
+        num_machines
+        num_operations
+        is_flexible
+        durations_matrix
+        machines_matrix
+        durations_matrix_array
+        machines_matrix_array
+        operations_by_machine
+        max_duration
+        max_duration_per_job
+        max_duration_per_machine
+        job_durations
+        machine_loads
+        total_duration
 
     Attributes:
         jobs (list[list[Operation]]):
             A list of lists of operations. Each list of operations represents
             a job, and the operations are ordered by their position in the job.
-            The `job_id`, `position_in_job`, and `operation_id` attributes of
-            the operations are set when the instance is created.
+            The ``job_id``, ``position_in_job``, and `operation_id` attributes
+            of the operations are set when the instance is created.
         name (str):
             A string with the name of the instance.
         metadata (dict[str, Any]):
@@ -34,11 +65,16 @@ class JobShopInstance:
         jobs:
             A list of lists of operations. Each list of operations
             represents a job, and the operations are ordered by their
-            position in the job. The `job_id`, `position_in_job`, and
-            `operation_id` attributes of the operations are set when the
+            position in the job. The ``job_id``, ``position_in_job``, and
+            ``operation_id`` attributes of the operations are set when the
             instance is created.
         name:
             A string with the name of the instance.
+        set_operation_attributes:
+            If True, the ``job_id``, ``position_in_job``, and ``operation_id``
+            attributes of the operations are set when the instance is created.
+            See :meth:`set_operation_attributes` for more information. Defaults
+            to True.
         **metadata:
             Additional information about the instance.
     """
@@ -47,15 +83,37 @@ class JobShopInstance:
         self,
         jobs: list[list[Operation]],
         name: str = "JobShopInstance",
+        set_operation_attributes: bool = True,
         **metadata: Any,
     ):
         self.jobs: list[list[Operation]] = jobs
-        self.set_operation_attributes()
+        if set_operation_attributes:
+            self.set_operation_attributes()
         self.name: str = name
         self.metadata: dict[str, Any] = metadata
 
     def set_operation_attributes(self):
-        """Sets the job_id and position of each operation."""
+        """Sets the ``job_id``, ``position_in_job``, and ``operation_id``
+        attributes for each operation in the instance.
+
+        The ``job_id`` attribute is set to the id of the job to which the
+        operation belongs.
+
+        The ``position_in_job`` attribute is set to the
+        position of the operation in the job (starts from 0).
+
+        The ``operation_id`` attribute is set to a unique identifier for the
+        operation (starting from 0).
+
+        The formula to compute the ``operation_id`` in a job shop instance with
+        a fixed number of operations per job is:
+
+        .. code-block:: python
+
+            operation_id = job_id * num_operations_per_job + position_in_job
+
+        """
+
         operation_id = 0
         for job_id, job in enumerate(self.jobs):
             for position, operation in enumerate(job):
@@ -90,8 +148,8 @@ class JobShopInstance:
                 Additional information about the instance.
 
         Returns:
-            A JobShopInstance object with the operations read from the file,
-            and the name and metadata provided.
+            A :class:`JobShopInstance` object with the operations read from the
+            file, and the name and metadata provided.
         """
         with open(file_path, "r", encoding=encoding) as file:
             lines = file.readlines()
@@ -128,13 +186,17 @@ class JobShopInstance:
         like Taillard's.
 
         Returns:
-        The returned dictionary has the following structure:
-        {
-            "name": self.name,
-            "duration_matrix": self.durations_matrix,
-            "machines_matrix": self.machines_matrix,
-            "metadata": self.metadata,
-        }
+            dict[str, Any]: The returned dictionary has the following
+            structure:
+
+            .. code-block:: python
+
+                {
+                    "name": self.name,
+                    "duration_matrix": self.durations_matrix,
+                    "machines_matrix": self.machines_matrix,
+                    "metadata": self.metadata,
+                }
         """
         return {
             "name": self.name,
@@ -151,7 +213,8 @@ class JobShopInstance:
         name: str = "JobShopInstance",
         metadata: dict[str, Any] | None = None,
     ) -> JobShopInstance:
-        """Creates a JobShopInstance from duration and machines matrices.
+        """Creates a :class:`JobShopInstance` from duration and machines
+        matrices.
 
         Args:
             duration_matrix:
@@ -168,7 +231,7 @@ class JobShopInstance:
                 A dictionary with additional information about the instance.
 
         Returns:
-            A JobShopInstance object.
+            A :class:`JobShopInstance` object.
         """
         jobs: list[list[Operation]] = [[] for _ in range(len(duration_matrix))]
 
@@ -220,7 +283,7 @@ class JobShopInstance:
 
     @functools.cached_property
     def is_flexible(self) -> bool:
-        """Returns True if any operation has more than one machine."""
+        """Returns ``True`` if any operation has more than one machine."""
         return any(
             any(len(operation.machines) > 1 for operation in job)
             for job in self.jobs
@@ -230,12 +293,14 @@ class JobShopInstance:
     def durations_matrix(self) -> list[list[int]]:
         """Returns the duration matrix of the instance.
 
-        The duration of the operation with `job_id` i and `position_in_job` j
-        is stored in the i-th position of the j-th list of the returned matrix:
+        The duration of the operation with ``job_id`` i and ``position_in_job``
+        j is stored in the i-th position of the j-th list of the returned
+        matrix:
 
-        ```python
-        duration = instance.durations_matrix[i][j]
-        ```
+        .. code-block:: python
+
+            duration = instance.durations_matrix[i][j]
+
         """
         return [[operation.duration for operation in job] for job in self.jobs]
 
@@ -252,9 +317,9 @@ class JobShopInstance:
         To access the machines of the operation with position i in the job
         with id j, the following code must be used:
 
-        ```python
-        machines = instance.machines_matrix[j][i]
-        ```
+        .. code-block:: python
+
+            machines = instance.machines_matrix[j][i]
 
         """
         if self.is_flexible:
@@ -269,8 +334,9 @@ class JobShopInstance:
     def durations_matrix_array(self) -> NDArray[np.float32]:
         """Returns the duration matrix of the instance as a numpy array.
 
-        The returned array has shape (num_jobs, max_num_operations_per_job).
-        Non-existing operations are filled with np.nan.
+        The returned array has shape (``num_jobs``,
+        ``max_num_operations_per_job``).
+        Non-existing operations are filled with ``np.nan``.
 
         Example:
             >>> jobs = [[Operation(0, 2), Operation(1, 3)], [Operation(0, 4)]]
@@ -286,9 +352,9 @@ class JobShopInstance:
     def machines_matrix_array(self) -> NDArray[np.float32]:
         """Returns the machines matrix of the instance as a numpy array.
 
-        The returned array has shape (num_jobs, max_num_operations_per_job,
-        max_num_machines_per_operation). Non-existing machines are filled with
-        np.nan.
+        The returned array has shape (``num_jobs``,
+        ``max_num_operations_per_job``, ``max_num_machines_per_operation``).
+        Non-existing machines are filled with ``np.nan``.
 
         Example:
             >>> jobs = [
@@ -411,7 +477,7 @@ class JobShopInstance:
     def _fill_matrix_with_nans_2d(
         matrix: list[list[int]],
     ) -> NDArray[np.float32]:
-        """Fills a matrix with np.nan values.
+        """Fills a matrix with ``np.nan`` values.
 
         Args:
             matrix:
@@ -419,7 +485,7 @@ class JobShopInstance:
 
         Returns:
             A numpy array with the same shape as the input matrix, filled with
-            np.nan values.
+            ``np.nan`` values.
         """
         max_length = max(len(row) for row in matrix)
         squared_matrix = np.full(
@@ -433,7 +499,7 @@ class JobShopInstance:
     def _fill_matrix_with_nans_3d(
         matrix: list[list[list[int]]],
     ) -> NDArray[np.float32]:
-        """Fills a 3D matrix with np.nan values.
+        """Fills a 3D matrix with ``np.nan`` values.
 
         Args:
             matrix:
@@ -441,7 +507,7 @@ class JobShopInstance:
 
         Returns:
             A numpy array with the same shape as the input matrix, filled with
-            np.nan values.
+            ``np.nan`` values.
         """
         max_length = max(len(row) for row in matrix)
         max_inner_length = len(matrix[0][0])

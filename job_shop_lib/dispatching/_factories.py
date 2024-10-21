@@ -51,13 +51,13 @@ def create_composite_operation_filter(
             'non_immediate_machines' or any Callable that takes a
             :class:`~job_shop_lib.dispatching.Dispatcher` instance and a list
             of :class:`~job_shop_lib.Operation` instances as input
-            and returns a list of :class:`~job_shop_lib.Operation`instances.
+            and returns a list of :class:`~job_shop_lib.Operation` instances.
 
     Returns:
         A function that takes a :class:`~job_shop_lib.dispatching.Dispatcher`
         instance and a list of :class:`~job_shop_lib.Operation`
         instances as input and returns a list of
-        :class:`~job_shop_lib.Operation`instances based on
+        :class:`~job_shop_lib.Operation` instances based on
         the specified list of filter strategies.
 
     Raises:

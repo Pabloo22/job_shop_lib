@@ -26,14 +26,21 @@ class DispatcherObserverConfig(Generic[T]):
     keyword arguments to pass to the dispatcher observer constructor while
     not containing the ``dispatcher`` argument.
 
-    Attributes:
+    Args:
         class_type:
             Type of the class to be initialized. It can be the class type, an
             enum value, or a string. This is useful for the creation of
-            DispatcherObserver instances from the factory functions.
+            :class:`~job_shop_lib.dispatching.DispatcherObserver` instances
+            from the factory functions.
         kwargs:
             Keyword arguments needed to initialize the class. It must not
             contain the ``dispatcher`` argument.
+
+    .. seealso::
+
+        - :class:`~job_shop_lib.dispatching.DispatcherObserver`
+        - :func:`job_shop_lib.dispatching.feature_observers.\\
+          feature_observer_factory`
     """
 
     # We use the type hint T, instead of ObserverType, to allow for string or
@@ -44,7 +51,13 @@ class DispatcherObserverConfig(Generic[T]):
     # This allows for the creation of a FeatureObserver instance
     # from the factory function.
     class_type: T
+    """Type of the class to be initialized. It can be the class type, an
+    enum value, or a string. This is useful for the creation of
+    :class:`DispatcherObserver` instances from the factory functions."""
+
     kwargs: dict[str, Any] = field(default_factory=dict)
+    """Keyword arguments needed to initialize the class. It must not
+    contain the ``dispatcher`` argument."""
 
     def __post_init__(self):
         if "dispatcher" in self.kwargs:

@@ -193,7 +193,6 @@ if __name__ == "__main__":
             dispatcher=dispatcher_,
         )
         for observer_type in feature_observer_types_
-        if not observer_type == FeatureObserverType.COMPOSITE
         # and not FeatureObserverType.EARLIEST_START_TIME
     ]
     composite_observer_ = CompositeFeatureObserver(

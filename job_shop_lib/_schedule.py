@@ -25,6 +25,16 @@ class Schedule:
         is_complete
         add
         reset
+
+    Args:
+        instance:
+            The :class:`JobShopInstance` object that the schedule is for.
+        schedule:
+            A list of lists of :class:`ScheduledOperation` objects. Each
+            list represents the order of operations on a machine. If
+            not provided, the schedule is initialized as an empty schedule.
+        **metadata:
+            Additional information about the schedule.
     """
 
     __slots__ = {
@@ -48,18 +58,6 @@ class Schedule:
         schedule: list[list[ScheduledOperation]] | None = None,
         **metadata: Any,
     ):
-        """Initializes the object with the given instance and schedule.
-
-        Args:
-            instance:
-                The :class:`JobShopInstance` object that the schedule is for.
-            schedule:
-                A list of lists of :class:`ScheduledOperation` objects. Each
-                list represents the order of operations on a machine. If
-                not provided, the schedule is initialized as an empty schedule.
-            **metadata:
-                Additional information about the schedule.
-        """
         if schedule is None:
             schedule = [[] for _ in range(instance.num_machines)]
 

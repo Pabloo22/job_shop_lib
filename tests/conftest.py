@@ -45,6 +45,31 @@ def example_job_shop_instance():
 
 
 @pytest.fixture
+def example_2_job_shop_instance():
+    # Cada máquina se representa con un id (empezando por 0)
+    m0 = 0
+    m1 = 1
+    m2 = 2
+
+    j0 = [
+        Operation(m0, duration=2),
+        Operation(m1, duration=2),
+        Operation(m2, duration=2),
+    ]
+    j1 = [
+        Operation(m0, duration=1),
+        Operation(m1, duration=1),
+        Operation(m2, duration=1),
+    ]
+    j2 = [
+        Operation(m0, duration=2),
+        Operation(m2, duration=3),
+        Operation(m1, duration=3),
+    ]
+    return JobShopInstance([j0, j1, j2], name="Example 2")
+
+
+@pytest.fixture
 def irregular_job_shop_instance():
     m1 = 0
     m2 = 1

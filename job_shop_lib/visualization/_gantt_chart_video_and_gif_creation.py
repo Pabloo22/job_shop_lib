@@ -38,16 +38,6 @@ class PartialGanttChartPlotter(Protocol):
 
     This kind of functions are created using the
     :func:`plot_gantt_chart_wrapper` function.
-
-    The function should take the following arguments:
-
-    - schedule: The schedule to plot.
-    - makespan: The makespan of the schedule if known. Can be used to fix the
-      x-axis limits.
-    - available_operations: A list of available operations. If ``None``,
-      the available operations are not shown.
-    - current_time: The current time in the schedule. If provided, a red
-      vertical line is plotted at this time.
     """
 
     def __call__(
@@ -57,7 +47,21 @@ class PartialGanttChartPlotter(Protocol):
         available_operations: list[Operation] | None = None,
         current_time: int | None = None,
     ) -> Figure:
-        pass
+        """Plots a Gantt chart for an unfinished schedule.
+
+        Args:
+            schedule:
+                The schedule to plot.
+            makespan:
+                The makespan of the schedule if known. Can be used to fix
+                the x-axis limits.
+            available_operations:
+                A list of available operations. If ``None``,
+                the available operations are not shown.
+            current_time:
+                The current time in the schedule. If provided, a red
+                vertical line is plotted at this time.
+        """
 
 
 def get_partial_gantt_chart_plotter(

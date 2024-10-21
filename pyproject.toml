@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "job-shop-lib"
-version = "1.0.0-alpha.3"
+version = "1.0.0-alpha.4"
 description = "An easy-to-use and modular Python library for the Job Shop Scheduling Problem (JSSP)"
 authors = ["Pabloo22 <pablete.arino@gmail.com>"]
 license = "MIT"
@@ -33,6 +33,7 @@ optional = true
 [tool.poetry.group.lint.dependencies]
 flake8 = "^7.0.0"
 mypy = "^1.8.0"
+pydoclint = {extras = ["flake8"], version = "^0.5.9"}
 
 [tool.poetry.group.notebooks]
 optional = true
