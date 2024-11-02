@@ -153,6 +153,36 @@ class Dispatcher:
     responsible for scheduling the operations on the machines and keeping
     track of the next available time for each machine and job.
 
+    The core method of the class are:
+
+    .. autosummary::
+
+        dispatch
+        reset
+
+    It also provides methods to query the state of the schedule and the
+    operations:
+
+    .. autosummary::
+
+        current_time
+        available_operations
+        available_machines
+        available_jobs
+        unscheduled_operations
+        scheduled_operations
+        ongoing_operations
+        completed_operations
+        uncompleted_operations
+        is_scheduled
+        is_ongoing
+        next_operation
+        earliest_start_time
+        remaining_duration
+
+    The above methods which do not take any arguments are cached to improve
+    performance. After each scheduling operation, the cache is cleared.
+
     Args:
         instance:
             The instance of the job shop problem to be solved.
@@ -189,11 +219,11 @@ class Dispatcher:
         self.instance = instance
         self.schedule = Schedule(self.instance)
         self.ready_operations_filter = ready_operations_filter
+        self.subscribers: list[DispatcherObserver] = []
 
         self._machine_next_available_time = [0] * self.instance.num_machines
         self._job_next_operation_index = [0] * self.instance.num_jobs
         self._job_next_available_time = [0] * self.instance.num_jobs
-        self.subscribers: list[DispatcherObserver] = []
         self._cache: dict[str, Any] = {}
 
     def __str__(self) -> str:
@@ -236,7 +266,9 @@ class Dispatcher:
         for subscriber in self.subscribers:
             subscriber.reset()
 
-    def dispatch(self, operation: Operation, machine_id: int) -> None:
+    def dispatch(
+        self, operation: Operation, machine_id: int | None = None
+    ) -> None:
         """Schedules the given operation on the given machine.
 
         The start time of the operation is computed based on the next
@@ -249,14 +281,20 @@ class Dispatcher:
                 The operation to be scheduled.
             machine_id:
                 The id of the machine on which the operation is to be
-                scheduled.
+                scheduled. If ``None``, the :class:`~job_shop_lib.Operation`'s
+                :attr:`~job_shop_lib.Operation.machine_id` attribute is used.
 
         Raises:
             ValidationError: If the operation is not ready to be scheduled.
+            UninitializedAttributeError: If the operation has multiple
+                machines in its list and no ``machine_id`` is provided.
         """
 
         if not self.is_operation_ready(operation):
             raise ValidationError("Operation is not ready to be scheduled.")
+
+        if machine_id is None:
+            machine_id = operation.machine_id
 
         start_time = self.start_time(operation, machine_id)
 
