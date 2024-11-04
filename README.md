@@ -33,10 +33,10 @@ pip install job-shop-lib
 See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing) Google Colab notebook for a quick start guide! 
 
 
-Version 1.0.0 is currently in alpha stage and can be installed with:
+Version 1.0.0 is currently in beta stage and can be installed with:
 
 ```bash
-pip install job-shop-lib==1.0.0b1
+pip install job-shop-lib==1.0.0b2
 ```
 
 Although this version is not stable and may contain breaking changes in subsequent releases, it is recommended to install it to access the new reinforcement learning environments and familiarize yourself with new changes (see the [latest pull requests](https://github.com/Pabloo22/job_shop_lib/pulls?q=is%3Apr+is%3Aclosed)). There is a [documentation page](https://job-shop-lib.readthedocs.io/en/latest/) for versions 1.0.0a3 and onward.
@@ -65,7 +65,11 @@ Although this version is not stable and may contain breaking changes in subseque
   - **Agent-Task Graphs**: Encode instances as agent-task graphs (introduced in [ScheduleNet paper](https://arxiv.org/abs/2106.03051)). See [Agent-Task Graph](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/07-Agent-Task-Graph.ipynb).
   - Build your own custom graphs with the `JobShopGraph` class.
 
+<<<<<<< HEAD
 - **Gymnasium Environments**: Two environments for solving the problem with graph neural networks (GNNs) or any other method, and reinforcement learning (RL). See [SingleJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/10-MultiJobShopGraphEnv.ipynb).
+=======
+- **Gymnasium Environments**: Two environments for solving the problem with Graph Neural Networks (GNNs) or any other method, and Reinforcement Learning (RL). See [SingleJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/10-MultiJobShopGraphEnv.ipynb).
+>>>>>>> 031bdf3 ([Docs] Update links in README to point to the correct GitHub URLs for tutorials and examples)
 
 <!-- end key features -->
 
