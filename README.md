@@ -65,11 +65,7 @@ Although this version is not stable and may contain breaking changes in subseque
   - **Agent-Task Graphs**: Encode instances as agent-task graphs (introduced in [ScheduleNet paper](https://arxiv.org/abs/2106.03051)). See [Agent-Task Graph](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/07-Agent-Task-Graph.ipynb).
   - Build your own custom graphs with the `JobShopGraph` class.
 
-<<<<<<< HEAD
 - **Gymnasium Environments**: Two environments for solving the problem with graph neural networks (GNNs) or any other method, and reinforcement learning (RL). See [SingleJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/10-MultiJobShopGraphEnv.ipynb).
-=======
-- **Gymnasium Environments**: Two environments for solving the problem with Graph Neural Networks (GNNs) or any other method, and Reinforcement Learning (RL). See [SingleJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/10-MultiJobShopGraphEnv.ipynb).
->>>>>>> 031bdf3 ([Docs] Update links in README to point to the correct GitHub URLs for tutorials and examples)
 
 <!-- end key features -->
 
