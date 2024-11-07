@@ -1,6 +1,10 @@
 import os
 import sys
 
+from job_shop_lib import __version__
+
+version = __version__  # pylint: disable=invalid-name
+
 sys.path.insert(0, os.path.abspath(".."))
 
 # Configuration file for the Sphinx documentation builder.

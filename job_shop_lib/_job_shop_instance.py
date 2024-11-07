@@ -54,8 +54,8 @@ class JobShopInstance:
         jobs (list[list[Operation]]):
             A list of lists of operations. Each list of operations represents
             a job, and the operations are ordered by their position in the job.
-            The ``job_id``, ``position_in_job``, and `operation_id` attributes
-            of the operations are set when the instance is created.
+            The ``job_id``, ``position_in_job``, and ``operation_id``
+            attributes of the operations are set when the instance is created.
         name (str):
             A string with the name of the instance.
         metadata (dict[str, Any]):

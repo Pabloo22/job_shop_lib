@@ -7,7 +7,7 @@ from job_shop_lib.visualization import plot_disjunctive_graph
     style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
 )
 def test_plot_disjunctive_graph(example_job_shop_instance):
-    fig = plot_disjunctive_graph(example_job_shop_instance)
+    fig, _ = plot_disjunctive_graph(example_job_shop_instance)
 
     return fig
 
