@@ -8,6 +8,11 @@ Welcome to JobShopLib's documentation!
 
 **Version:** |version|
 
+.. image:: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+   :target: https://github.com/Pabloo22/job_shop_lib
+   :width: 24px
+   :alt: GitHub
+   :align: right
 
 JobShopLib is a Python package for creating, solving, and visualizing
 Job Shop Scheduling Problems (JSSP).
