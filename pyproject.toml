@@ -78,3 +78,9 @@ ignore_missing_imports = true
 warn_redundant_casts = true
 warn_unused_configs = true
 warn_unused_ignores = false
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning:google._upb._message:488",
+    "ignore::DeprecationWarning:importlib._bootstrap:488"
+]
