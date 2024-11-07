@@ -1,4 +1,5 @@
 # Development files
+.vscode/
 tests/notebooks
 claude_engineer.py
 README.rst
