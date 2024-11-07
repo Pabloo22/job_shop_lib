@@ -10,7 +10,7 @@ include = ["benchmarks/benchmark_instances.json"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-ortools = ">=9.9,<9.10"
+ortools = "^9.9"
 matplotlib = "^3"
 pyarrow = "^15.0.0"  # An optional pandas' dependency that will be required in the future
 networkx = "^3"
