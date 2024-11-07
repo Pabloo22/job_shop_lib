@@ -38,11 +38,11 @@ def create_composite_operation_filter(
         ReadyOperationsFilter | str | ReadyOperationsFilterType
     ],
 ) -> ReadyOperationsFilter:
-    """Creates and returns a composite filter based on the specified list of
-    filters.
+    """Creates and returns a :class:`ReadyOperationsFilter` function by
+    combining multiple filter strategies.
 
-    The composite filter function filters operations based on the specified
-    list of filter strategies.
+    The composite filter function applies multiple filter strategies
+    iteratively in the order they are specified in the list.
 
     Args:
         ready_operations_filters:
