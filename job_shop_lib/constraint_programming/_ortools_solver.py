@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Any
 import time
 
 from ortools.sat.python import cp_model
@@ -151,7 +152,7 @@ class ORToolsSolver(BaseSolver):
         self._set_objective(instance)
 
     def _create_schedule(
-        self, instance: JobShopInstance, metadata: dict[str, object]
+        self, instance: JobShopInstance, metadata: dict[str, Any]
     ) -> Schedule:
         """Creates a Schedule object from the solution."""
         operations_start: dict[Operation, int] = {
