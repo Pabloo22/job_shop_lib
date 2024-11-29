@@ -79,7 +79,7 @@ class DispatchingRuleSolver(BaseSolver):
             | None
         ) = (
             ReadyOperationsFilterType.DOMINATED_OPERATIONS,
-            ReadyOperationsFilterType.NON_IDLE_MACHINES,
+            ReadyOperationsFilterType.NON_IMMEDIATE_OPERATIONS,
         ),
     ):
         if isinstance(dispatching_rule, str):
