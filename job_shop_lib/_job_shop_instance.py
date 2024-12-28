@@ -342,7 +342,7 @@ class JobShopInstance:
             >>> jobs = [[Operation(0, 2), Operation(1, 3)], [Operation(0, 4)]]
             >>> instance = JobShopInstance(jobs)
             >>> instance.durations_matrix_array
-            array([[ 2.,  2.],
+            array([[ 2.,  3.],
                    [ 4., nan]], dtype=float32)
         """
         duration_matrix = self.durations_matrix
@@ -358,8 +358,7 @@ class JobShopInstance:
 
         Example:
             >>> jobs = [
-            ...     [Operation(machines=[0, 1], 2), Operation(machines=1, 3)],
-            ...     [Operation(machines=0, 6)],
+            ...     [Operation([0, 1], 2), Operation(1, 3)], [Operation(0, 6)]
             ... ]
             >>> instance = JobShopInstance(jobs)
             >>> instance.machines_matrix_array
@@ -523,3 +522,9 @@ class JobShopInstance:
             for j, inner_row in enumerate(row):
                 squared_matrix[i, j, : len(inner_row)] = inner_row
         return squared_matrix
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
