@@ -15,6 +15,7 @@ from job_shop_lib.graphs.graph_updaters import (
     GraphUpdater,
     ResidualGraphUpdater,
 )
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import (
     Dispatcher,
     filter_dominated_operations,
@@ -195,6 +196,22 @@ class SingleJobShopGraphEnv(gym.Env):
         """Returns the job shop graph."""
         return self.graph_updater.job_shop_graph
 
+    def current_makespan(self) -> int:
+        """Returns current makespan of partial schedule."""
+        return self.dispatcher.schedule.makespan()
+
+    def machine_utilization(self) -> NDArray[np.float32]:
+        """Returns utilization percentage for each machine."""
+        total_time = max(1, self.current_makespan())  # Avoid division by zero
+        machine_busy_time = np.zeros(self.instance.num_machines)
+
+        for m_id, m_schedule in enumerate(self.dispatcher.schedule.schedule):
+            machine_busy_time[m_id] = sum(
+                op.operation.duration for op in m_schedule
+            )
+
+        return machine_busy_time / total_time
+
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
         num_edges = self.job_shop_graph.num_edges
@@ -255,8 +272,13 @@ class SingleJobShopGraphEnv(gym.Env):
             - A dictionary with additional information. The dictionary
               contains the following keys: "feature_names", the names of the
               features in the observation; "available_operations", the
-              operations that are ready to be scheduled.
-
+              operations that are ready to be scheduled; "makespan", the
+              current makespan of the schedule; "machine_utilization", the
+              utilization percentage for each machine; "valid_actions", a
+              boolean mask of valid actions in the current state;
+              "num_scheduled", the number of scheduled operations;
+              "total_operations", the total number of operations in the
+              instance.
         """
         job_id, machine_id = action
         operation = self.dispatcher.next_operation(job_id)
@@ -272,6 +294,11 @@ class SingleJobShopGraphEnv(gym.Env):
         info: dict[str, Any] = {
             "feature_names": self.composite_observer.column_names,
             "available_operations": self.dispatcher.available_operations(),
+            "makespan": self.current_makespan(),
+            "machine_utilization": self.machine_utilization(),
+            "valid_actions": self.get_valid_actions(),
+            "num_scheduled": self.dispatcher.schedule.num_scheduled_operations,
+            "total_operations": self.instance.num_operations,
         }
         return obs, reward, done, truncated, info
 
@@ -321,6 +348,55 @@ class SingleJobShopGraphEnv(gym.Env):
             self.gantt_chart_creator.create_video()
         elif self.render_mode == "save_gif":
             self.gantt_chart_creator.create_gif()
+
+    def get_valid_actions(self) -> NDArray[np.bool_]:
+        """Returns a boolean mask of valid actions in the current state."""
+        action_mask = np.zeros(
+            (self.instance.num_jobs, self.instance.num_machines + 1),
+            dtype=bool,
+        )
+
+        for job_id, job in enumerate(self.instance.jobs):
+            if self.dispatcher.job_next_operation_index[job_id] >= len(job):
+                continue
+
+            operation = self.dispatcher.next_operation(job_id)
+            if len(operation.machines) == 1:
+                # Allow -1 for single machine operations
+                action_mask[job_id, 0] = True
+            for machine_id in operation.machines:
+                action_mask[job_id, machine_id + 1] = True
+
+        return action_mask
+
+    def validate_action(self, action: tuple[int, int]) -> None:
+        """Validates that the action is legal in the current state.
+
+        Args:
+            action:
+                The action to validate. The action is a tuple of two integers
+                (job_id, machine_id).
+
+        Raises:
+            ValidationError: If the action is invalid.
+        """
+        job_id, machine_id = action
+        if not 0 <= job_id < self.instance.num_jobs:
+            raise ValidationError(f"Invalid job_id {job_id}")
+
+        if not -1 <= machine_id < self.instance.num_machines:
+            raise ValidationError(f"Invalid machine_id {machine_id}")
+
+        # Check if job has operations left
+        job = self.instance.jobs[job_id]
+        if self.dispatcher.job_next_operation_index[job_id] >= len(job):
+            raise ValidationError(f"Job {job_id} has no operations left")
+
+        next_operation = self.dispatcher.next_operation(job_id)
+        if machine_id == -1 and len(next_operation.machines) > 1:
+            raise ValidationError(
+                f"Operation {next_operation} requires a machine_id"
+            )
 
 
 if __name__ == "__main__":
