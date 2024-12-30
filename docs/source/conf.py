@@ -62,6 +62,7 @@ autodoc_typehints_format = "short"
 napoleon_include_init_with_doc = True  # pylint: disable=invalid-name
 napoleon_preprocess_types = True  # pylint: disable=invalid-name
 
+pygments_style = "friendly"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
