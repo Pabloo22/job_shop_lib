@@ -5,6 +5,7 @@ from typing import Any
 from collections.abc import Callable, Sequence, Iterable
 import warnings
 import copy
+from dataclasses import dataclass, field
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -40,6 +41,162 @@ def duration_labeler(node: Node) -> str:
         f"$p_{{{node.operation.job_id + 1}"
         f"{node.operation.position_in_job + 1}}}={node.operation.duration}$"
     )
+
+
+@dataclass
+class FigureConfig:
+    """Configuration for the matplotlib figure and overall plot appearance.
+
+    Args:
+        title:
+            Title of the plot. If ``None``, defaults to a title based on the
+            instance name.
+        figsize:
+            Size of the figure as a (width, height) tuple in inches.
+        font_family:
+            Font family to use for all text elements.
+    """
+
+    title: str | None = None
+    figsize: tuple[float, float] = (6, 4)
+    font_family: str = "sans-serif"
+
+
+@dataclass
+class NodeConfig:
+    """Configuration for node appearance and labeling in the disjunctive graph.
+
+    Args:
+        size:
+            Size of the nodes in matplotlib units.
+        font_size:
+            Font size for node labels.
+        font_color:
+            Color of the node labels.
+        color_map:
+            Matplotlib colormap name used for machine-based node coloring.
+        alpha:
+            Transparency level of the nodes (0 to 1).
+        operation_node_labeler:
+            Function that takes a Node and returns its label string. Default
+            shows duration as p_ij=duration where i is job ID and j is
+            position (see :func:`duration_labeler`).
+        start_node_label:
+            Label for the source node. Defaults to "S" in math mode.
+        end_node_label:
+            Label for the sink node. Defaults to "T" in math mode.
+    """
+
+    size: int = 1600
+    font_size: int = 10
+    font_color: str = "white"
+    color_map: str = "Dark2_r"
+    alpha: float = 0.95
+    operation_node_labeler: Callable[[Node], str] = field(
+        default=duration_labeler
+    )
+    """"""
+
+    start_node_label: str = "$S$"
+    end_node_label: str = "$T$"
+
+
+@dataclass
+class EdgeConfig:
+    """Configuration for edge appearance and behavior in the disjunctive graph.
+
+    Args:
+        width:
+            Width of the edges in matplotlib units.
+        arrow_size:
+            Size of the arrow heads in matplotlib units.
+        alpha:
+            Transparency level of the edges (0 to 1).
+        disjunctive_color:
+            Color for disjunctive edges.
+        conjunctive_color:
+            Color for conjunctive edges.
+        draw_disjunctive:
+            Whether to draw disjunctive edges. If "single_edge", draws
+            undirected edges by removing one direction.
+        conjunctive_additional_params:
+            Additional parameters passed to ``nx.draw_networkx_edges`` for
+            conjunctive edges.
+        disjunctive_additional_params:
+            Additional parameters passed to ``nx.draw_networkx_edges`` for
+            disjunctive edges.
+
+    .. seealso::
+        `nx.draw_networkx_edges <https://networkx.org/documentation/stable/ref
+        erence/generated/networkx.drawing.nx_pylab.draw_networkx_edges.html>`_
+    """
+
+    width: int = 2
+    arrow_size: int = 35
+    alpha: float = 0.95
+    disjunctive_color: str = "red"
+    conjunctive_color: str = "black"
+    draw_disjunctive: bool | str = True
+    conjunctive_additional_params: dict[str, Any] | None = None
+    disjunctive_additional_params: dict[str, Any] | None = None
+
+
+@dataclass
+class LegendConfig:
+    """Configuration for legend appearance and content in the disjunctive
+    graph.
+
+    Args:
+        text:
+            Explanatory text shown in the legend.
+        show_machine_colors:
+            Whether to show machine color swatches in legend.
+        machine_labels:
+            ustom labels for machines in legend. If ``None``, uses
+            ``"Machine {i}"`` format.
+        location:
+            Position of the legend in matplotlib terminology.
+        bbox_to_anchor:
+            Anchor point for legend box placement.
+        conjunctive_patch_label:
+            Label for conjunctive edges in legend.
+        disjunctive_patch_label:
+            Label for disjunctive edges in legend.
+    """
+
+    text: str = "$p_{ij}=$duration of $O_{ij}$"
+    show_machine_colors: bool = True
+    machine_labels: Sequence[str] | None = None
+    location: str = "upper left"
+    bbox_to_anchor: tuple[float, float] = (1.01, 1)
+    conjunctive_patch_label: str = "Conjunctive edges"
+    disjunctive_patch_label: str = "Disjunctive edges"
+
+
+@dataclass
+class PlotConfig:
+    """Main configuration class aggregating all settings for disjunctive graph
+    plotting.
+
+    Args:
+        figure:
+            Configuration for figure-level settings.
+        node:
+            Configuration for node appearance and labels.
+        edge:
+            Configuration for edge appearance and behavior.
+        legend:
+            Configuration for legend settings.
+        layout:
+            Optional function to compute graph layout. Takes a networkx
+            Graph and returns dict mapping nodes to (x,y) positions.
+    """
+
+    figure: FigureConfig = field(default_factory=FigureConfig)
+    node: NodeConfig = field(default_factory=NodeConfig)
+    edge: EdgeConfig = field(default_factory=EdgeConfig)
+    legend: LegendConfig = field(default_factory=LegendConfig)
+    layout: Layout | None = None
 
 
 # This function could be improved by a function extraction refactoring

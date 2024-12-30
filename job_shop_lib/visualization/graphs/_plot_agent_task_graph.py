@@ -1,41 +1,75 @@
-"""Contains functions to plot the agent-task graph of a job shop instance.
+"""Contains functions to plot a heteregenous graph representation of a job
+shop instance.
 
-The agent-task graph was introduced by Junyoung Park et al. (2021).
+It was introduced by Junyoung Park et al. (2021).
 In contrast to the disjunctive graph, instead of connecting operations that
 share the same resources directly by disjunctive edges, operation nodes are
 connected with machine ones. All machine nodes are connected between them, and
 all operation nodes from the same job are connected by non-directed edges too.
-
-See: job_shop_lib.graphs.build_agent_task_graph module for more information.
 """
 
+from collections.abc import Callable
 from typing import Optional
 
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import networkx as nx
 
 from job_shop_lib.graphs import NodeType, JobShopGraph, Node
 
 
-def plot_agent_task_graph(
+def plot_heterogeneous_graph(
     job_shop_graph: JobShopGraph,
     title: Optional[str] = None,
     figsize: tuple[int, int] = (10, 10),
     layout: Optional[dict[Node, tuple[float, float]]] = None,
-    color_map_name: str = "tab10",
     node_size: int = 1000,
     alpha: float = 0.95,
     add_legend: bool = False,
+    node_shapes: Optional[dict[str, str]] = None,
+    node_color_map: Optional[
+        Callable[[Node], tuple[float, float, float, float]]
+    ] = None,
+    machine_color_map_name: str = "tab10",
 ) -> plt.Figure:
-    """Returns a plot of the agent-task graph of the instance.
+    """Returns a plot of the hetereogeneous graph of the instance.
 
     Machine and job nodes are represented by squares, and the operation nodes
     are represented by circles.
 
     Args:
         job_shop_graph:
-            The job shop graph instance. It should be already initialized with
-            the instance with a valid agent-task graph representation.
+            The job shop graph instance.
+        title:
+            The title of the plot. If ``None``, a default title is used.
+        figsize:
+            The size of the figure. It should be a tuple with the width and
+            height in inches. The default is ``(10, 10)``.
+        layout:
+            A dictionary with the position of each node in the graph. The keys
+            are the node ids, and the values are tuples with the x and y
+            coordinates. If ``None``, the :func:`three_columns_layout` function
+            is used.
+        node_size:
+            The size of the nodes. The default is 1000.
+        alpha:
+            The transparency of the nodes. It should be a float between 0 and
+            1. The default is 0.95.
+        add_legend:
+            Whether to add a legend with the meaning of the colors and shapes.
+            The default is ``False``.
+        node_shapes:
+            A dictionary with the shapes of the nodes. The keys are the node
+            types, and the values are the shapes. The default is
+            ``{"machine": "s", "job": "d", "operation": "o", "global": "o"}``.
+        node_color_map:
+            A function that receives a node and returns a tuple with the RGBA
+            values of the color to use in the plot. If ``None``,
+            :func:`color_nodes_by_machine` is used.
+        machine_color_map_name:
+            The name of the colormap to use for the machines. The default is
+            ``"tab10"``. This argument is only used if ``node_color_map`` is
+            ``None``.
 
     Returns:
         The figure of the plot. This figure can be used to save the plot to a
@@ -43,7 +77,8 @@ def plot_agent_task_graph(
     """
     if title is None:
         title = (
-            f"Agent-Task Graph Visualization: {job_shop_graph.instance.name}"
+            "Heterogeneous Graph Visualization:"
+            f"{job_shop_graph.instance.name}"
         )
     # Create a new figure and axis
     fig, ax = plt.subplots(figsize=figsize)
@@ -58,18 +93,28 @@ def plot_agent_task_graph(
         layout = three_columns_layout(job_shop_graph)
 
     # Define colors and shapes
-    color_map = plt.get_cmap(color_map_name)
+    color_map = plt.get_cmap(machine_color_map_name)
     machine_colors = {
         machine.machine_id: color_map(i)
         for i, machine in enumerate(
             job_shop_graph.nodes_by_type[NodeType.MACHINE]
         )
     }
-
+    node_color_map = (
+        color_nodes_by_machine(machine_colors, "lightblue")
+        if node_color_map is None
+        else node_color_map
+    )
     node_colors = [
-        _get_node_color(node, machine_colors) for node in job_shop_graph.nodes
+        node_color_map(node) for node in job_shop_graph.nodes
     ]  # We need to get the color of all nodes to avoid an index error
-    node_shapes = {"machine": "s", "job": "d", "operation": "o", "global": "o"}
+    if node_shapes is None:
+        node_shapes = {
+            "machine": "s",
+            "job": "d",
+            "operation": "o",
+            "global": "o",
+        }
 
     # Draw nodes with different shapes based on their type
     for node_type, shape in node_shapes.items():
@@ -92,6 +137,11 @@ def plot_agent_task_graph(
     # Draw edges
     nx.draw_networkx_edges(graph, layout, ax=ax)
 
+    node_color_map = (
+        color_nodes_by_machine(machine_colors, "lightblue")
+        if node_color_map is None
+        else node_color_map
+    )
     node_labels = {node.node_id: _get_node_label(node) for node in nodes}
     nx.draw_networkx_labels(graph, layout, node_labels, ax=ax)
 
@@ -103,17 +153,6 @@ def plot_agent_task_graph(
     if add_legend:
         plt.figtext(0, 0.95, "d = duration", wrap=True, fontsize=12)
     return fig
-
-
-def _get_node_color(
-    node: Node, machine_colors: dict[int, tuple[float, float, float, float]]
-) -> tuple[float, float, float, float] | str:
-    if node.node_type == NodeType.OPERATION:
-        return machine_colors[node.operation.machine_id]
-    if node.node_type == NodeType.MACHINE:
-        return machine_colors[node.machine_id]
-
-    return "lightblue"
 
 
 def _get_node_label(node: Node) -> str:
@@ -129,6 +168,60 @@ def _get_node_label(node: Node) -> str:
     raise ValueError(f"Invalid node type: {node.node_type}")
 
 
+def _get_node_color(
+    node: Node, machine_colors: dict[int, tuple[float, float, float, float]]
+) -> tuple[float, float, float, float] | str:
+    if node.node_type == NodeType.OPERATION:
+        return machine_colors[node.operation.machine_id]
+    if node.node_type == NodeType.MACHINE:
+        return machine_colors[node.machine_id]
+
+    return "lightblue"
+
+
+def _color_to_rgba(
+    color: str | tuple[float, float, float, float]
+) -> tuple[float, float, float, float]:
+    if isinstance(color, str):
+        return mcolors.to_rgba(color)
+    return color
+
+
+def color_nodes_by_machine(
+    machine_colors: dict[int, tuple[float, float, float, float]],
+    default_color: str | tuple[float, float, float, float],
+) -> Callable[[Node], tuple[float, float, float, float]]:
+    """Returns a function that assigns a color to a node based on its type.
+
+    The function returns a color based on the node type. If the node is an
+    operation, the color is based on the machine it is assigned to. If the node
+    is a machine, the color is based on the machine id. If the node is a job or
+    global node, the color is the default color.
+
+    Args:
+        machine_colors:
+            A dictionary with the colors of each machine. The keys are the
+            machine ids, and the values are tuples with the RGBA values.
+        default_color:
+            The default color to use for job and global nodes. It can be a
+            string with a color name or a tuple with the RGBA values.
+
+    Returns:
+        A function that receives a node and returns a tuple with the RGBA
+        values of the color to use in the plot.
+    """
+
+    def _get_node_color(node: Node) -> tuple[float, float, float, float]:
+        if node.node_type == NodeType.OPERATION:
+            return machine_colors[node.operation.machine_id]
+        if node.node_type == NodeType.MACHINE:
+            return machine_colors[node.machine_id]
+
+        return _color_to_rgba(default_color)
+
+    return _get_node_color
+
+
 def three_columns_layout(
     job_shop_graph: JobShopGraph,
     *,
@@ -137,25 +230,18 @@ def three_columns_layout(
     topmost_position: float = 1.0,
     bottommost_position: float = 0.0,
 ) -> dict[Node, tuple[float, float]]:
-    """Returns the layout of the agent-task graph.
+    """Generates coordinates for a three-column grid layout
+        1. Left column: Machine nodes (M1, M2, etc.)
+        2. Middle column: Operation nodes (O_ij where i=job, j=operation)
+        3. Right column: Job nodes (J1, J2, etc.)
 
-    The layout is organized in a grid manner. For example, for a JobShopGraph
-    representing a job shop instance with 2 machines and 3 jobs, the layout
-    would be:
+    The operations are arranged vertically in groups by job, with a global node (G) at the bottom.
 
-    0:  -       O_11      -
-    1:  -       O_12      J1
-    2:  -       O_13      -
-    3:  M1      O_21      -
-    4:  -       O_22      J2
-    5:  -       O_23      -
-    6:  M2      O_31      -
-    7:  -       O_32      J3
-    8:  -       O_33      -
-    9:  -        -        -
-    10: -        G        -
-    Where M1 and M2 are the machine nodes, J1, J2, and J3 are the job
-    nodes, O_ij are the operation nodes, and G is the global node.
+    For example, in a 2-machine, 3-job problem:
+    - Machine nodes (M1, M2) appear in the left column where needed
+    - Operation nodes (O_11 through O_33) form the central column
+    - Job nodes (J1, J2, J3) appear in the right column at the middle of their respective operations
+    - A global node (G) appears at the bottom of the middle column
 
     Args:
         job_shop_graph:

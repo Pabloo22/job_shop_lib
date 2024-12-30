@@ -25,7 +25,7 @@ from job_shop_lib.dispatching.feature_observers import (
     FeatureObserverConfig,
     CompositeFeatureObserver,
 )
-from job_shop_lib.visualization import GanttChartCreator
+from job_shop_lib.visualization.gantt import GanttChartCreator
 from job_shop_lib.reinforcement_learning import (
     RewardObserver,
     MakespanReward,

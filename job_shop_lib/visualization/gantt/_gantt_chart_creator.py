@@ -7,7 +7,7 @@ from job_shop_lib.dispatching import (
     Dispatcher,
     HistoryObserver,
 )
-from job_shop_lib.visualization import (
+from job_shop_lib.visualization.gantt import (
     create_gantt_chart_video,
     get_partial_gantt_chart_plotter,
     create_gantt_chart_gif,

@@ -22,7 +22,7 @@ from job_shop_lib.dispatching import (
     HistoryObserver,
 )
 from job_shop_lib.dispatching.rules import DispatchingRuleSolver
-from job_shop_lib.visualization._plot_gantt_chart import plot_gantt_chart
+from job_shop_lib.visualization.gantt._plot_gantt_chart import plot_gantt_chart
 
 
 # This class serves as a more meaningful type hint than simply:
