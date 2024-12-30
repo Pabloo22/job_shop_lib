@@ -343,7 +343,9 @@ def plot_disjunctive_graph(
                     else f"Machine {machine_id}"
                 ),
             )
-            for machine_id, color in machine_colors.items()
+            for machine_id, color in sorted(
+                machine_colors.items(), key=lambda x: x[0]
+            )
         ]
         handles.extend(machine_patches)
 
