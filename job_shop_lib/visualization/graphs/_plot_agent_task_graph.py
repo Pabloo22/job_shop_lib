@@ -9,7 +9,8 @@ all operation nodes from the same job are connected by non-directed edges too.
 """
 
 from collections.abc import Callable
-from typing import Optional
+from copy import deepcopy
+from typing import Optional, Any
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -20,10 +21,13 @@ from job_shop_lib.graphs import NodeType, JobShopGraph, Node
 
 def plot_heterogeneous_graph(
     job_shop_graph: JobShopGraph,
+    *,
     title: Optional[str] = None,
     figsize: tuple[int, int] = (10, 10),
     layout: Optional[dict[Node, tuple[float, float]]] = None,
-    node_size: int = 1000,
+    node_size: int = 1200,
+    node_font_color: str = "k",
+    font_size: int = 10,
     alpha: float = 0.95,
     add_legend: bool = False,
     node_shapes: Optional[dict[str, str]] = None,
@@ -31,6 +35,9 @@ def plot_heterogeneous_graph(
         Callable[[Node], tuple[float, float, float, float]]
     ] = None,
     machine_color_map_name: str = "tab10",
+    legend_text: str = "$p_{ij}$ = duration of $O_ij$",
+    edge_additional_params: Optional[dict[str, Any]] = None,
+    draw_only_one_edge: bool = False,
 ) -> plt.Figure:
     """Returns a plot of the hetereogeneous graph of the instance.
 
@@ -41,7 +48,8 @@ def plot_heterogeneous_graph(
         job_shop_graph:
             The job shop graph instance.
         title:
-            The title of the plot. If ``None``, a default title is used.
+            The title of the plot. If ``None``, the title "Heterogeneous Graph
+            Visualization: {instance_name}" is used. The default is ``None``.
         figsize:
             The size of the figure. It should be a tuple with the width and
             height in inches. The default is ``(10, 10)``.
@@ -49,7 +57,7 @@ def plot_heterogeneous_graph(
             A dictionary with the position of each node in the graph. The keys
             are the node ids, and the values are tuples with the x and y
             coordinates. If ``None``, the :func:`three_columns_layout` function
-            is used.
+            is used. The default is ``None``.
         node_size:
             The size of the nodes. The default is 1000.
         alpha:
@@ -67,9 +75,9 @@ def plot_heterogeneous_graph(
             values of the color to use in the plot. If ``None``,
             :func:`color_nodes_by_machine` is used.
         machine_color_map_name:
-            The name of the colormap to use for the machines. The default is
-            ``"tab10"``. This argument is only used if ``node_color_map`` is
-            ``None``.
+            The name of the colormap to use for the machines. This argument is
+            only used if ``node_color_map`` is ``None``. The default is
+            ``"tab10"``.
 
     Returns:
         The figure of the plot. This figure can be used to save the plot to a
@@ -135,7 +143,20 @@ def plot_heterogeneous_graph(
         )
 
     # Draw edges
-    nx.draw_networkx_edges(graph, layout, ax=ax)
+    if edge_additional_params is None:
+        edge_additional_params = {}
+    if draw_only_one_edge:
+        graph = deepcopy(graph)
+        edges = list(graph.edges)
+        present_edges = set()
+        for edge in edges:
+            unorder_edge = frozenset(edge)
+            if unorder_edge in present_edges:
+                graph.remove_edge(*edge)
+            else:
+                present_edges.add(unorder_edge)
+
+    nx.draw_networkx_edges(graph, layout, ax=ax, **edge_additional_params)
 
     node_color_map = (
         color_nodes_by_machine(machine_colors, "lightblue")
@@ -143,7 +164,14 @@ def plot_heterogeneous_graph(
         else node_color_map
     )
     node_labels = {node.node_id: _get_node_label(node) for node in nodes}
-    nx.draw_networkx_labels(graph, layout, node_labels, ax=ax)
+    nx.draw_networkx_labels(
+        graph,
+        layout,
+        node_labels,
+        ax=ax,
+        font_size=font_size,
+        font_color=node_font_color,
+    )
 
     ax.set_axis_off()
 
@@ -151,32 +179,24 @@ def plot_heterogeneous_graph(
 
     # Add to the legend the meaning of m and d
     if add_legend:
-        plt.figtext(0, 0.95, "d = duration", wrap=True, fontsize=12)
+        plt.figtext(0, 0.95, legend_text, wrap=True, fontsize=12)
     return fig
 
 
 def _get_node_label(node: Node) -> str:
     if node.node_type == NodeType.OPERATION:
-        return f"d={node.operation.duration}"
+        i = node.operation.job_id
+        j = node.operation.position_in_job
+        ij = str(i) + str(j)
+        return f"$p_{{{ij}}}={node.operation.duration}$"
     if node.node_type == NodeType.MACHINE:
-        return f"M{node.machine_id}"
+        return f"$M_{node.machine_id}$"
     if node.node_type == NodeType.JOB:
-        return f"J{node.job_id}"
+        return f"$J_{node.job_id}$"
     if node.node_type == NodeType.GLOBAL:
-        return "G"
+        return "$G$"
 
     raise ValueError(f"Invalid node type: {node.node_type}")
-
-
-def _get_node_color(
-    node: Node, machine_colors: dict[int, tuple[float, float, float, float]]
-) -> tuple[float, float, float, float] | str:
-    if node.node_type == NodeType.OPERATION:
-        return machine_colors[node.operation.machine_id]
-    if node.node_type == NodeType.MACHINE:
-        return machine_colors[node.machine_id]
-
-    return "lightblue"
 
 
 def _color_to_rgba(
@@ -230,18 +250,22 @@ def three_columns_layout(
     topmost_position: float = 1.0,
     bottommost_position: float = 0.0,
 ) -> dict[Node, tuple[float, float]]:
-    """Generates coordinates for a three-column grid layout
-        1. Left column: Machine nodes (M1, M2, etc.)
-        2. Middle column: Operation nodes (O_ij where i=job, j=operation)
-        3. Right column: Job nodes (J1, J2, etc.)
+    """Generates coordinates for a three-column grid layout.
 
-    The operations are arranged vertically in groups by job, with a global node (G) at the bottom.
+    1. Left column: Machine nodes (M1, M2, etc.)
+    2. Middle column: Operation nodes (O_ij where i=job, j=operation)
+    3. Right column: Job nodes (J1, J2, etc.)
+
+    The operations are arranged vertically in groups by job, with a global
+    node (G) at the bottom.
 
     For example, in a 2-machine, 3-job problem:
+
     - Machine nodes (M1, M2) appear in the left column where needed
     - Operation nodes (O_11 through O_33) form the central column
-    - Job nodes (J1, J2, J3) appear in the right column at the middle of their respective operations
-    - A global node (G) appears at the bottom of the middle column
+    - Job nodes (J1, J2, J3) appear in the right column at the middle of their
+      respective operations
+    - The global node (G) appears at the bottom of the middle column
 
     Args:
         job_shop_graph:
