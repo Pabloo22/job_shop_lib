@@ -5,6 +5,7 @@ The factory functions create and return the appropriate functions based on the
 specified names or enums.
 """
 
+from typing import Union, Dict
 from enum import Enum
 from collections.abc import Callable
 import random
@@ -25,7 +26,7 @@ MachineChooser = Callable[[Dispatcher, Operation], int]
 
 
 def machine_chooser_factory(
-    machine_chooser: str | MachineChooser,
+    machine_chooser: Union[str, MachineChooser],
 ) -> MachineChooser:
     """Creates and returns a machine chooser function based on the specified
     machine chooser strategy name.
@@ -36,7 +37,7 @@ def machine_chooser_factory(
     machine randomly.
 
     Args:
-        machine_chooser (str): The name of the machine chooser strategy to be
+        machine_chooser: The name of the machine chooser strategy to be
             used. Supported values are 'first' and 'random'.
 
     Returns:
@@ -49,7 +50,7 @@ def machine_chooser_factory(
         ValueError: If the machine_chooser argument is not recognized or is
             not supported.
     """
-    machine_choosers: dict[str, Callable[[Dispatcher, Operation], int]] = {
+    machine_choosers: Dict[str, Callable[[Dispatcher, Operation], int]] = {
         MachineChooserType.FIRST: lambda _, operation: operation.machines[0],
         MachineChooserType.RANDOM: lambda _, operation: random.choice(
             operation.machines

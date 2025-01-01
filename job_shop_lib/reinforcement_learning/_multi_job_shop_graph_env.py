@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import Any, Tuple, Dict, List, Optional, Type
 from copy import deepcopy
 
 import gymnasium as gym
@@ -162,16 +162,16 @@ class MultiJobShopGraphEnv(gym.Env):
             [JobShopInstance], JobShopGraph
         ] = build_heterogeneous_graph,
         graph_updater_config: DispatcherObserverConfig[
-            type[GraphUpdater]
+            Type[GraphUpdater]
         ] = DispatcherObserverConfig(class_type=ResidualGraphUpdater),
         ready_operations_filter: Callable[
-            [Dispatcher, list[Operation]], list[Operation]
+            [Dispatcher, List[Operation]], List[Operation]
         ] = filter_dominated_operations,
         reward_function_config: DispatcherObserverConfig[
-            type[RewardObserver]
+            Type[RewardObserver]
         ] = DispatcherObserverConfig(class_type=MakespanReward),
-        render_mode: str | None = None,
-        render_config: RenderConfig | None = None,
+        render_mode: Optional[str] = None,
+        render_config: Optional[RenderConfig] = None,
         use_padding: bool = True,
     ) -> None:
         super().__init__()
@@ -226,7 +226,7 @@ class MultiJobShopGraphEnv(gym.Env):
     @property
     def ready_operations_filter(
         self,
-    ) -> Callable[[Dispatcher, list[Operation]], list[Operation]] | None:
+    ) -> Optional[Callable[[Dispatcher, List[Operation]], List[Operation]]]:
         """Returns the current ready operations filter."""
         return (
             self.single_job_shop_graph_env.dispatcher.ready_operations_filter
@@ -236,7 +236,7 @@ class MultiJobShopGraphEnv(gym.Env):
     def ready_operations_filter(
         self,
         pruning_function: Callable[
-            [Dispatcher, list[Operation]], list[Operation]
+            [Dispatcher, List[Operation]], List[Operation]
         ],
     ) -> None:
         """Sets the ready operations filter."""
@@ -267,9 +267,9 @@ class MultiJobShopGraphEnv(gym.Env):
     def reset(
         self,
         *,
-        seed: int | None = None,
-        options: dict[str, Any] | None = None,
-    ) -> tuple[ObservationDict, dict]:
+        seed: Optional[int] = None,
+        options: Dict[str, Any] | None = None,
+    ) -> Tuple[ObservationDict, Dict[str, Any]]:
         """Resets the environment and returns the initial observation.
 
         Args:
@@ -303,8 +303,8 @@ class MultiJobShopGraphEnv(gym.Env):
         return obs, info
 
     def step(
-        self, action: tuple[int, int]
-    ) -> tuple[ObservationDict, float, bool, bool, dict]:
+        self, action: Tuple[int, int]
+    ) -> Tuple[ObservationDict, float, bool, bool, Dict[str, Any]]:
         """Takes a step in the environment.
 
         Args:
@@ -355,7 +355,7 @@ class MultiJobShopGraphEnv(gym.Env):
             input_shape: (num_machines, num_features)
             output_shape: (max_num_machines, num_features) (padded with -1)
         """
-        padding_value: dict[str, float | bool] = defaultdict(lambda: -1)
+        padding_value: Dict[str, float | bool] = defaultdict(lambda: -1)
         padding_value[ObservationSpaceKey.REMOVED_NODES.value] = True
         for key, value in observation.items():
             if not isinstance(value, np.ndarray):  # Make mypy happy
@@ -368,7 +368,7 @@ class MultiJobShopGraphEnv(gym.Env):
             )
         return observation
 
-    def _get_output_shape(self, key: str) -> tuple[int, ...]:
+    def _get_output_shape(self, key: str) -> Tuple[int, ...]:
         """Returns the output shape of the observation space key."""
         output_shape = self.observation_space[key].shape
         assert output_shape is not None  # Make mypy happy

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, List, Union, Dict, Optional
 from collections import deque
 
 from job_shop_lib import ScheduledOperation, JobShopInstance
@@ -55,7 +55,7 @@ class Schedule:
     def __init__(
         self,
         instance: JobShopInstance,
-        schedule: list[list[ScheduledOperation]] | None = None,
+        schedule: Optional[List[List[ScheduledOperation]]] = None,
         **metadata: Any,
     ):
         if schedule is None:
@@ -65,19 +65,19 @@ class Schedule:
 
         self.instance: JobShopInstance = instance
         self._schedule = schedule
-        self.metadata: dict[str, Any] = metadata
+        self.metadata: Dict[str, Any] = metadata
 
     def __repr__(self) -> str:
         return str(self.schedule)
 
     @property
-    def schedule(self) -> list[list[ScheduledOperation]]:
+    def schedule(self) -> List[List[ScheduledOperation]]:
         """A list of lists of :class:`ScheduledOperation` objects. Each list
         represents the order of operations on a machine."""
         return self._schedule
 
     @schedule.setter
-    def schedule(self, new_schedule: list[list[ScheduledOperation]]):
+    def schedule(self, new_schedule: List[List[ScheduledOperation]]):
         Schedule.check_schedule(new_schedule)
         self._schedule = new_schedule
 
@@ -103,7 +103,7 @@ class Schedule:
                 - **"metadata"**: A dictionary with additional information
                   about the schedule.
         """
-        job_sequences: list[list[int]] = []
+        job_sequences: List[List[int]] = []
         for machine_schedule in self.schedule:
             job_sequences.append(
                 [operation.job_id for operation in machine_schedule]
@@ -117,9 +117,9 @@ class Schedule:
 
     @staticmethod
     def from_dict(
-        instance: dict[str, Any] | JobShopInstance,
-        job_sequences: list[list[int]],
-        metadata: dict[str, Any] | None = None,
+        instance: Union[Dict[str, Any], JobShopInstance],
+        job_sequences: List[List[int]],
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> Schedule:
         """Creates a schedule from a dictionary representation."""
         if isinstance(instance, dict):
@@ -131,7 +131,7 @@ class Schedule:
     @staticmethod
     def from_job_sequences(
         instance: JobShopInstance,
-        job_sequences: list[list[int]],
+        job_sequences: List[List[int]],
     ) -> Schedule:
         """Creates an active schedule from a list of job sequences.
 
@@ -240,7 +240,7 @@ class Schedule:
         return previous_operation.end_time <= scheduled_operation.start_time
 
     @staticmethod
-    def check_schedule(schedule: list[list[ScheduledOperation]]):
+    def check_schedule(schedule: List[List[ScheduledOperation]]):
         """Checks if a schedule is valid and raises a
         :class:`~exceptions.ValidationError` if it is not.
 

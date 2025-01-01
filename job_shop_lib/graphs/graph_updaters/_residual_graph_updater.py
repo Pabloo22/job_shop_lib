@@ -1,5 +1,7 @@
 """Home of the `ResidualGraphUpdater` class."""
 
+from typing import Optional, List
+
 from job_shop_lib import ScheduledOperation
 from job_shop_lib.exceptions import UninitializedAttributeError
 from job_shop_lib.graphs import NodeType, JobShopGraph
@@ -54,7 +56,7 @@ class ResidualGraphUpdater(GraphUpdater):
         remove_completed_machine_nodes: bool = True,
         remove_completed_job_nodes: bool = True,
     ):
-        self._is_completed_observer: None | IsCompletedObserver = None
+        self._is_completed_observer: Optional[IsCompletedObserver] = None
         self.remove_completed_job_nodes = remove_completed_job_nodes
         self.remove_completed_machine_nodes = remove_completed_machine_nodes
         self._initialize_is_completed_observer_attribute(dispatcher)
@@ -80,7 +82,7 @@ class ResidualGraphUpdater(GraphUpdater):
                     return False
             return True
 
-        feature_types: list[FeatureType] = []
+        feature_types: List[FeatureType] = []
         if self.remove_completed_machine_nodes:
             feature_types.append(FeatureType.MACHINES)
         if self.remove_completed_job_nodes:

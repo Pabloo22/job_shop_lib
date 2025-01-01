@@ -1,5 +1,6 @@
 """Home of the `BasicGenerator` class."""
 
+from typing import Optional, Tuple, Union, List
 import random
 
 from job_shop_lib import JobShopInstance, Operation
@@ -73,15 +74,15 @@ class GeneralInstanceGenerator(InstanceGenerator):
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        num_jobs: int | tuple[int, int] = (10, 20),
-        num_machines: int | tuple[int, int] = (5, 10),
-        duration_range: tuple[int, int] = (1, 99),
+        num_jobs: Union[int, Tuple[int, int]] = (10, 20),
+        num_machines: Union[int, Tuple[int, int]] = (5, 10),
+        duration_range: Tuple[int, int] = (1, 99),
         allow_less_jobs_than_machines: bool = True,
         allow_recirculation: bool = False,
-        machines_per_operation: int | tuple[int, int] = 1,
+        machines_per_operation: Union[int, Tuple[int, int]] = 1,
         name_suffix: str = "classic_generated_instance",
-        seed: int | None = None,
-        iteration_limit: int | None = None,
+        seed: Optional[int] = None,
+        iteration_limit: Optional[int] = None,
     ):
         super().__init__(
             num_jobs=num_jobs,
@@ -114,7 +115,9 @@ class GeneralInstanceGenerator(InstanceGenerator):
         )
 
     def generate(
-        self, num_jobs: int | None = None, num_machines: int | None = None
+        self,
+        num_jobs: Optional[int] = None,
+        num_machines: Optional[int] = None,
     ) -> JobShopInstance:
         if num_jobs is None:
             num_jobs = random.randint(*self.num_jobs_range)
@@ -128,8 +131,8 @@ class GeneralInstanceGenerator(InstanceGenerator):
             not self.allow_less_jobs_than_machines and num_jobs < num_machines
         ):
             raise ValidationError(
-                "Theere are fewer jobs than machines, which is not allowed"
-                "when `allow_less_jobs_than_machines` attribute is False."
+                "There are fewer jobs than machines, which is not allowed "
+                " when `allow_less_jobs_than_machines` attribute is False."
             )
 
         jobs = []
@@ -145,7 +148,7 @@ class GeneralInstanceGenerator(InstanceGenerator):
         return JobShopInstance(jobs=jobs, name=self._next_name())
 
     def create_random_operation(
-        self, available_machines: list[int] | None = None
+        self, available_machines: List[int] | None = None
     ) -> Operation:
         """Creates a random operation with the given available machines.
 
@@ -163,7 +166,7 @@ class GeneralInstanceGenerator(InstanceGenerator):
         machine_id = self._choose_one_machine(available_machines)
         return Operation(machines=machine_id, duration=duration)
 
-    def _choose_multiple_machines(self) -> list[int]:
+    def _choose_multiple_machines(self) -> List[int]:
         num_machines = random.randint(*self.machines_per_operation)
         available_machines = list(range(num_machines))
         machines = []
@@ -174,7 +177,7 @@ class GeneralInstanceGenerator(InstanceGenerator):
         return machines
 
     def _choose_one_machine(
-        self, available_machines: list[int] | None = None
+        self, available_machines: List[int] | None = None
     ) -> int:
         if available_machines is None:
             _, max_num_machines = self.num_machines_range

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import functools
-from typing import Any
+from typing import Any, List, Union, Dict
 
 import numpy as np
 from numpy.typing import NDArray
@@ -51,14 +51,14 @@ class JobShopInstance:
         total_duration
 
     Attributes:
-        jobs (list[list[Operation]]):
+        jobs (List[List[Operation]]):
             A list of lists of operations. Each list of operations represents
             a job, and the operations are ordered by their position in the job.
             The ``job_id``, ``position_in_job``, and ``operation_id``
             attributes of the operations are set when the instance is created.
         name (str):
             A string with the name of the instance.
-        metadata (dict[str, Any]):
+        metadata (Dict[str, Any]):
             A dictionary with additional information about the instance.
 
     Args:
@@ -81,16 +81,16 @@ class JobShopInstance:
 
     def __init__(
         self,
-        jobs: list[list[Operation]],
+        jobs: List[List[Operation]],
         name: str = "JobShopInstance",
         set_operation_attributes: bool = True,
         **metadata: Any,
     ):
-        self.jobs: list[list[Operation]] = jobs
+        self.jobs: List[List[Operation]] = jobs
         if set_operation_attributes:
             self.set_operation_attributes()
         self.name: str = name
-        self.metadata: dict[str, Any] = metadata
+        self.metadata: Dict[str, Any] = metadata
 
     def set_operation_attributes(self):
         """Sets the ``job_id``, ``position_in_job``, and ``operation_id``
@@ -125,10 +125,10 @@ class JobShopInstance:
     @classmethod
     def from_taillard_file(
         cls,
-        file_path: os.PathLike | str | bytes,
+        file_path: Union[os.PathLike, str, bytes],
         encoding: str = "utf-8",
         comment_symbol: str = "#",
-        name: str | None = None,
+        name: Union[str, None] = None,
         **metadata: Any,
     ) -> JobShopInstance:
         """Creates a JobShopInstance from a file following Taillard's format.
@@ -178,7 +178,7 @@ class JobShopInstance:
                 name = name.split(".")[0]
         return cls(jobs=jobs, name=name, **metadata)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """Returns a dictionary representation of the instance.
 
         This representation is useful for saving the instance to a JSON file,
@@ -186,7 +186,7 @@ class JobShopInstance:
         like Taillard's.
 
         Returns:
-            dict[str, Any]: The returned dictionary has the following
+            Dict[str, Any]: The returned dictionary has the following
             structure:
 
             .. code-block:: python
@@ -208,10 +208,10 @@ class JobShopInstance:
     @classmethod
     def from_matrices(
         cls,
-        duration_matrix: list[list[int]],
-        machines_matrix: list[list[list[int]]] | list[list[int]],
+        duration_matrix: List[List[int]],
+        machines_matrix: List[List[List[int]]] | List[List[int]],
         name: str = "JobShopInstance",
-        metadata: dict[str, Any] | None = None,
+        metadata: Dict[str, Any] | None = None,
     ) -> JobShopInstance:
         """Creates a :class:`JobShopInstance` from duration and machines
         matrices.
@@ -233,7 +233,7 @@ class JobShopInstance:
         Returns:
             A :class:`JobShopInstance` object.
         """
-        jobs: list[list[Operation]] = [[] for _ in range(len(duration_matrix))]
+        jobs: List[List[Operation]] = [[] for _ in range(len(duration_matrix))]
 
         num_jobs = len(duration_matrix)
         for job_id in range(num_jobs):
@@ -290,7 +290,7 @@ class JobShopInstance:
         )
 
     @functools.cached_property
-    def durations_matrix(self) -> list[list[int]]:
+    def durations_matrix(self) -> List[List[int]]:
         """Returns the duration matrix of the instance.
 
         The duration of the operation with ``job_id`` i and ``position_in_job``
@@ -305,7 +305,7 @@ class JobShopInstance:
         return [[operation.duration for operation in job] for job in self.jobs]
 
     @functools.cached_property
-    def machines_matrix(self) -> list[list[list[int]]] | list[list[int]]:
+    def machines_matrix(self) -> Union[List[List[List[int]]], List[List[int]]]:
         """Returns the machines matrix of the instance.
 
         If the instance is flexible (i.e., if any operation has more than one
@@ -371,25 +371,25 @@ class JobShopInstance:
         machines_matrix = self.machines_matrix
         if self.is_flexible:
             # False positive from mypy, the type of machines_matrix is
-            # list[list[list[int]]] here
+            # List[List[List[int]]] here
             return self._fill_matrix_with_nans_3d(
                 machines_matrix  # type: ignore[arg-type]
             )
 
         # False positive from mypy, the type of machines_matrix is
-        # list[list[int]] here
+        # List[List[int]] here
         return self._fill_matrix_with_nans_2d(
             machines_matrix  # type: ignore[arg-type]
         )
 
     @functools.cached_property
-    def operations_by_machine(self) -> list[list[Operation]]:
+    def operations_by_machine(self) -> List[List[Operation]]:
         """Returns a list of lists of operations.
 
         The i-th list contains the operations that can be processed in the
         machine with id i.
         """
-        operations_by_machine: list[list[Operation]] = [
+        operations_by_machine: List[List[Operation]] = [
             [] for _ in range(self.num_machines)
         ]
         for job in self.jobs:
@@ -409,7 +409,7 @@ class JobShopInstance:
         )
 
     @functools.cached_property
-    def max_duration_per_job(self) -> list[float]:
+    def max_duration_per_job(self) -> List[float]:
         """Returns the maximum duration of each job in the instance.
 
         The maximum duration of the job with id i is stored in the i-th
@@ -420,7 +420,7 @@ class JobShopInstance:
         return [max(op.duration for op in job) for job in self.jobs]
 
     @functools.cached_property
-    def max_duration_per_machine(self) -> list[int]:
+    def max_duration_per_machine(self) -> List[int]:
         """Returns the maximum duration of each machine in the instance.
 
         The maximum duration of the machine with id i is stored in the i-th
@@ -439,7 +439,7 @@ class JobShopInstance:
         return max_duration_per_machine
 
     @functools.cached_property
-    def job_durations(self) -> list[int]:
+    def job_durations(self) -> List[int]:
         """Returns a list with the duration of each job in the instance.
 
         The duration of a job is the sum of the durations of its operations.
@@ -450,7 +450,7 @@ class JobShopInstance:
         return [sum(op.duration for op in job) for job in self.jobs]
 
     @functools.cached_property
-    def machine_loads(self) -> list[int]:
+    def machine_loads(self) -> List[int]:
         """Returns the total machine load of each machine in the instance.
 
         The total machine load of a machine is the sum of the durations of the
@@ -474,7 +474,7 @@ class JobShopInstance:
 
     @staticmethod
     def _fill_matrix_with_nans_2d(
-        matrix: list[list[int]],
+        matrix: List[List[int]],
     ) -> NDArray[np.float32]:
         """Fills a matrix with ``np.nan`` values.
 
@@ -496,7 +496,7 @@ class JobShopInstance:
 
     @staticmethod
     def _fill_matrix_with_nans_3d(
-        matrix: list[list[list[int]]],
+        matrix: List[List[List[int]]],
     ) -> NDArray[np.float32]:
         """Fills a 3D matrix with ``np.nan`` values.
 

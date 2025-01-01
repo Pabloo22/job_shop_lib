@@ -1,6 +1,8 @@
 """Rewards functions are defined as `DispatcherObervers` and are used to
 calculate the reward for a given state."""
 
+from typing import List
+
 from job_shop_lib.dispatching import DispatcherObserver, Dispatcher
 from job_shop_lib import ScheduledOperation
 
@@ -18,7 +20,7 @@ class RewardObserver(DispatcherObserver):
         self, dispatcher: Dispatcher, *, subscribe: bool = True
     ) -> None:
         super().__init__(dispatcher, subscribe=subscribe)
-        self.rewards: list[float] = []
+        self.rewards: List[float] = []
 
     @property
     def last_reward(self) -> float:

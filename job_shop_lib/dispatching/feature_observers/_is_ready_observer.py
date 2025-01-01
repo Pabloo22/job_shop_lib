@@ -1,5 +1,7 @@
 """Home of the `IsReadyObserver` class."""
 
+from typing import List
+
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,
     FeatureType,
@@ -16,7 +18,7 @@ class IsReadyObserver(FeatureObserver):
             feature_ids = self._get_ready_feature_ids(feature_type)
             feature[feature_ids, 0] = 1.0
 
-    def _get_ready_feature_ids(self, feature_type: FeatureType) -> list[int]:
+    def _get_ready_feature_ids(self, feature_type: FeatureType) -> List[int]:
         if feature_type == FeatureType.OPERATIONS:
             return self._get_ready_operations()
         if feature_type == FeatureType.MACHINES:
@@ -28,6 +30,6 @@ class IsReadyObserver(FeatureObserver):
     def reset(self):
         self.initialize_features()
 
-    def _get_ready_operations(self) -> list[int]:
+    def _get_ready_operations(self) -> List[int]:
         available_operations = self.dispatcher.available_operations()
         return [operation.operation_id for operation in available_operations]

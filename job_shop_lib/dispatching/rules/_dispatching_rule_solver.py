@@ -1,5 +1,6 @@
 """Home of the `DispatchingRuleSolver` class."""
 
+from typing import Optional, Union
 from collections.abc import Callable, Iterable
 
 from job_shop_lib import JobShopInstance, Schedule, Operation, BaseSolver
@@ -65,19 +66,24 @@ class DispatchingRuleSolver(BaseSolver):
 
     def __init__(
         self,
-        dispatching_rule: (
-            str | Callable[[Dispatcher], Operation]
-        ) = DispatchingRuleType.MOST_WORK_REMAINING,
-        machine_chooser: (
-            str | Callable[[Dispatcher, Operation], int]
-        ) = MachineChooserType.FIRST,
-        ready_operations_filter: (
-            Iterable[ReadyOperationsFilter | str | ReadyOperationsFilterType]
-            | str
-            | ReadyOperationsFilterType
-            | ReadyOperationsFilter
-            | None
-        ) = (
+        dispatching_rule: Union[
+            str, Callable[[Dispatcher], Operation]
+        ] = DispatchingRuleType.MOST_WORK_REMAINING,
+        machine_chooser: Union[
+            str, Callable[[Dispatcher, Operation], int]
+        ] = MachineChooserType.FIRST,
+        ready_operations_filter: Optional[
+            Union[
+                Iterable[
+                    Union[
+                        ReadyOperationsFilter, str, ReadyOperationsFilterType
+                    ]
+                ],
+                str,
+                ReadyOperationsFilterType,
+                ReadyOperationsFilter,
+            ]
+        ] = (
             ReadyOperationsFilterType.DOMINATED_OPERATIONS,
             ReadyOperationsFilterType.NON_IMMEDIATE_OPERATIONS,
         ),
@@ -100,7 +106,9 @@ class DispatchingRuleSolver(BaseSolver):
         self.ready_operations_filter = ready_operations_filter
 
     def solve(
-        self, instance: JobShopInstance, dispatcher: Dispatcher | None = None
+        self,
+        instance: JobShopInstance,
+        dispatcher: Optional[Dispatcher] = None,
     ) -> Schedule:
         """Returns a schedule for the given job shop instance using the
         dispatching rule algorithm."""

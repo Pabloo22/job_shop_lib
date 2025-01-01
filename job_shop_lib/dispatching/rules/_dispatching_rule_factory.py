@@ -5,6 +5,8 @@ The factory functions create and return the appropriate functions based on the
 specified names or enums.
 """
 
+from typing import Dict, Union
+
 from enum import Enum
 from collections.abc import Callable
 
@@ -31,7 +33,7 @@ class DispatchingRuleType(str, Enum):
 
 
 def dispatching_rule_factory(
-    dispatching_rule: str | DispatchingRuleType,
+    dispatching_rule: Union[str, DispatchingRuleType,]
 ) -> Callable[[Dispatcher], Operation]:
     """Creates and returns a dispatching rule function based on the specified
     dispatching rule name.
@@ -55,7 +57,7 @@ def dispatching_rule_factory(
             If the dispatching_rule argument is not recognized or it is
             not supported.
     """
-    dispatching_rules: dict[
+    dispatching_rules: Dict[
         DispatchingRuleType,
         Callable[[Dispatcher], Operation],
     ] = {

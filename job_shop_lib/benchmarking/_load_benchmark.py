@@ -1,6 +1,6 @@
 """Contains functions to load benchmark instances from a JSON file."""
 
-from typing import Any
+from typing import Any, Dict
 
 import functools
 import json
@@ -10,7 +10,7 @@ from job_shop_lib import JobShopInstance
 
 
 @functools.cache
-def load_all_benchmark_instances() -> dict[str, JobShopInstance]:
+def load_all_benchmark_instances() -> Dict[str, JobShopInstance]:
     """Loads all benchmark instances available.
 
     Returns:
@@ -48,7 +48,7 @@ def load_benchmark_instance(name: str) -> JobShopInstance:
 
 
 @functools.cache
-def load_benchmark_json() -> dict[str, dict[str, Any]]:
+def load_benchmark_json() -> Dict[str, Dict[str, Any]]:
     """Loads the raw JSON file containing the benchmark instances.
 
     Results are cached to avoid reading the file multiple times.

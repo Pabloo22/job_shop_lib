@@ -3,7 +3,7 @@
 import os
 import pathlib
 import shutil
-from typing import Sequence, Protocol
+from typing import Sequence, Protocol, Optional, List
 
 import imageio
 import matplotlib.pyplot as plt
@@ -43,9 +43,9 @@ class PartialGanttChartPlotter(Protocol):
     def __call__(
         self,
         schedule: Schedule,
-        makespan: int | None = None,
-        available_operations: list[Operation] | None = None,
-        current_time: int | None = None,
+        makespan: Optional[int] = None,
+        available_operations: Optional[List[Operation]] = None,
+        current_time: Optional[int] = None,
     ) -> Figure:
         """Plots a Gantt chart for an unfinished schedule.
 
@@ -65,7 +65,7 @@ class PartialGanttChartPlotter(Protocol):
 
 
 def get_partial_gantt_chart_plotter(
-    title: str | None = None,
+    title: Optional[str] = None,
     cmap: str = "viridis",
     show_available_operations: bool = False,
 ) -> PartialGanttChartPlotter:
@@ -92,9 +92,9 @@ def get_partial_gantt_chart_plotter(
 
     def plot_function(
         schedule: Schedule,
-        makespan: int | None = None,
-        available_operations: list | None = None,
-        current_time: int | None = None,
+        makespan: Optional[int] = None,
+        available_operations: Optional[List[Operation]] = None,
+        current_time: Optional[int] = None,
     ) -> Figure:
         fig, ax = plot_gantt_chart(
             schedule, title=title, cmap_name=cmap, xlim=makespan
@@ -133,14 +133,14 @@ def get_partial_gantt_chart_plotter(
 # pylint: disable=too-many-arguments
 def create_gantt_chart_gif(
     instance: JobShopInstance,
-    gif_path: str | None = None,
-    solver: DispatchingRuleSolver | None = None,
-    plot_function: PartialGanttChartPlotter | None = None,
+    gif_path: Optional[str] = None,
+    solver: Optional[DispatchingRuleSolver] = None,
+    plot_function: Optional[PartialGanttChartPlotter] = None,
     fps: int = 1,
     remove_frames: bool = True,
-    frames_dir: str | None = None,
+    frames_dir: Optional[str] = None,
     plot_current_time: bool = True,
-    schedule_history: Sequence[ScheduledOperation] | None = None,
+    schedule_history: Optional[Sequence[ScheduledOperation]] = None,
 ) -> None:
     """Creates a GIF of the schedule being built.
 
@@ -202,14 +202,14 @@ def create_gantt_chart_gif(
 # pylint: disable=too-many-arguments
 def create_gantt_chart_video(
     instance: JobShopInstance,
-    video_path: str | None = None,
-    solver: DispatchingRuleSolver | None = None,
-    plot_function: PartialGanttChartPlotter | None = None,
+    video_path: Optional[str] = None,
+    solver: Optional[DispatchingRuleSolver] = None,
+    plot_function: Optional[PartialGanttChartPlotter] = None,
     fps: int = 1,
     remove_frames: bool = True,
-    frames_dir: str | None = None,
+    frames_dir: Optional[str] = None,
     plot_current_time: bool = True,
-    schedule_history: Sequence[ScheduledOperation] | None = None,
+    schedule_history: Optional[Sequence[ScheduledOperation]] = None,
 ) -> None:
     """Creates a video of the schedule being built.
 
@@ -268,10 +268,10 @@ def create_gantt_chart_video(
 def create_gantt_chart_frames(
     frames_dir: str,
     instance: JobShopInstance,
-    solver: DispatchingRuleSolver | None,
+    solver: Optional[DispatchingRuleSolver],
     plot_function: PartialGanttChartPlotter,
     plot_current_time: bool = True,
-    schedule_history: Sequence[ScheduledOperation] | None = None,
+    schedule_history: Optional[Sequence[ScheduledOperation]] = None,
 ) -> None:
     """Creates frames of the Gantt chart for the schedule being built.
 
@@ -411,7 +411,7 @@ def resize_image_to_macro_block(
     return image
 
 
-def _load_images(frames_dir: str) -> list:
+def _load_images(frames_dir: str) -> List:
     frames = [
         os.path.join(frames_dir, frame)
         for frame in sorted(os.listdir(frames_dir))

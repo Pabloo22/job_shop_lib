@@ -1,5 +1,7 @@
 """Home of the `Node` class."""
 
+from typing import Optional
+
 from job_shop_lib import Operation
 from job_shop_lib.exceptions import (
     UninitializedAttributeError,
@@ -80,9 +82,9 @@ class Node:
     def __init__(
         self,
         node_type: NodeType,
-        operation: Operation | None = None,
-        machine_id: int | None = None,
-        job_id: int | None = None,
+        operation: Optional[Operation] = None,
+        machine_id: Optional[int] = None,
+        job_id: Optional[int] = None,
     ):
         if node_type == NodeType.OPERATION and operation is None:
             raise ValidationError("Operation node must have an operation.")
@@ -94,7 +96,7 @@ class Node:
             raise ValidationError("Job node must have a job_id.")
 
         self.node_type: NodeType = node_type
-        self._node_id: int | None = None
+        self._node_id: Optional[int] = None
 
         self._operation = operation
         self._machine_id = machine_id
