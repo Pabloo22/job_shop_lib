@@ -4,6 +4,9 @@
 
     plot_disjunctive_graph
     plot_heterogeneous_graph
+    three_columns_layout
+    duration_labeler
+    color_nodes_by_machine
 
 """
 
@@ -14,6 +17,7 @@ from ._plot_disjunctive_graph import (
 from ._plot_agent_task_graph import (
     plot_heterogeneous_graph,
     three_columns_layout,
+    color_nodes_by_machine,
 )
 
 __all__ = [
@@ -21,4 +25,5 @@ __all__ = [
     "plot_heterogeneous_graph",
     "three_columns_layout",
     "duration_labeler",
+    "color_nodes_by_machine",
 ]
