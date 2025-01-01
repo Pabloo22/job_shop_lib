@@ -14,7 +14,7 @@ from ._plot_disjunctive_graph import (
     plot_disjunctive_graph,
     duration_labeler,
 )
-from ._plot_agent_task_graph import (
+from ._plot_heterogeneous_graph import (
     plot_heterogeneous_graph,
     three_columns_layout,
     color_nodes_by_machine,

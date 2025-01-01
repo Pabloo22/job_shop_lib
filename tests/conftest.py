@@ -10,7 +10,10 @@ from job_shop_lib.dispatching.feature_observers import (
     FeatureType,
 )
 from job_shop_lib.generation import GeneralInstanceGenerator
-from job_shop_lib.graphs import build_disjunctive_graph, build_agent_task_graph
+from job_shop_lib.graphs import (
+    build_disjunctive_graph,
+    build_heterogeneous_graph,
+)
 from job_shop_lib.benchmarking import load_benchmark_instance
 
 
@@ -116,7 +119,7 @@ def single_job_shop_graph_env_ft06() -> SingleJobShopGraphEnv:
 @pytest.fixture
 def single_job_shop_graph_env_ft06_agent_task() -> SingleJobShopGraphEnv:
     instance = load_benchmark_instance("ft06")
-    job_shop_graph = build_agent_task_graph(instance)
+    job_shop_graph = build_heterogeneous_graph(instance)
     feature_observer_configs = [
         DispatcherObserverConfig(
             FeatureObserverType.IS_READY,
@@ -150,7 +153,7 @@ def multi_job_shop_graph_env() -> MultiJobShopGraphEnv:
     env = MultiJobShopGraphEnv(
         instance_generator=generator,
         feature_observer_configs=feature_observer_configs,
-        graph_initializer=build_agent_task_graph,
+        graph_initializer=build_heterogeneous_graph,
         render_mode="human",
         render_config={"video_config": {"fps": 4}},
     )

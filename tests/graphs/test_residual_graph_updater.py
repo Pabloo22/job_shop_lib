@@ -7,7 +7,7 @@ from job_shop_lib.dispatching.feature_observers import (
 )
 from job_shop_lib.graphs import (
     build_disjunctive_graph,
-    build_agent_task_graph,
+    build_heterogeneous_graph,
     JobShopGraph,
 )
 from job_shop_lib.graphs.graph_updaters import ResidualGraphUpdater
@@ -65,7 +65,7 @@ def test_removes_all_nodes_agent_task_graph():
     instance = JobShopInstance.from_matrices(
         **instance_dict  # type: ignore[arg-type]
     )
-    job_shop_graph = build_agent_task_graph(instance)
+    job_shop_graph = build_heterogeneous_graph(instance)
     dispatcher = Dispatcher(instance)
 
     # Initialize ResidualGraphUpdater
@@ -87,7 +87,7 @@ def test_removes_all_nodes_agent_task_graph():
 
 
 def test_initialization(example_job_shop_instance: JobShopInstance):
-    job_shop_graph = build_agent_task_graph(example_job_shop_instance)
+    job_shop_graph = build_heterogeneous_graph(example_job_shop_instance)
     dispatcher = Dispatcher(example_job_shop_instance)
 
     # Initialize ResidualGraphUpdater

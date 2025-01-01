@@ -1,7 +1,7 @@
-from job_shop_lib.graphs._build_agent_task_graph import (
-    build_complete_agent_task_graph,
-    build_agent_task_graph_with_jobs,
-    build_agent_task_graph,
+from job_shop_lib.graphs._build_heterogeneous_graph import (
+    build_complete_heterogeneous_graph,
+    build_heterogeneous_graph_with_jobs,
+    build_heterogeneous_graph,
 )
 from job_shop_lib import JobShopInstance
 from job_shop_lib.benchmarking import load_all_benchmark_instances
@@ -10,7 +10,7 @@ from job_shop_lib.benchmarking import load_all_benchmark_instances
 def test_expected_num_nodes_complete():
     benchmark_instances = load_all_benchmark_instances()
     for instance in list(benchmark_instances.values())[:10]:
-        graph = build_complete_agent_task_graph(instance)
+        graph = build_complete_heterogeneous_graph(instance)
         expected_num_nodes = get_expected_num_nodes_for_complete_graph(
             instance
         )
@@ -20,7 +20,7 @@ def test_expected_num_nodes_complete():
 def test_expected_num_nodes_with_jobs():
     benchmark_instances = load_all_benchmark_instances()
     for instance in list(benchmark_instances.values())[:10]:
-        graph = build_agent_task_graph_with_jobs(instance)
+        graph = build_heterogeneous_graph_with_jobs(instance)
         expected_num_nodes = get_expected_num_nodes_for_graph_with_jobs(
             instance
         )
@@ -30,7 +30,7 @@ def test_expected_num_nodes_with_jobs():
 def test_expected_num_nodes():
     benchmark_instances = load_all_benchmark_instances()
     for instance in list(benchmark_instances.values())[:10]:
-        graph = build_agent_task_graph(instance)
+        graph = build_heterogeneous_graph(instance)
         expected_num_nodes = get_expected_num_nodes(instance)
         assert len(graph.nodes) == expected_num_nodes
 
@@ -38,7 +38,7 @@ def test_expected_num_nodes():
 def test_expected_num_edges_complete():
     benchmark_instances = load_all_benchmark_instances()
     for instance in list(benchmark_instances.values())[:10]:
-        graph = build_complete_agent_task_graph(instance)
+        graph = build_complete_heterogeneous_graph(instance)
         expected_num_edges = get_expected_num_edges_for_complete_graph(
             instance
         )
@@ -46,7 +46,7 @@ def test_expected_num_edges_complete():
 
 
 def test_expected_num_edges_complete_example(example_job_shop_instance):
-    graph = build_complete_agent_task_graph(example_job_shop_instance)
+    graph = build_complete_heterogeneous_graph(example_job_shop_instance)
     expected_num_edges = get_expected_num_edges_for_complete_graph(
         example_job_shop_instance
     )
@@ -54,7 +54,7 @@ def test_expected_num_edges_complete_example(example_job_shop_instance):
 
 
 def test_expected_num_edges_with_jobs_example(example_job_shop_instance):
-    graph = build_agent_task_graph_with_jobs(example_job_shop_instance)
+    graph = build_heterogeneous_graph_with_jobs(example_job_shop_instance)
     expected_num_edges = get_expected_num_edges_for_graph_with_jobs(
         example_job_shop_instance
     )
@@ -62,7 +62,7 @@ def test_expected_num_edges_with_jobs_example(example_job_shop_instance):
 
 
 def test_expected_num_edges_example(example_job_shop_instance):
-    graph = build_agent_task_graph(example_job_shop_instance)
+    graph = build_heterogeneous_graph(example_job_shop_instance)
     expected_num_edges = get_expected_num_edges(example_job_shop_instance)
     assert graph.num_edges == expected_num_edges
 
@@ -70,7 +70,7 @@ def test_expected_num_edges_example(example_job_shop_instance):
 def test_expected_num_edges_with_jobs():
     benchmark_instances = load_all_benchmark_instances()
     for instance in list(benchmark_instances.values())[:10]:
-        graph = build_agent_task_graph_with_jobs(instance)
+        graph = build_heterogeneous_graph_with_jobs(instance)
         expected_num_edges = get_expected_num_edges_for_graph_with_jobs(
             instance
         )
@@ -80,7 +80,7 @@ def test_expected_num_edges_with_jobs():
 def test_expected_num_edges():
     benchmark_instances = load_all_benchmark_instances()
     for instance in list(benchmark_instances.values())[:10]:
-        graph = build_agent_task_graph(instance)
+        graph = build_heterogeneous_graph(instance)
         expected_num_edges = get_expected_num_edges(instance)
         assert graph.num_edges == expected_num_edges
 

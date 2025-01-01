@@ -9,7 +9,7 @@ from job_shop_lib.graphs import (
     add_disjunctive_edges,
     add_source_sink_edges,
     add_source_sink_nodes,
-    build_complete_agent_task_graph,
+    build_complete_heterogeneous_graph,
 )
 
 
@@ -139,7 +139,7 @@ def test_remove_node(example_job_shop_instance):
 
 
 def test_get_machine_node(example_job_shop_instance: JobShopInstance):
-    graph = build_complete_agent_task_graph(example_job_shop_instance)
+    graph = build_complete_heterogeneous_graph(example_job_shop_instance)
 
     for machine_id in range(example_job_shop_instance.num_machines):
         machine_node = graph.get_machine_node(machine_id)
@@ -148,7 +148,7 @@ def test_get_machine_node(example_job_shop_instance: JobShopInstance):
 
 
 def test_get_job_node(example_job_shop_instance: JobShopInstance):
-    graph = build_complete_agent_task_graph(example_job_shop_instance)
+    graph = build_complete_heterogeneous_graph(example_job_shop_instance)
 
     for job_id in range(example_job_shop_instance.num_jobs):
         job_node = graph.get_job_node(job_id)
@@ -157,7 +157,7 @@ def test_get_job_node(example_job_shop_instance: JobShopInstance):
 
 
 def test_get_operation_node(example_job_shop_instance: JobShopInstance):
-    graph = build_complete_agent_task_graph(example_job_shop_instance)
+    graph = build_complete_heterogeneous_graph(example_job_shop_instance)
 
     for job in example_job_shop_instance.jobs:
         for operation in job:

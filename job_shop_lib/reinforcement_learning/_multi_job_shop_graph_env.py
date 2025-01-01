@@ -16,7 +16,7 @@ from job_shop_lib.dispatching import (
 )
 from job_shop_lib.dispatching.feature_observers import FeatureObserverConfig
 from job_shop_lib.generation import InstanceGenerator
-from job_shop_lib.graphs import JobShopGraph, build_agent_task_graph
+from job_shop_lib.graphs import JobShopGraph, build_heterogeneous_graph
 from job_shop_lib.graphs.graph_updaters import (
     GraphUpdater,
     ResidualGraphUpdater,
@@ -160,7 +160,7 @@ class MultiJobShopGraphEnv(gym.Env):
         feature_observer_configs: Sequence[FeatureObserverConfig],
         graph_initializer: Callable[
             [JobShopInstance], JobShopGraph
-        ] = build_agent_task_graph,
+        ] = build_heterogeneous_graph,
         graph_updater_config: DispatcherObserverConfig[
             type[GraphUpdater]
         ] = DispatcherObserverConfig(class_type=ResidualGraphUpdater),

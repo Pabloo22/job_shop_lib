@@ -34,8 +34,9 @@ def plot_heterogeneous_graph(
     node_color_map: Optional[
         Callable[[Node], tuple[float, float, float, float]]
     ] = None,
+    default_node_color: str | tuple[float, float, float, float] = "lightblue",
     machine_color_map_name: str = "tab10",
-    legend_text: str = "$p_{ij}$ = duration of $O_ij$",
+    legend_text: str = "$p_{ij}$ = duration of $O_{ij}$",
     edge_additional_params: Optional[dict[str, Any]] = None,
     draw_only_one_edge: bool = False,
 ) -> plt.Figure:
@@ -109,7 +110,7 @@ def plot_heterogeneous_graph(
         )
     }
     node_color_map = (
-        color_nodes_by_machine(machine_colors, "lightblue")
+        color_nodes_by_machine(machine_colors, default_node_color)
         if node_color_map is None
         else node_color_map
     )
