@@ -10,6 +10,7 @@
     GanttChartCreator
     GifConfig
     VideoConfig
+    PartialGanttChartPlotterConfig
 
 """
 
