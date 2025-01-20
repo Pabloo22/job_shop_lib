@@ -12,7 +12,7 @@
 
 </div>
 
-JobShopLib is a Python package for creating, solving, and visualizing Job Shop Scheduling Problems (JSSP).
+JobShopLib is a Python package for creating, solving, and visualizing job shop scheduling problems (JSSP).
 
 It follows a modular design, allowing users to easily extend the library with new solvers, dispatching rules, visualization functions, etc.
 
@@ -65,7 +65,7 @@ Although this version is not stable and may contain breaking changes in subseque
   - **Agent-Task Graphs**: Encode instances as agent-task graphs (introduced in [ScheduleNet paper](https://arxiv.org/abs/2106.03051)). See [Agent-Task Graph](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/07-Agent-Task-Graph.ipynb).
   - Build your own custom graphs with the `JobShopGraph` class.
 
-- **Gymnasium Environments**: Two environments for solving the problem with Graph Neural Networks (GNNs) or any other method, and Reinforcement Learning (RL). See [SingleJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/10-MultiJobShopGraphEnv.ipynb).
+- **Gymnasium Environments**: Two environments for solving the problem with graph neural networks (GNNs) or any other method, and reinforcement learning (RL). See [SingleJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/10-MultiJobShopGraphEnv.ipynb).
 
 <!-- end key features -->
 
@@ -221,7 +221,7 @@ The dashed red line represents the current time step, which is computed as the e
 
 ### Representing Instances as Graphs
 
-One of the main purposes of this library is to provide an easy way to encode instances as graphs. This can be very useful, not only for visualization purposes but also for developing Graph Neural Network-based algorithms.
+One of the main purposes of this library is to provide an easy way to encode instances as graphs. This can be very useful, not only for visualization purposes but also for developing graph neural network-based algorithms.
 
 A graph is represented by the `JobShopGraph` class, which internally stores a `networkx.DiGraph` object.
 
@@ -229,7 +229,7 @@ A graph is represented by the `JobShopGraph` class, which internally stores a `n
 
 The disjunctive graph is created by first adding nodes representing each operation in the jobs, along with two special nodes: a source $S$ and a sink $T$. Each operation node is linked to the next operation in its job sequence by **conjunctive edges**, forming a path from the source to the sink. These edges represent the order in which operations of a single job must be performed.
 
-Additionally, the graph includes **disjunctive edges** between operations that use the same machine but belong to different jobs. These edges are bidirectional, indicating that either of the connected operations can be performed first. The disjunctive edges thus represent the scheduling choices available: the order in which operations sharing a machine can be processed. Solving the Job Shop Scheduling problem involves choosing a direction for each disjunctive edge such that the overall processing time is minimized.
+Additionally, the graph includes **disjunctive edges** between operations that use the same machine but belong to different jobs. These edges are bidirectional, indicating that either of the connected operations can be performed first. The disjunctive edges thus represent the scheduling choices available: the order in which operations sharing a machine can be processed. Solving the job shop scheduling problem involves choosing a direction for each disjunctive edge such that the overall processing time is minimized.
 
 ```python
 from job_shop_lib.visualization import plot_disjunctive_graph
