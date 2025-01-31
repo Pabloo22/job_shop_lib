@@ -1,11 +1,16 @@
 """Home of the `BasicGenerator` class."""
 
-from typing import Optional, Tuple, Union, List
+from typing import Optional, Tuple, Union
 import random
 
-from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib import JobShopInstance
 from job_shop_lib.exceptions import ValidationError
-from job_shop_lib.generation import InstanceGenerator
+from job_shop_lib.generation import (
+    InstanceGenerator,
+    generate_duration_matrix,
+    generate_machine_matrix_with_recirculation,
+    generate_machine_matrix_without_recirculation,
+)
 
 
 class GeneralInstanceGenerator(InstanceGenerator):
@@ -20,6 +25,8 @@ class GeneralInstanceGenerator(InstanceGenerator):
     The class supports both single instance generation and iteration over
     multiple instances, controlled by the ``iteration_limit`` parameter. It
     implements the iterator protocol, allowing it to be used in a ``for`` loop.
+
+    The number of operations per machine is equal to the number of machines
 
     Note:
         When used as an iterator, the generator will produce instances until it
@@ -97,6 +104,10 @@ class GeneralInstanceGenerator(InstanceGenerator):
                 machines_per_operation,
                 machines_per_operation,
             )
+        if machines_per_operation != (1, 1):
+            raise NotImplementedError(
+                "The number of machines per operation must be 1 for now."
+            )
         self.machines_per_operation = machines_per_operation
 
         self.allow_less_jobs_than_machines = allow_less_jobs_than_machines
@@ -135,56 +146,20 @@ class GeneralInstanceGenerator(InstanceGenerator):
                 " when `allow_less_jobs_than_machines` attribute is False."
             )
 
-        jobs = []
-        available_machines = list(range(num_machines))
-        for _ in range(num_jobs):
-            job = []
-            for _ in range(num_machines):
-                operation = self.create_random_operation(available_machines)
-                job.append(operation)
-            jobs.append(job)
-            available_machines = list(range(num_machines))
+        duration_matrix = generate_duration_matrix(
+            num_jobs, num_machines, self.duration_range
+        )
+        if self.allow_recirculation:
+            machine_matrix = generate_machine_matrix_with_recirculation(
+                num_jobs, num_machines
+            )
+        else:
+            machine_matrix = generate_machine_matrix_without_recirculation(
+                num_jobs, num_machines
+            )
 
-        return JobShopInstance(jobs=jobs, name=self._next_name())
-
-    def create_random_operation(
-        self, available_machines: List[int] | None = None
-    ) -> Operation:
-        """Creates a random operation with the given available machines.
-
-        Args:
-            available_machines:
-                A list of available machine_ids to choose from.
-                If ``None``, all machines are available.
-        """
-        duration = random.randint(*self.duration_range)
-
-        if self.machines_per_operation[1] > 1:
-            machines = self._choose_multiple_machines()
-            return Operation(machines=machines, duration=duration)
-
-        machine_id = self._choose_one_machine(available_machines)
-        return Operation(machines=machine_id, duration=duration)
-
-    def _choose_multiple_machines(self) -> List[int]:
-        num_machines = random.randint(*self.machines_per_operation)
-        available_machines = list(range(self.num_machines_range[1]))
-        machines = []
-        for _ in range(num_machines):
-            machine = random.choice(available_machines)
-            machines.append(machine)
-            available_machines.remove(machine)
-        return machines
-
-    def _choose_one_machine(
-        self, available_machines: List[int] | None = None
-    ) -> int:
-        if available_machines is None:
-            _, max_num_machines = self.num_machines_range
-            available_machines = list(range(max_num_machines))
-
-        machine_id = random.choice(available_machines)
-        if not self.allow_recirculation:
-            available_machines.remove(machine_id)
-
-        return machine_id
+        return JobShopInstance.from_matrices(
+            duration_matrix,
+            machine_matrix,
+            name=self._next_name(),
+        )

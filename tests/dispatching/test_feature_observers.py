@@ -410,7 +410,6 @@ def test_is_completed_observer_with_random_instances():
         iteration_limit=100,
         allow_less_jobs_than_machines=False,
         seed=42,
-        machines_per_operation=(1, 2),
     )
     for instance in generator:
         test_is_completed_observer(instance)
