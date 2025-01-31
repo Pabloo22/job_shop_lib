@@ -168,7 +168,7 @@ class GeneralInstanceGenerator(InstanceGenerator):
 
     def _choose_multiple_machines(self) -> List[int]:
         num_machines = random.randint(*self.machines_per_operation)
-        available_machines = list(range(num_machines))
+        available_machines = list(range(self.num_machines_range[1]))
         machines = []
         for _ in range(num_machines):
             machine = random.choice(available_machines)
