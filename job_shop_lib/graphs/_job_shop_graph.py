@@ -167,7 +167,7 @@ class JobShopGraph:
         self,
         u_of_edge: Union[Node, int],
         v_of_edge: Union[Node, int],
-        **attr: Dict,
+        **attr,
     ) -> None:
         """Adds an edge to the graph.
 
