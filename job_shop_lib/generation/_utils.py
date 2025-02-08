@@ -1,10 +1,13 @@
-from typing import List, Tuple
+from typing import Tuple
 import numpy as np
 from numpy.typing import NDArray
 
+from job_shop_lib.exceptions import ValidationError
+
+
 def generate_duration_matrix(
     num_jobs: int, num_machines: int, duration_range: Tuple[int, int]
-) -> NDArray[int]:
+) -> NDArray[np.int32]:
     """Generates a duration matrix.
 
     Args:
@@ -15,11 +18,21 @@ def generate_duration_matrix(
     Returns:
         A duration matrix with shape (num_jobs, num_machines).
     """
-    if 
+    if duration_range[0] > duration_range[1]:
+        raise ValidationError(
+            "The lower bound of the duration range must be less than or equal "
+            "to the upper bound."
+        )
+    if num_jobs <= 0:
+        raise ValidationError("The number of jobs must be greater than 0.")
+    if num_machines <= 0:
+        raise ValidationError("The number of machines must be greater than 0.")
+
     return np.random.randint(
         duration_range[0],
         duration_range[1] + 1,
         size=(num_jobs, num_machines),
+        dtype=np.int32,
     )
 
 
@@ -36,6 +49,10 @@ def generate_machine_matrix_with_recirculation(
         A machine matrix with recirculation with shape (num_machines,
         num_jobs).
     """
+    if num_jobs <= 0:
+        raise ValidationError("The number of jobs must be greater than 0.")
+    if num_machines <= 0:
+        raise ValidationError("The number of machines must be greater than 0.")
     num_machines_is_correct = False
     while not num_machines_is_correct:
         machine_matrix: np.ndarray = np.random.randint(
@@ -60,6 +77,10 @@ def generate_machine_matrix_without_recirculation(
     Returns:
         A machine matrix without recirculation.
     """
+    if num_jobs <= 0:
+        raise ValidationError("The number of jobs must be greater than 0.")
+    if num_machines <= 0:
+        raise ValidationError("The number of machines must be greater than 0.")
     # Start with an arange repeated:
     # m1: [0, 1, 2]
     # m2: [0, 1, 2]

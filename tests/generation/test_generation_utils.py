@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.generation import (
     generate_duration_matrix,
     generate_machine_matrix_with_recirculation,
@@ -40,7 +41,7 @@ def test_generate_duration_matrix_different_seeds():
     np.random.seed(43)
     matrix2 = generate_duration_matrix(**params)
 
-    assert matrix1 != matrix2
+    assert not np.array_equal(matrix1, matrix2)
 
 
 def test_generate_machine_matrix_with_recirculation_shape(basic_params):
@@ -117,13 +118,20 @@ def test_edge_cases():
 def test_invalid_inputs():
     """Test if functions handle invalid inputs appropriately."""
 
-    assert not generate_duration_matrix(0, 3, (1, 10))
+    with pytest.raises(ValidationError):
+        generate_duration_matrix(0, 3, (1, 10))
 
-    assert generate_duration_matrix(3, 0, (1, 10)) == [[], [], []]
+    with pytest.raises(ValidationError):
+        generate_duration_matrix(3, 0, (10, 1))
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
+        generate_duration_matrix(3, 0, (1, 10))
+
+    with pytest.raises(ValidationError):
         generate_duration_matrix(3, 3, (10, 1))
 
-    assert not generate_machine_matrix_with_recirculation(0, 3)
+    with pytest.raises(ValidationError):
+        generate_machine_matrix_with_recirculation(0, 3)
 
-    assert generate_machine_matrix_without_recirculation(3, 0) == [[], [], []]
+    with pytest.raises(ValidationError):
+        generate_machine_matrix_with_recirculation(3, 0)

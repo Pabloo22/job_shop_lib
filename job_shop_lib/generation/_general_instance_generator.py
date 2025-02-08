@@ -159,7 +159,7 @@ class GeneralInstanceGenerator(InstanceGenerator):
             )
 
         return JobShopInstance.from_matrices(
-            duration_matrix,
-            machine_matrix,
+            duration_matrix.tolist(),
+            machine_matrix.tolist(),
             name=self._next_name(),
         )
