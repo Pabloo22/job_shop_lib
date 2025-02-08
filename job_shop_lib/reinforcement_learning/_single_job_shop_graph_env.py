@@ -248,7 +248,12 @@ class SingleJobShopGraphEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self.dispatcher.reset()
         obs = self.get_observation()
-        return obs, {}
+        return obs, {
+            "feature_names": self.composite_observer.column_names,
+            "available_operations_with_ids": (
+                self.get_available_actions_with_ids()
+            ),
+        }
 
     def step(
         self, action: Tuple[int, int]
@@ -271,14 +276,9 @@ class SingleJobShopGraphEnv(gym.Env):
             - Whether the episode was truncated (always False).
             - A dictionary with additional information. The dictionary
               contains the following keys: "feature_names", the names of the
-              features in the observation; "available_operations", the
-              operations that are ready to be scheduled; "makespan", the
-              current makespan of the schedule; "machine_utilization", the
-              utilization percentage for each machine; "valid_actions", a
-              boolean mask of valid actions in the current state;
-              "num_scheduled", the number of scheduled operations;
-              "total_operations", the total number of operations in the
-              instance.
+              features in the observation; and "available_operations_with_ids",
+              a list of available actions in the form of (operation_id,
+              machine_id, job_id).
         """
         job_id, machine_id = action
         operation = self.dispatcher.next_operation(job_id)
@@ -293,12 +293,9 @@ class SingleJobShopGraphEnv(gym.Env):
         truncated = False
         info: Dict[str, Any] = {
             "feature_names": self.composite_observer.column_names,
-            "available_operations": self.dispatcher.available_operations(),
-            "makespan": self.current_makespan(),
-            "machine_utilization": self.machine_utilization(),
-            "valid_actions": self.get_valid_actions(),
-            "num_scheduled": self.dispatcher.schedule.num_scheduled_operations,
-            "total_operations": self.instance.num_operations,
+            "available_operations_with_ids": (
+                self.get_available_actions_with_ids()
+            ),
         }
         return obs, reward, done, truncated, info
 
@@ -349,7 +346,7 @@ class SingleJobShopGraphEnv(gym.Env):
         elif self.render_mode == "save_gif":
             self.gantt_chart_creator.create_gif()
 
-    def get_valid_actions(self) -> NDArray[np.bool_]:
+    def get_valid_actions_mask(self) -> NDArray[np.bool_]:
         """Returns a boolean mask of valid actions in the current state."""
         action_mask = np.zeros(
             (self.instance.num_jobs, self.instance.num_machines + 1),
@@ -357,7 +354,10 @@ class SingleJobShopGraphEnv(gym.Env):
         )
 
         for job_id, job in enumerate(self.instance.jobs):
-            if self.dispatcher.job_next_operation_index[job_id] >= len(job):
+            job_is_completed = self.dispatcher.job_next_operation_index[
+                job_id
+            ] >= len(job)
+            if job_is_completed:
                 continue
 
             operation = self.dispatcher.next_operation(job_id)
@@ -368,6 +368,20 @@ class SingleJobShopGraphEnv(gym.Env):
                 action_mask[job_id, machine_id + 1] = True
 
         return action_mask
+
+    def get_available_actions_with_ids(self) -> List[Tuple[int, int, int]]:
+        """Returns a list of available actions in the form of
+        (operation_id, machine_id, job_id)."""
+        available_operations = self.dispatcher.available_operations()
+        available_operations_with_ids = []
+        for operation in available_operations:
+            job_id = operation.job_id
+            operation_id = operation.operation_id
+            for machine_id in operation.machines:
+                available_operations_with_ids.append(
+                    (operation_id, machine_id, job_id)
+                )
+        return available_operations_with_ids
 
     def validate_action(self, action: Tuple[int, int]) -> None:
         """Validates that the action is legal in the current state.
