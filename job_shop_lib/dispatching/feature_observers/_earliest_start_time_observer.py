@@ -1,5 +1,7 @@
 """Home of the `EarliestStartTimeObserver` class."""
 
+from typing import List, Optional, Union
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -75,7 +77,7 @@ class EarliestStartTimeObserver(FeatureObserver):
         dispatcher: Dispatcher,
         *,
         subscribe: bool = True,
-        feature_types: list[FeatureType] | FeatureType | None = None,
+        feature_types: Optional[Union[List[FeatureType], FeatureType]] = None,
     ):
 
         # Earliest start times initialization

@@ -1,7 +1,7 @@
 """Module for visualizing the disjunctive graph of a job shop instance."""
 
 import functools
-from typing import Any
+from typing import Any, Optional, Tuple, Dict, Union
 from collections.abc import Callable, Sequence, Iterable
 import warnings
 import copy
@@ -22,7 +22,7 @@ from job_shop_lib.graphs import (
 from job_shop_lib.exceptions import ValidationError
 
 
-Layout = Callable[[nx.Graph], dict[str, tuple[float, float]]]
+Layout = Callable[[nx.Graph], Dict[str, Tuple[float, float]]]
 
 
 def duration_labeler(node: Node) -> str:
@@ -50,15 +50,15 @@ def duration_labeler(node: Node) -> str:
 # For the "too many arguments" warning no satisfactory solution was
 # found. I believe is still better than using `**kwargs` and losing the
 # function signature or adding a dataclass for configuration (it would add
-# unnecessary complexity). A TypedDict could be used too, but the default
+# more complexity). A TypedDict could be used too, but the default
 # values would not be explicit.
 # pylint: disable=too-many-arguments, too-many-locals, too-many-statements
 # pylint: disable=too-many-branches, line-too-long
 def plot_disjunctive_graph(
-    job_shop: JobShopGraph | JobShopInstance,
+    job_shop: Union[JobShopGraph, JobShopInstance],
     *,
-    title: str | None = None,
-    figsize: tuple[float, float] = (6, 4),
+    title: Optional[str] = None,
+    figsize: Tuple[float, float] = (6, 4),
     node_size: int = 1600,
     edge_width: int = 2,
     font_size: int = 10,
@@ -69,21 +69,21 @@ def plot_disjunctive_graph(
     color_map: str = "Dark2_r",
     disjunctive_edge_color: str = "red",
     conjunctive_edge_color: str = "black",
-    layout: Layout | None = None,
-    draw_disjunctive_edges: bool | str = True,
-    conjunctive_edges_additional_params: dict[str, Any] | None = None,
-    disjunctive_edges_additional_params: dict[str, Any] | None = None,
+    layout: Optional[Layout] = None,
+    draw_disjunctive_edges: Union[bool, str] = True,
+    conjunctive_edges_additional_params: Optional[Dict[str, Any]] = None,
+    disjunctive_edges_additional_params: Optional[Dict[str, Any]] = None,
     conjunctive_patch_label: str = "Conjunctive edges",
     disjunctive_patch_label: str = "Disjunctive edges",
     legend_text: str = "$p_{ij}=$duration of $O_{ij}$",
     show_machine_colors_in_legend: bool = True,
-    machine_labels: Sequence[str] | None = None,
+    machine_labels: Optional[Sequence[str]] = None,
     legend_location: str = "upper left",
-    legend_bbox_to_anchor: tuple[float, float] = (1.01, 1),
+    legend_bbox_to_anchor: Tuple[float, float] = (1.01, 1),
     start_node_label: str = "$S$",
     end_node_label: str = "$T$",
     font_family: str = "sans-serif",
-) -> tuple[plt.Figure, plt.Axes]:
+) -> Tuple[plt.Figure, plt.Axes]:
     r"""Plots the disjunctive graph of the given job shop instance or graph.
 
     Args:
@@ -251,7 +251,7 @@ def plot_disjunctive_graph(
         for u, v, d in job_shop_graph.graph.edges(data=True)
         if d["type"] == EdgeType.CONJUNCTIVE
     ]
-    disjunctive_edges: Iterable[tuple[int, int]] = [
+    disjunctive_edges: Iterable[Tuple[int, int]] = [
         (u, v)
         for u, v, d in job_shop_graph.graph.edges(data=True)
         if d["type"] == EdgeType.DISJUNCTIVE
@@ -299,7 +299,7 @@ def plot_disjunctive_graph(
 
     sink_node = job_shop_graph.nodes_by_type[NodeType.SINK][0]
     labels[sink_node] = end_node_label
-    machine_colors: dict[int, tuple[float, float, float, float]] = {}
+    machine_colors: dict[int, Tuple[float, float, float, float]] = {}
     for operation_node in operation_nodes:
         if job_shop_graph.is_removed(operation_node.node_id):
             continue
@@ -343,7 +343,9 @@ def plot_disjunctive_graph(
                     else f"Machine {machine_id}"
                 ),
             )
-            for machine_id, color in machine_colors.items()
+            for machine_id, color in sorted(
+                machine_colors.items(), key=lambda x: x[0]
+            )
         ]
         handles.extend(machine_patches)
 

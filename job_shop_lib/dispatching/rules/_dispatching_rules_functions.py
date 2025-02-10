@@ -6,6 +6,7 @@ which operations are selected for execution based on certain criteria such as
 shortest processing time, first come first served, etc.
 """
 
+from typing import List, Optional
 from collections.abc import Callable, Sequence
 import random
 
@@ -88,7 +89,7 @@ def score_based_rule(
 
 
 def score_based_rule_with_tie_breaker(
-    score_functions: list[Callable[[Dispatcher], Sequence[int]]],
+    score_functions: List[Callable[[Dispatcher], Sequence[int]]],
 ) -> Callable[[Dispatcher], Operation]:
     """Creates a dispatching rule based on multiple scoring functions.
 
@@ -122,7 +123,7 @@ def score_based_rule_with_tie_breaker(
 # -----------------
 
 
-def shortest_processing_time_score(dispatcher: Dispatcher) -> list[int]:
+def shortest_processing_time_score(dispatcher: Dispatcher) -> List[int]:
     """Scores each job based on the duration of the next operation."""
     num_jobs = dispatcher.instance.num_jobs
     scores = [0] * num_jobs
@@ -131,7 +132,7 @@ def shortest_processing_time_score(dispatcher: Dispatcher) -> list[int]:
     return scores
 
 
-def first_come_first_served_score(dispatcher: Dispatcher) -> list[int]:
+def first_come_first_served_score(dispatcher: Dispatcher) -> List[int]:
     """Scores each job based on the position of the next operation."""
     num_jobs = dispatcher.instance.num_jobs
     scores = [0] * num_jobs
@@ -153,9 +154,9 @@ class MostWorkRemainingScorer:  # pylint: disable=too-few-public-methods
     """
 
     def __init__(self) -> None:
-        self._duration_observer: DurationObserver | None = None
-        self._is_ready_observer: IsReadyObserver | None = None
-        self._current_dispatcher: Dispatcher | None = None
+        self._duration_observer: Optional[DurationObserver] = None
+        self._is_ready_observer: Optional[IsReadyObserver] = None
+        self._current_dispatcher: Optional[Dispatcher] = None
 
     def __call__(self, dispatcher: Dispatcher) -> Sequence[int]:
         """Scores each job based on the remaining work in the job."""
@@ -197,7 +198,7 @@ observer_based_most_work_remaining_rule = score_based_rule(
 )
 
 
-def most_operations_remaining_score(dispatcher: Dispatcher) -> list[int]:
+def most_operations_remaining_score(dispatcher: Dispatcher) -> List[int]:
     """Scores each job based on the remaining operations in the job."""
     num_jobs = dispatcher.instance.num_jobs
     scores = [0] * num_jobs
@@ -206,7 +207,7 @@ def most_operations_remaining_score(dispatcher: Dispatcher) -> list[int]:
     return scores
 
 
-def random_score(dispatcher: Dispatcher) -> list[int]:
+def random_score(dispatcher: Dispatcher) -> List[int]:
     """Scores each job randomly."""
     return [
         random.randint(0, 100) for _ in range(dispatcher.instance.num_jobs)

@@ -1,13 +1,13 @@
 """Home of the `GanttChartCreator` class and its configuration types."""
 
-from typing import TypedDict
+from typing import TypedDict, Optional
 import matplotlib.pyplot as plt
 
 from job_shop_lib.dispatching import (
     Dispatcher,
     HistoryObserver,
 )
-from job_shop_lib.visualization import (
+from job_shop_lib.visualization.gantt import (
     create_gantt_chart_video,
     get_partial_gantt_chart_plotter,
     create_gantt_chart_gif,
@@ -24,7 +24,7 @@ class PartialGanttChartPlotterConfig(TypedDict, total=False):
         - :func:`get_partial_gantt_chart_plotter`
     """
 
-    title: str | None
+    title: Optional[str]
     """The title of the Gantt chart."""
 
     cmap: str
@@ -43,7 +43,7 @@ class GifConfig(TypedDict, total=False):
         :func:`create_gantt_chart_gif`
     """
 
-    gif_path: str | None
+    gif_path: Optional[str]
     """The path to save the GIF. It must end with '.gif'."""
 
     fps: int
@@ -52,7 +52,7 @@ class GifConfig(TypedDict, total=False):
     remove_frames: bool
     """Whether to remove the frames after creating the GIF."""
 
-    frames_dir: str | None
+    frames_dir: Optional[str]
     """The directory to store the frames."""
 
     plot_current_time: bool
@@ -68,7 +68,7 @@ class VideoConfig(TypedDict, total=False):
         :func:`create_gantt_chart_video`
     """
 
-    video_path: str | None
+    video_path: Optional[str]
     """The path to save the video. It must end with a valid video extension
     (e.g., '.mp4')."""
 
@@ -78,7 +78,7 @@ class VideoConfig(TypedDict, total=False):
     remove_frames: bool
     """Whether to remove the frames after creating the video."""
 
-    frames_dir: str | None
+    frames_dir: Optional[str]
     """The directory to store the frames."""
 
     plot_current_time: bool
@@ -164,11 +164,11 @@ class GanttChartCreator:
     def __init__(
         self,
         dispatcher: Dispatcher,
-        partial_gantt_chart_plotter_config: (
-            PartialGanttChartPlotterConfig | None
-        ) = None,
-        gif_config: GifConfig | None = None,
-        video_config: VideoConfig | None = None,
+        partial_gantt_chart_plotter_config: Optional[
+            PartialGanttChartPlotterConfig
+        ] = None,
+        gif_config: Optional[GifConfig] = None,
+        video_config: Optional[VideoConfig] = None,
     ):
         if gif_config is None:
             gif_config = {}

@@ -7,7 +7,7 @@ from typing import TypedDict
 import numpy as np
 
 from job_shop_lib.dispatching.feature_observers import FeatureType
-from job_shop_lib.visualization import (
+from job_shop_lib.visualization.gantt import (
     PartialGanttChartPlotterConfig,
     GifConfig,
     VideoConfig,

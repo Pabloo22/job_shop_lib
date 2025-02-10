@@ -3,6 +3,7 @@
 import abc
 import copy
 import random
+from typing import Optional
 
 from job_shop_lib import JobShopInstance, Operation
 
@@ -38,7 +39,7 @@ class RemoveMachines(Transformation):
     """Removes operations associated with randomly selected machines until
     there are exactly num_machines machines left."""
 
-    def __init__(self, num_machines: int, suffix: str | None = None):
+    def __init__(self, num_machines: int, suffix: Optional[str] = None):
         if suffix is None:
             suffix = f"_machines={num_machines}"
         super().__init__(suffix=suffix)
@@ -83,7 +84,7 @@ class AddDurationNoise(Transformation):
         min_duration: int = 1,
         max_duration: int = 100,
         noise_level: int = 10,
-        suffix: str | None = None,
+        suffix: Optional[str] = None,
     ):
         if suffix is None:
             suffix = f"_noise={noise_level}"
@@ -127,8 +128,8 @@ class RemoveJobs(Transformation):
         self,
         min_jobs: int,
         max_jobs: int,
-        target_jobs: int | None = None,
-        suffix: str | None = None,
+        target_jobs: Optional[int] = None,
+        suffix: Optional[str] = None,
     ):
         if suffix is None:
             suffix = f"_jobs={min_jobs}-{max_jobs}"

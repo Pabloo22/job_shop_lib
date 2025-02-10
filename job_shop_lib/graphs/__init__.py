@@ -25,10 +25,10 @@ from job_shop_lib.graphs._build_disjunctive_graph import (
     add_source_sink_nodes,
     add_source_sink_edges,
 )
-from job_shop_lib.graphs._build_agent_task_graph import (
-    build_agent_task_graph,
-    build_complete_agent_task_graph,
-    build_agent_task_graph_with_jobs,
+from job_shop_lib.graphs._build_resource_task_graphs import (
+    build_resource_task_graph,
+    build_complete_resource_task_graph,
+    build_resource_task_graph_with_jobs,
     add_same_job_operations_edges,
     add_machine_nodes,
     add_operation_machine_edges,
@@ -52,9 +52,9 @@ __all__ = [
     "add_conjunctive_edges",
     "add_source_sink_nodes",
     "add_source_sink_edges",
-    "build_agent_task_graph",
-    "build_complete_agent_task_graph",
-    "build_agent_task_graph_with_jobs",
+    "build_resource_task_graph",
+    "build_complete_resource_task_graph",
+    "build_resource_task_graph_with_jobs",
     "add_same_job_operations_edges",
     "add_machine_nodes",
     "add_operation_machine_edges",

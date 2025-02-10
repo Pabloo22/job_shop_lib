@@ -1,5 +1,6 @@
 """Utility functions."""
 
+from typing import Union, List
 import time
 from collections.abc import Callable
 import pandas as pd
@@ -10,12 +11,12 @@ from job_shop_lib.dispatching import Dispatcher
 
 
 def benchmark_dispatching_rules(
-    dispatching_rules: (
-        list[str | Callable[[Dispatcher], Operation]]
-        | list[str]
-        | list[Callable[[Dispatcher], Operation]]
-    ),
-    instances: list[JobShopInstance],
+    dispatching_rules: Union[
+        List[Union[str, Callable[[Dispatcher], Operation]]],
+        List[str],
+        List[Callable[[Dispatcher], Operation]]
+    ],
+    instances: List[JobShopInstance],
 ) -> pd.DataFrame:
     """Benchmark multiple dispatching rules on multiple JobShopInstances.
 
@@ -30,7 +31,7 @@ def benchmark_dispatching_rules(
             either a string (name of a built-in rule) or a callable
             (custom rule function).
         instances:
-             iList of :class:`JobShopInstance` objects to be solved.
+            List of :class:`JobShopInstance` objects to be solved.
 
     Returns:
         A pandas DataFrame with columns:
@@ -111,7 +112,7 @@ if __name__ == "__main__":
     instances_ = [load_benchmark_instance(f"ta{i:02d}") for i in range(1, 3)]
 
     # Define rules
-    rules_: list[str | Callable[[Dispatcher], Operation]] = [
+    rules_: List[str | Callable[[Dispatcher], Operation]] = [
         "most_work_remaining",
         "shortest_processing_time",
         most_work_remaining_rule,

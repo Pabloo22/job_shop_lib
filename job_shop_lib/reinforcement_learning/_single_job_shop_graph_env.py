@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import Any, Dict, Tuple, List, Optional, Type
 
 import matplotlib.pyplot as plt
 import gymnasium as gym
@@ -15,6 +15,7 @@ from job_shop_lib.graphs.graph_updaters import (
     GraphUpdater,
     ResidualGraphUpdater,
 )
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import (
     Dispatcher,
     filter_dominated_operations,
@@ -24,7 +25,7 @@ from job_shop_lib.dispatching.feature_observers import (
     FeatureObserverConfig,
     CompositeFeatureObserver,
 )
-from job_shop_lib.visualization import GanttChartCreator
+from job_shop_lib.visualization.gantt import GanttChartCreator
 from job_shop_lib.reinforcement_learning import (
     RewardObserver,
     MakespanReward,
@@ -138,16 +139,16 @@ class SingleJobShopGraphEnv(gym.Env):
         job_shop_graph: JobShopGraph,
         feature_observer_configs: Sequence[FeatureObserverConfig],
         reward_function_config: DispatcherObserverConfig[
-            type[RewardObserver]
+            Type[RewardObserver]
         ] = DispatcherObserverConfig(class_type=MakespanReward),
         graph_updater_config: DispatcherObserverConfig[
-            type[GraphUpdater]
+            Type[GraphUpdater]
         ] = DispatcherObserverConfig(class_type=ResidualGraphUpdater),
-        ready_operations_filter: (
-            Callable[[Dispatcher, list[Operation]], list[Operation]] | None
-        ) = filter_dominated_operations,
-        render_mode: str | None = None,
-        render_config: RenderConfig | None = None,
+        ready_operations_filter: Optional[
+            Callable[[Dispatcher, List[Operation]], List[Operation]]
+        ] = filter_dominated_operations,
+        render_mode: Optional[str] = None,
+        render_config: Optional[RenderConfig] = None,
         use_padding: bool = True,
     ) -> None:
         super().__init__()
@@ -195,10 +196,26 @@ class SingleJobShopGraphEnv(gym.Env):
         """Returns the job shop graph."""
         return self.graph_updater.job_shop_graph
 
+    def current_makespan(self) -> int:
+        """Returns current makespan of partial schedule."""
+        return self.dispatcher.schedule.makespan()
+
+    def machine_utilization(self) -> NDArray[np.float32]:
+        """Returns utilization percentage for each machine."""
+        total_time = max(1, self.current_makespan())  # Avoid division by zero
+        machine_busy_time = np.zeros(self.instance.num_machines)
+
+        for m_id, m_schedule in enumerate(self.dispatcher.schedule.schedule):
+            machine_busy_time[m_id] = sum(
+                op.operation.duration for op in m_schedule
+            )
+
+        return machine_busy_time / total_time
+
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
         num_edges = self.job_shop_graph.num_edges
-        dict_space: dict[str, gym.Space] = {
+        dict_space: Dict[str, gym.Space] = {
             ObservationSpaceKey.REMOVED_NODES.value: gym.spaces.MultiBinary(
                 len(self.job_shop_graph.nodes)
             ),
@@ -224,18 +241,23 @@ class SingleJobShopGraphEnv(gym.Env):
     def reset(
         self,
         *,
-        seed: int | None = None,
-        options: dict[str, Any] | None = None,
-    ) -> tuple[ObservationDict, dict]:
+        seed: Optional[int] = None,
+        options: Optional[Dict[str, Any]] = None,
+    ) -> Tuple[ObservationDict, dict]:
         """Resets the environment."""
         super().reset(seed=seed, options=options)
         self.dispatcher.reset()
         obs = self.get_observation()
-        return obs, {}
+        return obs, {
+            "feature_names": self.composite_observer.column_names,
+            "available_operations_with_ids": (
+                self.get_available_actions_with_ids()
+            ),
+        }
 
     def step(
-        self, action: tuple[int, int]
-    ) -> tuple[ObservationDict, float, bool, bool, dict[str, Any]]:
+        self, action: Tuple[int, int]
+    ) -> Tuple[ObservationDict, float, bool, bool, Dict[str, Any]]:
         """Takes a step in the environment.
 
         Args:
@@ -254,9 +276,9 @@ class SingleJobShopGraphEnv(gym.Env):
             - Whether the episode was truncated (always False).
             - A dictionary with additional information. The dictionary
               contains the following keys: "feature_names", the names of the
-              features in the observation; "available_operations", the
-              operations that are ready to be scheduled.
-
+              features in the observation; and "available_operations_with_ids",
+              a list of available actions in the form of (operation_id,
+              machine_id, job_id).
         """
         job_id, machine_id = action
         operation = self.dispatcher.next_operation(job_id)
@@ -269,9 +291,11 @@ class SingleJobShopGraphEnv(gym.Env):
         reward = self.reward_function.last_reward
         done = self.dispatcher.schedule.is_complete()
         truncated = False
-        info: dict[str, Any] = {
+        info: Dict[str, Any] = {
             "feature_names": self.composite_observer.column_names,
-            "available_operations": self.dispatcher.available_operations(),
+            "available_operations_with_ids": (
+                self.get_available_actions_with_ids()
+            ),
         }
         return obs, reward, done, truncated, info
 
@@ -322,6 +346,49 @@ class SingleJobShopGraphEnv(gym.Env):
         elif self.render_mode == "save_gif":
             self.gantt_chart_creator.create_gif()
 
+    def get_available_actions_with_ids(self) -> List[Tuple[int, int, int]]:
+        """Returns a list of available actions in the form of
+        (operation_id, machine_id, job_id)."""
+        available_operations = self.dispatcher.available_operations()
+        available_operations_with_ids = []
+        for operation in available_operations:
+            job_id = operation.job_id
+            operation_id = operation.operation_id
+            for machine_id in operation.machines:
+                available_operations_with_ids.append(
+                    (operation_id, machine_id, job_id)
+                )
+        return available_operations_with_ids
+
+    def validate_action(self, action: Tuple[int, int]) -> None:
+        """Validates that the action is legal in the current state.
+
+        Args:
+            action:
+                The action to validate. The action is a tuple of two integers
+                (job_id, machine_id).
+
+        Raises:
+            ValidationError: If the action is invalid.
+        """
+        job_id, machine_id = action
+        if not 0 <= job_id < self.instance.num_jobs:
+            raise ValidationError(f"Invalid job_id {job_id}")
+
+        if not -1 <= machine_id < self.instance.num_machines:
+            raise ValidationError(f"Invalid machine_id {machine_id}")
+
+        # Check if job has operations left
+        job = self.instance.jobs[job_id]
+        if self.dispatcher.job_next_operation_index[job_id] >= len(job):
+            raise ValidationError(f"Job {job_id} has no operations left")
+
+        next_operation = self.dispatcher.next_operation(job_id)
+        if machine_id == -1 and len(next_operation.machines) > 1:
+            raise ValidationError(
+                f"Operation {next_operation} requires a machine_id"
+            )
+
 
 if __name__ == "__main__":
     from job_shop_lib.dispatching.feature_observers import (
@@ -333,7 +400,7 @@ if __name__ == "__main__":
 
     instance = load_benchmark_instance("ft06")
     job_shop_graph_ = build_disjunctive_graph(instance)
-    feature_observer_configs_ = [
+    feature_observer_configs_: List[DispatcherObserverConfig] = [
         DispatcherObserverConfig(
             FeatureObserverType.IS_READY,
             kwargs={"feature_types": [FeatureType.JOBS]},

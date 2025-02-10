@@ -12,7 +12,7 @@
 
 </div>
 
-JobShopLib is a Python package for creating, solving, and visualizing Job Shop Scheduling Problems (JSSP).
+JobShopLib is a Python package for creating, solving, and visualizing job shop scheduling problems (JSSP).
 
 It follows a modular design, allowing users to easily extend the library with new solvers, dispatching rules, visualization functions, etc.
 
@@ -36,7 +36,7 @@ See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcoww
 Version 1.0.0 is currently in alpha stage and can be installed with:
 
 ```bash
-pip install job-shop-lib==1.0.0a5
+pip install job-shop-lib==1.0.0b1
 ```
 
 Although this version is not stable and may contain breaking changes in subsequent releases, it is recommended to install it to access the new reinforcement learning environments and familiarize yourself with new changes (see the [latest pull requests](https://github.com/Pabloo22/job_shop_lib/pulls?q=is%3Apr+is%3Aclosed)). There is a [documentation page](https://job-shop-lib.readthedocs.io/en/latest/) for versions 1.0.0a3 and onward.
@@ -65,7 +65,7 @@ Although this version is not stable and may contain breaking changes in subseque
   - **Agent-Task Graphs**: Encode instances as agent-task graphs (introduced in [ScheduleNet paper](https://arxiv.org/abs/2106.03051)). See [Agent-Task Graph](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/07-Agent-Task-Graph.ipynb).
   - Build your own custom graphs with the `JobShopGraph` class.
 
-- **Gymnasium Environments**: Two environments for solving the problem with Graph Neural Networks (GNNs) or any other method, and Reinforcement Learning (RL). See [SingleJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/10-MultiJobShopGraphEnv.ipynb).
+- **Gymnasium Environments**: Two environments for solving the problem with graph neural networks (GNNs) or any other method, and reinforcement learning (RL). See [SingleJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/10-MultiJobShopGraphEnv.ipynb).
 
 <!-- end key features -->
 
@@ -221,7 +221,7 @@ The dashed red line represents the current time step, which is computed as the e
 
 ### Representing Instances as Graphs
 
-One of the main purposes of this library is to provide an easy way to encode instances as graphs. This can be very useful, not only for visualization purposes but also for developing Graph Neural Network-based algorithms.
+One of the main purposes of this library is to provide an easy way to encode instances as graphs. This can be very useful, not only for visualization purposes but also for developing graph neural network-based algorithms.
 
 A graph is represented by the `JobShopGraph` class, which internally stores a `networkx.DiGraph` object.
 
@@ -229,7 +229,7 @@ A graph is represented by the `JobShopGraph` class, which internally stores a `n
 
 The disjunctive graph is created by first adding nodes representing each operation in the jobs, along with two special nodes: a source $S$ and a sink $T$. Each operation node is linked to the next operation in its job sequence by **conjunctive edges**, forming a path from the source to the sink. These edges represent the order in which operations of a single job must be performed.
 
-Additionally, the graph includes **disjunctive edges** between operations that use the same machine but belong to different jobs. These edges are bidirectional, indicating that either of the connected operations can be performed first. The disjunctive edges thus represent the scheduling choices available: the order in which operations sharing a machine can be processed. Solving the Job Shop Scheduling problem involves choosing a direction for each disjunctive edge such that the overall processing time is minimized.
+Additionally, the graph includes **disjunctive edges** between operations that use the same machine but belong to different jobs. These edges are bidirectional, indicating that either of the connected operations can be performed first. The disjunctive edges thus represent the scheduling choices available: the order in which operations sharing a machine can be processed. Solving the job shop scheduling problem involves choosing a direction for each disjunctive edge such that the overall processing time is minimized.
 
 ```python
 from job_shop_lib.visualization import plot_disjunctive_graph
@@ -271,9 +271,9 @@ Other attributes include:
 - `nodes_by_machine`: A nested list mapping each machine to its associated operation nodes, aiding in machine-specific analysis.
 - `nodes_by_job`: Similar to `nodes_by_machine`, but maps jobs to their operation nodes, useful for job-specific traversal.
 
-#### Agent-Task Graph
+#### Resource-Task Graph
 
-Introduced in the paper "ScheduleNet: Learn to solve multi-agent scheduling problems with reinforcement learning" by [Park et al. (2021)](https://arxiv.org/abs/2106.03051), the Agent-Task Graph is a graph that represents the scheduling problem as a multi-agent reinforcement learning problem.
+Introduced in the paper "ScheduleNet: Learn to solve multi-agent scheduling problems with reinforcement learning" by [Park et al. (2021)](https://arxiv.org/abs/2106.03051), the resource-task graph (orginally named "agent-task graph") is a graph that represents the scheduling problem as a multi-agent reinforcement learning problem.
 
 In contrast to the disjunctive graph, instead of connecting operations
 that share the same resources directly by disjunctive edges, operation
@@ -284,24 +284,26 @@ from the same job are connected by non-directed edges too.
 
 ```python
 from job_shop_lib.graphs import (
-    build_complete_agent_task_graph,
-    build_agent_task_graph_with_jobs,
-    build_agent_task_graph,
+    build_complete_resource_task_graph,
+    build_resource_task_graph_with_jobs,
+    build_resource_task_graph,
 )
-from job_shop_lib.visualization import plot_agent_task_graph
+from job_shop_lib.visualization import plot_resource_task_graph
 
-complete_agent_task_graph = build_complete_agent_task_graph(instance)
+complete_resource_task_graph = build_complete_resource_task_graph(instance)
 
-fig = plot_agent_task_graph(complete_agent_task_graph)
+fig = plot_resource_task_graph(complete_agent_task_graph)
 plt.show()
 ```
 
 <div align="center">
-<img src="docs/source/images/agent_task_graph.png" width="300">
+<img src="docs/source/examples/output/agent_task_graph.png" width="300">
 </div>
 <br>
 
 ----
+
+The library generalizes this graph by allowing the addition of job nodes and a global one (see `build_resource_task_graph_with_jobs` and `build_resource_task_graph`).
 
 For more details, check the [examples](examples) folder.
 

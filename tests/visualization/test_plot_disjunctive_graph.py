@@ -1,6 +1,6 @@
 import pytest
 
-from job_shop_lib.visualization import plot_disjunctive_graph
+from job_shop_lib.visualization.graphs import plot_disjunctive_graph
 
 
 @pytest.mark.mpl_image_compare(

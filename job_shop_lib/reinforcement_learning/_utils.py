@@ -1,6 +1,6 @@
 """Utility functions for reinforcement learning."""
 
-from typing import TypeVar, Any
+from typing import TypeVar, Any, Tuple, Optional, Type
 
 import numpy as np
 from numpy.typing import NDArray
@@ -12,9 +12,9 @@ T = TypeVar("T", bound=np.number)
 
 def add_padding(
     array: NDArray[Any],
-    output_shape: tuple[int, ...],
+    output_shape: Tuple[int, ...],
     padding_value: float = -1,
-    dtype: type[T] | None = None,
+    dtype: Optional[Type[T]] = None,
 ) -> NDArray[T]:
     """Adds padding to the array.
 

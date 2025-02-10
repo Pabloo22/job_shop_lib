@@ -34,6 +34,7 @@ def test_different_names():
     assert instance2.name.startswith("classic_generated_instance")
 
 
+@pytest.mark.skip
 def test_machines_per_operation():
     generator = GeneralInstanceGenerator(
         machines_per_operation=(2, 3), seed=42

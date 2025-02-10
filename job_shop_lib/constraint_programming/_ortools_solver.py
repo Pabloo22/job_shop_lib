@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Dict, List, Tuple
 import time
 
 from ortools.sat.python import cp_model
@@ -62,7 +62,7 @@ class ORToolsSolver(BaseSolver):
         self._makespan: cp_model.IntVar | None = None
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
-        self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
+        self._operations_start: Dict[Operation, Tuple[IntVar, IntVar]] = {}
 
     def __call__(self, instance: JobShopInstance) -> Schedule:
         """Equivalent to calling the :meth:`~ORToolsSolver.solve` method.
@@ -152,15 +152,15 @@ class ORToolsSolver(BaseSolver):
         self._set_objective(instance)
 
     def _create_schedule(
-        self, instance: JobShopInstance, metadata: dict[str, Any]
+        self, instance: JobShopInstance, metadata: Dict[str, Any]
     ) -> Schedule:
         """Creates a Schedule object from the solution."""
-        operations_start: dict[Operation, int] = {
+        operations_start: Dict[Operation, int] = {
             operation: self.solver.Value(start_var)
             for operation, (start_var, _) in self._operations_start.items()
         }
 
-        unsorted_schedule: list[list[ScheduledOperation]] = [
+        unsorted_schedule: List[List[ScheduledOperation]] = [
             [] for _ in range(instance.num_machines)
         ]
         for operation, start_time in operations_start.items():
@@ -235,7 +235,7 @@ class ORToolsSolver(BaseSolver):
         each machine."""
 
         # Create interval variables for each operation on each machine
-        machines_operations: list[list[tuple[tuple[IntVar, IntVar], int]]] = [
+        machines_operations: List[List[Tuple[Tuple[IntVar, IntVar], int]]] = [
             [] for _ in range(instance.num_machines)
         ]
         for job in instance.jobs:

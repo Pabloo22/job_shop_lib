@@ -8,7 +8,7 @@ Examples
     examples/04-Disjunctive-Graph
     examples/05-Load-Benchmark-Instances
     examples/06-Save-Gif.ipynb
-    examples/07-Agent-Task-Graph
+    examples/07-Resource-Task-Graph
     examples/08-Feature-Observers
     examples/09-SingleJobShopGraphEnv
     examples/10-MultiJobShopGraphEnv
