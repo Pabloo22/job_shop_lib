@@ -36,7 +36,7 @@ See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcoww
 Version 1.0.0 is currently in alpha stage and can be installed with:
 
 ```bash
-pip install job-shop-lib==1.0.0a5
+pip install job-shop-lib==1.0.0b1
 ```
 
 Although this version is not stable and may contain breaking changes in subsequent releases, it is recommended to install it to access the new reinforcement learning environments and familiarize yourself with new changes (see the [latest pull requests](https://github.com/Pabloo22/job_shop_lib/pulls?q=is%3Apr+is%3Aclosed)). There is a [documentation page](https://job-shop-lib.readthedocs.io/en/latest/) for versions 1.0.0a3 and onward.
