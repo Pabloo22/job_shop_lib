@@ -346,29 +346,6 @@ class SingleJobShopGraphEnv(gym.Env):
         elif self.render_mode == "save_gif":
             self.gantt_chart_creator.create_gif()
 
-    def get_valid_actions_mask(self) -> NDArray[np.bool_]:
-        """Returns a boolean mask of valid actions in the current state."""
-        action_mask = np.zeros(
-            (self.instance.num_jobs, self.instance.num_machines + 1),
-            dtype=bool,
-        )
-
-        for job_id, job in enumerate(self.instance.jobs):
-            job_is_completed = self.dispatcher.job_next_operation_index[
-                job_id
-            ] >= len(job)
-            if job_is_completed:
-                continue
-
-            operation = self.dispatcher.next_operation(job_id)
-            if len(operation.machines) == 1:
-                # Allow -1 for single machine operations
-                action_mask[job_id, 0] = True
-            for machine_id in operation.machines:
-                action_mask[job_id, machine_id + 1] = True
-
-        return action_mask
-
     def get_available_actions_with_ids(self) -> List[Tuple[int, int, int]]:
         """Returns a list of available actions in the form of
         (operation_id, machine_id, job_id)."""
