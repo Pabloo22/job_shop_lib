@@ -322,9 +322,10 @@ class MultiJobShopGraphEnv(gym.Env):
             - Whether the environment is done.
             - Whether the episode was truncated (always False).
             - A dictionary with additional information. The dictionary
-              contains the following keys: ``"feature_names"``, The names of
-              the features in the observation; ``"available_operations"``, the
-              operations that are ready to be scheduled.
+              contains the following keys: "feature_names", the names of the
+              features in the observation; and "available_operations_with_ids",
+              a list of available actions in the form of (operation_id,
+              machine_id, job_id).
         """
         obs, reward, done, truncated, info = (
             self.single_job_shop_graph_env.step(action)
@@ -376,3 +377,22 @@ class MultiJobShopGraphEnv(gym.Env):
 
     def render(self) -> None:
         self.single_job_shop_graph_env.render()
+
+    def get_available_actions_with_ids(self) -> List[Tuple[int, int, int]]:
+        """Returns a list of available actions in the form of
+        (operation_id, machine_id, job_id)."""
+        return self.single_job_shop_graph_env.get_available_actions_with_ids()
+
+    def validate_action(self, action: Tuple[int, int]) -> None:
+        """Validates the action.
+
+        Args:
+            action:
+                The action to validate. The action is a tuple of two integers
+                (job_id, machine_id): the job ID and the machine ID in which
+                to schedule the operation.
+
+        Raises:
+            ValidationError: If the action is invalid.
+        """
+        self.single_job_shop_graph_env.validate_action(action)
