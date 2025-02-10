@@ -1,16 +1,12 @@
-"""Contains helper functions to build the heterogeneous graphs from a job shop
+"""Contains helper functions to build the resource-task graphs from a job shop
 instance.
 
-The agent-task graph (renamed to heterogeneous graph) was introduced by
+The agent-task graph (renamed to resource-task graph) was introduced by
 Junyoung Park et al. (2021).
 In contrast to the disjunctive graph, instead of connecting operations that
 share the same resources directly by disjunctive edges, operation nodes are
 connected with machine ones. All machine nodes are connected between them, and
 all operation nodes from the same job are connected by non-directed edges too.
-
-The renaming is because we generalize this approach by adding of job
-nodes and a global node. Job nodes are connected to all operation nodes of
-the same job, and the global node is connected to all machine and job nodes.
 
 References:
 - Junyoung Park, Sanjar Bakhtiyar, and Jinkyoo Park. Schedulenet: Learn to
@@ -24,13 +20,13 @@ from job_shop_lib import JobShopInstance
 from job_shop_lib.graphs import JobShopGraph, NodeType, Node
 
 
-def build_complete_heterogeneous_graph(
+def build_complete_resource_task_graph(
     instance: JobShopInstance,
 ) -> JobShopGraph:
-    """Builds the heterogeneous graph of the instance with job and global
+    """Builds the resource-task graph of the instance with job and global
     nodes.
 
-    The complete heterogeneous includes job nodes and a global node.
+    The complete resource-task includes job nodes and a global node.
 
     Job nodes are connected to all operation nodes of the same job, and the
     global node is connected to all machine and job nodes.
@@ -41,11 +37,11 @@ def build_complete_heterogeneous_graph(
 
     Args:
         instance:
-            The job shop instance in which the heterogeneous graph will be
+            The job shop instance in which the resource-task graph will be
             built.
 
     Returns:
-        The complete heterogeneous graph of the instance.
+        The complete resource-task graph of the instance.
     """
     graph = JobShopGraph(instance)
 
@@ -62,23 +58,23 @@ def build_complete_heterogeneous_graph(
     return graph
 
 
-def build_heterogeneous_graph_with_jobs(
+def build_resource_task_graph_with_jobs(
     instance: JobShopInstance,
 ) -> JobShopGraph:
-    """Builds the heterogeneous graph of the instance with job nodes.
+    """Builds the resource-task graph of the instance with job nodes.
 
-    The heterogeneous graph that includes job nodes.
+    The resource-task graph that includes job nodes.
 
     Job nodes are connected to all operation nodes of the same job, and their
     are connected between them.
 
     Args:
         instance:
-            The job shop instance in which the heterogeneous graph will be
+            The job shop instance in which the resource-task graph will be
             built.
 
     Returns:
-        The heterogeneous graph of the instance with job nodes.
+        The resource-task graph of the instance with job nodes.
     """
     graph = JobShopGraph(instance)
 
@@ -93,10 +89,10 @@ def build_heterogeneous_graph_with_jobs(
     return graph
 
 
-def build_heterogeneous_graph(instance: JobShopInstance) -> JobShopGraph:
-    """Builds the heterogeneous graph of the instance.
+def build_resource_task_graph(instance: JobShopInstance) -> JobShopGraph:
+    """Builds the resource-task graph of the instance.
 
-    The JSSP heterogeneous graph representation was introduced by Junyoung
+    The JSSP resource-task graph representation was introduced by Junyoung
     Park et al. (2021) (named agent-task graph in the original paper).
 
     In contrast to the disjunctive graph, instead of connecting operations
@@ -108,11 +104,11 @@ def build_heterogeneous_graph(instance: JobShopInstance) -> JobShopGraph:
 
     Args:
         instance:
-            The job shop instance in which the heterogeneous graph will be
+            The job shop instance in which the resource-task graph will be
             built.
 
     Returns:
-        The heterogeneous graph of the instance.
+        The resource-task graph of the instance.
     """
     graph = JobShopGraph(instance)
 

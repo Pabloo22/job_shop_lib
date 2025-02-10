@@ -271,9 +271,9 @@ Other attributes include:
 - `nodes_by_machine`: A nested list mapping each machine to its associated operation nodes, aiding in machine-specific analysis.
 - `nodes_by_job`: Similar to `nodes_by_machine`, but maps jobs to their operation nodes, useful for job-specific traversal.
 
-#### Agent-Task Graph
+#### Resource-Task Graph
 
-Introduced in the paper "ScheduleNet: Learn to solve multi-agent scheduling problems with reinforcement learning" by [Park et al. (2021)](https://arxiv.org/abs/2106.03051), the Agent-Task Graph is a graph that represents the scheduling problem as a multi-agent reinforcement learning problem.
+Introduced in the paper "ScheduleNet: Learn to solve multi-agent scheduling problems with reinforcement learning" by [Park et al. (2021)](https://arxiv.org/abs/2106.03051), the resource-task graph (orginally named "agent-task graph") is a graph that represents the scheduling problem as a multi-agent reinforcement learning problem.
 
 In contrast to the disjunctive graph, instead of connecting operations
 that share the same resources directly by disjunctive edges, operation
@@ -284,24 +284,26 @@ from the same job are connected by non-directed edges too.
 
 ```python
 from job_shop_lib.graphs import (
-    build_complete_agent_task_graph,
-    build_agent_task_graph_with_jobs,
-    build_agent_task_graph,
+    build_complete_resource_task_graph,
+    build_resource_task_graph_with_jobs,
+    build_resource_task_graph,
 )
-from job_shop_lib.visualization import plot_agent_task_graph
+from job_shop_lib.visualization import plot_resource_task_graph
 
-complete_agent_task_graph = build_complete_agent_task_graph(instance)
+complete_resource_task_graph = build_complete_resource_task_graph(instance)
 
-fig = plot_agent_task_graph(complete_agent_task_graph)
+fig = plot_resource_task_graph(complete_agent_task_graph)
 plt.show()
 ```
 
 <div align="center">
-<img src="docs/source/images/agent_task_graph.png" width="300">
+<img src="docs/source/examples/output/agent_task_graph.png" width="300">
 </div>
 <br>
 
 ----
+
+The library generalizes this graph by allowing the addition of job nodes and a global one (see `build_resource_task_graph_with_jobs` and `build_resource_task_graph`).
 
 For more details, check the [examples](examples) folder.
 

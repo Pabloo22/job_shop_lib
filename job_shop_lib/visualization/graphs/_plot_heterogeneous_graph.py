@@ -1,4 +1,4 @@
-"""Contains functions to plot a heteregenous graph representation of a job
+"""Contains functions to plot a resource-task graph representation of a job
 shop instance.
 
 It was introduced by Junyoung Park et al. (2021).
@@ -19,7 +19,7 @@ import networkx as nx
 from job_shop_lib.graphs import NodeType, JobShopGraph, Node
 
 
-def plot_heterogeneous_graph(
+def plot_resource_task_graph(
     job_shop_graph: JobShopGraph,
     *,
     title: Optional[str] = None,
