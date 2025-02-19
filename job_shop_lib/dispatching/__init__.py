@@ -8,6 +8,7 @@ Problem step-by-step.
     DispatcherObserver
     HistoryObserver
     UnscheduledOperationsObserver
+    OptimalOperationsObserver
     ReadyOperationsFilter
     DispatcherObserverConfig
     filter_dominated_operations
@@ -25,9 +26,8 @@ from ._dispatcher import Dispatcher, DispatcherObserver
 from ._history_observer import (
     HistoryObserver,
 )
-from ._unscheduled_operations_observer import (
-    UnscheduledOperationsObserver,
-)
+from ._unscheduled_operations_observer import UnscheduledOperationsObserver
+from ._optimal_operations_observer import OptimalOperationsObserver
 from ._ready_operation_filters import (
     filter_dominated_operations,
     filter_non_immediate_machines,
@@ -57,4 +57,5 @@ __all__ = [
     "ReadyOperationsFilter",
     "filter_non_idle_machines",
     "filter_non_immediate_operations",
+    "OptimalOperationsObserver",
 ]

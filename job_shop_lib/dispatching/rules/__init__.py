@@ -3,7 +3,7 @@
 Main objects:
 
 .. autosummary::
-    
+
     DispatchingRuleSolver
     dispatching_rule_factory
     DispatchingRuleType
