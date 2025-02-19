@@ -30,14 +30,14 @@ class DispatchingRuleSolver(BaseSolver):
             Used to choose the machine where the operation will be dispatched
             to. It is only used if the operation can be dispatched to multiple
             machines.
-        pruning_function:
-            The pruning function to use. It is used to initialize the
+        ready_operations_filter:
+            The ready operations filter to use. It is used to initialize the
             dispatcher object internally when calling the solve method.
 
     Args:
         dispatching_rule:
             The dispatching rule to use. It can be a string with the name
-            of the dispatching rule, a class`DispatchingRuleType` enum member,
+            of the dispatching rule, a :class:`DispatchingRuleType` member,
             or a callable that takes a dispatcher and returns the operation to
             be dispatched next.
         machine_chooser:
@@ -110,8 +110,30 @@ class DispatchingRuleSolver(BaseSolver):
         instance: JobShopInstance,
         dispatcher: Optional[Dispatcher] = None,
     ) -> Schedule:
-        """Returns a schedule for the given job shop instance using the
-        dispatching rule algorithm."""
+        """Solves the instance using the dispatching rule and machine chooser
+        algorithms.
+
+        Args:
+            instance:
+                The job shop instance to be solved.
+            dispatcher:
+                The dispatcher object that will be used to dispatch the
+                operations. If not provided, a new dispatcher will be created
+                using the ready operations filter provided in the constructor.
+
+        Returns:
+            The schedule obtained after solving the instance.
+
+        .. tip::
+            Another way to use the solver is by calling it as a function. This
+            will call the ``solve`` method internally and will add metadata to
+            the schedule. For example:
+
+            .. code-block:: python
+
+                solver = DispatchingRuleSolver()
+                schedule = solver(instance)
+        """
         if dispatcher is None:
             dispatcher = Dispatcher(
                 instance, ready_operations_filter=self.ready_operations_filter
