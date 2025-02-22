@@ -8,9 +8,9 @@ The main classes and functions available in this package are:
     NodeType
     build_disjunctive_graph
     build_solved_disjunctive_graph
-    build_agent_task_graph
-    build_complete_agent_task_graph
-    build_agent_task_graph_with_jobs
+    build_resource_task_graph
+    build_complete_resource_task_graph
+    build_resource_task_graph_with_jobs
 
 """
 
