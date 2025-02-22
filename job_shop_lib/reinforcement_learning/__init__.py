@@ -12,6 +12,7 @@
     IdleTimeReward
     RenderConfig
     add_padding
+    create_edge_type_dict
 
 """
 
@@ -27,7 +28,10 @@ from job_shop_lib.reinforcement_learning._reward_observers import (
     IdleTimeReward,
 )
 
-from job_shop_lib.reinforcement_learning._utils import add_padding
+from job_shop_lib.reinforcement_learning._utils import (
+    add_padding,
+    create_edge_type_dict,
+)
 
 from job_shop_lib.reinforcement_learning._single_job_shop_graph_env import (
     SingleJobShopGraphEnv,
@@ -47,4 +51,5 @@ __all__ = [
     "ObservationDict",
     "add_padding",
     "MultiJobShopGraphEnv",
+    "create_edge_type_dict",
 ]
