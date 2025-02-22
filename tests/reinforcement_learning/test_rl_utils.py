@@ -3,7 +3,10 @@ import numpy as np
 from numpy.typing import NDArray
 
 from job_shop_lib.exceptions import ValidationError
-from job_shop_lib.reinforcement_learning import add_padding
+from job_shop_lib.reinforcement_learning import (
+    add_padding,
+    create_edge_type_dict,
+)
 
 
 def test_add_padding_int_array():
@@ -120,6 +123,125 @@ def test_add_padding_raises_error():
     output_shape = (1, 3)
     with pytest.raises(ValidationError):
         add_padding(array, output_shape)
+
+
+def test_basic_bipartite():
+    """Test basic bipartite graph with two node types."""
+    edge_index = np.array(
+        [
+            [0, 0, 1, 1],  # source nodes
+            [2, 3, 2, 3],  # target nodes
+        ]
+    )
+
+    type_ranges = {"user": (0, 2), "item": (2, 4)}
+
+    result = create_edge_type_dict(edge_index, type_ranges)
+
+    # Check all possible type combinations
+    assert ("user", "to", "item") in result
+    assert np.array_equal(result[("user", "to", "item")], edge_index)
+
+    # These combinations should be empty
+    assert result[("user", "to", "user")].size == 0
+    assert result[("item", "to", "item")].size == 0
+    assert result[("item", "to", "user")].size == 0
+
+
+def test_three_node_types():
+    """Test graph with three node types."""
+    edge_index = np.array(
+        [
+            [0, 1, 2, 3, 4],  # source nodes
+            [3, 3, 5, 5, 5],  # target nodes
+        ]
+    )
+
+    type_ranges = {
+        "user": (0, 2),  # nodes 0,1
+        "item": (2, 4),  # nodes 2,3
+        "category": (4, 6),  # nodes 4,5
+    }
+
+    result = create_edge_type_dict(edge_index, type_ranges)
+
+    # Test user to item edges
+    user_to_item = result[("user", "to", "item")]
+    assert np.array_equal(user_to_item, np.array([[0, 1], [3, 3]]))
+
+    # Test item to category edges
+    item_to_category = result[("item", "to", "category")]
+    assert np.array_equal(item_to_category, np.array([[2, 3], [5, 5]]))
+
+    # Test category to category edges
+    category_to_category = result[("category", "to", "category")]
+    assert np.array_equal(category_to_category, np.array([[4], [5]]))
+
+    # Verify that non-existent edges have empty arrays
+    assert result[("user", "to", "user")].size == 0
+    assert result[("user", "to", "category")].size == 0
+    assert result[("category", "to", "user")].size == 0
+    assert result[("category", "to", "item")].size == 0
+    assert result[("item", "to", "user")].size == 0
+    assert result[("item", "to", "item")].size == 0
+
+
+def test_zeros_edge_index():
+    """Test with empty edge index."""
+    edge_index = np.zeros((2, 0))
+
+    type_ranges = {"user": (0, 2), "item": (2, 4), "category": (4, 6)}
+
+    result = create_edge_type_dict(edge_index, type_ranges)
+
+    user_to_user = result[("user", "to", "user")]
+    assert len(result) == 9
+    assert np.array_equal(user_to_user, edge_index)
+
+
+def test_single_node_type():
+    """Test with single node type."""
+    edge_index = np.array([[0, 1, 1, 2], [1, 0, 2, 1]])
+
+    type_ranges = {"user": (0, 3)}
+
+    result = create_edge_type_dict(edge_index, type_ranges)
+
+    assert ("user", "to", "user") in result
+    assert np.array_equal(result[("user", "to", "user")], edge_index)
+
+
+def test_out_of_range_edges():
+    """Test handling of edges that are out of the specified ranges."""
+    edge_index = np.array(
+        [
+            [0, 1, 5, 2],  # node 5 is out of range
+            [1, 2, 1, 5],  # node 5 is out of range
+        ]
+    )
+
+    type_ranges = {"user": (0, 2), "item": (2, 4)}
+
+    result = create_edge_type_dict(edge_index, type_ranges)
+
+    # Check that out-of-range edges are not included
+    user_to_user = result[("user", "to", "user")]
+    assert user_to_user.shape[1] == 1  # Only one valid user-to-user edge
+    assert np.array_equal(user_to_user, np.array([[0], [1]]))
+
+
+def test_edge_case_adjacent_ranges():
+    """Test with adjacent ranges."""
+    edge_index = np.array([[1, 2, 3], [2, 3, 4]])
+
+    type_ranges = {"type1": (0, 2), "type2": (2, 4), "type3": (4, 6)}
+
+    result = create_edge_type_dict(edge_index, type_ranges)
+
+    # Check edges at the boundaries
+    assert np.array_equal(
+        result[("type1", "to", "type2")], np.array([[1], [2]])
+    )
 
 
 if __name__ == "__main__":

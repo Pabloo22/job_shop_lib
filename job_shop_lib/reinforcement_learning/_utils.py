@@ -1,6 +1,6 @@
 """Utility functions for reinforcement learning."""
 
-from typing import TypeVar, Any, Tuple, Optional, Type
+from typing import TypeVar, Any, Type, Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -12,9 +12,9 @@ T = TypeVar("T", bound=np.number)
 
 def add_padding(
     array: NDArray[Any],
-    output_shape: Tuple[int, ...],
+    output_shape: tuple[int, ...],
     padding_value: float = -1,
-    dtype: Optional[Type[T]] = None,
+    dtype: Type[T] | None = None,
 ) -> NDArray[T]:
     """Adds padding to the array.
 
@@ -88,6 +88,42 @@ def add_padding(
     slices = tuple(slice(0, dim) for dim in array.shape)
     padded_array[slices] = array
     return padded_array
+
+
+def create_edge_type_dict(
+    edge_index: NDArray[T], type_ranges: dict[str, tuple[int, int]]
+) -> dict[tuple[str, Literal["to"], str], NDArray[T]]:
+    """Organizes edges based on node types.
+
+    Args:
+        edge_index:
+            numpy array of shape (2, E) where E is number of edges
+        type_ranges: dict[str, tuple[int, int]]
+            Dictionary mapping type names to their corresponding index ranges
+            [start, end) in the ``edge_index`` array.
+
+    Returns:
+        A dictionary with keys (type_i, "to", type_j) and values as edge
+        indices
+    """
+    edge_index_dict: dict[tuple[str, Literal["to"], str], NDArray] = {}
+    for type_name_i, (start_i, end_i) in type_ranges.items():
+        for type_name_j, (start_j, end_j) in type_ranges.items():
+            key: tuple[str, Literal["to"], str] = (
+                type_name_i,
+                "to",
+                type_name_j,
+            )
+            # Find edges where source is in type_i and target is in type_j
+            mask = (
+                (edge_index[0] >= start_i)
+                & (edge_index[0] < end_i)
+                & (edge_index[1] >= start_j)
+                & (edge_index[1] < end_j)
+            )
+            edge_index_dict[key] = edge_index[:, mask]
+
+    return edge_index_dict
 
 
 if __name__ == "__main__":
