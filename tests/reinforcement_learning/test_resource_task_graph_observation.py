@@ -14,13 +14,13 @@ def test_edge_index_dict(
         single_env_ft06_resource_task_graph_with_all_features
     )
     obs, info = env.reset()
-    max_index = env.job_shop_graph.instance.num_operations
+    max_index = env.unwrapped.job_shop_graph.instance.num_operations
     edge_index_dict = obs["edge_index_dict"]
     _check_that_edge_index_has_been_reindexed(edge_index_dict, max_index)
 
     done = False
     _, machine_id, job_id = info["available_operations_with_ids"][0]
-    removed_nodes = env.job_shop_graph.removed_nodes
+    removed_nodes = env.unwrapped.job_shop_graph.removed_nodes
     _check_count_of_unique_ids(edge_index_dict, removed_nodes)
     while not done:
         obs, _, done, _, info = env.step((job_id, machine_id))
@@ -43,7 +43,7 @@ def test_node_features_dict(
     obs, info = env.reset()
     done = False
     _, machine_id, job_id = info["available_operations_with_ids"][0]
-    removed_nodes = env.job_shop_graph.removed_nodes
+    removed_nodes = env.unwrapped.job_shop_graph.removed_nodes
     _check_number_of_nodes(obs["node_features_dict"], removed_nodes)
     while not done:
         obs, _, done, _, info = env.step((job_id, machine_id))
@@ -64,7 +64,7 @@ def test_original_ids_dict(
     obs, info = env.reset()
     done = False
     _, machine_id, job_id = info["available_operations_with_ids"][0]
-    removed_nodes = env.job_shop_graph.removed_nodes
+    removed_nodes = env.unwrapped.job_shop_graph.removed_nodes
     _check_original_ids_dict(obs["original_ids_dict"], removed_nodes)
     while not done:
         obs, _, done, _, info = env.step((job_id, machine_id))
