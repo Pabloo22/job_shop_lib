@@ -35,7 +35,7 @@ _FEATURE_TYPE_STR_TO_NODE_TYPE = {
 class ResourceTaskGraphObservationDict(TypedDict):
     """Represents a dictionary for resource task graph observations."""
 
-    edge_index_dict: dict[str, NDArray[np.int64]]
+    edge_index_dict: dict[tuple[str, str, str], NDArray[np.int32]]
     node_features_dict: dict[str, NDArray[np.float32]]
     original_ids_dict: dict[str, NDArray[np.int32]]
 

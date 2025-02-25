@@ -5,6 +5,7 @@ from enum import Enum
 from typing import TypedDict
 
 import numpy as np
+from numpy.typing import NDArray
 
 from job_shop_lib.dispatching.feature_observers import FeatureType
 from job_shop_lib.visualization.gantt import (
@@ -35,27 +36,27 @@ class ObservationSpaceKey(str, Enum):
 class _ObservationDictRequired(TypedDict):
     """Required fields for the observation dictionary."""
 
-    removed_nodes: np.ndarray
-    edge_index: np.ndarray
+    removed_nodes: NDArray[np.bool_]
+    edge_index: NDArray[np.int32]
 
 
 class _ObservationDictOptional(TypedDict, total=False):
     """Optional fields for the observation dictionary."""
 
-    operations: np.ndarray
-    jobs: np.ndarray
-    machines: np.ndarray
+    operations: NDArray[np.float32]
+    jobs: NDArray[np.float32]
+    machines: NDArray[np.float32]
 
 
 class ObservationDict(_ObservationDictRequired, _ObservationDictOptional):
     """A dictionary containing the observation of the environment.
 
     Required fields:
-        removed_nodes (np.ndarray): Binary vector indicating removed nodes.
-        edge_index (np.ndarray): Edge list in COO format.
+        removed_nodes: Binary vector indicating removed nodes.
+        edge_index: Edge list in COO format.
 
     Optional fields:
-        operations (np.ndarray): Matrix of operation features.
-        jobs (np.ndarray): Matrix of job features.
-        machines (np.ndarray): Matrix of machine features.
+        operations: Matrix of operation features.
+        jobs: Matrix of job features.
+        machines: Matrix of machine features.
     """
