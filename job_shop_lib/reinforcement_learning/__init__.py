@@ -14,6 +14,7 @@
     add_padding
     create_edge_type_dict
     ResourceTaskGraphObservation
+    ResourceTaskGraphObservationDict
 
 """
 
@@ -42,7 +43,7 @@ from job_shop_lib.reinforcement_learning._multi_job_shop_graph_env import (
     MultiJobShopGraphEnv,
 )
 from ._resource_task_graph_observation import (
-    ResourceTaskGraphObservation,
+    ResourceTaskGraphObservation, ResourceTaskGraphObservationDict
 )
 
 
@@ -59,4 +60,5 @@ __all__ = [
     "create_edge_type_dict",
     "ResourceTaskGraphObservation",
     "map_values",
+    "ResourceTaskGraphObservationDict",
 ]
