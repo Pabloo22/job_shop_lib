@@ -6,6 +6,7 @@ from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.reinforcement_learning import (
     add_padding,
     create_edge_type_dict,
+    map_values,
 )
 
 
@@ -242,6 +243,58 @@ def test_edge_case_adjacent_ranges():
     assert np.array_equal(
         result[("type1", "to", "type2")], np.array([[1], [2]])
     )
+
+
+def test_basic_sequential_mapping():
+    edge_index = np.array(
+        [
+            [0, 1, 2],
+            [1, 2, 0],
+        ]
+    )
+    mapping = {0: 0, 1: 1, 2: 2}
+    result = map_values(edge_index, mapping)
+    expected = np.array([[0, 1, 2], [1, 2, 0]])
+    np.testing.assert_array_equal(result, expected)
+
+
+def test_non_sequential_global_ids():
+    edge_index = np.array([[10, 20], [20, 30]]).reshape(2, -1)
+    mapping = {10: 0, 20: 1, 30: 2}
+    result = map_values(edge_index, mapping)
+    expected = np.array([[0, 1], [1, 2]]).reshape(2, -1)
+    np.testing.assert_array_equal(result, expected)
+
+
+def test_empty_edge_index():
+    edge_index = np.array([], dtype=int).reshape(2, 0)
+    mapping = {0: 0, 1: 1}
+    result = map_values(edge_index, mapping)
+    expected = np.array([], dtype=int).reshape(2, 0)
+    np.testing.assert_array_equal(result, expected)
+
+
+def test_single_edge():
+    edge_index = np.array([[5], [10]])
+    mapping = {5: 0, 10: 1}
+    result = map_values(edge_index, mapping)
+    expected = np.array([[0], [1]]).reshape(2, -1)
+    np.testing.assert_array_equal(result, expected)
+
+
+def test_repeated_nodes():
+    edge_index = np.array([[1, 1, 2], [2, 3, 3]])
+    mapping = {1: 0, 2: 1, 3: 2, 4: 5}
+    result = map_values(edge_index, mapping)
+    expected = np.array([[0, 0, 1], [1, 2, 2]])
+    np.testing.assert_array_equal(result, expected)
+
+
+def test_invalid_global_id():
+    edge_index = np.array([[0, 1], [1, 2]])
+    mapping = {0: 0, 1: 1}  # Missing mapping for 2
+    with pytest.raises(ValidationError):
+        map_values(edge_index, mapping)
 
 
 if __name__ == "__main__":

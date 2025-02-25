@@ -1,6 +1,6 @@
 """Utility functions for reinforcement learning."""
 
-from typing import TypeVar, Any, Type, Literal
+from typing import TypeVar, Any, Type
 
 import numpy as np
 from numpy.typing import NDArray
@@ -91,8 +91,10 @@ def add_padding(
 
 
 def create_edge_type_dict(
-    edge_index: NDArray[T], type_ranges: dict[str, tuple[int, int]]
-) -> dict[tuple[str, Literal["to"], str], NDArray[T]]:
+    edge_index: NDArray[T],
+    type_ranges: dict[str, tuple[int, int]],
+    relationship: str = "to",
+) -> dict[tuple[str, str, str], NDArray[T]]:
     """Organizes edges based on node types.
 
     Args:
@@ -101,17 +103,19 @@ def create_edge_type_dict(
         type_ranges: dict[str, tuple[int, int]]
             Dictionary mapping type names to their corresponding index ranges
             [start, end) in the ``edge_index`` array.
+        relationship:
+            A string representing the relationship type between nodes.
 
     Returns:
-        A dictionary with keys (type_i, "to", type_j) and values as edge
-        indices
+        A dictionary with keys (type_i, relationship, type_j) and values as
+        edge indices
     """
-    edge_index_dict: dict[tuple[str, Literal["to"], str], NDArray] = {}
+    edge_index_dict: dict[tuple[str, str, str], NDArray] = {}
     for type_name_i, (start_i, end_i) in type_ranges.items():
         for type_name_j, (start_j, end_j) in type_ranges.items():
-            key: tuple[str, Literal["to"], str] = (
+            key: tuple[str, str, str] = (
                 type_name_i,
-                "to",
+                relationship,
                 type_name_j,
             )
             # Find edges where source is in type_i and target is in type_j
@@ -124,6 +128,40 @@ def create_edge_type_dict(
             edge_index_dict[key] = edge_index[:, mask]
 
     return edge_index_dict
+
+
+def map_values(array: NDArray[T], mapping: dict[int, int]) -> NDArray[T]:
+    """Maps values in an array using a mapping.
+
+    Args:
+        array:
+            An NumPy array.
+
+    Returns:
+        A NumPy array where each element has been replaced by its
+        corresponding value from the mapping.
+
+    Raises:
+        ValidationError:
+            If the array contains values that are not in the mapping.
+
+    Examples:
+        >>> map_values(np.array([1, 2, 3]), {1: 10, 2: 20, 3: 30})
+        array([10, 20, 30])
+
+        >>> map_values(np.array([1, 2]), {1: 10, 2: 10, 3: 30})
+        array([10, 10])
+
+    """
+    if array.size == 0:
+        return array
+    try:
+        vectorized_mapping = np.vectorize(mapping.get)
+        return vectorized_mapping(array)
+    except TypeError as e:
+        raise ValidationError(
+            "The array contains values that are not in the mapping."
+        ) from e
 
 
 if __name__ == "__main__":
