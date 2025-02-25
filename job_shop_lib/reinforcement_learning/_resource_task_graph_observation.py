@@ -20,6 +20,17 @@ EnvType = TypeVar(  # pylint: disable=invalid-name
     "EnvType", bound=SingleJobShopGraphEnv | MultiJobShopGraphEnv
 )
 
+_NODE_TYPE_TO_FEATURE_TYPE = {
+    NodeType.OPERATION: FeatureType.OPERATIONS,
+    NodeType.MACHINE: FeatureType.MACHINES,
+    NodeType.JOB: FeatureType.JOBS,
+}
+_FEATURE_TYPE_STR_TO_NODE_TYPE = {
+    FeatureType.OPERATIONS.value: NodeType.OPERATION,
+    FeatureType.MACHINES.value: NodeType.MACHINE,
+    FeatureType.JOBS.value: NodeType.JOB,
+}
+
 
 class ResourceTaskGraphObservationDict(TypedDict):
     """Represents a dictionary for resource task graph observations."""
@@ -145,27 +156,50 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
 
         return type_ranges
 
-    def observation(self, observation: ObservationDict):
+    def observation(
+        self, observation: ObservationDict
+    ) -> ResourceTaskGraphObservationDict:
         edge_index_dict = create_edge_type_dict(
             observation["edge_index"],
             type_ranges=self.type_ranges,
             relationship="to",
         )
+        node_features_dict = self._create_node_features_dict(observation)
+        node_features_dict, original_ids_dict = self._remove_nodes(
+            node_features_dict, observation["removed_nodes"]
+        )
+
         # mapping from global node ID to local node ID
         for key, edge_index in edge_index_dict.items():
             edge_index_dict[key] = map_values(
                 edge_index, self.global_to_local_id
             )
-        node_features_dict = self._create_node_features_dict(observation)
-        node_features_dict, original_ids_dict = self._remove_nodes(
-            node_features_dict, observation["removed_nodes"]
+        # mapping so that ids start from 0 in edge index
+        start_from_zero_mappings = self._get_start_from_zero_mappings(
+            original_ids_dict
         )
+        for (type_1, to, type_2), edge_index in edge_index_dict.items():
+            edge_index_dict[(type_1, to, type_2)][0] = map_values(
+                edge_index[0], start_from_zero_mappings[type_1]
+            )
+            edge_index_dict[(type_1, to, type_2)][1] = map_values(
+                edge_index[1], start_from_zero_mappings[type_2]
+            )
 
         return {
             "edge_index_dict": edge_index_dict,
             "node_features_dict": node_features_dict,
             "original_ids_dict": original_ids_dict,
         }
+
+    @staticmethod
+    def _get_start_from_zero_mappings(
+        original_indices_dict: dict[str, NDArray[np.int32]]
+    ) -> dict[str, dict[int, int]]:
+        mappings = {}
+        for key, indices in original_indices_dict.items():
+            mappings[key] = {idx: i for i, idx in enumerate(indices)}
+        return mappings
 
     def _create_node_features_dict(
         self, observation: ObservationDict
@@ -178,13 +212,9 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
         Returns:
             Dictionary mapping node type names to node features.
         """
-        node_type_to_feature_type = {
-            NodeType.OPERATION: FeatureType.OPERATIONS,
-            NodeType.MACHINE: FeatureType.MACHINES,
-            NodeType.JOB: FeatureType.JOBS,
-        }
+
         node_features_dict = {}
-        for node_type, feature_type in node_type_to_feature_type.items():
+        for node_type, feature_type in _NODE_TYPE_TO_FEATURE_TYPE.items():
             if node_type in self.unwrapped.job_shop_graph.nodes_by_type:
                 node_features_dict[feature_type.value] = observation[
                     feature_type.value
@@ -225,13 +255,10 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
         """
         removed_nodes_dict: dict[str, NDArray[np.float32]] = {}
         original_ids_dict: dict[str, NDArray[np.int32]] = {}
-        feature_type_to_node_type = {
-            FeatureType.OPERATIONS.value: NodeType.OPERATION,
-            FeatureType.MACHINES.value: NodeType.MACHINE,
-            FeatureType.JOBS.value: NodeType.JOB,
-        }
         for feature_type, features in node_features_dict.items():
-            node_type = feature_type_to_node_type[feature_type].name.lower()
+            node_type = _FEATURE_TYPE_STR_TO_NODE_TYPE[
+                feature_type
+            ].name.lower()
             if node_type not in self.type_ranges:
                 continue
             start, end = self.type_ranges[node_type]

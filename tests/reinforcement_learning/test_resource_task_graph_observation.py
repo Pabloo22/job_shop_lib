@@ -27,6 +27,7 @@ def test_edge_index_dict(
         if done:
             break
         edge_index_dict = obs["edge_index_dict"]
+        max_index = len(obs["node_features_dict"]["operation"])
         _check_that_edge_index_has_been_reindexed(edge_index_dict, max_index)
         _, machine_id, job_id = info["available_operations_with_ids"][0]
         _check_count_of_unique_ids(edge_index_dict, removed_nodes)
@@ -51,6 +52,20 @@ def test_node_features_dict(
             break
         _check_number_of_nodes(obs["node_features_dict"], removed_nodes)
         _, machine_id, job_id = info["available_operations_with_ids"][0]
+        is_completed_idx_ops = info["feature_names"]["operations"].index(
+            "IsCompleted"
+        )
+        is_completed_idx_machines = info["feature_names"]["machines"].index(
+            "IsCompleted"
+        )
+        assert np.all(
+            obs["node_features_dict"]["operation"][:, is_completed_idx_ops]
+            == 0
+        )
+        assert np.all(
+            obs["node_features_dict"]["machine"][:, is_completed_idx_machines]
+            == 0
+        )
 
 
 def test_original_ids_dict(
@@ -94,9 +109,17 @@ def test_type_ranges(
 def _check_that_edge_index_has_been_reindexed(
     edge_index_dict: dict, max_idx: int
 ):
-    for edge_index in edge_index_dict.values():
+    values_found = np.zeros(max_idx)
+    for (type1, _, type2), edge_index in edge_index_dict.items():
         assert np.all(edge_index >= 0)
         assert np.all(edge_index < max_idx)
+        if type1 != "operation" and type2 != "operation":
+            continue
+
+        for value in range(max_idx):
+            if value in edge_index:
+                values_found[value] = 1
+    assert np.all(values_found == 1)
 
 
 def _check_count_of_unique_ids(
@@ -142,4 +165,4 @@ def _check_original_ids_dict(
 if __name__ == "__main__":
     import pytest
 
-    pytest.main(["-v", __file__])
+    pytest.main(["-vv", __file__])
