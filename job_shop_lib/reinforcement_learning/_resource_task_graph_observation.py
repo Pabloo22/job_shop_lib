@@ -38,15 +38,14 @@ class ResourceTaskGraphObservation(ObservationWrapper):
     ``node_type_j`` are the node types of the source and target nodes,
     respectively.
 
-    Args:
-        env: The environment to wrap.
-
     Attributes:
         global_to_local_id: A dictionary mapping global node IDs to local node
             IDs for each node type.
         type_ranges: A dictionary mapping node type names to (start, end) index
             ranges.
 
+    Args:
+        env: The environment to wrap.
     """
 
     def __init__(self, env: SingleJobShopGraphEnv | MultiJobShopGraphEnv):
