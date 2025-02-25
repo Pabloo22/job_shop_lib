@@ -13,6 +13,8 @@
     RenderConfig
     add_padding
     create_edge_type_dict
+    ResourceTaskGraphObservation
+    ResourceTaskGraphObservationDict
 
 """
 
@@ -31,6 +33,7 @@ from job_shop_lib.reinforcement_learning._reward_observers import (
 from job_shop_lib.reinforcement_learning._utils import (
     add_padding,
     create_edge_type_dict,
+    map_values,
 )
 
 from job_shop_lib.reinforcement_learning._single_job_shop_graph_env import (
@@ -38,6 +41,9 @@ from job_shop_lib.reinforcement_learning._single_job_shop_graph_env import (
 )
 from job_shop_lib.reinforcement_learning._multi_job_shop_graph_env import (
     MultiJobShopGraphEnv,
+)
+from ._resource_task_graph_observation import (
+    ResourceTaskGraphObservation, ResourceTaskGraphObservationDict
 )
 
 
@@ -52,4 +58,7 @@ __all__ = [
     "add_padding",
     "MultiJobShopGraphEnv",
     "create_edge_type_dict",
+    "ResourceTaskGraphObservation",
+    "map_values",
+    "ResourceTaskGraphObservationDict",
 ]

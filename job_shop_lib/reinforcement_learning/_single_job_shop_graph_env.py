@@ -243,8 +243,27 @@ class SingleJobShopGraphEnv(gym.Env):
         *,
         seed: Optional[int] = None,
         options: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[ObservationDict, dict]:
-        """Resets the environment."""
+    ) -> Tuple[ObservationDict, dict[str, Any]]:
+        """Resets the environment.
+
+        Args:
+            seed:
+                Added to match the signature of the parent class. It is not
+                used in this method.
+            options:
+                Additional options to pass to the environment. Not used in
+                this method.
+
+        Returns:
+            A tuple containing the following elements:
+
+            - The observation of the environment.
+            - A dictionary with additional information, keys
+                include: "feature_names", the names of the features in the
+                observation; and "available_operations_with_ids", a list of
+                available a list of available actions in the form of
+                (operation_id, machine_id, job_id).
+        """
         super().reset(seed=seed, options=options)
         self.dispatcher.reset()
         obs = self.get_observation()

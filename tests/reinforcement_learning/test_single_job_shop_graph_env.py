@@ -84,9 +84,9 @@ def test_edge_index_padding(
 
 
 def test_all_nodes_removed(
-    single_job_shop_graph_env_ft06_agent_task: SingleJobShopGraphEnv,
+    single_job_shop_graph_env_ft06_resource_task: SingleJobShopGraphEnv,
 ):
-    env = single_job_shop_graph_env_ft06_agent_task
+    env = single_job_shop_graph_env_ft06_resource_task
     obs, _ = env.reset()
     done = False
     while not done:

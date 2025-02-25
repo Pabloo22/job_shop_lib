@@ -235,13 +235,13 @@ class MultiJobShopGraphEnv(gym.Env):
     @ready_operations_filter.setter
     def ready_operations_filter(
         self,
-        pruning_function: Callable[
+        ready_operations_filter: Callable[
             [Dispatcher, List[Operation]], List[Operation]
         ],
     ) -> None:
         """Sets the ready operations filter."""
         self.single_job_shop_graph_env.dispatcher.ready_operations_filter = (
-            pruning_function
+            ready_operations_filter
         )
 
     @property
