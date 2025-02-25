@@ -117,7 +117,7 @@ def single_job_shop_graph_env_ft06() -> SingleJobShopGraphEnv:
 
 
 @pytest.fixture
-def single_job_shop_graph_env_ft06_agent_task() -> SingleJobShopGraphEnv:
+def single_job_shop_graph_env_ft06_resource_task() -> SingleJobShopGraphEnv:
     instance = load_benchmark_instance("ft06")
     job_shop_graph = build_resource_task_graph(instance)
     feature_observer_configs = [
@@ -125,6 +125,30 @@ def single_job_shop_graph_env_ft06_agent_task() -> SingleJobShopGraphEnv:
             FeatureObserverType.IS_READY,
             kwargs={"feature_types": [FeatureType.JOBS]},
         )
+    ]
+
+    env = SingleJobShopGraphEnv(
+        job_shop_graph=job_shop_graph,
+        feature_observer_configs=feature_observer_configs,
+        render_mode="save_video",
+        render_config={"video_config": {"fps": 4}},
+    )
+    return env
+
+
+@pytest.fixture
+def single_env_ft06_resource_task_graph_with_all_features() -> (
+    SingleJobShopGraphEnv
+):
+    instance = load_benchmark_instance("ft06")
+    job_shop_graph = build_resource_task_graph(instance)
+    feature_observer_configs = [
+        FeatureObserverType.DURATION,
+        FeatureObserverType.EARLIEST_START_TIME,
+        FeatureObserverType.IS_COMPLETED,
+        FeatureObserverType.IS_SCHEDULED,
+        FeatureObserverType.POSITION_IN_JOB,
+        FeatureObserverType.REMAINING_OPERATIONS,
     ]
 
     env = SingleJobShopGraphEnv(
