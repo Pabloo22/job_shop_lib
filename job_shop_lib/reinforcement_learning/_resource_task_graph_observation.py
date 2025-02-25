@@ -1,6 +1,6 @@
 """Contains wrappers for the environments."""
 
-from typing import TypeVar, TypedDict
+from typing import TypeVar, TypedDict, Generic
 from gymnasium import ObservationWrapper
 import numpy as np
 from numpy.typing import NDArray
@@ -12,11 +12,13 @@ from job_shop_lib.reinforcement_learning import (
     create_edge_type_dict,
     map_values,
 )
-from job_shop_lib.graphs import NodeType, JobShopGraph
-from job_shop_lib.exceptions import ValidationError
+from job_shop_lib.graphs import NodeType
 from job_shop_lib.dispatching.feature_observers import FeatureType
 
 T = TypeVar("T", bound=np.number)
+EnvType = TypeVar(  # pylint: disable=invalid-name
+    "EnvType", bound=SingleJobShopGraphEnv | MultiJobShopGraphEnv
+)
 
 
 class ResourceTaskGraphObservationDict(TypedDict):
@@ -28,7 +30,7 @@ class ResourceTaskGraphObservationDict(TypedDict):
 
 
 # pylint: disable=line-too-long
-class ResourceTaskGraphObservation(ObservationWrapper):
+class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
     """Observation wrapper that converts an observation following the
     :class:`ObservationDict` format to a format suitable to PyG's
     [`HeteroData`](https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.data.HeteroData.html).
@@ -48,25 +50,11 @@ class ResourceTaskGraphObservation(ObservationWrapper):
         env: The environment to wrap.
     """
 
-    def __init__(self, env: SingleJobShopGraphEnv | MultiJobShopGraphEnv):
+    def __init__(self, env: EnvType):
         super().__init__(env)
+        self.env = env  # Unnecessary, but makes mypy happy
         self.global_to_local_id = self._compute_id_mappings()
         self.type_ranges = self._compute_node_type_ranges()
-
-    @property
-    def job_shop_graph(self) -> JobShopGraph:
-        """Returns the job shop graph from the environment.
-
-        Raises:
-            ValidationError: If the environment is not an instance of
-                ``SingleJobShopGraphEnv`` or ``MultiJobShopGraphEnv``.
-        """
-        if isinstance(self.env, (SingleJobShopGraphEnv, MultiJobShopGraphEnv)):
-            return self.env.job_shop_graph
-        raise ValidationError(
-            "The environment must be an instance of "
-            "SingleJobShopGraphEnv or MultiJobShopGraphEnv"
-        )
 
     def step(self, action: tuple[int, int]):
         """Takes a step in the environment.
@@ -127,7 +115,7 @@ class ResourceTaskGraphObservation(ObservationWrapper):
         """
         mappings = {}
         for node_type in NodeType:
-            type_nodes = self.job_shop_graph.nodes_by_type[node_type]
+            type_nodes = self.unwrapped.job_shop_graph.nodes_by_type[node_type]
             if not type_nodes:
                 continue
             # Create mapping from global ID to local ID
@@ -148,7 +136,7 @@ class ResourceTaskGraphObservation(ObservationWrapper):
         """
         type_ranges = {}
         for node_type in NodeType:
-            type_nodes = self.job_shop_graph.nodes_by_type[node_type]
+            type_nodes = self.unwrapped.job_shop_graph.nodes_by_type[node_type]
             if not type_nodes:
                 continue
             start = min(node.node_id for node in type_nodes)
@@ -197,7 +185,7 @@ class ResourceTaskGraphObservation(ObservationWrapper):
         }
         node_features_dict = {}
         for node_type, feature_type in node_type_to_feature_type.items():
-            if node_type in self.job_shop_graph.nodes_by_type:
+            if node_type in self.unwrapped.job_shop_graph.nodes_by_type:
                 node_features_dict[feature_type.value] = observation[
                     feature_type.value
                 ]
@@ -210,7 +198,7 @@ class ResourceTaskGraphObservation(ObservationWrapper):
             ]
             job_ids_of_ops = [
                 node.operation.job_id
-                for node in self.job_shop_graph.nodes_by_type[
+                for node in self.unwrapped.job_shop_graph.nodes_by_type[
                     NodeType.OPERATION
                 ]
             ]
@@ -256,3 +244,8 @@ class ResourceTaskGraphObservation(ObservationWrapper):
             )[0]
 
         return removed_nodes_dict, original_ids_dict
+
+    @property
+    def unwrapped(self) -> EnvType:
+        """Returns the unwrapped environment."""
+        return self.env  # type: ignore[return-value]
