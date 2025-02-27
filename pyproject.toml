@@ -8,6 +8,9 @@ readme = "README.md"
 packages = [{include = "job_shop_lib"}]
 include = ["benchmarks/benchmark_instances.json"]
 
+[tool.poetry.package]
+include = ["py.typed"]
+
 [tool.poetry.dependencies]
 python = "^3.10"
 ortools = "^9.9"
