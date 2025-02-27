@@ -215,7 +215,7 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
 
         node_features_dict = {}
         for node_type, feature_type in _NODE_TYPE_TO_FEATURE_TYPE.items():
-            if node_type in self.unwrapped.job_shop_graph.nodes_by_type:
+            if self.unwrapped.job_shop_graph.nodes_by_type[node_type]:
                 node_features_dict[feature_type.value] = observation[
                     feature_type.value
                 ]

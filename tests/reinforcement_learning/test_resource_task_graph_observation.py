@@ -66,6 +66,7 @@ def test_node_features_dict(
             obs["node_features_dict"]["machine"][:, is_completed_idx_machines]
             == 0
         )
+        assert obs["node_features_dict"]["operation"].shape[1] == 10
 
 
 def test_original_ids_dict(
