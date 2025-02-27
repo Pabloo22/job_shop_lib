@@ -13,6 +13,8 @@
     RenderConfig
     add_padding
     create_edge_type_dict
+    map_values
+    get_optimal_actions
     ResourceTaskGraphObservation
     ResourceTaskGraphObservationDict
 
@@ -34,6 +36,7 @@ from job_shop_lib.reinforcement_learning._utils import (
     add_padding,
     create_edge_type_dict,
     map_values,
+    get_optimal_actions,
 )
 
 from job_shop_lib.reinforcement_learning._single_job_shop_graph_env import (
@@ -61,4 +64,5 @@ __all__ = [
     "ResourceTaskGraphObservation",
     "map_values",
     "ResourceTaskGraphObservationDict",
+    "get_optimal_actions",
 ]

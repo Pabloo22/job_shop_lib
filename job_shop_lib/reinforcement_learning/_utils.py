@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from job_shop_lib.exceptions import ValidationError
+from job_shop_lib.dispatching import OptimalOperationsObserver
 
 T = TypeVar("T", bound=np.number)
 
@@ -162,6 +163,34 @@ def map_values(array: NDArray[T], mapping: dict[int, int]) -> NDArray[T]:
         raise ValidationError(
             "The array contains values that are not in the mapping."
         ) from e
+
+
+def get_optimal_actions(
+    optimal_ops_observer: OptimalOperationsObserver,
+    available_operations_with_ids: list[tuple[int, int, int]],
+) -> dict[tuple[int, int, int], int]:
+    """Indicates if each action is optimal according to a
+    :class:`~job_shop_lib.dispatching.OptimalOperationsObserver` instance.
+
+    Args:
+        optimal_ops_observer: The observer that provides optimal operations.
+        available_operations_with_ids: List of available operations with their
+        IDs (operation_id, machine_id, job_id).
+
+    Returns:
+        A dictionary mapping each tuple
+        (operation_id, machine_id, job_id) in the available actions to a binary
+        indicator (1 if optimal, 0 otherwise).
+    """
+    optimal_actions = {}
+    optimal_ops = optimal_ops_observer.optimal_available
+    optimal_ops_ids = [
+        (op.operation_id, op.machine_id, op.job_id) for op in optimal_ops
+    ]
+    for operation_id, machine_id, job_id in available_operations_with_ids:
+        is_optimal = (operation_id, machine_id, job_id) in optimal_ops_ids
+        optimal_actions[(operation_id, machine_id, job_id)] = int(is_optimal)
+    return optimal_actions
 
 
 if __name__ == "__main__":
