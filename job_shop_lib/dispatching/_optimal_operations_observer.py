@@ -20,8 +20,6 @@ class OptimalOperationsObserver(DispatcherObserver):
             based on the reference schedule.
         reference_schedule: The reference schedule used to determine optimal
             operations.
-        _operation_to_scheduled: Dictionary mapping operations to their
-            scheduled versions in the reference schedule.
 
     Args:
         dispatcher: The dispatcher instance to observe.
