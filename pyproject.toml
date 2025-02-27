@@ -6,10 +6,7 @@ authors = ["Pabloo22 <pablete.arino@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "job_shop_lib"}]
-include = ["benchmarks/benchmark_instances.json"]
-
-[tool.poetry.package]
-include = ["py.typed"]
+include = ["job_shop_lib/benchmarking/benchmark_instances.json", "job_shop_lib/py.typed"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
