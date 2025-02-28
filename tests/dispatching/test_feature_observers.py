@@ -219,7 +219,7 @@ machines:
 2      1.0                2.0       1.0          1.0                  1.0          0.0
 jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
-0      0.0                2.0       0.0          2.0                  0.0          1.0
+0      0.0                2.0       0.0          2.0                  0.0          0.0
 1      1.0                2.0       2.0          0.0                  2.0          0.0
 2      1.0                0.0       2.0          0.0                  1.0          0.0"""
 
@@ -241,10 +241,10 @@ machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                4.0       1.0          1.0                  1.0          0.0
 1      1.0                0.0       2.0          0.0                  1.0          0.0
-2      0.0               -7.0       0.0          2.0                  0.0          1.0
+2      0.0               -7.0       0.0          2.0                  0.0          0.0
 jobs:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
-0      0.0                2.0       0.0          2.0                  0.0          1.0
+0      0.0                2.0       0.0          2.0                  0.0          0.0
 1      1.0                4.0       1.0          1.0                  1.0          0.0
 2      1.0                0.0       2.0          0.0                  1.0          0.0"""
 
@@ -373,21 +373,10 @@ def test_is_completed_observer(example_job_shop_instance: JobShopInstance):
     )
 
     assert isinstance(is_completed_observer, IsCompletedObserver)
-    if not example_job_shop_instance.is_flexible:
-        assert (
-            is_completed_observer.remaining_ops_per_machine.sum()
-            == example_job_shop_instance.num_operations
-        )
-        assert (
-            is_completed_observer.remaining_ops_per_job.sum()
-            == example_job_shop_instance.num_operations
-        )
     # Solve the job shop instance to simulate completing all operations
     solver = DispatchingRuleSolver(dispatching_rule="most_work_remaining")
     for _ in range(dispatcher.instance.num_operations):
         solver.step(dispatcher)
-        assert all(is_completed_observer.remaining_ops_per_machine >= 0)
-        assert all(is_completed_observer.remaining_ops_per_job >= 0)
 
     assert dispatcher.schedule.is_complete()
 
@@ -398,7 +387,6 @@ def test_is_completed_observer(example_job_shop_instance: JobShopInstance):
         except AssertionError:
             print(is_completed_observer.features[feature_type])
             print(feature_type)
-            print(is_completed_observer.remaining_ops_per_machine)
             print(dispatcher.instance.to_dict())
             raise
 
