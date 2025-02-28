@@ -80,3 +80,6 @@ class ScheduledOperation:
             and self.start_time == value.start_time
             and self.machine_id == value.machine_id
         )
+
+    def __hash__(self) -> int:
+        return hash((self.operation, self.start_time, self.machine_id))
