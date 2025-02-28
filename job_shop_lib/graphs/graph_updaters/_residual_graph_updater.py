@@ -112,7 +112,9 @@ class ResidualGraphUpdater(GraphUpdater):
         """Updates the residual graph based on the completed operations."""
         remove_completed_operations(
             self.job_shop_graph,
-            completed_operations=self.dispatcher.completed_operations(),
+            completed_operations=(
+                op.operation for op in self.dispatcher.completed_operations()
+            ),
         )
         graph_has_machine_nodes = bool(
             self.job_shop_graph.nodes_by_type[NodeType.MACHINE]

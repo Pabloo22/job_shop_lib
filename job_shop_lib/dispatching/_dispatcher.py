@@ -459,12 +459,11 @@ class Dispatcher:
         return unscheduled_operations
 
     @_dispatcher_cache
-    def scheduled_operations(self) -> List[Operation]:
+    def scheduled_operations(self) -> List[ScheduledOperation]:
         """Returns the list of operations that have been scheduled."""
         scheduled_operations = []
-        for job_id, next_position in enumerate(self._job_next_operation_index):
-            operations = self.instance.jobs[job_id][:next_position]
-            scheduled_operations.extend(operations)
+        for machine_schedule in self.schedule.schedule:
+            scheduled_operations.extend(machine_schedule)
         return scheduled_operations
 
     @_dispatcher_cache
@@ -532,19 +531,14 @@ class Dispatcher:
         return scheduled_operation.end_time - adjusted_start_time
 
     @_dispatcher_cache
-    def completed_operations(self) -> Set[Operation]:
+    def completed_operations(self) -> Set[ScheduledOperation]:
         """Returns the set of operations that have been completed.
 
         This method returns the operations that have been scheduled and the
         current time is greater than or equal to the end time of the operation.
         """
         scheduled_operations = set(self.scheduled_operations())
-        ongoing_operations = set(
-            map(
-                lambda scheduled_op: scheduled_op.operation,
-                self.ongoing_operations(),
-            )
-        )
+        ongoing_operations = set(self.ongoing_operations())
         completed_operations = scheduled_operations - ongoing_operations
         return completed_operations
 
