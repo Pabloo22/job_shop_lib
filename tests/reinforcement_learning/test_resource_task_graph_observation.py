@@ -3,6 +3,7 @@ from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
     ResourceTaskGraphObservation,
 )
+from job_shop_lib.exceptions import ValidationError
 
 
 def test_edge_index_dict(
@@ -31,6 +32,7 @@ def test_edge_index_dict(
         _check_that_edge_index_has_been_reindexed(edge_index_dict, max_index)
         _, machine_id, job_id = info["available_operations_with_ids"][0]
         _check_count_of_unique_ids(edge_index_dict, removed_nodes)
+        machine_id = obs["original_ids_dict"]["machine"][machine_id]
 
 
 def test_node_features_dict(
@@ -52,6 +54,7 @@ def test_node_features_dict(
             break
         _check_number_of_nodes(obs["node_features_dict"], removed_nodes)
         _, machine_id, job_id = info["available_operations_with_ids"][0]
+        machine_id = obs["original_ids_dict"]["machine"][machine_id]
         is_completed_idx_ops = info["feature_names"]["operations"].index(
             "IsCompleted"
         )
@@ -81,13 +84,11 @@ def test_original_ids_dict(
     done = False
     _, machine_id, job_id = info["available_operations_with_ids"][0]
     removed_nodes = env.unwrapped.job_shop_graph.removed_nodes
-    _check_original_ids_dict(obs["original_ids_dict"], removed_nodes)
     while not done:
-        obs, _, done, _, info = env.step((job_id, machine_id))
-        if done:
-            break
         _check_original_ids_dict(obs["original_ids_dict"], removed_nodes)
         _, machine_id, job_id = info["available_operations_with_ids"][0]
+        original_machine_id = obs["original_ids_dict"]["machine"][machine_id]
+        obs, _, done, _, info = env.step((job_id, original_machine_id))
 
 
 def test_type_ranges(
@@ -105,6 +106,60 @@ def test_type_ranges(
     assert env.type_ranges["operation"] == (0, 36)
     assert env.type_ranges["machine"] == (36, 42)
     assert len(env.type_ranges) == 2
+
+
+def test_info(
+    single_env_ft06_resource_task_graph_with_all_features: (
+        SingleJobShopGraphEnv
+    ),
+):
+    env = ResourceTaskGraphObservation(
+        single_env_ft06_resource_task_graph_with_all_features
+    )
+    obs, info = env.reset()
+    done = False
+    _check_info_ids(
+        obs["node_features_dict"],
+        info["available_operations_with_ids"],
+        obs["original_ids_dict"],
+        env,
+    )
+    while not done:
+        action = info["available_operations_with_ids"][0]
+        _, machine_id, job_id = action
+        original_machine_id = obs["original_ids_dict"]["machine"][machine_id]
+        obs, _, done, _, info = env.step((job_id, original_machine_id))
+        _check_info_ids(
+            obs["node_features_dict"],
+            info["available_operations_with_ids"],
+            obs["original_ids_dict"],
+            env,
+        )
+
+
+def _check_info_ids(
+    node_features_dict: dict[str, np.ndarray],
+    available_actions_ids: list[tuple[int, int, int]],
+    original_ids_dict: dict[str, np.ndarray],
+    env: ResourceTaskGraphObservation[SingleJobShopGraphEnv],
+):
+    for i, (node_type, node_features) in enumerate(node_features_dict.items()):
+        max_id = node_features.shape[0]
+        for action in available_actions_ids:
+            assert action[i] < max_id
+            if node_type == "machine":
+                original_machine_id = original_ids_dict[node_type][action[i]]
+                *_, job_id = action
+                try:
+                    env.unwrapped.validate_action(
+                        (job_id, original_machine_id)
+                    )
+                except ValidationError as e:
+                    print(f"machine_id: {action[i]}")
+                    print(f"original_machine_id: {original_machine_id}")
+                    print(f"job_id: {job_id}")
+                    print(f"original_ids_dict: {original_ids_dict}")
+                    raise e
 
 
 def _check_that_edge_index_has_been_reindexed(

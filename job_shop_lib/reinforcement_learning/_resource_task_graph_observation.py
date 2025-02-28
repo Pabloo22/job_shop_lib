@@ -1,6 +1,6 @@
 """Contains wrappers for the environments."""
 
-from typing import TypeVar, TypedDict, Generic
+from typing import TypeVar, TypedDict, Generic, Any
 from gymnasium import ObservationWrapper
 import numpy as np
 from numpy.typing import NDArray
@@ -66,6 +66,7 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
         self.env = env  # Unnecessary, but makes mypy happy
         self.global_to_local_id = self._compute_id_mappings()
         self.type_ranges = self._compute_node_type_ranges()
+        self._start_from_zero_mapping: dict[str, dict[int, int]] = {}
 
     def step(self, action: tuple[int, int]):
         """Takes a step in the environment.
@@ -91,7 +92,9 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
               machine_id, job_id).
         """
         observation, reward, done, truncated, info = self.env.step(action)
-        return self.observation(observation), reward, done, truncated, info
+        new_observation = self.observation(observation)
+        new_info = self._info(info)
+        return new_observation, reward, done, truncated, new_info
 
     def reset(self, *, seed: int | None = None, options: dict | None = None):
         """Resets the environment.
@@ -115,7 +118,34 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
                 (operation_id, machine_id, job_id).
         """
         observation, info = self.env.reset()
-        return self.observation(observation), info
+        new_observation = self.observation(observation)
+        new_info = self._info(info)
+        return new_observation, new_info
+
+    def _info(self, info: dict[str, Any]) -> dict[str, Any]:
+        """Updates the "available_operations_with_ids" key in the info
+        dictionary so that they start from 0 using the
+        `_start_from_zero_mapping` attribute.
+        """
+        new_available_operations_ids = []
+        for operation_id, machine_id, job_id in info[
+            "available_operations_with_ids"
+        ]:
+            if "operation" in self._start_from_zero_mapping:
+                operation_id = self._start_from_zero_mapping["operation"][
+                    operation_id
+                ]
+            if "machine" in self._start_from_zero_mapping:
+                machine_id = self._start_from_zero_mapping["machine"][
+                    machine_id
+                ]
+            if "job" in self._start_from_zero_mapping:
+                job_id = self._start_from_zero_mapping["job"][job_id]
+            new_available_operations_ids.append(
+                (operation_id, machine_id, job_id)
+            )
+        info["available_operations_with_ids"] = new_available_operations_ids
+        return info
 
     def _compute_id_mappings(self) -> dict[int, int]:
         """Computes mappings from global node IDs to type-local IDs.
@@ -175,15 +205,15 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
                 edge_index, self.global_to_local_id
             )
         # mapping so that ids start from 0 in edge index
-        start_from_zero_mappings = self._get_start_from_zero_mappings(
+        self._start_from_zero_mapping = self._get_start_from_zero_mappings(
             original_ids_dict
         )
         for (type_1, to, type_2), edge_index in edge_index_dict.items():
             edge_index_dict[(type_1, to, type_2)][0] = map_values(
-                edge_index[0], start_from_zero_mappings[type_1]
+                edge_index[0], self._start_from_zero_mapping[type_1]
             )
             edge_index_dict[(type_1, to, type_2)][1] = map_values(
-                edge_index[1], start_from_zero_mappings[type_2]
+                edge_index[1], self._start_from_zero_mapping[type_2]
             )
 
         return {

@@ -156,6 +156,7 @@ def single_env_ft06_resource_task_graph_with_all_features() -> (
         feature_observer_configs=feature_observer_configs,
         render_mode="save_video",
         render_config={"video_config": {"fps": 4}},
+        ready_operations_filter=None,
     )
     return env
 
