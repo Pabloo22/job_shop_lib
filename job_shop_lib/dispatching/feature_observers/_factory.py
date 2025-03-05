@@ -39,9 +39,14 @@ class FeatureObserverType(str, Enum):
 # FeatureObserverConfig = DispatcherObserverConfig[
 #     Type[FeatureObserver] | FeatureObserverType | str
 # ]
-FeatureObserverConfig = DispatcherObserverConfig[
-    Union[Type[FeatureObserver], FeatureObserverType, str]
-]
+# FeatureObserverConfig = DispatcherObserverConfig[
+#     Union[Type[FeatureObserver], FeatureObserverType, str]
+# ]
+FeatureObserverConfig = (
+    DispatcherObserverConfig[Type[FeatureObserver]]
+    | DispatcherObserverConfig[FeatureObserverType]
+    | DispatcherObserverConfig[str]
+)
 
 
 def feature_observer_factory(

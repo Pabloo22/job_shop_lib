@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 from collections.abc import Callable, Sequence
-from typing import Any, Dict, Tuple, List, Optional, Type
+from typing import Any, Dict, Tuple, List, Optional, Type, Union
 
 import matplotlib.pyplot as plt
 import gymnasium as gym
@@ -24,6 +24,8 @@ from job_shop_lib.dispatching import (
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserverConfig,
     CompositeFeatureObserver,
+    FeatureObserver,
+    FeatureObserverType,
 )
 from job_shop_lib.visualization.gantt import GanttChartCreator
 from job_shop_lib.reinforcement_learning import (
@@ -137,7 +139,14 @@ class SingleJobShopGraphEnv(gym.Env):
     def __init__(
         self,
         job_shop_graph: JobShopGraph,
-        feature_observer_configs: Sequence[FeatureObserverConfig],
+        feature_observer_configs: Sequence[
+            Union[
+                str,
+                FeatureObserverType,
+                Type[FeatureObserver],
+                FeatureObserverConfig,
+            ],
+        ],
         reward_function_config: DispatcherObserverConfig[
             Type[RewardObserver]
         ] = DispatcherObserverConfig(class_type=MakespanReward),
@@ -432,3 +441,24 @@ if __name__ == "__main__":
         render_mode="save_video",
         render_config={"video_config": {"fps": 4}},
     )
+
+    # from typing import Union, Generic, TypeVar
+
+    # T = TypeVar("T")
+
+    # class GenericClass(Generic[T]):
+    #     def __init__(self, value: T):
+    #         self.value = value
+
+    #     def __str__(self):
+    #         return str(self.value)
+
+    # StrOrInt = GenericClass[str] | GenericClass[int]
+
+    # def _example(seq: Sequence[Union[StrOrInt, int, str]]) -> None:
+    #     print(seq)
+
+    # one = GenericClass(1)
+    # two = GenericClass("two")
+    # _example([one, two])
+    # _example([1, 1])

@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from collections.abc import Sequence
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Type
 # The Self type can be imported directly from Python’s typing module in
 # version 3.11 and beyond. We use the typing_extensions module to support
 # python >=3.8
@@ -18,6 +18,7 @@ from job_shop_lib.dispatching.feature_observers import (
     FeatureType,
     FeatureObserverConfig,
     feature_observer_factory,
+    FeatureObserverType,
 )
 
 
@@ -104,7 +105,14 @@ class CompositeFeatureObserver(FeatureObserver):
     def from_feature_observer_configs(
         cls,
         dispatcher: Dispatcher,
-        feature_observer_configs: Sequence[FeatureObserverConfig],
+        feature_observer_configs: Sequence[
+            Union[
+                str,
+                FeatureObserverType,
+                Type[FeatureObserver],
+                FeatureObserverConfig,
+            ],
+        ],
         subscribe: bool = True,
     ) -> Self:
         """Creates the composite feature observer.
