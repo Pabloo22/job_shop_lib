@@ -1,4 +1,4 @@
-"""Contains grah updater functions to update """
+"""Contains utility functions for updating the job shop graph."""
 
 from collections.abc import Iterable
 
@@ -13,7 +13,7 @@ def remove_completed_operations(
     """Removes the operation node of the scheduled operation from the graph.
 
     Args:
-        graph:
+        job_shop_graph:
             The job shop graph to update.
         dispatcher:
             The dispatcher instance.

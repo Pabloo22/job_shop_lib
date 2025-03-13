@@ -1,7 +1,7 @@
 """Contains helper functions to build the resource-task graphs from a job shop
 instance.
 
-The agent-task graph (renamed to resource-task graph) was introduced by
+The resource-task graph (originally called agent-task graph) was introduced by
 Junyoung Park et al. (2021).
 In contrast to the disjunctive graph, instead of connecting operations that
 share the same resources directly by disjunctive edges, operation nodes are
