@@ -1,6 +1,6 @@
 import pytest
 from job_shop_lib import Operation
-from job_shop_lib.exceptions import UninitializedAttributeError
+from job_shop_lib.exceptions import ValidationError
 
 
 def test_init_single_machine():
@@ -22,5 +22,5 @@ def test_machine_id_single():
 
 def test_machine_id_multiple():
     op = Operation([1, 2], 10)
-    with pytest.raises(UninitializedAttributeError):
+    with pytest.raises(ValidationError):
         _ = op.machine_id
