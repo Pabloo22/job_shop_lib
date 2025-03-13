@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Union, List
 
-from job_shop_lib.exceptions import UninitializedAttributeError
+from job_shop_lib.exceptions import ValidationError
 
 
 class Operation:
@@ -81,8 +81,14 @@ class Operation:
                 If the operation has multiple machines in its list.
         """
         if len(self.machines) > 1:
-            raise UninitializedAttributeError(
-                "Operation has multiple machines."
+            raise ValidationError(
+                "Operation has multiple machines. The `machine_id` property "
+                "should only be used when working with a classic JSSP "
+                "instance. This error prevents silent bugs. To handle "
+                "operations with more machines you have to use the machines "
+                "attribute. If you get this error using `job_shop_lib` "
+                "objects, it means that that object does not support "
+                "operations with multiple machines yet."
             )
         return self.machines[0]
 
