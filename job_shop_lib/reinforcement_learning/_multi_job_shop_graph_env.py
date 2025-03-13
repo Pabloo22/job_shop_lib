@@ -117,7 +117,7 @@ class MultiJobShopGraphEnv(gym.Env):
         graph_initializer:
             Function to create the initial graph representation.
             If ``None``, the default graph initializer is used:
-            :func:`~job_shop_lib.graphs.build_agent_task_graph`.
+            :func:`~job_shop_lib.graphs.build_resource_task_graph`.
         graph_updater_config:
             Configuration for the graph updater. The graph updater is used
             to update the graph representation after each action. If

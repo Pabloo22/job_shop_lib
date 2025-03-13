@@ -441,24 +441,3 @@ if __name__ == "__main__":
         render_mode="save_video",
         render_config={"video_config": {"fps": 4}},
     )
-
-    # from typing import Union, Generic, TypeVar
-
-    # T = TypeVar("T")
-
-    # class GenericClass(Generic[T]):
-    #     def __init__(self, value: T):
-    #         self.value = value
-
-    #     def __str__(self):
-    #         return str(self.value)
-
-    # StrOrInt = GenericClass[str] | GenericClass[int]
-
-    # def _example(seq: Sequence[Union[StrOrInt, int, str]]) -> None:
-    #     print(seq)
-
-    # one = GenericClass(1)
-    # two = GenericClass("two")
-    # _example([one, two])
-    # _example([1, 1])

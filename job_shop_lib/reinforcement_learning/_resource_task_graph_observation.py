@@ -51,6 +51,12 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
     ``node_type_j`` are the node types of the source and target nodes,
     respectively.
 
+    Additionally, the node features are stored in a dictionary with keys
+    corresponding to the node type names under the ``node_features_dict`` key.
+
+    The node IDs are mapped to local IDs starting from 0. The
+    ``original_ids_dict`` contains the original node IDs before removing nodes.
+
     Attributes:
         global_to_local_id: A dictionary mapping global node IDs to local node
             IDs for each node type.
@@ -189,6 +195,21 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
     def observation(
         self, observation: ObservationDict
     ) -> ResourceTaskGraphObservationDict:
+        """Processes the observation data into the resource task graph format.
+
+        Args:
+            observation: The observation dictionary. It must NOT have padding.
+
+        Returns:
+            A dictionary containing the following keys:
+
+            - "edge_index_dict": A dictionary mapping edge types to edge index
+              arrays.
+            - "node_features_dict": A dictionary mapping node type names to
+                node feature arrays.
+            - "original_ids_dict": A dictionary mapping node type names to the
+              original node IDs before removing nodes.
+        """
         edge_index_dict = create_edge_type_dict(
             observation["edge_index"],
             type_ranges=self.type_ranges,
@@ -271,9 +292,9 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
 
     def _remove_nodes(
         self,
-        node_features_dict: dict[str, NDArray[np.float32]],
+        node_features_dict: dict[str, NDArray[T]],
         removed_nodes: NDArray[np.bool_],
-    ) -> tuple[dict[str, NDArray[np.float32]], dict[str, NDArray[np.int32]]]:
+    ) -> tuple[dict[str, NDArray[T]], dict[str, NDArray[np.int32]]]:
         """Removes nodes from the node features dictionary.
 
         Args:
@@ -283,7 +304,7 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
             The node features dictionary with the nodes removed and a
             dictionary containing the original node ids.
         """
-        removed_nodes_dict: dict[str, NDArray[np.float32]] = {}
+        removed_nodes_dict: dict[str, NDArray[T]] = {}
         original_ids_dict: dict[str, NDArray[np.int32]] = {}
         for feature_type, features in node_features_dict.items():
             node_type = _FEATURE_TYPE_STR_TO_NODE_TYPE[
