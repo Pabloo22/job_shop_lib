@@ -38,6 +38,7 @@ from job_shop_lib.graphs._build_resource_task_graphs import (
     add_global_node,
     add_machine_global_edges,
     add_job_global_edges,
+    add_job_job_edges,
 )
 
 
@@ -65,4 +66,5 @@ __all__ = [
     "add_machine_global_edges",
     "add_job_global_edges",
     "build_solved_disjunctive_graph",
+    "add_job_job_edges",
 ]
