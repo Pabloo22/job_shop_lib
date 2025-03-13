@@ -47,8 +47,9 @@ def machine_chooser_factory(
         machine chooser strategy.
 
     Raises:
-        ValueError: If the machine_chooser argument is not recognized or is
-            not supported.
+        ValidationError:
+            If the ``machine_chooser`` argument is not recognized or
+            is not supported.
     """
     machine_choosers: Dict[str, Callable[[Dispatcher, Operation], int]] = {
         MachineChooserType.FIRST: lambda _, operation: operation.machines[0],

@@ -36,7 +36,7 @@ class FeatureObserver(DispatcherObserver):
     individually. Furthermore, machine learning models can be trained on these
     arrays to predict the best dispatching decisions.
 
-    Arrays use the data type ``np.float32``. This is because most machine
+    Arrays use the data type ``np.float32``.
 
     New :class:`FeatureObservers` must inherit from this class, and re-define
     the class attributes ``_singleton`` (defualt ), ``_feature_size``

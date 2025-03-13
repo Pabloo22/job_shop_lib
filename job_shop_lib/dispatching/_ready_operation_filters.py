@@ -153,16 +153,16 @@ def _get_min_machine_end_times(
 
 
 def _get_immediate_machines(
-    self: Dispatcher, available_operations: List[Operation]
+    dispatcher: Dispatcher, available_operations: List[Operation]
 ) -> List[bool]:
     """Returns the machine ids of the machines that have at least one
     operation with the lowest start time (i.e. the start time)."""
-    working_machines = [False] * self.instance.num_machines
+    working_machines = [False] * dispatcher.instance.num_machines
     # We can't use the current_time directly because it will cause
     # an infinite loop.
-    current_time = self.min_start_time(available_operations)
+    current_time = dispatcher.min_start_time(available_operations)
     for op in available_operations:
         for machine_id in op.machines:
-            if self.start_time(op, machine_id) == current_time:
+            if dispatcher.start_time(op, machine_id) == current_time:
                 working_machines[machine_id] = True
     return working_machines

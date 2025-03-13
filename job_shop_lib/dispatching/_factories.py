@@ -95,9 +95,9 @@ def ready_operations_filter_factory(
 
     Args:
         filter_name:
-            The name of the filter function to be used. Supported
-            values are 'dominated_operations' and
-            'immediate_machine_operations'.
+            The name of the filter function to be used. See
+            :class:`ReadyOperationsFilterType` for supported values.
+            Alternatively, a custom filter function can be passed directly.
 
     Returns:
         A function that takes a :class:`~job_shop_lib.dispatching.Dispatcher`

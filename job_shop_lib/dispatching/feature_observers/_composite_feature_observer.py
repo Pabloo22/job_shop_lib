@@ -186,9 +186,6 @@ if __name__ == "__main__":
     import time
     from job_shop_lib.benchmarking import load_benchmark_instance
     from job_shop_lib.dispatching.rules import DispatchingRuleSolver
-    from job_shop_lib.dispatching.feature_observers import (
-        FeatureObserverType,
-    )
 
     ta80 = load_benchmark_instance("ta80")
 

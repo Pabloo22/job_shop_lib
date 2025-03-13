@@ -33,7 +33,7 @@ class DispatchingRuleType(str, Enum):
 
 
 def dispatching_rule_factory(
-    dispatching_rule: Union[str, DispatchingRuleType,]
+    dispatching_rule: Union[str, DispatchingRuleType],
 ) -> Callable[[Dispatcher], Operation]:
     """Creates and returns a dispatching rule function based on the specified
     dispatching rule name.

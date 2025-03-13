@@ -336,8 +336,7 @@ class Dispatcher:
                 The operation to be scheduled.
             machine_id:
                 The id of the machine on which the operation is to be
-                scheduled. If ``None``, the start time is computed based on the
-                next available time for the operation on any machine.
+                scheduled.
         """
         return max(
             self._machine_next_available_time[machine_id],
