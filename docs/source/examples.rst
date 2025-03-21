@@ -14,3 +14,4 @@ Examples
     examples/10-MultiJobShopGraphEnv
     examples/11-UnscheduledOperationsObserver
     examples/12-ReadyOperationsFilter
+    examples/13-DisjunctiveGraphUpdater
