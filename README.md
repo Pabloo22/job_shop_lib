@@ -24,7 +24,7 @@ See the [documentation](https://job-shop-lib.readthedocs.io/en/latest/) for more
 
 JobShopLib is distributed on [PyPI](https://pypi.org/project/job-shop-lib/) and it supports Python 3.10+.
 
-You can install the latest stable version (version 0.5.1) using `pip`:
+You can install the latest stable version using `pip`:
 
 ```bash
 pip install job-shop-lib
