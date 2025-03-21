@@ -7,6 +7,7 @@ import warnings
 import copy
 
 import matplotlib
+import matplotlib.colors
 import matplotlib.pyplot as plt
 import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
@@ -66,6 +67,9 @@ def plot_disjunctive_graph(
     alpha: float = 0.95,
     operation_node_labeler: Callable[[Node], str] = duration_labeler,
     node_font_color: str = "white",
+    machine_colors: Optional[
+        Dict[int, Tuple[float, float, float, float]]
+    ] = None,
     color_map: str = "Dark2_r",
     disjunctive_edge_color: str = "red",
     conjunctive_edge_color: str = "black",
@@ -114,6 +118,12 @@ def plot_disjunctive_graph(
             with their duration.
         node_font_color:
             The color of the node labels (default is ``"white"``).
+        machine_colors:
+            A dictionary that maps machine ids to colors. If not provided,
+            the colors are generated using the ``color_map``. If provided,
+            the colors are used as the base for the node colors. The
+            dictionary should have the form ``{machine_id: (r, g, b, a)}``.
+            For source and sink nodes use ``-1`` as the machine id.
         color_map:
             The color map to use for the nodes (default is ``"Dark2_r"``).
         disjunctive_edge_color:
@@ -229,12 +239,40 @@ def plot_disjunctive_graph(
 
     # Draw nodes
     # ----------
-    node_colors = [
-        _get_node_color(node)
-        for node in job_shop_graph.nodes
-        if not job_shop_graph.is_removed(node.node_id)
-    ]
-    cmap_func = matplotlib.colormaps.get_cmap(color_map)
+    operation_nodes = job_shop_graph.nodes_by_type[NodeType.OPERATION]
+    cmap_func: Optional[matplotlib.colors.Colormap] = None
+    if machine_colors is None:
+        machine_colors = {}
+        cmap_func = matplotlib.colormaps.get_cmap(color_map)
+        remaining_machines = job_shop_graph.instance.num_machines
+        for operation_node in operation_nodes:
+            if job_shop_graph.is_removed(operation_node.node_id):
+                continue
+            machine_id = operation_node.operation.machine_id
+            if machine_id not in machine_colors:
+                machine_colors[machine_id] = cmap_func(
+                    (_get_node_color(operation_node) + 1)
+                    / job_shop_graph.instance.num_machines
+                )
+                remaining_machines -= 1
+            if remaining_machines == 0:
+                break
+        node_colors: list[Any] = [
+            _get_node_color(node)
+            for node in job_shop_graph.nodes
+            if not job_shop_graph.is_removed(node.node_id)
+        ]
+    else:
+        node_colors = []
+        for node in job_shop_graph.nodes:
+            if job_shop_graph.is_removed(node.node_id):
+                continue
+            if node.node_type == NodeType.OPERATION:
+                machine_id = node.operation.machine_id
+            else:
+                machine_id = -1
+            node_colors.append(machine_colors[machine_id])
+
     nx.draw_networkx_nodes(
         job_shop_graph.graph,
         pos,
@@ -292,24 +330,20 @@ def plot_disjunctive_graph(
 
     # Draw node labels
     # ----------------
-    operation_nodes = job_shop_graph.nodes_by_type[NodeType.OPERATION]
     labels = {}
-    source_node = job_shop_graph.nodes_by_type[NodeType.SOURCE][0]
-    labels[source_node] = start_node_label
-
-    sink_node = job_shop_graph.nodes_by_type[NodeType.SINK][0]
-    labels[sink_node] = end_node_label
-    machine_colors: dict[int, Tuple[float, float, float, float]] = {}
+    if job_shop_graph.nodes_by_type[NodeType.SOURCE]:
+        source_node = job_shop_graph.nodes_by_type[NodeType.SOURCE][0]
+        if not job_shop_graph.is_removed(source_node.node_id):
+            labels[source_node] = start_node_label
+    if job_shop_graph.nodes_by_type[NodeType.SINK]:
+        sink_node = job_shop_graph.nodes_by_type[NodeType.SINK][0]
+        # check if the sink node is removed
+        if not job_shop_graph.is_removed(sink_node.node_id):
+            labels[sink_node] = end_node_label
     for operation_node in operation_nodes:
         if job_shop_graph.is_removed(operation_node.node_id):
             continue
         labels[operation_node] = operation_node_labeler(operation_node)
-        machine_id = operation_node.operation.machine_id
-        if machine_id not in machine_colors:
-            machine_colors[machine_id] = cmap_func(
-                (_get_node_color(operation_node) + 1)
-                / job_shop_graph.instance.num_machines
-            )
 
     nx.draw_networkx_labels(
         job_shop_graph.graph,

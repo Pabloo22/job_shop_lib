@@ -11,8 +11,10 @@ from job_shop_lib.dispatching.feature_observers import (
 )
 from job_shop_lib.generation import GeneralInstanceGenerator
 from job_shop_lib.graphs import (
-    build_disjunctive_graph,
+    add_disjunctive_edges,
+    add_conjunctive_edges,
     build_resource_task_graph,
+    JobShopGraph,
 )
 from job_shop_lib.benchmarking import load_benchmark_instance
 
@@ -99,7 +101,10 @@ def irregular_job_shop_instance():
 @pytest.fixture
 def single_job_shop_graph_env_ft06() -> SingleJobShopGraphEnv:
     instance = load_benchmark_instance("ft06")
-    job_shop_graph = build_disjunctive_graph(instance)
+    job_shop_graph = JobShopGraph(instance)
+    add_disjunctive_edges(job_shop_graph)
+    add_conjunctive_edges(job_shop_graph)
+
     feature_observer_configs = [
         DispatcherObserverConfig(
             FeatureObserverType.IS_READY,

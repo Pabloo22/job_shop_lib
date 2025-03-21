@@ -132,15 +132,13 @@ class JobShopGraph:
 
         This method assigns a unique identifier to the node, adds it to the
         graph, and updates the nodes list and the nodes_by_type dictionary. If
-        the node is of type `OPERATION`, it also updates `nodes_by_job` and
-        `nodes_by_machine` based on the operation's job_id and machine_ids.
+        the node is of type :class:`NodeType.OPERATION`, it also updates
+        ``nodes_by_job`` and ``nodes_by_machine`` based on the operation's
+        job id and machine ids.
 
         Args:
-            node_for_adding (Node): The node to be added to the graph.
-
-        Raises:
-            ValueError: If the node type is unsupported or if required
-            attributes for the node type are missing.
+            node_for_adding:
+                The node to be added to the graph.
 
         Note:
             This method directly modifies the graph attribute as well as
@@ -171,17 +169,25 @@ class JobShopGraph:
     ) -> None:
         """Adds an edge to the graph.
 
+        It automatically determines the edge type based on the source and
+        destination nodes unless explicitly provided in the ``attr`` argument
+        via the ``type`` key. The edge type is a tuple of strings:
+        ``(source_node_type, "to", destination_node_type)``.
+
         Args:
-            u_of_edge: The source node of the edge. If it is a `Node`, its
-                `node_id` is used as the source. Otherwise, it is assumed to be
-                the node_id of the source.
-            v_of_edge: The destination node of the edge. If it is a `Node`, its
-                `node_id` is used as the destination. Otherwise, it is assumed
-                to be the node_id of the destination.
-            **attr: Additional attributes to be added to the edge.
+            u_of_edge:
+                The source node of the edge. If it is a :class:`Node`, its
+                ``node_id`` is used as the source. Otherwise, it is assumed to
+                be the ``node_id`` of the source.
+            v_of_edge:
+                The destination node of the edge. If it is a :class:`Node`,
+                its ``node_id`` is used as the destination. Otherwise, it
+                is assumed to be the ``node_id`` of the destination.
+            **attr:
+                Additional attributes to be added to the edge.
 
         Raises:
-            ValidationError: If `u_of_edge` or `v_of_edge` are not in the
+            ValidationError: If ``u_of_edge`` or ``v_of_edge`` are not in the
                 graph.
         """
         if isinstance(u_of_edge, Node):
@@ -192,18 +198,30 @@ class JobShopGraph:
             raise ValidationError(
                 "`u_of_edge` and `v_of_edge` must be in the graph."
             )
-        self.graph.add_edge(u_of_edge, v_of_edge, **attr)
+        edge_type = attr.pop("type", None)
+        if edge_type is None:
+            u_node = self.nodes[u_of_edge]
+            v_node = self.nodes[v_of_edge]
+            edge_type = (
+                u_node.node_type.name.lower(),
+                "to",
+                v_node.node_type.name.lower(),
+            )
+        self.graph.add_edge(u_of_edge, v_of_edge, type=edge_type, **attr)
 
     def remove_node(self, node_id: int) -> None:
         """Removes a node from the graph and the isolated nodes that result
         from the removal.
 
         Args:
-            node_id: The id of the node to remove.
+            node_id:
+                The id of the node to remove.
         """
         self.graph.remove_node(node_id)
         self.removed_nodes[node_id] = True
 
+    def remove_isolated_nodes(self) -> None:
+        """Removes isolated nodes from the graph."""
         isolated_nodes = list(nx.isolates(self.graph))
         for isolated_node in isolated_nodes:
             self.removed_nodes[isolated_node] = True
@@ -214,9 +232,10 @@ class JobShopGraph:
         """Returns whether the node is removed from the graph.
 
         Args:
-            node: The node to check. If it is a `Node`, its `node_id` is used
+            node:
+                The node to check. If it is a ``Node``, its `node_id` is used
                 as the node to check. Otherwise, it is assumed to be the
-                `node_id` of the node to check.
+                ``node_id`` of the node to check.
         """
         if isinstance(node, Node):
             node = node.node_id
