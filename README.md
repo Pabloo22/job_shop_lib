@@ -16,7 +16,11 @@ JobShopLib is a Python package for creating, solving, and visualizing job shop s
 
 It follows a modular design, allowing users to easily extend the library with new solvers, dispatching rules, visualization functions, etc.
 
-See the [documentation](https://job-shop-lib.readthedocs.io/en/latest/) for more details about the latest version.
+There is a [documentation page](https://job-shop-lib.readthedocs.io/en/stable/) for versions 1.0.0a3 and onward. See the [latest pull requests](https://github.com/Pabloo22/job_shop_lib/pulls?q=is%3Apr+is%3Aclosed) for the latest changes.
+
+See [`gnn_scheduler`](https://github.com/Pabloo22/gnn_scheduler/blob/main/gnn_scheduler/) for an example implementation of a graph neural network-based dispatcher trained with [PyTorch Geometric](https://pyg.org/).
+
+See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing) Google Colab notebook for a quick start guide! More advanced examples can be found [here](https://job-shop-lib.readthedocs.io/en/stable/examples.html).
 
 ## Installation :package:
 
@@ -29,11 +33,6 @@ You can install the latest stable version using `pip`:
 ```bash
 pip install job-shop-lib
 ```
-
-See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing) Google Colab notebook for a quick start guide! 
-
-
-There is a [documentation page](https://job-shop-lib.readthedocs.io/en/latest/) for versions 1.0.0a3 and onward. See see the [latest pull requests](https://github.com/Pabloo22/job_shop_lib/pulls?q=is%3Apr+is%3Aclosed) for the latest changes.
 
 <!-- end installation -->
 
