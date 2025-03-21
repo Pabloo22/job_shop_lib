@@ -169,6 +169,11 @@ class JobShopGraph:
     ) -> None:
         """Adds an edge to the graph.
 
+        It automatically determines the edge type based on the source and
+        destination nodes unless explicitly provided in the ``attr`` argument
+        via the ``type`` key. The edge type is a tuple of strings:
+        ``(source_node_type, "to", destination_node_type)``.
+
         Args:
             u_of_edge:
                 The source node of the edge. If it is a :class:`Node`, its
@@ -193,7 +198,16 @@ class JobShopGraph:
             raise ValidationError(
                 "`u_of_edge` and `v_of_edge` must be in the graph."
             )
-        self.graph.add_edge(u_of_edge, v_of_edge, **attr)
+        edge_type = attr.pop("type", None)
+        if edge_type is None:
+            u_node = self.nodes[u_of_edge]
+            v_node = self.nodes[v_of_edge]
+            edge_type = (
+                u_node.node_type.name.lower(),
+                "to",
+                v_node.node_type.name.lower(),
+            )
+        self.graph.add_edge(u_of_edge, v_of_edge, type=edge_type, **attr)
 
     def remove_node(self, node_id: int) -> None:
         """Removes a node from the graph and the isolated nodes that result
