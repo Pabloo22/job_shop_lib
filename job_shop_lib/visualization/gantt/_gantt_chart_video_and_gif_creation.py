@@ -46,7 +46,6 @@ class PartialGanttChartPlotter(Protocol):
         makespan: Optional[int] = None,
         available_operations: Optional[List[Operation]] = None,
         current_time: Optional[int] = None,
-        **kwargs: Any,
     ) -> Figure:
         """Plots a Gantt chart for an unfinished schedule.
 
@@ -62,8 +61,6 @@ class PartialGanttChartPlotter(Protocol):
             current_time:
                 The current time in the schedule. If provided, a red
                 vertical line is plotted at this time.
-            **kwargs:
-                Additional keyword arguments.
         """
 
 
