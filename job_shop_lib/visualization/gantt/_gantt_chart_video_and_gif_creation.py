@@ -3,7 +3,7 @@
 import os
 import pathlib
 import shutil
-from typing import Sequence, Protocol, Optional, List
+from typing import Sequence, Protocol, Optional, List, Any
 
 import imageio
 import matplotlib.pyplot as plt
@@ -46,6 +46,7 @@ class PartialGanttChartPlotter(Protocol):
         makespan: Optional[int] = None,
         available_operations: Optional[List[Operation]] = None,
         current_time: Optional[int] = None,
+        **kwargs: Any,
     ) -> Figure:
         """Plots a Gantt chart for an unfinished schedule.
 
@@ -61,6 +62,8 @@ class PartialGanttChartPlotter(Protocol):
             current_time:
                 The current time in the schedule. If provided, a red
                 vertical line is plotted at this time.
+            **kwargs:
+                Additional keyword arguments.
         """
 
 
@@ -68,6 +71,7 @@ def get_partial_gantt_chart_plotter(
     title: Optional[str] = None,
     cmap: str = "viridis",
     show_available_operations: bool = False,
+    **kwargs: Any,
 ) -> PartialGanttChartPlotter:
     """Returns a function that plots a Gantt chart for an unfinished schedule.
 
@@ -76,6 +80,8 @@ def get_partial_gantt_chart_plotter(
         cmap: The name of the colormap to use.
         show_available_operations:
             Whether to show the available operations in the Gantt chart.
+        **kwargs: Additional keyword arguments to pass to the
+            :func:`plot_gantt_chart` function.
 
     Returns:
         A function that plots a Gantt chart for a schedule. The function takes
@@ -97,7 +103,7 @@ def get_partial_gantt_chart_plotter(
         current_time: Optional[int] = None,
     ) -> Figure:
         fig, ax = plot_gantt_chart(
-            schedule, title=title, cmap_name=cmap, xlim=makespan
+            schedule, title=title, cmap_name=cmap, xlim=makespan, **kwargs
         )
 
         if show_available_operations and available_operations is not None:
