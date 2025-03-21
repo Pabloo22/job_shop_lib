@@ -19,7 +19,7 @@ from job_shop_lib._schedule import Schedule
 from job_shop_lib._base_solver import BaseSolver, Solver
 
 
-__version__ = "1.0.0-b.5"
+__version__ = "1.0.0"
 
 __all__ = [
     "Operation",
