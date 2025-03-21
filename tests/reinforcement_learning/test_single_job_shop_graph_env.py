@@ -79,8 +79,15 @@ def test_edge_index_padding(
                 if padding_start > 0:
                     assert np.all(row[padding_start:])
 
-    removed_nodes = np.all(obs[ObservationSpaceKey.REMOVED_NODES.value])
-    assert np.all(removed_nodes)
+    assert env.dispatcher.schedule.is_complete()
+    try:
+        assert np.all(obs[ObservationSpaceKey.REMOVED_NODES.value])
+    except AssertionError:
+        print(obs[ObservationSpaceKey.REMOVED_NODES.value])
+        print(env.instance.to_dict())
+        print(env.instance)
+        print(env.job_shop_graph.nodes)
+        raise
 
 
 def test_all_nodes_removed(

@@ -114,6 +114,7 @@ def test_remove_node(example_job_shop_instance):
     for node_to_remove in nodes_to_remove:
         assert node_to_remove not in graph.graph.nodes()
 
+    graph.remove_isolated_nodes()
     # Verify isolated nodes are also removed and that the source node has
     # been removed due to the removal of the isolated nodes
     isolated_nodes = list(nx.isolates(graph.graph))

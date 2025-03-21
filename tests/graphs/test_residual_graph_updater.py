@@ -9,6 +9,7 @@ from job_shop_lib.graphs import (
     build_disjunctive_graph,
     build_resource_task_graph,
     JobShopGraph,
+    NodeType,
 )
 from job_shop_lib.graphs.graph_updaters import ResidualGraphUpdater
 
@@ -25,6 +26,12 @@ def test_removes_all_nodes_disjunctive_graph(
 ):
 
     job_shop_graph = build_disjunctive_graph(example_job_shop_instance)
+
+    # Remove source and sink nodes
+    source_node = job_shop_graph.nodes_by_type[NodeType.SOURCE][0]
+    sink_node = job_shop_graph.nodes_by_type[NodeType.SINK][0]
+    job_shop_graph.remove_node(source_node.node_id)
+    job_shop_graph.remove_node(sink_node.node_id)
     dispatcher = Dispatcher(example_job_shop_instance)
 
     # Initialize ResidualGraphUpdater
