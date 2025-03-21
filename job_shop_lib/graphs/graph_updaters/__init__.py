@@ -7,6 +7,7 @@ Currently, the following classes and utilities are available:
 
     GraphUpdater
     ResidualGraphUpdater
+    DisjunctiveGraphUpdater
     remove_completed_operations
 
 """
@@ -14,10 +15,12 @@ Currently, the following classes and utilities are available:
 from ._graph_updater import GraphUpdater
 from ._utils import remove_completed_operations
 from ._residual_graph_updater import ResidualGraphUpdater
+from ._disjunctive_graph_updater import DisjunctiveGraphUpdater
 
 
 __all__ = [
     "GraphUpdater",
     "remove_completed_operations",
     "ResidualGraphUpdater",
+    "DisjunctiveGraphUpdater",
 ]
