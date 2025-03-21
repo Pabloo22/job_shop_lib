@@ -220,6 +220,8 @@ class JobShopGraph:
         self.graph.remove_node(node_id)
         self.removed_nodes[node_id] = True
 
+    def remove_isolated_nodes(self) -> None:
+        """Removes isolated nodes from the graph."""
         isolated_nodes = list(nx.isolates(self.graph))
         for isolated_node in isolated_nodes:
             self.removed_nodes[isolated_node] = True
