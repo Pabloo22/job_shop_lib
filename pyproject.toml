@@ -43,6 +43,8 @@ ipykernel = "^6.29.2"
 nbconvert = "^7.16.0"
 pandas = "^2.2.1"
 
+[tool.poetry.group.docs]
+optional = true
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^7.3.7"
@@ -53,15 +55,6 @@ myst-parser = "^3.0.1"
 pandoc = "^2.3"
 pygments = "^2.18.0"
 ipython = "^8.31.0"
-
-[tool.poetry.group.claude.dependencies]
-anthropic = "^0.31.2"
-python-dotenv = "^1.0.1"
-tavily-python = "^0.3.5"
-pillow = "^10.4.0"
-rich = "^13.7.1"
-aiohttp = "^3.9.5"
-prompt-toolkit = "^3.0.47"
 
 [tool.poetry.extras]
 pygraphviz = ["pygraphviz"]
