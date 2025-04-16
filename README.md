@@ -227,7 +227,15 @@ Additionally, the graph includes **disjunctive edges** between operations that u
 ```python
 from job_shop_lib.visualization import plot_disjunctive_graph
 
-fig = plot_disjunctive_graph(instance)
+fig = plot_disjunctive_graph(
+    instance,
+    figsize=(6, 4),
+    draw_disjunctive_edges="single_edge",
+    disjunctive_edges_additional_params={
+        "arrowstyle": "<|-|>",
+        "connectionstyle": "arc3,rad=0.15",
+    },
+)
 plt.show()
 ```
 
@@ -283,9 +291,9 @@ from job_shop_lib.graphs import (
 )
 from job_shop_lib.visualization import plot_resource_task_graph
 
-complete_resource_task_graph = build_complete_resource_task_graph(instance)
+resource_task_graph = build_resource_task_graph(instance)
 
-fig = plot_resource_task_graph(complete_agent_task_graph)
+fig = plot_resource_task_graph(resource_task_graph)
 plt.show()
 ```
 
