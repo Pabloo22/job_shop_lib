@@ -1,34 +1,19 @@
 """Contains reinforcement learning components.
 
 
-Environments:
 
 .. autosummary::
+    :nosignatures:
 
     SingleJobShopGraphEnv
     MultiJobShopGraphEnv
-
-Observations objects:
-
-.. autosummary::
-
     ObservationDict
     ObservationSpaceKey
     ResourceTaskGraphObservation
     ResourceTaskGraphObservationDict
-
-Reward observers:
-
-.. autosummary::
-
     RewardObserver
     MakespanReward
     IdleTimeReward
-
-Miscellaneous:
-
-.. autosummary::
-
     RenderConfig
     add_padding
     create_edge_type_dict
