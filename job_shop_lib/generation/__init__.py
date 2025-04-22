@@ -1,4 +1,14 @@
-"""Package for generating job shop instances."""
+"""Package for generating job shop instances.
+
+.. autosummary::
+
+    InstanceGenerator
+    GeneralInstanceGenerator
+    generate_duration_matrix
+    generate_machine_matrix_with_recirculation
+    generate_machine_matrix_without_recirculation
+
+"""
 
 from job_shop_lib.generation._utils import (
     generate_duration_matrix,
