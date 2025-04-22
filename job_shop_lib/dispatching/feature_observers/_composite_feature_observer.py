@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from typing import List, Dict, Union, Optional, Type
 # The Self type can be imported directly from Python’s typing module in
 # version 3.11 and beyond. We use the typing_extensions module to support
-# python >=3.8
+# python >=3.10
 from typing_extensions import Self
 import numpy as np
 from numpy.typing import NDArray
