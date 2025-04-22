@@ -5,7 +5,10 @@ from job_shop_lib.exceptions import ValidationError
 
 
 def generate_duration_matrix(
-    num_jobs: int, num_machines: int, duration_range: tuple[int, int]
+    num_jobs: int,
+    num_machines: int,
+    duration_range: tuple[int, int],
+    rng: np.random.Generator | None = None,
 ) -> NDArray[np.int32]:
     """Generates a duration matrix.
 
@@ -13,10 +16,12 @@ def generate_duration_matrix(
         num_jobs: The number of jobs.
         num_machines: The number of machines.
         duration_range: The range of the duration values.
+        rng: A numpy random number generator.
 
     Returns:
         A duration matrix with shape (num_jobs, num_machines).
     """
+    rng = rng or np.random.default_rng()
     if duration_range[0] > duration_range[1]:
         raise ValidationError(
             "The lower bound of the duration range must be less than or equal "
@@ -27,7 +32,7 @@ def generate_duration_matrix(
     if num_machines <= 0:
         raise ValidationError("The number of machines must be greater than 0.")
 
-    return np.random.randint(
+    return rng.integers(
         duration_range[0],
         duration_range[1] + 1,
         size=(num_jobs, num_machines),
@@ -36,26 +41,28 @@ def generate_duration_matrix(
 
 
 def generate_machine_matrix_with_recirculation(
-    num_jobs: int, num_machines: int
+    num_jobs: int, num_machines: int, rng: np.random.Generator | None = None
 ) -> NDArray[np.int32]:
     """Generate a machine matrix with recirculation.
 
     Args:
         num_jobs: The number of jobs.
         num_machines: The number of machines.
+        rng: A numpy random number generator.
 
     Returns:
         A machine matrix with recirculation with shape (num_machines,
         num_jobs).
     """
+    rng = rng or np.random.default_rng()
     if num_jobs <= 0:
         raise ValidationError("The number of jobs must be greater than 0.")
     if num_machines <= 0:
         raise ValidationError("The number of machines must be greater than 0.")
     num_machines_is_correct = False
     while not num_machines_is_correct:
-        machine_matrix: np.ndarray = np.random.randint(
-            0, num_machines, size=(num_machines, num_jobs)
+        machine_matrix: np.ndarray = rng.integers(
+            0, num_machines, size=(num_machines, num_jobs), dtype=np.int32
         )
         num_machines_is_correct = (
             len(np.unique(machine_matrix)) == num_machines
@@ -65,17 +72,19 @@ def generate_machine_matrix_with_recirculation(
 
 
 def generate_machine_matrix_without_recirculation(
-    num_jobs: int, num_machines: int
+    num_jobs: int, num_machines: int, rng: np.random.Generator | None = None
 ) -> NDArray[np.int32]:
     """Generate a machine matrix without recirculation.
 
     Args:
         num_jobs: The number of jobs.
         num_machines: The number of machines.
+        rng: A numpy random number generator.
 
     Returns:
         A machine matrix without recirculation.
     """
+    rng = rng or np.random.default_rng()
     if num_jobs <= 0:
         raise ValidationError("The number of jobs must be greater than 0.")
     if num_machines <= 0:
@@ -90,7 +99,7 @@ def generate_machine_matrix_without_recirculation(
     )
     # Shuffle the columns:
     machine_matrix = np.apply_along_axis(
-        np.random.permutation, 1, machine_matrix
+        rng.permutation, 1, machine_matrix
     )
     return machine_matrix
 

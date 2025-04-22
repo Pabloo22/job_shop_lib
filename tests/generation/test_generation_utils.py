@@ -135,3 +135,43 @@ def test_invalid_inputs():
 
     with pytest.raises(ValidationError):
         generate_machine_matrix_with_recirculation(3, 0)
+
+
+def test_rng_determinism():
+    """Tests that passing a custom RNG with a fixed seed produces deterministic
+    results."""
+    import numpy as np
+    from job_shop_lib.generation import (
+        generate_duration_matrix,
+        generate_machine_matrix_with_recirculation,
+        generate_machine_matrix_without_recirculation,
+    )
+
+    params = {"num_jobs": 3, "num_machines": 3, "duration_range": (1, 10)}
+    seed = 12345
+    rng1 = np.random.default_rng(seed)
+    rng2 = np.random.default_rng(seed)
+    # Duration matrix
+    mat1 = generate_duration_matrix(**params, rng=rng1)
+    mat2 = generate_duration_matrix(**params, rng=rng2)
+    assert np.array_equal(mat1, mat2)
+    # Machine matrix with recirculation
+    rng1 = np.random.default_rng(seed)
+    rng2 = np.random.default_rng(seed)
+    mat1 = generate_machine_matrix_with_recirculation(
+        params["num_jobs"], params["num_machines"], rng=rng1
+    )
+    mat2 = generate_machine_matrix_with_recirculation(
+        params["num_jobs"], params["num_machines"], rng=rng2
+    )
+    assert np.array_equal(mat1, mat2)
+    # Machine matrix without recirculation
+    rng1 = np.random.default_rng(seed)
+    rng2 = np.random.default_rng(seed)
+    mat1 = generate_machine_matrix_without_recirculation(
+        params["num_jobs"], params["num_machines"], rng=rng1
+    )
+    mat2 = generate_machine_matrix_without_recirculation(
+        params["num_jobs"], params["num_machines"], rng=rng2
+    )
+    assert np.array_equal(mat1, mat2)
