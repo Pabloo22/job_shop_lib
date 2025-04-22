@@ -1,5 +1,3 @@
-"""Home of the `BasicGenerator` class."""
-
 from typing import Optional, Tuple, Union
 import random
 
