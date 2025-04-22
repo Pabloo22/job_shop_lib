@@ -3,13 +3,16 @@
 .. autosummary::
 
     plot_gantt_chart
-    get_partial_gantt_chart_plotter
-    PartialGanttChartPlotter
     create_gantt_chart_video
     create_gantt_chart_gif
+    create_gantt_chart_frames
+    get_partial_gantt_chart_plotter
+    create_gif_from_frames
+    create_video_from_frames
     GanttChartCreator
     GifConfig
     VideoConfig
+    PartialGanttChartPlotter
     PartialGanttChartPlotterConfig
 
 """
@@ -41,8 +44,8 @@ __all__ = [
     "create_gif_from_frames",
     "create_video_from_frames",
     "GanttChartCreator",
-    "PartialGanttChartPlotterConfig",
     "GifConfig",
     "VideoConfig",
     "PartialGanttChartPlotter",
+    "PartialGanttChartPlotterConfig",
 ]
