@@ -1,6 +1,7 @@
 """Contains functions to load benchmark instances.
 
 .. autosummary::
+    :nosignatures:
 
     load_all_benchmark_instances
     load_benchmark_instance

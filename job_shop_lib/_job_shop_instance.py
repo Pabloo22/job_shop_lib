@@ -16,8 +16,8 @@ class JobShopInstance:
     """Data structure to store a Job Shop Scheduling Problem instance.
 
     Additional attributes such as ``num_machines`` or ``durations_matrix`` can
-    be computed from the instance and are cached for performance if they
-    require expensive computations.
+    be computed from the instance and are cached for performance since they
+    might require expensive computations.
 
     Methods:
 

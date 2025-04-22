@@ -1,12 +1,16 @@
 """Contains reinforcement learning components.
 
 
+
 .. autosummary::
+    :nosignatures:
 
     SingleJobShopGraphEnv
     MultiJobShopGraphEnv
     ObservationDict
     ObservationSpaceKey
+    ResourceTaskGraphObservation
+    ResourceTaskGraphObservationDict
     RewardObserver
     MakespanReward
     IdleTimeReward
@@ -15,8 +19,6 @@
     create_edge_type_dict
     map_values
     get_optimal_actions
-    ResourceTaskGraphObservation
-    ResourceTaskGraphObservationDict
 
 """
 
@@ -51,18 +53,18 @@ from ._resource_task_graph_observation import (
 
 
 __all__ = [
+    "SingleJobShopGraphEnv",
+    "MultiJobShopGraphEnv",
+    "ObservationDict",
     "ObservationSpaceKey",
+    "ResourceTaskGraphObservation",
+    "ResourceTaskGraphObservationDict",
     "RewardObserver",
     "MakespanReward",
     "IdleTimeReward",
-    "SingleJobShopGraphEnv",
     "RenderConfig",
-    "ObservationDict",
     "add_padding",
-    "MultiJobShopGraphEnv",
     "create_edge_type_dict",
-    "ResourceTaskGraphObservation",
     "map_values",
-    "ResourceTaskGraphObservationDict",
     "get_optimal_actions",
 ]

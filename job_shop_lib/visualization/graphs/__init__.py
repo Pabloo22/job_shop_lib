@@ -1,6 +1,7 @@
 """Contains functions and classes for visualizing job shop scheduling problems.
 
 .. autosummary::
+    :nosignatures:
 
     plot_disjunctive_graph
     plot_resource_task_graph
