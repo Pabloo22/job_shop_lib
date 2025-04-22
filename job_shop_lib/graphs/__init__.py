@@ -5,6 +5,7 @@ The main classes and functions available in this package are:
 Main objects:
 
 .. autosummary::
+    :nosignatures:
 
     JobShopGraph
     Node
@@ -15,6 +16,7 @@ Main objects:
 Build functions:
 
 .. autosummary::
+    :nosignatures:
     build_disjunctive_graph
     build_resource_task_graph
     build_complete_resource_task_graph
@@ -24,6 +26,7 @@ Build functions:
 Add functions:
 
 .. autosummary::
+    :nosignatures:
     add_disjunctive_edges
     add_conjunctive_edges
     add_source_sink_nodes

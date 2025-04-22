@@ -1,6 +1,7 @@
 """Package for generating job shop instances.
 
 .. autosummary::
+    :nosignatures:
 
     InstanceGenerator
     GeneralInstanceGenerator

@@ -4,6 +4,7 @@ job shop scheduling problem.
 Currently, the following classes and utilities are available:
 
 .. autosummary::
+    :nosignatures:
 
     GraphUpdater
     ResidualGraphUpdater

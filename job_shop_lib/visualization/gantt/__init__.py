@@ -1,6 +1,7 @@
 """Contains functions and classes for visualizing job shop scheduling problems.
 
 .. autosummary::
+    :nosignatures:
 
     plot_gantt_chart
     create_gantt_chart_video

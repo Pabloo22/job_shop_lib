@@ -3,6 +3,7 @@
 Main objects:
 
 .. autosummary::
+    :nosignatures:
 
     DispatchingRuleSolver
     DispatchingRuleType
@@ -14,6 +15,7 @@ Main objects:
 Dispatching rules:
 
 .. autosummary::
+    :nosignatures:
 
     shortest_processing_time_rule
     first_come_first_served_rule
@@ -27,6 +29,7 @@ Dispatching rules:
 Dispatching rule scorers:
 
 .. autosummary::
+    :nosignatures:
 
     shortest_processing_time_score
     first_come_first_served_score
