@@ -20,7 +20,7 @@ from ._disjunctive_graph_updater import DisjunctiveGraphUpdater
 
 __all__ = [
     "GraphUpdater",
-    "remove_completed_operations",
     "ResidualGraphUpdater",
     "DisjunctiveGraphUpdater",
+    "remove_completed_operations",
 ]
