@@ -9,13 +9,15 @@ Problem step-by-step.
     HistoryObserver
     UnscheduledOperationsObserver
     OptimalOperationsObserver
-    ReadyOperationsFilter
     DispatcherObserverConfig
-    filter_dominated_operations
-    filter_non_immediate_machines
-    create_composite_operation_filter
+    ReadyOperationsFilter
     ReadyOperationsFilterType
     ready_operations_filter_factory
+    filter_dominated_operations
+    filter_non_immediate_machines
+    filter_non_idle_machines
+    filter_non_immediate_operations
+    create_composite_operation_filter
 
 Dispatching refers to the decision-making process of selecting which job
 should be processed next on a particular machine when that machine becomes
@@ -45,17 +47,17 @@ from ._factories import (
 
 __all__ = [
     "Dispatcher",
-    "filter_dominated_operations",
-    "filter_non_immediate_machines",
-    "create_composite_operation_filter",
-    "ReadyOperationsFilterType",
-    "ready_operations_filter_factory",
     "DispatcherObserver",
     "HistoryObserver",
-    "DispatcherObserverConfig",
     "UnscheduledOperationsObserver",
+    "OptimalOperationsObserver",
+    "DispatcherObserverConfig",
     "ReadyOperationsFilter",
+    "ReadyOperationsFilterType",
+    "ready_operations_filter_factory",
+    "filter_dominated_operations",
+    "filter_non_immediate_machines",
     "filter_non_idle_machines",
     "filter_non_immediate_operations",
-    "OptimalOperationsObserver",
+    "create_composite_operation_filter",
 ]
