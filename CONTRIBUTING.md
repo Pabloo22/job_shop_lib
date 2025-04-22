@@ -45,13 +45,13 @@ The project includes several helpful commands in the Makefile:
 
 ## Testing
 
-- All new features should include appropriate pytest tests
+- All new features should include appropriate tests using pytest
 - Ensure all existing tests pass before submitting your PR
 - Run tests with `pytest` in the project root
 
 ## Code Style
 
-- We use **Black** with line length of 88 characters for code formatting
+- We use **Black** with line length of 79 characters for code formatting
 - Follow the **Google Style Guide** for docstrings
 - Include docstrings for all new functions and classes
 - Keep your changes focused on the specific issue/feature at hand
@@ -59,7 +59,7 @@ The project includes several helpful commands in the Makefile:
 ## Pull Request Process
 
 1. Update the README.md or documentation with details of changes if needed
-2. Update the requirements.txt if you've added dependencies
+2. Update the pyproject.toml if you've added dependencies
 3. Your PR will be reviewed by maintainers, who may request changes
 4. Once approved, your PR will be merged
 
