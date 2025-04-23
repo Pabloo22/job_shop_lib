@@ -5,7 +5,7 @@ The factory functions create and return the appropriate functions based on the
 specified names or enums.
 """
 
-from typing import TypeVar, Generic, Any, Dict
+from typing import TypeVar, Generic, Any
 
 from dataclasses import dataclass, field
 
@@ -46,7 +46,7 @@ class DispatcherObserverConfig(Generic[T]):
     # We use the type hint T, instead of ObserverType, to allow for string or
     # specific Enum values to be passed as the type argument. For example:
     # FeatureObserverConfig = DispatcherObserverConfig[
-    #     Type[FeatureObserver] | FeatureObserverType | str
+    #     type[FeatureObserver] | FeatureObserverType | str
     # ]
     # This allows for the creation of a FeatureObserver instance
     # from the factory function.
@@ -55,7 +55,7 @@ class DispatcherObserverConfig(Generic[T]):
     enum value, or a string. This is useful for the creation of
     :class:`DispatcherObserver` instances from the factory functions."""
 
-    kwargs: Dict[str, Any] = field(default_factory=dict)
+    kwargs: dict[str, Any] = field(default_factory=dict)
     """Keyword arguments needed to initialize the class. It must not
     contain the ``dispatcher`` argument."""
 

@@ -1,6 +1,5 @@
 """Home of the `DispatchingRuleSolver` class."""
 
-from typing import Optional, Union
 from collections.abc import Callable, Iterable
 
 from job_shop_lib import JobShopInstance, Schedule, Operation, BaseSolver
@@ -66,24 +65,19 @@ class DispatchingRuleSolver(BaseSolver):
 
     def __init__(
         self,
-        dispatching_rule: Union[
-            str, Callable[[Dispatcher], Operation]
-        ] = DispatchingRuleType.MOST_WORK_REMAINING,
-        machine_chooser: Union[
-            str, Callable[[Dispatcher, Operation], int]
-        ] = MachineChooserType.FIRST,
-        ready_operations_filter: Optional[
-            Union[
-                Iterable[
-                    Union[
-                        ReadyOperationsFilter, str, ReadyOperationsFilterType
-                    ]
-                ],
-                str,
-                ReadyOperationsFilterType,
-                ReadyOperationsFilter,
-            ]
-        ] = (
+        dispatching_rule: (
+            str | Callable[[Dispatcher], Operation]
+        ) = DispatchingRuleType.MOST_WORK_REMAINING,
+        machine_chooser: (
+            str | Callable[[Dispatcher, Operation], int]
+        ) = MachineChooserType.FIRST,
+        ready_operations_filter: (
+            Iterable[ReadyOperationsFilter | str | ReadyOperationsFilterType]
+            | str
+            | ReadyOperationsFilterType
+            | ReadyOperationsFilter
+            | None
+        ) = (
             ReadyOperationsFilterType.DOMINATED_OPERATIONS,
             ReadyOperationsFilterType.NON_IMMEDIATE_OPERATIONS,
         ),
@@ -108,7 +102,7 @@ class DispatchingRuleSolver(BaseSolver):
     def solve(
         self,
         instance: JobShopInstance,
-        dispatcher: Optional[Dispatcher] = None,
+        dispatcher: Dispatcher | None = None,
     ) -> Schedule:
         """Solves the instance using the dispatching rule and machine chooser
         algorithms.
@@ -159,6 +153,7 @@ class DispatchingRuleSolver(BaseSolver):
 if __name__ == "__main__":
     import time
     import cProfile
+
     # import pstats
     # from io import StringIO
     from job_shop_lib.benchmarking import (

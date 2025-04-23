@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from collections.abc import Callable, Sequence
-from typing import Any, Tuple, Dict, List, Optional, Type
+from typing import Any
 from copy import deepcopy
 
 import gymnasium as gym
@@ -162,16 +162,16 @@ class MultiJobShopGraphEnv(gym.Env):
             [JobShopInstance], JobShopGraph
         ] = build_resource_task_graph,
         graph_updater_config: DispatcherObserverConfig[
-            Type[GraphUpdater]
+            type[GraphUpdater]
         ] = DispatcherObserverConfig(class_type=ResidualGraphUpdater),
         ready_operations_filter: Callable[
-            [Dispatcher, List[Operation]], List[Operation]
+            [Dispatcher, list[Operation]], list[Operation]
         ] = filter_dominated_operations,
         reward_function_config: DispatcherObserverConfig[
-            Type[RewardObserver]
+            type[RewardObserver]
         ] = DispatcherObserverConfig(class_type=MakespanReward),
-        render_mode: Optional[str] = None,
-        render_config: Optional[RenderConfig] = None,
+        render_mode: str | None = None,
+        render_config: RenderConfig | None = None,
         use_padding: bool = True,
     ) -> None:
         super().__init__()
@@ -226,7 +226,7 @@ class MultiJobShopGraphEnv(gym.Env):
     @property
     def ready_operations_filter(
         self,
-    ) -> Optional[Callable[[Dispatcher, List[Operation]], List[Operation]]]:
+    ) -> Callable[[Dispatcher, list[Operation]], list[Operation]] | None:
         """Returns the current ready operations filter."""
         return (
             self.single_job_shop_graph_env.dispatcher.ready_operations_filter
@@ -236,7 +236,7 @@ class MultiJobShopGraphEnv(gym.Env):
     def ready_operations_filter(
         self,
         ready_operations_filter: Callable[
-            [Dispatcher, List[Operation]], List[Operation]
+            [Dispatcher, list[Operation]], list[Operation]
         ],
     ) -> None:
         """Sets the ready operations filter."""
@@ -267,9 +267,9 @@ class MultiJobShopGraphEnv(gym.Env):
     def reset(
         self,
         *,
-        seed: Optional[int] = None,
-        options: Dict[str, Any] | None = None,
-    ) -> Tuple[ObservationDict, Dict[str, Any]]:
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
+    ) -> tuple[ObservationDict, dict[str, Any]]:
         """Resets the environment and returns the initial observation.
 
         Args:
@@ -303,8 +303,8 @@ class MultiJobShopGraphEnv(gym.Env):
         return obs, info
 
     def step(
-        self, action: Tuple[int, int]
-    ) -> Tuple[ObservationDict, float, bool, bool, Dict[str, Any]]:
+        self, action: tuple[int, int]
+    ) -> tuple[ObservationDict, float, bool, bool, dict[str, Any]]:
         """Takes a step in the environment.
 
         Args:
@@ -356,7 +356,7 @@ class MultiJobShopGraphEnv(gym.Env):
             input_shape: (num_machines, num_features)
             output_shape: (max_num_machines, num_features) (padded with -1)
         """
-        padding_value: Dict[str, float | bool] = defaultdict(lambda: -1)
+        padding_value: dict[str, float | bool] = defaultdict(lambda: -1)
         padding_value[ObservationSpaceKey.REMOVED_NODES.value] = True
         for key, value in observation.items():
             if not isinstance(value, np.ndarray):  # Make mypy happy
@@ -369,7 +369,7 @@ class MultiJobShopGraphEnv(gym.Env):
             )
         return observation
 
-    def _get_output_shape(self, key: str) -> Tuple[int, ...]:
+    def _get_output_shape(self, key: str) -> tuple[int, ...]:
         """Returns the output shape of the observation space key."""
         output_shape = self.observation_space[key].shape
         assert output_shape is not None  # Make mypy happy
@@ -378,12 +378,12 @@ class MultiJobShopGraphEnv(gym.Env):
     def render(self) -> None:
         self.single_job_shop_graph_env.render()
 
-    def get_available_actions_with_ids(self) -> List[Tuple[int, int, int]]:
+    def get_available_actions_with_ids(self) -> list[tuple[int, int, int]]:
         """Returns a list of available actions in the form of
         (operation_id, machine_id, job_id)."""
         return self.single_job_shop_graph_env.get_available_actions_with_ids()
 
-    def validate_action(self, action: Tuple[int, int]) -> None:
+    def validate_action(self, action: tuple[int, int]) -> None:
         """Validates the action.
 
         Args:

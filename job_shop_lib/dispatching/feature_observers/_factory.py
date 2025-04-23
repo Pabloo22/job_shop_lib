@@ -1,7 +1,6 @@
 """Contains factory functions for creating :class:`FeatureObserver`s."""
 
 from enum import Enum
-from typing import Union, Type
 
 from job_shop_lib.dispatching import DispatcherObserverConfig
 from job_shop_lib.dispatching.feature_observers import (
@@ -37,25 +36,25 @@ class FeatureObserverType(str, Enum):
 
 
 # FeatureObserverConfig = DispatcherObserverConfig[
-#     Type[FeatureObserver] | FeatureObserverType | str
+#     type[FeatureObserver] | FeatureObserverType | str
 # ]
 # FeatureObserverConfig = DispatcherObserverConfig[
-#     Union[Type[FeatureObserver], FeatureObserverType, str]
+#     Union[type[FeatureObserver], FeatureObserverType, str]
 # ]
 FeatureObserverConfig = (
-    DispatcherObserverConfig[Type[FeatureObserver]]
+    DispatcherObserverConfig[type[FeatureObserver]]
     | DispatcherObserverConfig[FeatureObserverType]
     | DispatcherObserverConfig[str]
 )
 
 
 def feature_observer_factory(
-    feature_observer_type: Union[
-        str,
-        FeatureObserverType,
-        Type[FeatureObserver],
-        FeatureObserverConfig
-    ],
+    feature_observer_type: (
+        str
+        | FeatureObserverType
+        | type[FeatureObserver]
+        | FeatureObserverConfig
+    ),
     **kwargs,
 ) -> FeatureObserver:
     """Creates and returns a :class:`FeatureObserver` based on the specified
@@ -77,12 +76,12 @@ def feature_observer_factory(
             **feature_observer_type.kwargs,
             **kwargs,
         )
-    # if the instance is of type Type[FeatureObserver] we can just
+    # if the instance is of type type[FeatureObserver] we can just
     # call the object constructor with the keyword arguments
     if isinstance(feature_observer_type, type):
         return feature_observer_type(**kwargs)
 
-    mapping: dict[FeatureObserverType, Type[FeatureObserver]] = {
+    mapping: dict[FeatureObserverType, type[FeatureObserver]] = {
         FeatureObserverType.IS_READY: IsReadyObserver,
         FeatureObserverType.EARLIEST_START_TIME: EarliestStartTimeObserver,
         FeatureObserverType.DURATION: DurationObserver,

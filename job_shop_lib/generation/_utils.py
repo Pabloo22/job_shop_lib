@@ -1,4 +1,3 @@
-from typing import Tuple
 import numpy as np
 from numpy.typing import NDArray
 
@@ -6,7 +5,7 @@ from job_shop_lib.exceptions import ValidationError
 
 
 def generate_duration_matrix(
-    num_jobs: int, num_machines: int, duration_range: Tuple[int, int]
+    num_jobs: int, num_machines: int, duration_range: tuple[int, int]
 ) -> NDArray[np.int32]:
     """Generates a duration matrix.
 

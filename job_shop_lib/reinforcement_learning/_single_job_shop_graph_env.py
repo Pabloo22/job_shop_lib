@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 from collections.abc import Callable, Sequence
-from typing import Any, Dict, Tuple, List, Optional, Type, Union
+from typing import Any
 
 import matplotlib.pyplot as plt
 import gymnasium as gym
@@ -140,24 +140,22 @@ class SingleJobShopGraphEnv(gym.Env):
         self,
         job_shop_graph: JobShopGraph,
         feature_observer_configs: Sequence[
-            Union[
-                str,
-                FeatureObserverType,
-                Type[FeatureObserver],
-                FeatureObserverConfig,
-            ],
+            str
+            | FeatureObserverType
+            | type[FeatureObserver]
+            | FeatureObserverConfig
         ],
         reward_function_config: DispatcherObserverConfig[
-            Type[RewardObserver]
+            type[RewardObserver]
         ] = DispatcherObserverConfig(class_type=MakespanReward),
         graph_updater_config: DispatcherObserverConfig[
-            Type[GraphUpdater]
+            type[GraphUpdater]
         ] = DispatcherObserverConfig(class_type=ResidualGraphUpdater),
-        ready_operations_filter: Optional[
-            Callable[[Dispatcher, List[Operation]], List[Operation]]
-        ] = filter_dominated_operations,
-        render_mode: Optional[str] = None,
-        render_config: Optional[RenderConfig] = None,
+        ready_operations_filter: (
+            Callable[[Dispatcher, list[Operation]], list[Operation]] | None
+        ) = filter_dominated_operations,
+        render_mode: str | None = None,
+        render_config: RenderConfig | None = None,
         use_padding: bool = True,
     ) -> None:
         super().__init__()
@@ -224,7 +222,7 @@ class SingleJobShopGraphEnv(gym.Env):
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
         num_edges = self.job_shop_graph.num_edges
-        dict_space: Dict[str, gym.Space] = {
+        dict_space: dict[str, gym.Space] = {
             ObservationSpaceKey.REMOVED_NODES.value: gym.spaces.MultiBinary(
                 len(self.job_shop_graph.nodes)
             ),
@@ -250,9 +248,9 @@ class SingleJobShopGraphEnv(gym.Env):
     def reset(
         self,
         *,
-        seed: Optional[int] = None,
-        options: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[ObservationDict, dict[str, Any]]:
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
+    ) -> tuple[ObservationDict, dict[str, Any]]:
         """Resets the environment.
 
         Args:
@@ -284,8 +282,8 @@ class SingleJobShopGraphEnv(gym.Env):
         }
 
     def step(
-        self, action: Tuple[int, int]
-    ) -> Tuple[ObservationDict, float, bool, bool, Dict[str, Any]]:
+        self, action: tuple[int, int]
+    ) -> tuple[ObservationDict, float, bool, bool, dict[str, Any]]:
         """Takes a step in the environment.
 
         Args:
@@ -319,7 +317,7 @@ class SingleJobShopGraphEnv(gym.Env):
         reward = self.reward_function.last_reward
         done = self.dispatcher.schedule.is_complete()
         truncated = False
-        info: Dict[str, Any] = {
+        info: dict[str, Any] = {
             "feature_names": self.composite_observer.column_names,
             "available_operations_with_ids": (
                 self.get_available_actions_with_ids()
@@ -374,7 +372,7 @@ class SingleJobShopGraphEnv(gym.Env):
         elif self.render_mode == "save_gif":
             self.gantt_chart_creator.create_gif()
 
-    def get_available_actions_with_ids(self) -> List[Tuple[int, int, int]]:
+    def get_available_actions_with_ids(self) -> list[tuple[int, int, int]]:
         """Returns a list of available actions in the form of
         (operation_id, machine_id, job_id)."""
         available_operations = self.dispatcher.available_operations()
@@ -388,7 +386,7 @@ class SingleJobShopGraphEnv(gym.Env):
                 )
         return available_operations_with_ids
 
-    def validate_action(self, action: Tuple[int, int]) -> None:
+    def validate_action(self, action: tuple[int, int]) -> None:
         """Validates that the action is legal in the current state.
 
         Args:
@@ -428,7 +426,7 @@ if __name__ == "__main__":
 
     instance = load_benchmark_instance("ft06")
     job_shop_graph_ = build_disjunctive_graph(instance)
-    feature_observer_configs_: List[DispatcherObserverConfig] = [
+    feature_observer_configs_: list[DispatcherObserverConfig] = [
         DispatcherObserverConfig(
             FeatureObserverType.IS_READY,
             kwargs={"feature_types": [FeatureType.JOBS]},
