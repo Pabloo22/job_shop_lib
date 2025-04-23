@@ -1,7 +1,6 @@
 """Home of the `FeatureObserver` class and `FeatureType` enum."""
 
 import enum
-from typing import Optional, Union, Dict, List, Tuple
 
 import numpy as np
 
@@ -65,7 +64,7 @@ class FeatureObserver(DispatcherObserver):
     """
 
     _is_singleton = False
-    _feature_sizes: Union[Dict[FeatureType, int], int] = 1
+    _feature_sizes: dict[FeatureType, int] | int = 1
     _supported_feature_types = list(FeatureType)
 
     __slots__ = {
@@ -85,7 +84,7 @@ class FeatureObserver(DispatcherObserver):
         dispatcher: Dispatcher,
         *,
         subscribe: bool = True,
-        feature_types: Optional[Union[List[FeatureType], FeatureType]] = None,
+        feature_types: list[FeatureType] | FeatureType | None = None,
     ):
         feature_types = self._get_feature_types_list(feature_types)
         if isinstance(self._feature_sizes, int):
@@ -117,7 +116,7 @@ class FeatureObserver(DispatcherObserver):
         self.initialize_features()
 
     @property
-    def feature_sizes(self) -> Dict[FeatureType, int]:
+    def feature_sizes(self) -> dict[FeatureType, int]:
         """Returns the size of the features.
 
         The size of the features is the number of values being observed for
@@ -135,12 +134,12 @@ class FeatureObserver(DispatcherObserver):
         return self._feature_sizes
 
     @property
-    def supported_feature_types(self) -> List[FeatureType]:
+    def supported_feature_types(self) -> list[FeatureType]:
         """Returns the supported feature types."""
         return self._supported_feature_types
 
     @property
-    def feature_dimensions(self) -> Dict[FeatureType, Tuple[int, int]]:
+    def feature_dimensions(self) -> dict[FeatureType, tuple[int, int]]:
         """A dictionary containing the shape of each :class:`FeatureType`."""
         feature_dimensions = {}
         for feature_type, array in self.features.items():
@@ -171,7 +170,7 @@ class FeatureObserver(DispatcherObserver):
         self.initialize_features()
 
     def set_features_to_zero(
-        self, exclude: Optional[Union[FeatureType, List[FeatureType]]] = None
+        self, exclude: FeatureType | list[FeatureType] | None = None
     ):
         """Sets all features to zero except for the ones specified in
         ``exclude``.
@@ -197,8 +196,8 @@ class FeatureObserver(DispatcherObserver):
 
     def _get_feature_types_list(
         self,
-        feature_types: Optional[Union[List[FeatureType], FeatureType]],
-    ) -> List[FeatureType]:
+        feature_types: list[FeatureType] | FeatureType | None,
+    ) -> list[FeatureType]:
         """Returns a list of feature types.
 
         Args:

@@ -1,7 +1,7 @@
 """Module for visualizing the disjunctive graph of a job shop instance."""
 
 import functools
-from typing import Any, Optional, Tuple, Dict, Union
+from typing import Any
 from collections.abc import Callable, Sequence, Iterable
 import warnings
 import copy
@@ -23,7 +23,7 @@ from job_shop_lib.graphs import (
 from job_shop_lib.exceptions import ValidationError
 
 
-Layout = Callable[[nx.Graph], Dict[str, Tuple[float, float]]]
+Layout = Callable[[nx.Graph], dict[str, tuple[float, float]]]
 
 
 def duration_labeler(node: Node) -> str:
@@ -56,10 +56,10 @@ def duration_labeler(node: Node) -> str:
 # pylint: disable=too-many-arguments, too-many-locals, too-many-statements
 # pylint: disable=too-many-branches, line-too-long
 def plot_disjunctive_graph(
-    job_shop: Union[JobShopGraph, JobShopInstance],
+    job_shop: JobShopGraph | JobShopInstance,
     *,
-    title: Optional[str] = None,
-    figsize: Tuple[float, float] = (6, 4),
+    title: str | None = None,
+    figsize: tuple[float, float] = (6, 4),
     node_size: int = 1600,
     edge_width: int = 2,
     font_size: int = 10,
@@ -67,27 +67,25 @@ def plot_disjunctive_graph(
     alpha: float = 0.95,
     operation_node_labeler: Callable[[Node], str] = duration_labeler,
     node_font_color: str = "white",
-    machine_colors: Optional[
-        Dict[int, Tuple[float, float, float, float]]
-    ] = None,
+    machine_colors: dict[int, tuple[float, float, float, float]] | None = None,
     color_map: str = "Dark2_r",
     disjunctive_edge_color: str = "red",
     conjunctive_edge_color: str = "black",
-    layout: Optional[Layout] = None,
-    draw_disjunctive_edges: Union[bool, str] = True,
-    conjunctive_edges_additional_params: Optional[Dict[str, Any]] = None,
-    disjunctive_edges_additional_params: Optional[Dict[str, Any]] = None,
+    layout: Layout | None = None,
+    draw_disjunctive_edges: bool | str = True,
+    conjunctive_edges_additional_params: dict[str, Any] | None = None,
+    disjunctive_edges_additional_params: dict[str, Any] | None = None,
     conjunctive_patch_label: str = "Conjunctive edges",
     disjunctive_patch_label: str = "Disjunctive edges",
     legend_text: str = "$p_{ij}=$duration of $O_{ij}$",
     show_machine_colors_in_legend: bool = True,
-    machine_labels: Optional[Sequence[str]] = None,
+    machine_labels: Sequence[str] | None = None,
     legend_location: str = "upper left",
-    legend_bbox_to_anchor: Tuple[float, float] = (1.01, 1),
+    legend_bbox_to_anchor: tuple[float, float] = (1.01, 1),
     start_node_label: str = "$S$",
     end_node_label: str = "$T$",
     font_family: str = "sans-serif",
-) -> Tuple[plt.Figure, plt.Axes]:
+) -> tuple[plt.Figure, plt.Axes]:
     r"""Plots the disjunctive graph of the given job shop instance or graph.
 
     Args:
@@ -240,7 +238,7 @@ def plot_disjunctive_graph(
     # Draw nodes
     # ----------
     operation_nodes = job_shop_graph.nodes_by_type[NodeType.OPERATION]
-    cmap_func: Optional[matplotlib.colors.Colormap] = None
+    cmap_func: matplotlib.colors.Colormap | None = None
     if machine_colors is None:
         machine_colors = {}
         cmap_func = matplotlib.colormaps.get_cmap(color_map)
@@ -289,7 +287,7 @@ def plot_disjunctive_graph(
         for u, v, d in job_shop_graph.graph.edges(data=True)
         if d["type"] == EdgeType.CONJUNCTIVE
     ]
-    disjunctive_edges: Iterable[Tuple[int, int]] = [
+    disjunctive_edges: Iterable[tuple[int, int]] = [
         (u, v)
         for u, v, d in job_shop_graph.graph.edges(data=True)
         if d["type"] == EdgeType.DISJUNCTIVE

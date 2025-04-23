@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from collections.abc import Sequence
-from typing import List, Dict, Union, Optional, Type
+
 # The Self type can be imported directly from Python’s typing module in
 # version 3.11 and beyond. We use the typing_extensions module to support
 # python >=3.10
@@ -77,8 +77,8 @@ class CompositeFeatureObserver(FeatureObserver):
         dispatcher: Dispatcher,
         *,
         subscribe: bool = True,
-        feature_types: Optional[Union[List[FeatureType], FeatureType]] = None,
-        feature_observers: Optional[List[FeatureObserver]] = None,
+        feature_types: list[FeatureType] | FeatureType | None = None,
+        feature_observers: list[FeatureObserver] | None = None,
     ):
         if feature_observers is None:
             feature_observers = [
@@ -97,7 +97,7 @@ class CompositeFeatureObserver(FeatureObserver):
                     f"Composite feature types: {feature_types}"
                 )
         self.feature_observers = feature_observers
-        self.column_names: Dict[FeatureType, List[str]] = defaultdict(list)
+        self.column_names: dict[FeatureType, list[str]] = defaultdict(list)
         super().__init__(dispatcher, subscribe=subscribe)
         self._set_column_names()
 
@@ -106,12 +106,10 @@ class CompositeFeatureObserver(FeatureObserver):
         cls,
         dispatcher: Dispatcher,
         feature_observer_configs: Sequence[
-            Union[
-                str,
-                FeatureObserverType,
-                Type[FeatureObserver],
-                FeatureObserverConfig,
-            ],
+            str
+            | FeatureObserverType
+            | type[FeatureObserver]
+            | FeatureObserverConfig
         ],
         subscribe: bool = True,
     ) -> Self:
@@ -136,7 +134,7 @@ class CompositeFeatureObserver(FeatureObserver):
         return composite_observer
 
     @property
-    def features_as_dataframe(self) -> Dict[FeatureType, pd.DataFrame]:
+    def features_as_dataframe(self) -> dict[FeatureType, pd.DataFrame]:
         """Returns the features as a dictionary of `pd.DataFrame` instances."""
         return {
             feature_type: pd.DataFrame(
@@ -146,7 +144,7 @@ class CompositeFeatureObserver(FeatureObserver):
         }
 
     def initialize_features(self):
-        features: Dict[FeatureType, List[NDArray[np.float32]]] = defaultdict(
+        features: dict[FeatureType, list[NDArray[np.float32]]] = defaultdict(
             list
         )
         for observer in self.feature_observers:

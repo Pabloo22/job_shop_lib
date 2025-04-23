@@ -48,7 +48,8 @@ from job_shop_lib.reinforcement_learning._multi_job_shop_graph_env import (
     MultiJobShopGraphEnv,
 )
 from ._resource_task_graph_observation import (
-    ResourceTaskGraphObservation, ResourceTaskGraphObservationDict
+    ResourceTaskGraphObservation,
+    ResourceTaskGraphObservationDict,
 )
 
 

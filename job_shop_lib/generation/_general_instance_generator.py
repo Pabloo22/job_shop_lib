@@ -1,6 +1,5 @@
 """Home of the `BasicGenerator` class."""
 
-from typing import Optional, Tuple, Union
 import random
 
 from job_shop_lib import JobShopInstance
@@ -81,15 +80,15 @@ class GeneralInstanceGenerator(InstanceGenerator):
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        num_jobs: Union[int, Tuple[int, int]] = (10, 20),
-        num_machines: Union[int, Tuple[int, int]] = (5, 10),
-        duration_range: Tuple[int, int] = (1, 99),
+        num_jobs: int | tuple[int, int] = (10, 20),
+        num_machines: int | tuple[int, int] = (5, 10),
+        duration_range: tuple[int, int] = (1, 99),
         allow_less_jobs_than_machines: bool = True,
         allow_recirculation: bool = False,
-        machines_per_operation: Union[int, Tuple[int, int]] = 1,
+        machines_per_operation: int | tuple[int, int] = 1,
         name_suffix: str = "classic_generated_instance",
-        seed: Optional[int] = None,
-        iteration_limit: Optional[int] = None,
+        seed: int | None = None,
+        iteration_limit: int | None = None,
     ):
         super().__init__(
             num_jobs=num_jobs,
@@ -127,8 +126,8 @@ class GeneralInstanceGenerator(InstanceGenerator):
 
     def generate(
         self,
-        num_jobs: Optional[int] = None,
-        num_machines: Optional[int] = None,
+        num_jobs: int | None = None,
+        num_machines: int | None = None,
     ) -> JobShopInstance:
         if num_jobs is None:
             num_jobs = random.randint(*self.num_jobs_range)

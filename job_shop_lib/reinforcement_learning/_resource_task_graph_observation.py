@@ -245,7 +245,7 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
 
     @staticmethod
     def _get_start_from_zero_mappings(
-        original_indices_dict: dict[str, NDArray[np.int32]]
+        original_indices_dict: dict[str, NDArray[np.int32]],
     ) -> dict[str, dict[int, int]]:
         mappings = {}
         for key, indices in original_indices_dict.items():

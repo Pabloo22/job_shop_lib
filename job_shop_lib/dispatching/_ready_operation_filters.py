@@ -4,7 +4,6 @@ This functions are used by the `Dispatcher` class to reduce the
 amount of available operations to choose from.
 """
 
-from typing import List, Set
 from collections.abc import Callable
 
 from job_shop_lib import Operation
@@ -12,13 +11,13 @@ from job_shop_lib.dispatching import Dispatcher
 
 
 ReadyOperationsFilter = Callable[
-    [Dispatcher, List[Operation]], List[Operation]
+    [Dispatcher, list[Operation]], list[Operation]
 ]
 
 
 def filter_non_idle_machines(
-    dispatcher: Dispatcher, operations: List[Operation]
-) -> List[Operation]:
+    dispatcher: Dispatcher, operations: list[Operation]
+) -> list[Operation]:
     """Filters out all the operations associated with non-idle machines.
 
     A machine is considered idle if there are no ongoing operations
@@ -41,7 +40,7 @@ def filter_non_idle_machines(
 
     # Filter operations to keep those that are associated with at least one
     # idle machine
-    filtered_operations: List[Operation] = []
+    filtered_operations: list[Operation] = []
     for operation in operations:
         if all(
             machine_id in non_idle_machines
@@ -55,7 +54,7 @@ def filter_non_idle_machines(
 
 def _get_non_idle_machines(
     dispatcher: Dispatcher, current_time: int
-) -> Set[int]:
+) -> set[int]:
     """Returns the set of machine ids that are currently busy (i.e., have at
     least one uncompleted operation)."""
 
@@ -71,8 +70,8 @@ def _get_non_idle_machines(
 
 
 def filter_non_immediate_operations(
-    dispatcher: Dispatcher, operations: List[Operation]
-) -> List[Operation]:
+    dispatcher: Dispatcher, operations: list[Operation]
+) -> list[Operation]:
     """Filters out all the operations that can't start immediately.
 
     An operation can start immediately if its earliest start time is the
@@ -87,7 +86,7 @@ def filter_non_immediate_operations(
     """
 
     min_start_time = dispatcher.min_start_time(operations)
-    immediate_operations: List[Operation] = []
+    immediate_operations: list[Operation] = []
     for operation in operations:
         start_time = dispatcher.earliest_start_time(operation)
         if start_time == min_start_time:
@@ -97,8 +96,8 @@ def filter_non_immediate_operations(
 
 
 def filter_dominated_operations(
-    dispatcher: Dispatcher, operations: List[Operation]
-) -> List[Operation]:
+    dispatcher: Dispatcher, operations: list[Operation]
+) -> list[Operation]:
     """Filters out all the operations that are dominated.
     An operation is dominated if there is another operation that ends before
     it starts on the same machine.
@@ -106,7 +105,7 @@ def filter_dominated_operations(
 
     min_machine_end_times = _get_min_machine_end_times(dispatcher, operations)
 
-    non_dominated_operations: List[Operation] = []
+    non_dominated_operations: list[Operation] = []
     for operation in operations:
         # One benchmark instance has an operation with duration 0
         if operation.duration == 0:
@@ -122,13 +121,13 @@ def filter_dominated_operations(
 
 
 def filter_non_immediate_machines(
-    dispatcher: Dispatcher, operations: List[Operation]
-) -> List[Operation]:
+    dispatcher: Dispatcher, operations: list[Operation]
+) -> list[Operation]:
     """Filters out all the operations associated with machines which earliest
     operation is not the current time."""
 
     is_immediate_machine = _get_immediate_machines(dispatcher, operations)
-    non_dominated_operations: List[Operation] = []
+    non_dominated_operations: list[Operation] = []
     for operation in operations:
         if any(
             is_immediate_machine[machine_id]
@@ -140,8 +139,8 @@ def filter_non_immediate_machines(
 
 
 def _get_min_machine_end_times(
-    dispatcher: Dispatcher, available_operations: List[Operation]
-) -> List[float]:
+    dispatcher: Dispatcher, available_operations: list[Operation]
+) -> list[float]:
     end_times_per_machine = [float("inf")] * dispatcher.instance.num_machines
     for op in available_operations:
         for machine_id in op.machines:
@@ -153,8 +152,8 @@ def _get_min_machine_end_times(
 
 
 def _get_immediate_machines(
-    dispatcher: Dispatcher, available_operations: List[Operation]
-) -> List[bool]:
+    dispatcher: Dispatcher, available_operations: list[Operation]
+) -> list[bool]:
     """Returns the machine ids of the machines that have at least one
     operation with the lowest start time (i.e. the start time)."""
     working_machines = [False] * dispatcher.instance.num_machines

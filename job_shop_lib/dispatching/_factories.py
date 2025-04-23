@@ -4,7 +4,6 @@ The factory functions create and return the appropriate functions based on the
 specified names or enums.
 """
 
-from typing import Union
 from enum import Enum
 from collections.abc import Iterable
 
@@ -37,7 +36,7 @@ class ReadyOperationsFilterType(str, Enum):
 
 def create_composite_operation_filter(
     ready_operations_filters: Iterable[
-        Union[ReadyOperationsFilter, str, ReadyOperationsFilterType]
+        ReadyOperationsFilter | str | ReadyOperationsFilterType
     ],
 ) -> ReadyOperationsFilter:
     """Creates and returns a :class:`ReadyOperationsFilter` function by
@@ -85,7 +84,7 @@ def create_composite_operation_filter(
 
 
 def ready_operations_filter_factory(
-    filter_name: Union[str, ReadyOperationsFilterType, ReadyOperationsFilter]
+    filter_name: str | ReadyOperationsFilterType | ReadyOperationsFilter,
 ) -> ReadyOperationsFilter:
     """Creates and returns a filter function based on the specified
     filter strategy name.

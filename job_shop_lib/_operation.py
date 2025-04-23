@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Union, List
-
 from job_shop_lib.exceptions import ValidationError
 
 
@@ -61,8 +59,8 @@ class Operation:
         ),
     }
 
-    def __init__(self, machines: Union[int, List[int]], duration: int):
-        self.machines: List[int] = (
+    def __init__(self, machines: int | list[int], duration: int):
+        self.machines: list[int] = (
             [machines] if isinstance(machines, int) else machines
         )
         self.duration: int = duration

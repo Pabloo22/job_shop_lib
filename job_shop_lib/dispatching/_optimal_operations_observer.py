@@ -1,6 +1,5 @@
 """Home of the `OptimalOperationsObserver` class."""
 
-from typing import List, Set, Dict
 from job_shop_lib.dispatching import DispatcherObserver, Dispatcher
 from job_shop_lib import Schedule, Operation, ScheduledOperation
 from job_shop_lib.exceptions import ValidationError
@@ -53,9 +52,9 @@ class OptimalOperationsObserver(DispatcherObserver):
             )
 
         self.reference_schedule = reference_schedule
-        self.optimal_available: Set[Operation] = set()
-        self._operation_to_scheduled: Dict[Operation, ScheduledOperation] = {}
-        self._machine_next_operation_index: List[int] = [0] * len(
+        self.optimal_available: set[Operation] = set()
+        self._operation_to_scheduled: dict[Operation, ScheduledOperation] = {}
+        self._machine_next_operation_index: list[int] = [0] * len(
             reference_schedule.schedule
         )
 

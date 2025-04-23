@@ -1,7 +1,5 @@
 """Module for plotting static Gantt charts for job shop schedules."""
 
-from typing import Optional, List, Tuple, Dict
-
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
@@ -15,16 +13,16 @@ _Y_POSITION_INCREMENT = 10
 
 def plot_gantt_chart(
     schedule: Schedule,
-    title: Optional[str] = None,
+    title: str | None = None,
     cmap_name: str = "viridis",
-    xlim: Optional[int] = None,
+    xlim: int | None = None,
     number_of_x_ticks: int = 15,
-    job_labels: Optional[List[str]] = None,
-    machine_labels: Optional[List[str]] = None,
+    job_labels: list[str] | None = None,
+    machine_labels: list[str] | None = None,
     legend_title: str = "",
     x_label: str = "Time units",
     y_label: str = "Machines",
-) -> Tuple[Figure, plt.Axes]:
+) -> tuple[Figure, plt.Axes]:
     """Plots a Gantt chart for the schedule.
 
     This function generates a Gantt chart that visualizes the schedule of jobs
@@ -90,10 +88,10 @@ def plot_gantt_chart(
 
 def _initialize_plot(
     schedule: Schedule,
-    title: Optional[str],
+    title: str | None,
     x_label: str = "Time units",
     y_label: str = "Machines",
-) -> Tuple[Figure, plt.Axes]:
+) -> tuple[Figure, plt.Axes]:
     """Initializes the plot."""
     fig, ax = plt.subplots()
     ax.set_xlabel(x_label)
@@ -110,8 +108,8 @@ def _plot_machine_schedules(
     schedule: Schedule,
     ax: plt.Axes,
     cmap_name: str,
-    job_labels: Optional[List[str]],
-) -> Dict[int, Patch]:
+    job_labels: list[str] | None,
+) -> dict[int, Patch]:
     """Plots the schedules for each machine."""
     max_job_id = schedule.instance.num_jobs - 1
     cmap = plt.get_cmap(cmap_name, max_job_id + 1)
@@ -137,7 +135,7 @@ def _plot_machine_schedules(
     return legend_handles
 
 
-def _get_job_label(job_labels: Optional[List[str]], job_id: int) -> str:
+def _get_job_label(job_labels: list[str] | None, job_id: int) -> str:
     """Returns the label for the job."""
     if job_labels is None:
         return f"Job {job_id}"
@@ -161,7 +159,7 @@ def _plot_scheduled_operation(
 
 
 def _configure_legend(
-    ax: plt.Axes, legend_handles: Dict[int, Patch], legend_title: str
+    ax: plt.Axes, legend_handles: dict[int, Patch], legend_title: str
 ):
     """Configures the legend for the plot."""
     sorted_legend_handles = [
@@ -178,7 +176,7 @@ def _configure_legend(
 def _configure_axes(
     schedule: Schedule,
     ax: plt.Axes,
-    xlim: Optional[int],
+    xlim: int | None,
     number_of_x_ticks: int,
     machine_labels: list[str] | None,
 ):
