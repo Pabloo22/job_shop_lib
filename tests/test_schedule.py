@@ -115,9 +115,7 @@ def test_from_job_sequences_invalid(
         [1, 0, 2],
     ]
     with pytest.raises(ValidationError):
-        Schedule.from_job_sequences(
-            example_job_shop_instance, job_sequences
-        )
+        Schedule.from_job_sequences(example_job_shop_instance, job_sequences)
 
 
 def test_to_dict(example_job_shop_instance: JobShopInstance):
