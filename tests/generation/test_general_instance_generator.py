@@ -46,3 +46,23 @@ def test_machines_per_operation():
             assert 2 <= len(operation.machines) <= 3
             for machine_id in operation.machines:
                 assert 0 <= machine_id < instance.num_machines
+
+
+def test_rng_determinism_class():
+    """Tests that GeneralInstanceGenerator produces deterministic results with
+    the same seed."""
+    params = {
+        "duration_range": (1, 10),
+        "seed": 12345,
+        "num_jobs": 4,
+        "num_machines": 4,
+    }
+    gen1 = GeneralInstanceGenerator(**params)  # type: ignore[arg-type]
+    gen2 = GeneralInstanceGenerator(**params)  # type: ignore[arg-type]
+    inst1 = gen1.generate()
+    inst2 = gen2.generate()
+    # Compare job durations and machine assignments
+    for job1, job2 in zip(inst1.jobs, inst2.jobs):
+        for op1, op2 in zip(job1, job2):
+            assert op1.duration == op2.duration
+            assert op1.machine_id == op2.machine_id
