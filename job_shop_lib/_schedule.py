@@ -121,7 +121,23 @@ class Schedule:
         job_sequences: list[list[int]],
         metadata: dict[str, Any] | None = None,
     ) -> Schedule:
-        """Creates a schedule from a dictionary representation."""
+        """Creates a schedule from a dictionary representation.
+
+        Args:
+            instance:
+                The instance to create the schedule for. Can be a dictionary
+                representation of a :class:`JobShopInstance` or a
+                :class:`JobShopInstance` object.
+            job_sequences:
+                A list of lists of job ids. Each list of job ids represents the
+                order of operations on the machine. The machine that the list
+                corresponds to is determined by the index of the list.
+            metadata:
+                A dictionary with additional information about the schedule.
+
+        Returns:
+            A :class:`Schedule` object with the given job sequences.
+        """
         if isinstance(instance, dict):
             instance = JobShopInstance.from_matrices(**instance)
         schedule = Schedule.from_job_sequences(instance, job_sequences)
@@ -157,7 +173,7 @@ class Schedule:
         dispatcher.reset()
         raw_solution_deques = [deque(job_ids) for job_ids in job_sequences]
 
-        while not dispatcher.schedule.is_complete():
+        while any(job_seq for job_seq in raw_solution_deques):
             at_least_one_operation_scheduled = False
             for machine_id, job_ids in enumerate(raw_solution_deques):
                 if not job_ids:
