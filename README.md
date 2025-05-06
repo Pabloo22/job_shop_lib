@@ -110,7 +110,7 @@ The contributions to this benchmark dataset are as follows:
 
 - `orb01-10`: by Applegate and Cook (1991).
 
-- `swb01-20`: by Storer et al. (1992).
+- `swv01-20`: by Storer et al. (1992).
 
 - `yn1-4`: by Yamada and Nakano (1992).
 
