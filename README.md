@@ -44,7 +44,7 @@ pip install job-shop-lib
 
 - **Benchmark Instances**: Load well-known benchmark instances directly from the library without manual downloading. See [Load Benchmark Instances](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/05-Load-Benchmark-Instances.ipynb).
 
-- **Random Instance Generation**: Create random instances with customizable sizes and properties or augment existing ones. See [`generation`](job_shop_lib/generation) package.
+- **Random Instance Generation**: Create random instances with customizable sizes and properties. See [`generation`](job_shop_lib/generation) package.
 
 - **Multiple Solvers**:
   - **Constraint Programming Solver**: OR-Tools' CP-SAT solver. See [Solving the Problem](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/02-Solving-the-Problem.ipynb).
