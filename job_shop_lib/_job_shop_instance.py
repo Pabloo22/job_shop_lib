@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-import functools
+from functools import cached_property
 from typing import Any, List, Union, Dict
 
 import numpy as np
@@ -264,7 +264,7 @@ class JobShopInstance:
         """Returns the number of jobs in the instance."""
         return len(self.jobs)
 
-    @functools.cached_property
+    @cached_property
     def num_machines(self) -> int:
         """Returns the number of machines in the instance.
 
@@ -276,12 +276,12 @@ class JobShopInstance:
                 max_machine_id = max(max_machine_id, *operation.machines)
         return max_machine_id + 1
 
-    @functools.cached_property
+    @cached_property
     def num_operations(self) -> int:
         """Returns the number of operations in the instance."""
         return sum(len(job) for job in self.jobs)
 
-    @functools.cached_property
+    @cached_property
     def is_flexible(self) -> bool:
         """Returns ``True`` if any operation has more than one machine."""
         return any(
@@ -289,7 +289,7 @@ class JobShopInstance:
             for job in self.jobs
         )
 
-    @functools.cached_property
+    @cached_property
     def durations_matrix(self) -> List[List[int]]:
         """Returns the duration matrix of the instance.
 
@@ -304,7 +304,7 @@ class JobShopInstance:
         """
         return [[operation.duration for operation in job] for job in self.jobs]
 
-    @functools.cached_property
+    @cached_property
     def machines_matrix(self) -> Union[List[List[List[int]]], List[List[int]]]:
         """Returns the machines matrix of the instance.
 
@@ -330,7 +330,7 @@ class JobShopInstance:
             [operation.machine_id for operation in job] for job in self.jobs
         ]
 
-    @functools.cached_property
+    @cached_property
     def durations_matrix_array(self) -> NDArray[np.float32]:
         """Returns the duration matrix of the instance as a numpy array.
 
@@ -348,7 +348,7 @@ class JobShopInstance:
         duration_matrix = self.durations_matrix
         return self._fill_matrix_with_nans_2d(duration_matrix)
 
-    @functools.cached_property
+    @cached_property
     def machines_matrix_array(self) -> NDArray[np.float32]:
         """Returns the machines matrix of the instance as a numpy array.
 
@@ -382,7 +382,7 @@ class JobShopInstance:
             machines_matrix  # type: ignore[arg-type]
         )
 
-    @functools.cached_property
+    @cached_property
     def operations_by_machine(self) -> List[List[Operation]]:
         """Returns a list of lists of operations.
 
@@ -399,7 +399,7 @@ class JobShopInstance:
 
         return operations_by_machine
 
-    @functools.cached_property
+    @cached_property
     def max_duration(self) -> float:
         """Returns the maximum duration of the instance.
 
@@ -408,7 +408,7 @@ class JobShopInstance:
             max(operation.duration for operation in job) for job in self.jobs
         )
 
-    @functools.cached_property
+    @cached_property
     def max_duration_per_job(self) -> List[float]:
         """Returns the maximum duration of each job in the instance.
 
@@ -419,7 +419,7 @@ class JobShopInstance:
         """
         return [max(op.duration for op in job) for job in self.jobs]
 
-    @functools.cached_property
+    @cached_property
     def max_duration_per_machine(self) -> List[int]:
         """Returns the maximum duration of each machine in the instance.
 
@@ -438,7 +438,7 @@ class JobShopInstance:
                     )
         return max_duration_per_machine
 
-    @functools.cached_property
+    @cached_property
     def job_durations(self) -> List[int]:
         """Returns a list with the duration of each job in the instance.
 
@@ -449,7 +449,7 @@ class JobShopInstance:
         """
         return [sum(op.duration for op in job) for job in self.jobs]
 
-    @functools.cached_property
+    @cached_property
     def machine_loads(self) -> List[int]:
         """Returns the total machine load of each machine in the instance.
 
@@ -467,7 +467,7 @@ class JobShopInstance:
 
         return machine_times
 
-    @functools.cached_property
+    @cached_property
     def total_duration(self) -> int:
         """Returns the sum of the durations of all operations in all jobs."""
         return sum(self.job_durations)
