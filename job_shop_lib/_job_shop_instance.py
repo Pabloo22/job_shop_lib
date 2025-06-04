@@ -326,9 +326,11 @@ class JobShopInstance:
             return [
                 [operation.machines for operation in job] for job in self.jobs
             ]
-        return [
-            [operation.machine_id for operation in job] for job in self.jobs
-        ]
+        else:
+            return [
+                [operation.machine_id for operation in job]
+                for job in self.jobs
+            ]
 
     @cached_property
     def durations_matrix_array(self) -> NDArray[np.float32]:
