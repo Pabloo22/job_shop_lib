@@ -26,9 +26,7 @@ See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcoww
 
 <!-- start installation -->
 
-JobShopLib is distributed on [PyPI](https://pypi.org/project/job-shop-lib/) and it supports Python 3.10+.
-
-You can install the latest stable version using `pip`:
+JobShopLib is distributed on [PyPI](https://pypi.org/project/job-shop-lib/). You can install the latest stable version using `pip`:
 
 ```bash
 pip install job-shop-lib
