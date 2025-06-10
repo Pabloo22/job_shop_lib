@@ -99,16 +99,16 @@ def irregular_job_shop_instance():
 
 
 @pytest.fixture
-def job_shop_instance2x2():
+def flexible_job_shop_instance2x2():
     """Create a simple job shop instance for testing."""
     jobs = [
         [
-            Operation(machines=[0], duration=3),
-            Operation(machines=[1], duration=2),
+            Operation(machines=[0, 1], duration=3),
+            Operation(machines=[0, 1], duration=2),
         ],
         [
-            Operation(machines=[1], duration=4),
-            Operation(machines=[0], duration=1),
+            Operation(machines=[0, 1], duration=4),
+            Operation(machines=[0, 1], duration=1),
         ],
     ]
     return JobShopInstance(jobs, name="test_instance")
