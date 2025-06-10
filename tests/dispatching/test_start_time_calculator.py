@@ -332,5 +332,41 @@ def test_get_breakdown_calculator(
     assert dispatcher.start_time(job_2_op_1, 1) == 7  # after breakdown
 
 
+def test_get_job_dependent_setup_calculator(
+    flexible_job_shop_instance2x2: JobShopInstance,
+):
+    """Test the job-dependent setup time calculator."""
+    setup_calculator = get_job_dependent_setup_calculator(
+        same_job_setup=1, different_job_setup=3, initial_setup=1
+    )
+    dispatcher = Dispatcher(
+        flexible_job_shop_instance2x2, start_time_calculator=setup_calculator
+    )
+
+    job_1_op_1 = flexible_job_shop_instance2x2.jobs[0][0]
+    job_1_op_2 = flexible_job_shop_instance2x2.jobs[0][1]
+    job_2_op_1 = flexible_job_shop_instance2x2.jobs[1][0]
+
+    # Initial setup time should be 1
+    assert dispatcher.start_time(job_1_op_1, 0) == 1
+    assert dispatcher.start_time(job_1_op_1, 1) == 1
+    assert dispatcher.start_time(job_2_op_1, 0) == 1
+    assert dispatcher.start_time(job_2_op_1, 1) == 1
+
+    # Same job setup time should be 1
+    dispatcher.dispatch(job_1_op_1, 0)
+
+    assert (
+        dispatcher.start_time(job_1_op_2, 0)
+        == no_setup_time_calculator(dispatcher, job_1_op_2, 0) + 1
+    )
+
+    # Different job setup time should be 3
+    assert (
+        dispatcher.start_time(job_2_op_1, 0)
+        == no_setup_time_calculator(dispatcher, job_2_op_1, 0) + 3
+    )
+
+
 if __name__ == "__main__":
     pytest.main(["-vv", __file__])
