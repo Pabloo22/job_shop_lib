@@ -5,6 +5,8 @@ with the Dispatcher class to implement different scheduling behaviors.
 """
 
 from collections.abc import Sequence
+import numpy as np
+from numpy.typing import NDArray
 
 from job_shop_lib import Operation
 from job_shop_lib.dispatching import (
@@ -15,16 +17,16 @@ from job_shop_lib.dispatching import (
 
 
 def get_matrix_setup_time_calculator(
-    setup_times: Sequence[Sequence[int]],
+    setup_times: Sequence[Sequence[int]] | NDArray[np.integer],
 ) -> StartTimeCalculator:
     """Factory function to create a start time calculator with matrix setup
     times.
 
     Args:
         setup_times:
-            A 2D list (matrix) where setup_times[i][j] is the setuptime
-            for switching from operation i to operation j. Here, `i` and `j`
-            are operation's IDs.
+            A 2D matrix where setup_times[i][j] is the setuptime
+            for switching from operation ``i`` to operation ``j``. Here,
+            ``i`` and ``j`` are operation's IDs.
     Returns:
         A start time calculator function that adds setup times based on the
         matrix.
