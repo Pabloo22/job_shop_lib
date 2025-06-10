@@ -19,8 +19,8 @@ from job_shop_lib.dispatching import (
 def get_matrix_setup_time_calculator(
     setup_times: Sequence[Sequence[int]] | NDArray[np.integer],
 ) -> StartTimeCalculator:
-    """Factory function to create a start time calculator with matrix setup
-    times.
+    """Returns a start time calculator that adds setup times based on a
+    matrix of setup times.
 
     Args:
         setup_times:
@@ -42,11 +42,8 @@ def get_matrix_setup_time_calculator(
         default_start = no_setup_time_calculator(
             dispatcher, operation, machine_id
         )
-
-        # Get the last operation on this machine
         machine_schedule = dispatcher.schedule.schedule[machine_id]
         if not machine_schedule:
-            # No previous operation, no setup time
             return default_start
 
         last_operation = machine_schedule[-1].operation
@@ -62,13 +59,14 @@ def get_matrix_setup_time_calculator(
 def get_setup_time_by_machine_calculator(
     setup_times: dict[int, int], default: int = 0
 ):
-    """Factory function to create a start time calculator with setup times.
+    """Returns a start time calculator that adds setup times based on
+    machine IDs.
 
     Args:
         setup_times:
             Dictionary mapping machine_id to setup time in time units.
         default:
-            Default setup time to use if a machine_id is not found    
+            Default setup time to use if a machine_id is not found
             in the setup_times dictionary.
 
     Returns:
@@ -92,7 +90,11 @@ def get_setup_time_by_machine_calculator(
 
 
 def get_breakdown_calculator(breakdowns: dict[int, list[tuple[int, int]]]):
-    """Factory function to create a start time calculator with breakdowns.
+    """Returns a start time calculator that accounts for machine breakdowns.
+
+    This calculator adjusts the start time of an operation based on
+    when the machine is expected to be down due to breakdowns, maintenance,
+    holidays, etc.
 
     Args:
         breakdowns: Dictionary mapping machine_id to list of
