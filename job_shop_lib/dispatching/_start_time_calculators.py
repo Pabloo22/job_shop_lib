@@ -56,7 +56,7 @@ def get_matrix_setup_time_calculator(
     return calculator
 
 
-def get_machine_dependendent_setup_time_calculator(
+def get_machine_dependent_setup_time_calculator(
     setup_times: dict[int, int], default: int = 0
 ):
     """Returns a start time calculator that adds setup times based on
@@ -73,7 +73,7 @@ def get_machine_dependendent_setup_time_calculator(
         A start time calculator function that adds setup times.
 
     Example:
-        >>> setup_calc = get_machine_dependendent_setup_time_calculator(
+        >>> setup_calc = get_machine_dependent_setup_time_calculator(
         ...     {0: 2, 1: 1, 2: 3}
         ... )
         >>> dispatcher = Dispatcher(instance, start_time_calculator=setup_calc)

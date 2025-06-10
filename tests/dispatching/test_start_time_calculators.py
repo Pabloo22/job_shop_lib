@@ -5,7 +5,7 @@ from job_shop_lib.dispatching import (
     Dispatcher,
     no_setup_time_calculator,
     get_matrix_setup_time_calculator,
-    get_machine_dependendent_setup_time_calculator,
+    get_machine_dependent_setup_time_calculator,
     get_breakdown_calculator,
     get_job_dependent_setup_calculator,
 )
@@ -106,7 +106,7 @@ def test_default_in_machine_setup_time_calculator(
     flexible_job_shop_instance2x2: JobShopInstance,
 ):
     setup_times = {0: 2}
-    setup_calculator = get_machine_dependendent_setup_time_calculator(
+    setup_calculator = get_machine_dependent_setup_time_calculator(
         setup_times, default=3
     )
     dispatcher = Dispatcher(
@@ -140,9 +140,7 @@ def test_get_setup_time_by_machine_calculator(
 ):
     """Test the setup time by machine calculator."""
     setup_times = {0: 2, 1: 3}  # Machine 0 has 2 units setup, machine 1 has 3
-    setup_calculator = get_machine_dependendent_setup_time_calculator(
-        setup_times
-    )
+    setup_calculator = get_machine_dependent_setup_time_calculator(setup_times)
     dispatcher = Dispatcher(
         flexible_job_shop_instance2x2, start_time_calculator=setup_calculator
     )

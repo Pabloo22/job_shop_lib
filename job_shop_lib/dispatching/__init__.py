@@ -50,7 +50,7 @@ from ._ready_operation_filters import (
     filter_non_immediate_operations,
 )
 from ._start_time_calculators import (
-    get_machine_dependendent_setup_time_calculator,
+    get_machine_dependent_setup_time_calculator,
     get_breakdown_calculator,
     get_job_dependent_setup_calculator,
     get_matrix_setup_time_calculator,
@@ -80,7 +80,7 @@ __all__ = [
     "filter_non_immediate_operations",
     "create_composite_operation_filter",
     "no_setup_time_calculator",
-    "get_machine_dependendent_setup_time_calculator",
+    "get_machine_dependent_setup_time_calculator",
     "StartTimeCalculator",
     "get_matrix_setup_time_calculator",
     "get_breakdown_calculator",
