@@ -273,5 +273,37 @@ def test_get_matrix_setup_time_calculator(
     ) + 4 == dispatcher.start_time(job_2_op_2, 1)
 
 
+def test_get_setup_time_by_machine_calculator(
+    flexible_job_shop_instance2x2: JobShopInstance,
+):
+    """Test the setup time by machine calculator."""
+    setup_times = {0: 2, 1: 3}  # Machine 0 has 2 units setup, machine 1 has 3
+    setup_calculator = get_setup_time_by_machine_calculator(setup_times)
+    dispatcher = Dispatcher(
+        flexible_job_shop_instance2x2, start_time_calculator=setup_calculator
+    )
+
+    job_1_op_1 = flexible_job_shop_instance2x2.jobs[0][0]
+    job_2_op_1 = flexible_job_shop_instance2x2.jobs[1][0]
+    job_1_op_2 = flexible_job_shop_instance2x2.jobs[0][1]
+    job_2_op_2 = flexible_job_shop_instance2x2.jobs[1][1]
+
+    # First operation should have setup time of 2 on machine 0
+    assert dispatcher.start_time(job_1_op_1, 0) == 2
+
+    # Second operation should have setup time of 3 on machine 1
+    assert dispatcher.start_time(job_2_op_1, 1) == 3
+
+    dispatcher.dispatch(job_1_op_1, 0)
+    dispatcher.dispatch(job_2_op_1, 1)
+
+    assert no_setup_time_calculator(
+        dispatcher, job_1_op_2, 1
+    ) + 3 == dispatcher.start_time(job_1_op_1, 1)
+    assert no_setup_time_calculator(
+        dispatcher, job_2_op_2, 0
+    ) + 2 == dispatcher.start_time(job_2_op_2, 0)
+
+
 if __name__ == "__main__":
     pytest.main(["-vv", __file__])
