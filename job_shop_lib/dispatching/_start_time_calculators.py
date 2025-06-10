@@ -59,11 +59,17 @@ def get_matrix_setup_time_calculator(
     return calculator
 
 
-def get_setup_time_by_machine_calculator(setup_times: dict[int, int]):
+def get_setup_time_by_machine_calculator(
+    setup_times: dict[int, int], default: int = 0
+):
     """Factory function to create a start time calculator with setup times.
 
     Args:
-        setup_times: Dictionary mapping machine_id to setup time in time units.
+        setup_times:
+            Dictionary mapping machine_id to setup time in time units.
+        default:
+            Default setup time to use if a machine_id is not found    
+            in the setup_times dictionary.
 
     Returns:
         A start time calculator function that adds setup times.
@@ -79,7 +85,7 @@ def get_setup_time_by_machine_calculator(setup_times: dict[int, int]):
         default_start = no_setup_time_calculator(
             dispatcher, operation, machine_id
         )
-        setup_time = setup_times.get(machine_id, 0)
+        setup_time = setup_times.get(machine_id, default)
         return default_start + setup_time
 
     return calculator
@@ -108,8 +114,6 @@ def get_breakdown_calculator(breakdowns: dict[int, list[tuple[int, int]]]):
         default_start = no_setup_time_calculator(
             dispatcher, operation, machine_id
         )
-
-        # Check if this machine has any breakdowns
         if machine_id not in breakdowns:
             return default_start
 
@@ -142,12 +146,15 @@ def get_job_dependent_setup_calculator(
     on the same machine.
 
     Args:
-        same_job_setup: Setup time when the previous operation on the
-                       machine was from the same job.
-        different_job_setup: Setup time when the previous operation
-                            on the machine was from a different job.
-        initial_setup: Setup time for the first operation on a machine
-                      or if the machine is currently idle.
+        same_job_setup:
+            Setup time when the previous operation on the
+            machine was from the same job.
+        different_job_setup:
+            Setup time when the previous operation
+            on the machine was from a different job.
+        initial_setup:
+            Setup time for the first operation on a machine
+            or if the machine is currently idle.
 
     Returns:
         A start time calculator function that applies
@@ -169,18 +176,11 @@ def get_job_dependent_setup_calculator(
         default_start = no_setup_time_calculator(
             dispatcher, operation, machine_id
         )
-
-        # Get the machine's schedule
         machine_schedule = dispatcher.schedule.schedule[machine_id]
-
         if not machine_schedule:
-            # First operation on this machine or machine is idle
             setup_time = initial_setup
         else:
-            # Get the last operation on this machine
             last_operation_on_machine = machine_schedule[-1].operation
-
-            # Setup time depends on job transition
             if last_operation_on_machine.job_id == operation.job_id:
                 setup_time = same_job_setup
             else:
