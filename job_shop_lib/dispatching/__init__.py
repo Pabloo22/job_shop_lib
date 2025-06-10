@@ -19,9 +19,8 @@ Problem step-by-step.
     filter_non_immediate_operations
     create_composite_operation_filter
     StartTimeCalculator
-    default_start_time_calculator
-    setup_time_calculator
-    get_setup_time_by_machine_calculator
+    no_setup_time_calculator
+    get_machine_dependent_setup_time_calculator
     get_matrix_setup_time_calculator
     get_breakdown_calculator
     get_job_dependent_setup_calculator
