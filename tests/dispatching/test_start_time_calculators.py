@@ -129,7 +129,7 @@ def test_default_in_machine_setup_time_calculator(
 
     assert no_setup_time_calculator(
         dispatcher, job_1_op_2, 1
-    ) + 3 == dispatcher.start_time(job_1_op_1, 1)
+    ) + 3 == dispatcher.start_time(job_1_op_2, 1)
     assert no_setup_time_calculator(
         dispatcher, job_2_op_2, 0
     ) + 2 == dispatcher.start_time(job_2_op_2, 0)
