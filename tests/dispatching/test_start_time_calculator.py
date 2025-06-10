@@ -305,5 +305,32 @@ def test_get_setup_time_by_machine_calculator(
     ) + 2 == dispatcher.start_time(job_2_op_2, 0)
 
 
+def test_get_breakdown_calculator(
+    flexible_job_shop_instance2x2: JobShopInstance,
+):
+    """Test the breakdown calculator."""
+    breakdowns = {
+        0: [(2, 3)],  # Machine 0 breaks down at time 2 for 3 time units
+        1: [(5, 2)],  # Machine 1 breaks down at time 5 for 2 time units
+    }
+    breakdown_calculator = get_breakdown_calculator(breakdowns)
+    dispatcher = Dispatcher(
+        flexible_job_shop_instance2x2,
+        start_time_calculator=breakdown_calculator,
+    )
+
+    job_1_op_1 = flexible_job_shop_instance2x2.jobs[0][0]  # d=3
+    job_2_op_1 = flexible_job_shop_instance2x2.jobs[1][0]  # d=4
+
+    # No breakdown:
+    assert dispatcher.start_time(job_1_op_1, 1) == 0
+    assert dispatcher.start_time(job_2_op_1, 1) == 0
+
+    # With breakdown:
+    assert dispatcher.start_time(job_1_op_1, 0) == 5
+    dispatcher.dispatch(job_1_op_1, 1)
+    assert dispatcher.start_time(job_2_op_1, 1) == 7  # after breakdown
+
+
 if __name__ == "__main__":
     pytest.main(["-vv", __file__])
