@@ -16,6 +16,34 @@ from job_shop_lib import (
 from job_shop_lib.exceptions import ValidationError
 
 
+# Type alias for start time calculator callable
+StartTimeCalculator = Callable[["Dispatcher", Operation, int], int]
+
+
+def no_setup_time_calculator(
+    dispatcher: Dispatcher, operation: Operation, machine_id: int
+) -> int:
+    """Default start time calculator that implements the standard behavior.
+
+    The start time is the maximum of the next available time for the
+    machine and the next available time for the job to which the
+    operation belongs.
+
+    Args:
+        dispatcher: The dispatcher instance.
+        operation: The operation to be scheduled.
+        machine_id: The id of the machine on which the operation is to be
+            scheduled.
+
+    Returns:
+        The start time for the operation on the given machine.
+    """
+    return max(
+        dispatcher.machine_next_available_time[machine_id],
+        dispatcher.job_next_available_time[operation.job_id],
+    )
+
+
 # Added here to avoid circular imports
 class DispatcherObserver(abc.ABC):
     """Abstract class that allows objects to observe and respond to changes
@@ -192,6 +220,14 @@ class Dispatcher:
             list of operations as input and return a list of operations
             that are ready to be scheduled. If ``None``, no filtering is
             done.
+        start_time_calculator:
+            A function that calculates the start time for a given operation
+            on a given machine. The function should take a dispatcher, an
+            operation and a machine id as input and return the start time for
+            the operation. Defaults to the standard calculation which is the
+            maximum of the machine's next available time and the job's next
+            available time. This allows for implementing context-dependent
+            setup times, downtime, and machine breakdowns.
     """
 
     __slots__ = {
@@ -204,6 +240,10 @@ class Dispatcher:
             "A function that filters out operations that are not ready to be "
             "scheduled."
         ),
+        "start_time_calculator": (
+            "A function that calculates the start time for a given operation "
+            "on a given machine."
+        ),
         "subscribers": "A list of observers subscribed to the dispatcher.",
         "_cache": "A dictionary to cache the results of the cached methods.",
     }
@@ -214,11 +254,15 @@ class Dispatcher:
         ready_operations_filter: (
             Callable[[Dispatcher, list[Operation]], list[Operation]] | None
         ) = None,
+        start_time_calculator: StartTimeCalculator = (
+            no_setup_time_calculator
+        ),
     ) -> None:
 
         self.instance = instance
         self.schedule = Schedule(self.instance)
         self.ready_operations_filter = ready_operations_filter
+        self.start_time_calculator = start_time_calculator
         self.subscribers: list[DispatcherObserver] = []
 
         self._machine_next_available_time = [0] * self.instance.num_machines
@@ -327,7 +371,8 @@ class Dispatcher:
         """Computes the start time for the given operation on the given
         machine.
 
-        The start time is the maximum of the next available time for the
+        Uses the configured start time calculator to compute the start time.
+        By default, this is the maximum of the next available time for the
         machine and the next available time for the job to which the
         operation belongs.
 
@@ -338,10 +383,7 @@ class Dispatcher:
                 The id of the machine on which the operation is to be
                 scheduled.
         """
-        return max(
-            self._machine_next_available_time[machine_id],
-            self._job_next_available_time[operation.job_id],
-        )
+        return self.start_time_calculator(self, operation, machine_id)
 
     def _update_tracking_attributes(
         self, scheduled_operation: ScheduledOperation

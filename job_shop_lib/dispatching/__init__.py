@@ -18,13 +18,25 @@ Problem step-by-step.
     filter_non_idle_machines
     filter_non_immediate_operations
     create_composite_operation_filter
+    StartTimeCalculator
+    default_start_time_calculator
+    setup_time_calculator
+    get_setup_time_by_machine_calculator
+    get_matrix_setup_time_calculator
+    get_breakdown_calculator
+    get_job_dependent_setup_calculator
 
 Dispatching refers to the decision-making process of selecting which job
 should be processed next on a particular machine when that machine becomes
 available.
 """
 
-from ._dispatcher import Dispatcher, DispatcherObserver
+from ._dispatcher import (
+    Dispatcher,
+    DispatcherObserver,
+    StartTimeCalculator,
+    no_setup_time_calculator,
+)
 from ._history_observer import (
     HistoryObserver,
 )
@@ -37,6 +49,12 @@ from ._ready_operation_filters import (
     filter_non_idle_machines,
     filter_non_immediate_operations,
 )
+from ._start_time_calculators import (
+    get_setup_time_by_machine_calculator,
+    get_breakdown_calculator,
+    get_job_dependent_setup_calculator,
+    get_matrix_setup_time_calculator,
+)
 from ._dispatcher_observer_config import DispatcherObserverConfig
 from ._factories import (
     ReadyOperationsFilterType,
@@ -48,6 +66,7 @@ from ._factories import (
 __all__ = [
     "Dispatcher",
     "DispatcherObserver",
+    "StartTimeCalculator",
     "HistoryObserver",
     "UnscheduledOperationsObserver",
     "OptimalOperationsObserver",
@@ -60,4 +79,10 @@ __all__ = [
     "filter_non_idle_machines",
     "filter_non_immediate_operations",
     "create_composite_operation_filter",
+    "no_setup_time_calculator",
+    "get_setup_time_by_machine_calculator",
+    "StartTimeCalculator",
+    "get_matrix_setup_time_calculator",
+    "get_breakdown_calculator",
+    "get_job_dependent_setup_calculator",
 ]
