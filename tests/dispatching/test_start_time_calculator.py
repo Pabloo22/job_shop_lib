@@ -3,22 +3,29 @@
 import pytest
 
 from job_shop_lib import JobShopInstance, Operation
-from job_shop_lib.dispatching import Dispatcher
+from job_shop_lib.dispatching import (
+    Dispatcher,
+    no_setup_time_calculator,
+    get_matrix_setup_time_calculator,
+    get_setup_time_by_machine_calculator,
+    get_breakdown_calculator,
+    get_job_dependent_setup_calculator,
+)
 
 
 def test_default_start_time_calculator(
-    job_shop_instance2x2: JobShopInstance,
+    flexible_job_shop_instance2x2: JobShopInstance,
 ):
     """Test that the default start time calculation works when no calculator
     is provided."""
-    dispatcher = Dispatcher(job_shop_instance2x2)
+    dispatcher = Dispatcher(flexible_job_shop_instance2x2)
 
     # Schedule first operation
-    job_1_op_1 = job_shop_instance2x2.jobs[0][0]
+    job_1_op_1 = flexible_job_shop_instance2x2.jobs[0][0]
     dispatcher.dispatch(job_1_op_1, machine_id=0)
 
     # Check that the start time for the next operation is calculated correctly
-    job_1_op_2 = job_shop_instance2x2.jobs[0][1]
+    job_1_op_2 = flexible_job_shop_instance2x2.jobs[0][1]
     expected_start_time = max(
         dispatcher.machine_next_available_time[1],  # machine 1 availability
         dispatcher.job_next_available_time[0],  # job 0 availability
@@ -27,7 +34,7 @@ def test_default_start_time_calculator(
 
 
 def test_custom_start_time_calculator_basic(
-    job_shop_instance2x2: JobShopInstance,
+    flexible_job_shop_instance2x2: JobShopInstance,
 ):
     """Test a basic custom start time calculator."""
 
@@ -42,11 +49,11 @@ def test_custom_start_time_calculator_basic(
         return default_start + 2
 
     dispatcher = Dispatcher(
-        job_shop_instance2x2, start_time_calculator=custom_calculator
+        flexible_job_shop_instance2x2, start_time_calculator=custom_calculator
     )
 
     # First operation should start at time 2 (0 + 2 setup time)
-    job_1_op_1 = job_shop_instance2x2.jobs[0][0]
+    job_1_op_1 = flexible_job_shop_instance2x2.jobs[0][0]
     assert dispatcher.start_time(job_1_op_1, 0) == 2
 
     # Dispatch the operation and check it was scheduled correctly
@@ -58,7 +65,7 @@ def test_custom_start_time_calculator_basic(
 
 
 def test_machine_dependent_setup_time(
-    job_shop_instance2x2: JobShopInstance,
+    flexible_job_shop_instance2x2: JobShopInstance,
 ):
     """Test setup times that depend on the machine."""
 
@@ -78,12 +85,12 @@ def test_machine_dependent_setup_time(
         return default_start + setup_times.get(machine_id, 0)
 
     dispatcher = Dispatcher(
-        job_shop_instance2x2,
+        flexible_job_shop_instance2x2,
         start_time_calculator=machine_setup_calculator,
     )
 
-    job_1_op_1 = job_shop_instance2x2.jobs[0][0]  # Goes to machine 0
-    job_2_op_1 = job_shop_instance2x2.jobs[1][0]  # Goes to machine 1
+    job_1_op_1 = flexible_job_shop_instance2x2.jobs[0][0]  # Goes to machine 0
+    job_2_op_1 = flexible_job_shop_instance2x2.jobs[1][0]  # Goes to machine 1
 
     # Machine 0 should have 5 units setup time
     assert dispatcher.start_time(job_1_op_1, 0) == 5
@@ -92,7 +99,9 @@ def test_machine_dependent_setup_time(
     assert dispatcher.start_time(job_2_op_1, 1) == 1
 
 
-def test_context_dependent_downtime(job_shop_instance2x2: JobShopInstance):
+def test_context_dependent_downtime(
+    flexible_job_shop_instance2x2: JobShopInstance,
+):
     """Test downtime that depends on the current schedule state."""
 
     def downtime_calculator(
@@ -112,16 +121,17 @@ def test_context_dependent_downtime(job_shop_instance2x2: JobShopInstance):
         return default_start
 
     dispatcher = Dispatcher(
-        job_shop_instance2x2, start_time_calculator=downtime_calculator
+        flexible_job_shop_instance2x2,
+        start_time_calculator=downtime_calculator,
     )
 
     # First operation on machine 0 - no downtime
-    job_1_op_1 = job_shop_instance2x2.jobs[0][0]
+    job_1_op_1 = flexible_job_shop_instance2x2.jobs[0][0]
     assert dispatcher.start_time(job_1_op_1, 0) == 0
     dispatcher.dispatch(job_1_op_1, machine_id=0)
 
     # Second operation on machine 0 - should have downtime
-    job_2_op_2 = job_shop_instance2x2.jobs[1][
+    job_2_op_2 = flexible_job_shop_instance2x2.jobs[1][
         1
     ]  # Operation that can go to machine 0
     expected_start = (
@@ -131,7 +141,7 @@ def test_context_dependent_downtime(job_shop_instance2x2: JobShopInstance):
 
 
 def test_machine_breakdown_simulation(
-    job_shop_instance2x2: JobShopInstance,
+    flexible_job_shop_instance2x2: JobShopInstance,
 ):
     """Test simulating machine breakdowns that affect start times."""
     # Simulate machine 0 breaking down at time 2 for 4 time units
@@ -156,12 +166,13 @@ def test_machine_breakdown_simulation(
         return default_start
 
     dispatcher = Dispatcher(
-        job_shop_instance2x2, start_time_calculator=breakdown_calculator
+        flexible_job_shop_instance2x2,
+        start_time_calculator=breakdown_calculator,
     )
 
     # Schedule an operation that would normally start at time 0 but machine
     # breaks down
-    job_1_op_1 = job_shop_instance2x2.jobs[0][0]
+    job_1_op_1 = flexible_job_shop_instance2x2.jobs[0][0]
     dispatcher.dispatch(job_1_op_1, machine_id=0)
 
     # The operation should start after the breakdown ends
@@ -170,7 +181,7 @@ def test_machine_breakdown_simulation(
 
 
 def test_start_time_calculator_with_ready_operations_filter(
-    job_shop_instance2x2: JobShopInstance,
+    flexible_job_shop_instance2x2: JobShopInstance,
 ):
     """Test that start time calculator works together with ready operations
     filter."""
@@ -185,7 +196,7 @@ def test_start_time_calculator_with_ready_operations_filter(
         return default_start + 1  # Add 1 unit setup time
 
     dispatcher = Dispatcher(
-        job_shop_instance2x2,
+        flexible_job_shop_instance2x2,
         start_time_calculator=simple_setup_calculator,
     )
 
@@ -202,11 +213,13 @@ def test_start_time_calculator_with_ready_operations_filter(
     assert start_time == 1  # 0 (default) + 1 (setup)
 
 
-def test_none_start_time_calculator(job_shop_instance2x2: JobShopInstance):
+def test_none_start_time_calculator(
+    flexible_job_shop_instance2x2: JobShopInstance,
+):
     """Test that None start_time_calculator works (uses default behavior)."""
-    dispatcher = Dispatcher(job_shop_instance2x2)
+    dispatcher = Dispatcher(flexible_job_shop_instance2x2)
 
-    job_1_op_1 = job_shop_instance2x2.jobs[0][0]
+    job_1_op_1 = flexible_job_shop_instance2x2.jobs[0][0]
 
     # Should use default calculation
     expected_start_time = max(
@@ -214,6 +227,50 @@ def test_none_start_time_calculator(job_shop_instance2x2: JobShopInstance):
         dispatcher.job_next_available_time[0],
     )
     assert dispatcher.start_time(job_1_op_1, 0) == expected_start_time
+
+
+def test_get_matrix_setup_time_calculator(
+    flexible_job_shop_instance2x2: JobShopInstance,
+):
+    """Test the matrix setup time calculator."""
+
+    setup_times = [
+        [0, 0, 1, 2],  # O_11 = O_0 -> O_ij
+        [0, 0, 3, 4],  # O_12 = O_1 -> O_ij
+        [0, 0, 0, 0],  # O_21 = O_2 -> O_ij
+        [0, 0, 0, 0],  # O_22 = O_3 -> O_ij
+    ]
+    setup_calculator = get_matrix_setup_time_calculator(setup_times)
+    dispatcher = Dispatcher(
+        flexible_job_shop_instance2x2, start_time_calculator=setup_calculator
+    )
+    job_1_op_1 = flexible_job_shop_instance2x2.jobs[0][0]
+    job_2_op_1 = flexible_job_shop_instance2x2.jobs[1][0]
+    job_2_op_2 = flexible_job_shop_instance2x2.jobs[1][1]
+    job_1_op_2 = flexible_job_shop_instance2x2.jobs[0][1]
+
+    # First operation should have no setup time
+    assert dispatcher.start_time(job_1_op_1, 0) == 0
+    assert dispatcher.start_time(job_1_op_2, 1) == 0
+    dispatcher.dispatch(job_1_op_1, 0)
+    dispatcher.dispatch(job_1_op_2, 1)
+    # Second operation on different machine should have setup time
+
+    # Machine 0: O_11 -> O_21 / O_11 -> O_21
+    assert no_setup_time_calculator(  # O_12 -> O_21
+        dispatcher, job_2_op_1, 0
+    ) + 1 == dispatcher.start_time(job_2_op_1, 0)
+    assert no_setup_time_calculator(  # O_12 -> O_22
+        dispatcher, job_2_op_2, 0
+    ) + 2 == dispatcher.start_time(job_2_op_2, 0)
+
+    # Machine 1: O_12 -> O_21 / O_12 -> O_22
+    assert no_setup_time_calculator(  # O_11 -> O_21
+        dispatcher, job_2_op_1, 1
+    ) + 3 == dispatcher.start_time(job_2_op_1, 1)
+    assert no_setup_time_calculator(  # O_11 -> O_22
+        dispatcher, job_2_op_2, 1
+    ) + 4 == dispatcher.start_time(job_2_op_2, 1)
 
 
 if __name__ == "__main__":
