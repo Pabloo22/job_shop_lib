@@ -24,7 +24,7 @@ optional = true
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.0.0"
-pytest-cov = "^4.1.0"
+pytest-cov = ">=4.1,<7.0"
 pytest-mpl = "^0.17.0"
 
 [tool.poetry.group.lint]
