@@ -42,8 +42,11 @@ jobs:
         pip install poetry==1.7
         poetry install --with test
 
-    - name: Run tests
-      run: poetry run pytest -v --cov=job_shop_lib
+    - name: Run tests and generate coverage report
+      run: poetry run pytest -v --cov=job_shop_lib --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
 
   lint:
 
