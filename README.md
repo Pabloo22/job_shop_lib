@@ -6,6 +6,7 @@
 
 [![Tests](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml/badge.svg)](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml)
 [![Documentation Status](https://readthedocs.org/projects/job-shop-lib/badge/?version=latest)](https://job-shop-lib.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/Pabloo22/job_shop_lib/graph/badge.svg?token=DWXLYJWAOZ)](https://codecov.io/gh/Pabloo22/job_shop_lib)
 ![Python versions](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
