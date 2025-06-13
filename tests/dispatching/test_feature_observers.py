@@ -369,6 +369,106 @@ def test_composite_feature_observer_none_observers(
     assert isinstance(composite.feature_observers[1], IsReadyObserver)
 
 
+def test_composite_observer_of_composites_column_names(
+    irregular_job_shop_instance: JobShopInstance,
+):
+    """
+    Tests that CompositeFeatureObserver correctly generates column names
+    when aggregating features from other CompositeFeatureObserver instances,
+    specifically testing the case where the inner composite's feature matrix
+    has more than one column.
+    """
+    dispatcher = Dispatcher(irregular_job_shop_instance)
+
+    # Create inner observers for the first composite observer (composite1)
+    obs1_comp1 = feature_observer_factory(
+        FeatureObserverType.DURATION, dispatcher=dispatcher
+    )
+    obs2_comp1 = feature_observer_factory(
+        FeatureObserverType.IS_READY, dispatcher=dispatcher
+    )
+    composite1 = CompositeFeatureObserver(
+        dispatcher, feature_observers=[obs1_comp1, obs2_comp1]
+    )
+
+    # Create inner observers for the second composite observer (composite2)
+    obs1_comp2 = feature_observer_factory(
+        FeatureObserverType.EARLIEST_START_TIME, dispatcher=dispatcher
+    )
+    obs2_comp2 = feature_observer_factory(
+        FeatureObserverType.IS_SCHEDULED, dispatcher=dispatcher
+    )
+    composite2 = CompositeFeatureObserver(
+        dispatcher, feature_observers=[obs1_comp2, obs2_comp2]
+    )
+
+    # Create the top-level composite observer (top_composite)
+    # This top_composite will observe composite1 and composite2.
+    top_composite = CompositeFeatureObserver(
+        dispatcher, feature_observers=[composite1, composite2]
+    )
+
+    # Expected column names:
+    # Each inner composite (composite1, composite2) provides a 2-column matrix
+    # to the top_composite. The feature_name for these is "CompositeFeature".
+    # So, top_composite should generate
+    # ["CompositeFeature_0", "CompositeFeature_1"]
+    # for each of them.
+    expected_column_names = [
+        "CompositeFeature_0",
+        "CompositeFeature_1",
+        "CompositeFeature_0",
+        "CompositeFeature_1",
+    ]
+
+    # All chosen base observers support OPERATIONS, MACHINES, and JOBS feature
+    # types.
+    # Thus, composite1 and composite2 will have features for these types,
+    # and their feature matrices for these types will have 2 columns.
+
+    assert (
+        top_composite.column_names[FeatureType.OPERATIONS]
+        == expected_column_names
+    ), (
+        f"Incorrect column names for OPERATIONS. "
+        f"Expected: {expected_column_names}, "
+        f"Got: {top_composite.column_names[FeatureType.OPERATIONS]}"
+    )
+
+    assert (
+        top_composite.column_names[FeatureType.MACHINES]
+        == expected_column_names
+    ), (
+        f"Incorrect column names for MACHINES. "
+        f"Expected: {expected_column_names}, "
+        f"Got: {top_composite.column_names[FeatureType.MACHINES]}"
+    )
+
+    assert (
+        top_composite.column_names[FeatureType.JOBS] == expected_column_names
+    ), (
+        f"Incorrect column names for JOBS. "
+        f"Expected: {expected_column_names}, "
+        f"Got: {top_composite.column_names[FeatureType.JOBS]}"
+    )
+
+    # Verify the shape of the concatenated features in top_composite
+    num_ops = irregular_job_shop_instance.num_operations
+    num_machines = irregular_job_shop_instance.num_machines
+    num_jobs = irregular_job_shop_instance.num_jobs
+
+    # Each base observer -> 1 column.
+    # composite1 (2 base observers) -> 2 columns.
+    # composite2 (2 base observers) -> 2 columns.
+    # top_composite (aggregating composite1 and composite2) -> 2+2 = 4 columns.
+    assert top_composite.features[FeatureType.OPERATIONS].shape == (num_ops, 4)
+    assert top_composite.features[FeatureType.MACHINES].shape == (
+        num_machines,
+        4,
+    )
+    assert top_composite.features[FeatureType.JOBS].shape == (num_jobs, 4)
+
+
 def test_duration_observer_init(irregular_job_shop_instance: JobShopInstance):
     dispatcher = Dispatcher(irregular_job_shop_instance)
     feature_observer = feature_observer_factory(
