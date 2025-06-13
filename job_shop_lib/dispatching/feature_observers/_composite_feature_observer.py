@@ -11,7 +11,6 @@ import numpy as np
 from numpy.typing import NDArray
 import pandas as pd
 
-from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserver,
@@ -86,19 +85,11 @@ class CompositeFeatureObserver(FeatureObserver):
                 for observer in dispatcher.subscribers
                 if isinstance(observer, FeatureObserver)
             ]
-        feature_types = self._get_feature_types_list(feature_types)
-        for observer in feature_observers:
-            if not set(observer.features.keys()).issubset(set(feature_types)):
-                raise ValidationError(
-                    "The feature types observed by the feature observer "
-                    f"{observer.__class__.__name__} are not a subset of the "
-                    "feature types specified in the CompositeFeatureObserver."
-                    f"Observer feature types: {observer.features.keys()}"
-                    f"Composite feature types: {feature_types}"
-                )
         self.feature_observers = feature_observers
         self.column_names: dict[FeatureType, list[str]] = defaultdict(list)
-        super().__init__(dispatcher, subscribe=subscribe)
+        super().__init__(
+            dispatcher, subscribe=subscribe, feature_types=feature_types
+        )
         self._set_column_names()
 
     @classmethod
@@ -148,7 +139,10 @@ class CompositeFeatureObserver(FeatureObserver):
             list
         )
         for observer in self.feature_observers:
-            for feature_type, feature_matrix in observer.features.items():
+            for feature_type in self.supported_feature_types:
+                feature_matrix = observer.features.get(feature_type)
+                if feature_matrix is None:
+                    continue
                 features[feature_type].append(feature_matrix)
 
         self.features = {
@@ -177,34 +171,3 @@ class CompositeFeatureObserver(FeatureObserver):
             out.append(f"{feature_type.value}:")
             out.append(dataframe.to_string())
         return "\n".join(out)
-
-
-if __name__ == "__main__":
-    # from cProfile import Profile
-    import time
-    from job_shop_lib.benchmarking import load_benchmark_instance
-    from job_shop_lib.dispatching.rules import DispatchingRuleSolver
-
-    ta80 = load_benchmark_instance("ta80")
-
-    dispatcher_ = Dispatcher(ta80)
-    feature_observer_types_ = list(FeatureObserverType)
-    feature_observers_ = [
-        feature_observer_factory(
-            observer_type,
-            dispatcher=dispatcher_,
-        )
-        for observer_type in feature_observer_types_
-        # and not FeatureObserverType.EARLIEST_START_TIME
-    ]
-    composite_observer_ = CompositeFeatureObserver(
-        dispatcher_, feature_observers=feature_observers_
-    )
-    solver = DispatchingRuleSolver(dispatching_rule="random")
-    # profiler = Profile()
-    # profiler.runcall(solver.solve, dispatcher_.instance, dispatcher_)
-    # profiler.print_stats("cumtime")
-    start = time.perf_counter()
-    solver.solve(dispatcher_.instance, dispatcher_)
-    end = time.perf_counter()
-    print(f"Time: {end - start}")
