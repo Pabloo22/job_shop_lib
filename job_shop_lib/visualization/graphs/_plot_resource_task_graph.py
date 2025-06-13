@@ -86,7 +86,7 @@ def plot_resource_task_graph(
     """
     if title is None:
         title = (
-            "Heterogeneous Graph Visualization:"
+            "Heterogeneous Graph Visualization: "
             f"{job_shop_graph.instance.name}"
         )
     # Create a new figure and axis
