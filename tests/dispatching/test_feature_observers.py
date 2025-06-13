@@ -9,6 +9,7 @@ from job_shop_lib.dispatching.feature_observers import (
     EarliestStartTimeObserver,
     FeatureObserver,
     IsCompletedObserver,
+    IsReadyObserver,
 )
 
 from job_shop_lib.dispatching import (
@@ -346,6 +347,26 @@ def test_every_feature_observer(irregular_job_shop_instance: JobShopInstance):
     for step in steps:
         solver.step(dispatcher)
         assert str(composite) == step, f"index: {steps.index(step)}"
+
+
+def test_composite_feature_observer_none_observers(
+    irregular_job_shop_instance: JobShopInstance,
+):
+    dispatcher = Dispatcher(irregular_job_shop_instance)
+    # Add some observers to the dispatcher
+    feature_observer_factory(
+        FeatureObserverType.DURATION, dispatcher=dispatcher
+    )
+    feature_observer_factory(
+        FeatureObserverType.IS_READY, dispatcher=dispatcher
+    )
+
+    composite = CompositeFeatureObserver(dispatcher, feature_observers=None)
+    # Check that the composite observer picked up the observers from the
+    # dispatcher
+    assert len(composite.feature_observers) == 2
+    assert isinstance(composite.feature_observers[0], DurationObserver)
+    assert isinstance(composite.feature_observers[1], IsReadyObserver)
 
 
 def test_duration_observer_init(irregular_job_shop_instance: JobShopInstance):
