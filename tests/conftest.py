@@ -1,5 +1,10 @@
 import pytest
-from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib import (
+    JobShopInstance,
+    Operation,
+    Schedule,
+)
+from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
     MultiJobShopGraphEnv,
@@ -205,3 +210,14 @@ def multi_job_shop_graph_env() -> MultiJobShopGraphEnv:
     )
 
     return env
+
+
+@pytest.fixture
+def example_schedule(  # W0621 = redefined-outer-name
+    example_job_shop_instance: JobShopInstance,  # pylint: disable=W0621
+) -> Schedule:
+    """Creates a simple schedule for testing using DispatchingRuleSolver."""
+    instance = example_job_shop_instance
+    solver = DispatchingRuleSolver()
+    schedule = solver.solve(instance)
+    return schedule

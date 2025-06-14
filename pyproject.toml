@@ -82,3 +82,4 @@ filterwarnings = [
     "ignore::DeprecationWarning:google._upb._message:488",
     "ignore::DeprecationWarning:importlib._bootstrap:488"
 ]
+mpl-baseline-path = "tests/visualization/baseline"
