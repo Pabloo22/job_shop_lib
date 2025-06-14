@@ -366,18 +366,25 @@ def plot_disjunctive_graph(
 
     # Add machine colors to the legend
     if show_machine_colors_in_legend:
+        label_color_pairs = []
+        sorted_machine_colors = sorted(
+            machine_colors.items(), key=lambda x: x[0]
+        )
+        for machine_id, color in sorted_machine_colors:
+            label = None
+            if machine_id == -1:
+                continue
+            if machine_labels is not None:
+                label = machine_labels[machine_id]
+            elif machine_id >= 0:
+                label = f"Machine {machine_id}"
+
+            if label:  # Add patch if a label was determined
+                label_color_pairs.append((label, color))
+
         machine_patches = [
-            matplotlib.patches.Patch(
-                color=color,
-                label=(
-                    machine_labels[machine_id]
-                    if machine_labels is not None
-                    else f"Machine {machine_id}"
-                ),
-            )
-            for machine_id, color in sorted(
-                machine_colors.items(), key=lambda x: x[0]
-            )
+            matplotlib.patches.Patch(color=color, label=label)
+            for label, color in sorted(label_color_pairs)
         ]
         handles.extend(machine_patches)
 
