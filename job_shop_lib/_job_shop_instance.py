@@ -13,7 +13,7 @@ from job_shop_lib import Operation
 
 
 class JobShopInstance:
-    """Data structure to store a Job Shop Scheduling Problem instance.
+    r"""Data structure to store a Job Shop Scheduling Problem instance.
 
     Additional attributes such as ``num_machines`` or ``durations_matrix`` can
     be computed from the instance and are cached for performance since they
@@ -75,7 +75,7 @@ class JobShopInstance:
             attributes of the operations are set when the instance is created.
             See :meth:`set_operation_attributes` for more information. Defaults
             to True.
-        **metadata:
+        \**metadata:
             Additional information about the instance.
     """
 
@@ -131,7 +131,7 @@ class JobShopInstance:
         name: str | None = None,
         **metadata: Any,
     ) -> JobShopInstance:
-        """Creates a JobShopInstance from a file following Taillard's format.
+        r"""Creates a JobShopInstance from a file following Taillard's format.
 
         Args:
             file_path:
@@ -144,7 +144,7 @@ class JobShopInstance:
             name:
                 A string with the name of the instance. If not provided, the
                 name of the instance is set to the name of the file.
-            **metadata:
+            \**metadata:
                 Additional information about the instance.
 
         Returns:
@@ -221,7 +221,7 @@ class JobShopInstance:
                 A list of lists of integers. The i-th list contains the
                 durations of the operations of the job with id i.
             machines_matrix:
-            A list of lists of lists of integers if the
+                A list of lists of lists of integers if the
                 instance is flexible, or a list of lists of integers if the
                 instance is not flexible. The i-th list contains the machines
                 in which the operations of the job with id i can be processed.

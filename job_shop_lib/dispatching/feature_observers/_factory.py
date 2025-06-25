@@ -1,5 +1,3 @@
-"""Contains factory functions for creating :class:`FeatureObserver`s."""
-
 from enum import Enum
 
 from job_shop_lib.dispatching import DispatcherObserverConfig
@@ -57,13 +55,13 @@ def feature_observer_factory(
     ),
     **kwargs,
 ) -> FeatureObserver:
-    """Creates and returns a :class:`FeatureObserver` based on the specified
+    r"""Creates and returns a :class:`FeatureObserver` based on the specified
     :class:`FeatureObserver` type.
 
     Args:
         feature_creator_type:
             The type of :class:`FeatureObserver` to create.
-        **kwargs:
+        \*\*kwargs:
             Additional keyword arguments to pass to the
             :class:`FeatureObserver` constructor.
 

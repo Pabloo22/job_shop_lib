@@ -30,9 +30,12 @@ def no_setup_time_calculator(
     operation belongs.
 
     Args:
-        dispatcher: The dispatcher instance.
-        operation: The operation to be scheduled.
-        machine_id: The id of the machine on which the operation is to be
+        dispatcher:
+            The dispatcher instance.
+        operation:
+            The operation to be scheduled.
+        machine_id:
+            The id of the machine on which the operation is to be
             scheduled.
 
     Returns:
@@ -329,8 +332,10 @@ class Dispatcher:
                 :attr:`~job_shop_lib.Operation.machine_id` attribute is used.
 
         Raises:
-            ValidationError: If the operation is not ready to be scheduled.
-            UninitializedAttributeError: If the operation has multiple
+            ValidationError:
+                If the operation is not ready to be scheduled.
+            UninitializedAttributeError:
+                If the operation has multiple
                 machines in its list and no ``machine_id`` is provided.
         """
 
@@ -408,7 +413,7 @@ class Dispatcher:
         condition: Callable[[DispatcherObserver], bool] = lambda _: True,
         **kwargs,
     ) -> ObserverType:
-        """Creates a new observer of the specified type or returns an existing
+        r"""Creates a new observer of the specified type or returns an existing
         observer of the same type if it already exists in the dispatcher's list
         of observers.
 
@@ -419,7 +424,7 @@ class Dispatcher:
                 A function that takes an observer and returns True if it is
                 the observer to be retrieved. By default, it returns True for
                 all observers.
-            **kwargs:
+            \**kwargs:
                 Additional keyword arguments to be passed to the observer's
                 constructor.
         """

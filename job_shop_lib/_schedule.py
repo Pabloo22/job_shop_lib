@@ -10,7 +10,7 @@ from job_shop_lib.exceptions import ValidationError
 
 
 class Schedule:
-    """Data structure to store a complete or partial solution for a particular
+    r"""Data structure to store a complete or partial solution for a particular
     :class:`JobShopInstance`.
 
     A schedule is a list of lists of :class:`ScheduledOperation` objects. Each
@@ -33,7 +33,7 @@ class Schedule:
             A list of lists of :class:`ScheduledOperation` objects. Each
             list represents the order of operations on a machine. If
             not provided, the schedule is initialized as an empty schedule.
-        **metadata:
+        \**metadata:
             Additional information about the schedule.
     """
 
