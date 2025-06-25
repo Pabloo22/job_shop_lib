@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 import matplotlib
 
@@ -164,6 +166,7 @@ def test_graph_with_invalid_node_type(
 
 
 def mock_layout(*args, **kwargs):
+    """Simulates that pygraphviz is not installed."""
     raise ImportError
 
 
@@ -172,7 +175,14 @@ def test_fallback_layout(
 ):
     graph = build_disjunctive_graph(example_job_shop_instance)
     # If pygraphviz is not installed, it should not raise an ImportError
-    plot_disjunctive_graph(graph, layout=mock_layout)
+    # but a warning.
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        plot_disjunctive_graph(graph, layout=mock_layout)
+        assert any(
+            "Default layout requires pygraphviz" in str(warn.message)
+            for warn in w
+        )
 
 
 if __name__ == "__main__":
