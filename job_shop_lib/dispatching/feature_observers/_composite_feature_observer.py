@@ -146,8 +146,10 @@ class CompositeFeatureObserver(FeatureObserver):
                 features[feature_type].append(feature_matrix)
 
         self.features = {
-            feature_type: np.concatenate(features, axis=1)
-            for feature_type, features in features.items()
+            feature_type: np.concatenate(
+                feature_matrices, axis=1  # type: ignore[misc]
+            )
+            for feature_type, feature_matrices in features.items()
         }
 
     def _set_column_names(self):
