@@ -221,3 +221,23 @@ def example_schedule(  # W0621 = redefined-outer-name
     solver = DispatchingRuleSolver()
     schedule = solver.solve(instance)
     return schedule
+
+
+@pytest.fixture
+def instance_with_recirculation() -> JobShopInstance:
+    """Create a job shop instance with recirculation."""
+    m0 = 0
+    m1 = 1
+    m2 = 2
+
+    job_0 = [Operation(m0, 1), Operation(m1, 1), Operation(m0, 7)]
+    job_1 = [Operation(m1, 5), Operation(m2, 1), Operation(m1, 1)]
+    job_2 = [Operation(m2, 1), Operation(m0, 3), Operation(m1, 2)]
+
+    jobs = [job_0, job_1, job_2]
+
+    instance = JobShopInstance(
+        jobs,
+        name="Recirculation",
+    )
+    return instance
