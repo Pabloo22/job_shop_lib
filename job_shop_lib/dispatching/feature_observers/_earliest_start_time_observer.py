@@ -93,8 +93,8 @@ class EarliestStartTimeObserver(FeatureObserver):
         # Cache:
         operations_by_machine = dispatcher.instance.operations_by_machine
         self._is_regular_instance = all(
-            len(job) == len(dispatcher.instance.jobs[0])
-            for job in dispatcher.instance.jobs
+            len(machine_ops) == len(operations_by_machine[0])
+            for machine_ops in operations_by_machine
         )
         if self._is_regular_instance:
             self._job_ids = np.array(

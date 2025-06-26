@@ -1,3 +1,5 @@
+import numpy as np
+
 from job_shop_lib import JobShopInstance
 from job_shop_lib.generation import GeneralInstanceGenerator
 from job_shop_lib.dispatching.feature_observers import (
@@ -522,6 +524,75 @@ def test_is_completed_observer_with_random_instances():
     )
     for instance in generator:
         test_is_completed_observer(instance)
+
+
+def test_earliest_start_time_observer_with_recirculation(
+    instance_with_recirculation: JobShopInstance,
+):
+    dispatcher = Dispatcher(instance_with_recirculation)
+    feature_observer_factory(
+        FeatureObserverType.EARLIEST_START_TIME, dispatcher=dispatcher
+    )
+
+
+def test_earliest_start_time_observer_without_cache(
+    irregular_job_shop_instance: JobShopInstance,
+):
+    pruning_function = ready_operations_filter_factory(
+        ReadyOperationsFilterType.DOMINATED_OPERATIONS
+    )
+    dispatcher = Dispatcher(
+        irregular_job_shop_instance,
+        ready_operations_filter=pruning_function,
+    )
+    feature_observers_types: list[
+        FeatureObserverType | type[FeatureObserver]
+    ] = [
+        FeatureObserverType.IS_READY,
+        EarliestStartTimeObserver,  # For checking the factory
+        DurationObserver,
+        FeatureObserverType.IS_SCHEDULED,
+        FeatureObserverType.POSITION_IN_JOB,
+        FeatureObserverType.REMAINING_OPERATIONS,
+        FeatureObserverType.IS_COMPLETED,
+    ]
+    feature_observers = [
+        feature_observer_factory(
+            feature_observer_type,
+            dispatcher=dispatcher,
+        )
+        for feature_observer_type in feature_observers_types
+    ]
+    # REMOVE CACHE
+    earliest_start_time_observer = dispatcher.create_or_get_observer(
+        EarliestStartTimeObserver
+    )
+    # pylint: disable=protected-access
+    earliest_start_time_observer._is_regular_instance = False
+    earliest_start_time_observer._job_ids = np.array([])
+    earliest_start_time_observer._positions = np.array([])
+
+    composite = CompositeFeatureObserver(
+        dispatcher, feature_observers=feature_observers
+    )
+    assert str(composite) == STEP_0
+    solver = DispatchingRuleSolver("most_work_remaining")
+
+    steps = [
+        STEP_1,
+        STEP_2,
+        STEP_3,
+        STEP_4,
+        STEP_5,
+        STEP_6,
+        STEP_7,
+        STEP_8,
+        STEP_9,
+        STEP_10,
+    ]
+    for step in steps:
+        solver.step(dispatcher)
+        assert str(composite) == step, f"index: {steps.index(step)}"
 
 
 if __name__ == "__main__":
