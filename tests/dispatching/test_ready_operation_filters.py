@@ -118,7 +118,8 @@ def test_dominated_operation_filter(
 
     A smaller example to illustrate the point:
 
-    ```python
+    .. code-block:: python
+
     instance_dict = {
         "name": "classic_generated_instance_375",
         "duration_matrix": [[3, 5, 9],
@@ -133,7 +134,6 @@ def test_dominated_operation_filter(
             "dispatching_rule": "most_work_remaining",
         },
     }
-    ```
 
     You can see the plots of the schedules in the `examples` folder.
     """

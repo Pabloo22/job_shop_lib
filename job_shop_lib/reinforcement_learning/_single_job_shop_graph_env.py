@@ -3,10 +3,12 @@
 from copy import deepcopy
 from collections.abc import Callable, Sequence
 from typing import Any
+import warnings
 
 import matplotlib.pyplot as plt
 import gymnasium as gym
 import numpy as np
+
 from numpy.typing import NDArray
 
 from job_shop_lib import JobShopInstance, Operation
@@ -207,17 +209,34 @@ class SingleJobShopGraphEnv(gym.Env):
         """Returns current makespan of partial schedule."""
         return self.dispatcher.schedule.makespan()
 
-    def machine_utilization(self) -> NDArray[np.float32]:
-        """Returns utilization percentage for each machine."""
+    def machine_utilization(  # noqa: DOC201,DOC203
+        self,
+    ) -> NDArray[np.float32]:
+        """Returns utilization percentage for each machine.
+
+        Returns:
+            Utilization percentage for each machine as a numpy array.
+
+        .. deprecated:: 1.1.2
+            This method is deprecated and will be removed in version 2.0.0.
+        """
+        warnings.warn(
+            "machine_utilization is deprecated and will be removed in "
+            "version 2.0.0",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         total_time = max(1, self.current_makespan())  # Avoid division by zero
-        machine_busy_time = np.zeros(self.instance.num_machines)
+        machine_busy_time = np.zeros(
+            self.instance.num_machines, dtype=np.float32
+        )
 
         for m_id, m_schedule in enumerate(self.dispatcher.schedule.schedule):
             machine_busy_time[m_id] = sum(
                 op.operation.duration for op in m_schedule
             )
 
-        return machine_busy_time / total_time
+        return machine_busy_time / total_time  # type: ignore[return-value]
 
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
@@ -414,28 +433,3 @@ class SingleJobShopGraphEnv(gym.Env):
             raise ValidationError(
                 f"Operation {next_operation} requires a machine_id"
             )
-
-
-if __name__ == "__main__":
-    from job_shop_lib.dispatching.feature_observers import (
-        FeatureObserverType,
-        FeatureType,
-    )
-    from job_shop_lib.graphs import build_disjunctive_graph
-    from job_shop_lib.benchmarking import load_benchmark_instance
-
-    instance = load_benchmark_instance("ft06")
-    job_shop_graph_ = build_disjunctive_graph(instance)
-    feature_observer_configs_: list[DispatcherObserverConfig] = [
-        DispatcherObserverConfig(
-            FeatureObserverType.IS_READY,
-            kwargs={"feature_types": [FeatureType.JOBS]},
-        )
-    ]
-
-    env = SingleJobShopGraphEnv(
-        job_shop_graph=job_shop_graph_,
-        feature_observer_configs=feature_observer_configs_,
-        render_mode="save_video",
-        render_config={"video_config": {"fps": 4}},
-    )

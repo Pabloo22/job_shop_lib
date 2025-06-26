@@ -21,10 +21,13 @@ class OptimalOperationsObserver(DispatcherObserver):
             operations.
 
     Args:
-        dispatcher: The dispatcher instance to observe.
-        reference_schedule: A complete schedule that represents the optimal
+        dispatcher:
+            The dispatcher instance to observe.
+        reference_schedule:
+            A complete schedule that represents the optimal
             or reference solution.
-        subscribe: If True, automatically subscribes to the dispatcher.
+        subscribe:
+            If True, automatically subscribes to the dispatcher.
 
     Raises:
         ValidationError: If the reference schedule is incomplete or if it

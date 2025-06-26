@@ -277,7 +277,8 @@ class MultiJobShopGraphEnv(gym.Env):
             options: Additional options for reset (currently unused).
 
         Returns:
-            A tuple containing:
+            tuple[ObservationDict, dict[str, Any]]:
+
             - ObservationDict: The initial observation of the environment.
             - dict: An info dictionary containing additional information about
               the reset state. This may include details about the generated
@@ -305,7 +306,7 @@ class MultiJobShopGraphEnv(gym.Env):
     def step(
         self, action: tuple[int, int]
     ) -> tuple[ObservationDict, float, bool, bool, dict[str, Any]]:
-        """Takes a step in the environment.
+        r"""Takes a step in the environment.
 
         Args:
             action:
@@ -315,7 +316,7 @@ class MultiJobShopGraphEnv(gym.Env):
                 operation.
 
         Returns:
-            A tuple containing the following elements:
+            tuple[ObservationDict, float, bool, bool, dict[str, Any]]:
 
             - The observation of the environment.
             - The reward obtained.

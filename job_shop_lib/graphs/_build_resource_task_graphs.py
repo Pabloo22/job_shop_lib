@@ -9,6 +9,7 @@ connected with machine ones. All machine nodes are connected between them, and
 all operation nodes from the same job are connected by non-directed edges too.
 
 References:
+
 - Junyoung Park, Sanjar Bakhtiyar, and Jinkyoo Park. Schedulenet: Learn to
   solve multi-agent scheduling problems with reinforcement learning. ArXiv,
   abs/2106.03051, 2021.
