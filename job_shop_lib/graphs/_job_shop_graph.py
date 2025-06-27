@@ -28,8 +28,8 @@ class JobShopGraph:
     This transformation allows for the application of graph algorithms
     to analyze and solve scheduling problems.
 
-    The class generates and manages node identifiers as tuples of the
-    form `(node_type_name, local_id)`, e.g., `("operation", 42)`.
+    The class now generates and manages node identifiers as tuples of the
+    form `(node_type_name, local_id)`, e.g., `("OPERATION", 42)`.
 
     Args:
         instance:
@@ -55,43 +55,6 @@ class JobShopGraph:
         "removed_nodes": (
             "Dictionary mapping node types to a list of boolean values "
             "indicating whether a node has been removed from the graph."
-            "Dictionary mapping instance ids to a boolean indicating whether "
-            "a node has been removed."
-            "The keys are node types, and the values are lists mapping "
-            "instance ids to booleans. This allows for quick access "
-            "to removed nodes by their instance ids."
-        ),
-        "instance_id_map": (
-            "Dictionary mapping instance ids to nodes for quick access."
-            "The keys are node types, and the values are dictionaries mapping "
-            "instance ids to nodes. This allows for quick access to "
-            "nodes by their operation, machine, or job ids."
-        ),
-        "adjacency_in": (
-            "Stores graph adjacency information of incoming edges,"
-            "mapping nodes to their neighbors based on edge types. The "
-            "keys are either edge types or tuples of (source_node_type, "
-            "'to', destination_node_type), and the values are lists of "
-            "nodes that are connected to the key node type or tuple."
-            "In case of conjunctive or disjunctive edges, these edge types"
-            "will replace the 'to' component of the type tuple"
-        ),
-        "adjacency_out": (
-            "Stores graph adjacency information of outgoing edges,"
-            "mapping nodes to their neighbors based on edge types. The "
-            "keys are either edge types or tuples of (source_node_type, "
-            "'to', destination_node_type), and the values are lists of "
-            "nodes that are connected to the key node type or tuple."
-            "In case of conjunctive or disjunctive edges, these edge types"
-            "will replace the 'to' component of the type tuple"
-        ),
-        "edge_types": (
-            "A set of all edge types present in the graph."
-            "Only includes tuples of "
-            "(source_node_type, 'to', destination_node_type),"
-            "processing conjunctive and disjunctive edges, "
-            "replacing the 'to' component of the type tuple"
-            "with the appropriate edge type"
         ),
     }
 
@@ -102,7 +65,6 @@ class JobShopGraph:
 
         self._nodes: list[Node] = []
         self._nodes_map: dict[tuple[str, int], Node] = {}
-        self._nodes_map: dict[tuple[str, int], Node] = {}
         self._nodes_by_type: dict[NodeType, list[Node]] = (
             collections.defaultdict(list)
         )
@@ -112,24 +74,12 @@ class JobShopGraph:
         self._nodes_by_job: list[list[Node]] = [
             [] for _ in range(instance.num_jobs)
         ]
-        # Changed: _next_node_id is now removed
-        # self._next_node_id = collections.defaultdict(int)
+        # Changed: _next_node_id is now a dictionary
+        self._next_node_id = collections.defaultdict(int)
         # Changed: removed_nodes is now a dictionary of lists
         self.removed_nodes: dict[str, list[bool]] = collections.defaultdict(
             list
         )
-        self.instance_id_map: dict[str, dict[int, Node]] = (
-            collections.defaultdict(dict)
-        )
-        self.adjacency_in: dict[
-            Node,
-            dict[tuple[str, str, str], list[Node]],
-        ] = {}
-        self.adjacency_out: dict[
-            Node,
-            dict[tuple[str, str, str], list[Node]],
-        ] = {}
-
         if add_operation_nodes:
             self.add_operation_nodes()
 
@@ -225,6 +175,10 @@ class JobShopGraph:
         id is a tuple `(node_type_name, local_id)`. If the node is of type
         :class:`NodeType.OPERATION`, it also updates ``nodes_by_job`` and
         ``nodes_by_machine`` based on the operation's job id and machine ids.
+        graph, and updates the nodes list and the nodes_by_type dictionary. The
+        id is a tuple `(node_type_name, local_id)`. If the node is of type
+        :class:`NodeType.OPERATION`, it also updates ``nodes_by_job`` and
+        ``nodes_by_machine`` based on the operation's job id and machine ids.
 
         Args:
             node_for_adding:
@@ -243,8 +197,18 @@ class JobShopGraph:
 
         node_for_adding.node_id = new_id
         self.graph.add_node(new_id, **{NODE_ATTR: node_for_adding})
+        # Changed: Node ID generation logic
+        node_type_name = node_for_adding.node_type.name
+        local_id = self._next_node_id[node_type_name]
+        new_id = (node_type_name, local_id)
+
+        node_for_adding.node_id = new_id
+        self.graph.add_node(new_id, **{NODE_ATTR: node_for_adding})
         self._nodes_by_type[node_for_adding.node_type].append(node_for_adding)
         self._nodes.append(node_for_adding)
+        self._nodes_map[new_id] = node_for_adding
+        self._next_node_id[node_type_name] += 1
+        self.removed_nodes[node_type_name].append(False)
         self._nodes_map[new_id] = node_for_adding
         self._next_node_id[node_type_name] += 1
         self.removed_nodes[node_type_name].append(False)
@@ -301,10 +265,12 @@ class JobShopGraph:
             u_of_edge:
                 The source node of the edge. Can be a :class:`Node` or
                 its tuple id.
+                The source node of the edge. Can be a :class:`Node` or
+                its tuple id.
             v_of_edge:
                 The destination node of the edge. Can be a :class:`Node` or
                 its tuple id.
-            \**attr:
+            **attr:
                 Additional attributes to be added to the edge.
 
         Raises:
@@ -323,6 +289,9 @@ class JobShopGraph:
             # Changed: Use _nodes_map for efficient lookup
             u_node = self._nodes_map[u_of_edge]
             v_node = self._nodes_map[v_of_edge]
+            # Changed: Use _nodes_map for efficient lookup
+            u_node = self._nodes_map[u_of_edge]
+            v_node = self._nodes_map[v_of_edge]
             edge_type = (
                 u_node.node_type.name.lower(),
                 "to",
@@ -335,6 +304,7 @@ class JobShopGraph:
 
         Args:
             node_id:
+                The tuple id of the node to remove.
                 The tuple id of the node to remove.
         """
         self.graph.remove_node(node_id)
