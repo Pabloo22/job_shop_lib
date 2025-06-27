@@ -61,6 +61,24 @@ pip install job-shop-lib
 
 <!-- end key features -->
 
+## Publication :scroll:
+
+For an in-depth explanation of the library (v1.0.0), including its design, features, reinforcement learning environments, and some experiments, please refer to my [Bachelor's thesis](https://www.arxiv.org/abs/2506.13781).
+
+You can also cite the library using the following BibTeX entry:
+
+```bibtex
+@misc{arino2025jobshoplib,
+      title={Solving the Job Shop Scheduling Problem with Graph Neural Networks: A Customizable Reinforcement Learning Environment}, 
+      author={Pablo Ariño Fernández},
+      year={2025},
+      eprint={2506.13781},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2506.13781}, 
+}
+```
+
 ## Some Examples :rocket:
 
 ### Create a Job Shop Instance
@@ -305,31 +323,82 @@ plt.show()
 
 The library generalizes this graph by allowing the addition of job nodes and a global one (see `build_resource_task_graph_with_jobs` and `build_resource_task_graph`).
 
-For more details, check the [examples](examples) folder.
+### Gymnasium Environments
 
-## Installation for development
+<div align="center">
+<img src="docs/source/images/rl_diagram.png">
+</div>
+<br>
 
-<!-- start installation development -->
 
-1. Clone the repository.
+The `SingleJobShopGraphEnv` allows to learn from a single job shop instance, while the `MultiJobShopGraphEnv` generates a new instance at each reset. For an in-depth explanation of the environments see chapter 7 of my [Bachelor's thesis](https://www.arxiv.org/abs/2506.13781).
 
-```bash
-git clone https://github.com/Pabloo22/job_shop_lib.git
-cd job_shop_lib
+```python
+from IPython.display import clear_output
+
+from job_shop_lib.reinforcement_learning import (
+    # MakespanReward,
+    SingleJobShopGraphEnv,
+    ObservationSpaceKey,
+    IdleTimeReward,
+    ObservationDict,
+)
+from job_shop_lib.dispatching.feature_observers import (
+    FeatureObserverType,
+    FeatureType,
+)
+from job_shop_lib.dispatching import DispatcherObserverConfig
+
+
+instance = load_benchmark_instance("ft06")
+job_shop_graph = build_disjunctive_graph(instance)
+feature_observer_configs = [
+    DispatcherObserverConfig(
+        FeatureObserverType.IS_READY,
+        kwargs={"feature_types": [FeatureType.JOBS]},
+    )
+]
+
+env = SingleJobShopGraphEnv(
+    job_shop_graph=job_shop_graph,
+    feature_observer_configs=feature_observer_configs,
+    reward_function_config=DispatcherObserverConfig(IdleTimeReward),
+    render_mode="human",  # Try "save_video"
+    render_config={
+        "video_config": {"fps": 4}
+    }
+)
+
+
+def random_action(observation: ObservationDict) -> tuple[int, int]:
+    ready_jobs = []
+    for job_id, is_ready in enumerate(
+        observation[ObservationSpaceKey.JOBS.value].ravel()
+    ):
+        if is_ready == 1.0:
+            ready_jobs.append(job_id)
+
+    job_id = random.choice(ready_jobs)
+    machine_id = -1  # We can use -1 if each operation can only be scheduled
+    # on one machine.
+    return (job_id, machine_id)
+
+
+done = False
+obs, _ = env.reset()
+while not done:
+    action = random_action(obs)
+    obs, reward, done, *_ = env.step(action)
+    if env.render_mode == "human":
+        env.render()
+        clear_output(wait=True)
+
+if env.render_mode == "save_video" or env.render_mode == "save_gif":
+    env.render()
 ```
 
-2. Install [poetry](https://python-poetry.org/docs/) if you don't have it already:
-
-```bash
-pip install poetry
-```
-
-3. Install dependencies:
-```bash
-make poetry_install_all 
-```
-
-<!-- end installation development -->
+## Contributing :handshake:
+Any contribution is welcome, whether it's a small bug or documentation fix or a new feature! See the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute to this project.
 
 ## License :scroll:
 
@@ -366,4 +435,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
  - E. Taillard, "Benchmarks for basic scheduling problems," European
      Journal of Operational Research, vol. 64, no. 2, pp. 278–285, 1993.
 
-- Park, Junyoung, Sanjar Bakhtiyar, and Jinkyoo Park. "ScheduleNet: Learn to solve multi-agent scheduling problems with reinforcement learning." arXiv preprint arXiv:2106.03051, 2021. 
+  - Park, Junyoung, Sanjar Bakhtiyar, and Jinkyoo Park. "ScheduleNet: Learn to solve multi-agent scheduling problems with reinforcement learning." arXiv preprint arXiv:2106.03051, 2021. 
