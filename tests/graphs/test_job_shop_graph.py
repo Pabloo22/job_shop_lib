@@ -49,7 +49,7 @@ def test_node_ids(example_job_shop_instance):
         assert isinstance(node_id[1], int)
 
         # Assert the node type in the ID matches the node's actual type
-        assert node_id[0] == node.node_type.name.lower()
+        assert node_id[0] == node.node_type.name
 
         # Assert that we can retrieve the exact same node using its ID
         # This tests the `_nodes_map` functionality.
@@ -138,35 +138,29 @@ def test_remove_node(example_job_shop_instance):
     # Ensure there are enough nodes to run the test
     assert len(op_nodes) >= 7, "Test instance needs at least 7 operations"
     nodes_to_remove = [
-        op_nodes[0],
-        op_nodes[3],
-        op_nodes[6],
+        op_nodes[0].node_id,
+        op_nodes[3].node_id,
+        op_nodes[6].node_id,
     ]
 
     # Remove nodes using their correct tuple IDs
-    for node in nodes_to_remove:
-        graph.remove_node(node.node_id)
+    for node_id in nodes_to_remove:
+        graph.remove_node(node_id)
 
     # Verify the nodes are no longer in the graph's node set
-    for node in nodes_to_remove:
-        if node.node_id in graph._nodes_map:
-            assert (
-                graph._nodes_map[node.node_id].operation.operation_id
-                != node.operation.operation_id
-            )
+    for node_id in nodes_to_remove:
+        assert node_id not in graph.graph.nodes()
 
     # Verify the `removed_nodes` attribute is updated correctly via the API
-    for node in nodes_to_remove:
-        assert graph.is_removed(node)
+    for node_id in nodes_to_remove:
+        assert graph.is_removed(node_id)
 
-    """
-    Won't raise an error because ids are updated after removal.
-    with pytest.raises(nx.NetworkXError):
-        # Seeing all edges of removed nodes returns an empty list, not an error
+    with pytest.raises(nx.NetworkXError) as excinfo:
+        # Seeing all edges of removed nodes just returns an empty list, not an error
         # So we try to access an edge that should not exist
         last_removed_node_id = nodes_to_remove[-1]
         graph.graph.remove_edge(last_removed_node_id, ("SOURCE", 0))
-    """
+
     # This part of the test remains valid as it uses the is_removed() helper
     graph.remove_isolated_nodes()
     isolated_nodes = list(nx.isolates(graph.graph))

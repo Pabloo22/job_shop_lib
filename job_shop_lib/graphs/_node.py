@@ -1,5 +1,7 @@
 """Home of the `Node` class."""
 
+from typing import Tuple
+
 from job_shop_lib import Operation
 from job_shop_lib.exceptions import (
     UninitializedAttributeError,
