@@ -138,9 +138,7 @@ def test_plot_complete_resource_task_graph_custom_shapes_colors_layout(
 def test_plot_complete_resource_task_graph_custom_edge_params(
     example_job_shop_instance,
 ):
-    graph = build_complete_resource_task_graph(
-        example_job_shop_instance
-    )
+    graph = build_complete_resource_task_graph(example_job_shop_instance)
     fig = plot_resource_task_graph(
         graph,
         title="",

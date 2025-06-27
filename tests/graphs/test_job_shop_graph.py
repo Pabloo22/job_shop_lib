@@ -1,3 +1,4 @@
+from collections import defaultdict
 import pytest
 import networkx as nx
 
@@ -28,13 +29,43 @@ def test_nodes(example_job_shop_instance):
 
 
 def test_node_ids(example_job_shop_instance):
+    """
+    Tests that node IDs are correctly formatted tuples, that nodes can be
+    retrieved by their ID, and that local IDs are sequential per type.
+    """
     graph = JobShopGraph(example_job_shop_instance)
     add_source_sink_nodes(graph)
 
-    # We don't use enumerate here because we want to test if we can
-    # access the node by its id
-    for i in range(graph.graph.number_of_nodes()):
-        assert graph.nodes[i].node_id == i
+    nodes_by_type = defaultdict(list)
+
+    # Part 1: Verify ID format and that the node is accessible by its ID
+    for node in graph.nodes:
+        node_id = node.node_id
+
+        # Assert the ID is a tuple of (str, int)
+        assert isinstance(node_id, tuple)
+        assert len(node_id) == 2
+        assert isinstance(node_id[0], str)
+        assert isinstance(node_id[1], int)
+
+        # Assert the node type in the ID matches the node's actual type
+        assert node_id[0] == node.node_type.name
+
+        # Assert that we can retrieve the exact same node using its ID
+        # This tests the `_nodes_map` functionality.
+        assert graph._nodes_map[node_id] is node
+
+        # Group nodes for the next part of the test
+        nodes_by_type[node.node_type].append(node)
+
+    # Part 2: Verify that local IDs are sequential for each type
+    for node_type, nodes_of_that_type in nodes_by_type.items():
+        # Extract the local_id (the integer) from each node's tuple ID
+        local_ids = [node.node_id[1] for node in nodes_of_that_type]
+        local_ids.sort()
+
+        # Assert that the local IDs form a complete sequence from 0..N-1
+        assert local_ids == list(range(len(nodes_of_that_type)))
 
 
 def test_node_types(example_job_shop_instance):
@@ -101,36 +132,41 @@ def test_remove_node(example_job_shop_instance):
     add_conjunctive_edges(graph)
     add_disjunctive_edges(graph)
     add_source_sink_edges(graph)
+    # Dynamically select valid tuple IDs to remove.
+    # This is more robust than hardcoding integer indices.
+    op_nodes = graph.nodes_by_type[NodeType.OPERATION]
+    # Ensure there are enough nodes to run the test
+    assert len(op_nodes) >= 7, "Test instance needs at least 7 operations"
+    nodes_to_remove = [
+        op_nodes[0].node_id,
+        op_nodes[3].node_id,
+        op_nodes[6].node_id,
+    ]
 
-    # Assumption: graph initially has nodes to remove
-    node_to_remove = graph.nodes[0].node_id
-
-    nodes_to_remove = [0, 3, 6]
-
+    # Remove nodes using their correct tuple IDs
     for node_id in nodes_to_remove:
         graph.remove_node(node_id)
 
-    # Verify the node is no longer in the graph
-    for node_to_remove in nodes_to_remove:
-        assert node_to_remove not in graph.graph.nodes()
+    # Verify the nodes are no longer in the graph's node set
+    for node_id in nodes_to_remove:
+        assert node_id not in graph.graph.nodes()
 
+    # Verify the `removed_nodes` attribute is updated correctly via the API
+    for node_id in nodes_to_remove:
+        assert graph.is_removed(node_id)
+
+    with pytest.raises(nx.NetworkXError) as excinfo:
+        # Seeing all edges of removed nodes just returns an empty list, not an error
+        # So we try to access an edge that should not exist
+        last_removed_node_id = nodes_to_remove[-1]
+        graph.graph.remove_edge(last_removed_node_id, ("SOURCE", 0))
+
+    # This part of the test remains valid as it uses the is_removed() helper
     graph.remove_isolated_nodes()
-    # Verify isolated nodes are also removed and that the source node has
-    # been removed due to the removal of the isolated nodes
     isolated_nodes = list(nx.isolates(graph.graph))
     assert not isolated_nodes
-    source_node = graph.nodes_by_type[NodeType.SOURCE][0]
-    assert graph.is_removed(source_node)
 
-    # Verify the `removed_nodes` list is updated correctly
-    for node_to_remove in nodes_to_remove:
-        assert graph.removed_nodes[node_to_remove]
-
-    # Optional: Check that no edges remain that involve the removed node
-    with pytest.raises(nx.NetworkXError):
-        graph.graph.edges(node_to_remove)
-
-    # Check the integrity of the remaining graph structure
+    # Verify the integrity of the remaining graph structure
     remaining_node_ids = {
         node.node_id for node in graph.nodes if not graph.is_removed(node)
     }

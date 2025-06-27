@@ -25,6 +25,9 @@ class JobShopGraph:
     This transformation allows for the application of graph algorithms
     to analyze and solve scheduling problems.
 
+    The class now generates and manages node identifiers as tuples of the
+    form `(node_type_name, local_id)`, e.g., `("OPERATION", 42)`.
+
     Args:
         instance:
             The job shop instance that the graph represents.
@@ -42,17 +45,18 @@ class JobShopGraph:
             "source, and sink, with edges indicating dependencies."
         ),
         "_nodes": "List of all nodes added to the graph.",
+        "_nodes_map": "Dictionary mapping node tuple ids to Node objects.",
         "_nodes_by_type": "Dictionary mapping node types to lists of nodes.",
         "_nodes_by_machine": (
             "List of lists mapping machine ids to operation nodes."
         ),
         "_nodes_by_job": "List of lists mapping job ids to operation nodes.",
         "_next_node_id": (
-            "The id to assign to the next node added to thegraph."
+            "Dictionary mapping node types to their next available local id."
         ),
         "removed_nodes": (
-            "List of boolean values indicating whether a node has been "
-            "removed from the graph."
+            "Dictionary mapping node types to a list of boolean values "
+            "indicating whether a node has been removed from the graph."
         ),
     }
 
@@ -63,6 +67,7 @@ class JobShopGraph:
         self.instance = instance
 
         self._nodes: list[Node] = []
+        self._nodes_map: dict[tuple[str, int], Node] = {}
         self._nodes_by_type: dict[NodeType, list[Node]] = (
             collections.defaultdict(list)
         )
@@ -72,8 +77,12 @@ class JobShopGraph:
         self._nodes_by_job: list[list[Node]] = [
             [] for _ in range(instance.num_jobs)
         ]
-        self._next_node_id = 0
-        self.removed_nodes: list[bool] = []
+        # Changed: _next_node_id is now a dictionary
+        self._next_node_id = collections.defaultdict(int)
+        # Changed: removed_nodes is now a dictionary of lists
+        self.removed_nodes: dict[str, list[bool]] = collections.defaultdict(
+            list
+        )
         if add_operation_nodes:
             self.add_operation_nodes()
 
@@ -130,10 +139,10 @@ class JobShopGraph:
         """Adds a node to the graph and updates relevant class attributes.
 
         This method assigns a unique identifier to the node, adds it to the
-        graph, and updates the nodes list and the nodes_by_type dictionary. If
-        the node is of type :class:`NodeType.OPERATION`, it also updates
-        ``nodes_by_job`` and ``nodes_by_machine`` based on the operation's
-        job id and machine ids.
+        graph, and updates the nodes list and the nodes_by_type dictionary. The
+        id is a tuple `(node_type_name, local_id)`. If the node is of type
+        :class:`NodeType.OPERATION`, it also updates ``nodes_by_job`` and
+        ``nodes_by_machine`` based on the operation's job id and machine ids.
 
         Args:
             node_for_adding:
@@ -145,14 +154,18 @@ class JobShopGraph:
             should be done exclusively through this method to avoid
             inconsistencies.
         """
-        node_for_adding.node_id = self._next_node_id
-        self.graph.add_node(
-            node_for_adding.node_id, **{NODE_ATTR: node_for_adding}
-        )
+        # Changed: Node ID generation logic
+        node_type_name = node_for_adding.node_type.name
+        local_id = self._next_node_id[node_type_name]
+        new_id = (node_type_name, local_id)
+
+        node_for_adding.node_id = new_id
+        self.graph.add_node(new_id, **{NODE_ATTR: node_for_adding})
         self._nodes_by_type[node_for_adding.node_type].append(node_for_adding)
         self._nodes.append(node_for_adding)
-        self._next_node_id += 1
-        self.removed_nodes.append(False)
+        self._nodes_map[new_id] = node_for_adding
+        self._next_node_id[node_type_name] += 1
+        self.removed_nodes[node_type_name].append(False)
 
         if node_for_adding.node_type == NodeType.OPERATION:
             operation = node_for_adding.operation
@@ -162,8 +175,8 @@ class JobShopGraph:
 
     def add_edge(
         self,
-        u_of_edge: Node | int,
-        v_of_edge: Node | int,
+        u_of_edge: Node | tuple[str, int],
+        v_of_edge: Node | tuple[str, int],
         **attr,
     ) -> None:
         """Adds an edge to the graph.
@@ -175,13 +188,11 @@ class JobShopGraph:
 
         Args:
             u_of_edge:
-                The source node of the edge. If it is a :class:`Node`, its
-                ``node_id`` is used as the source. Otherwise, it is assumed to
-                be the ``node_id`` of the source.
+                The source node of the edge. Can be a :class:`Node` or
+                its tuple id.
             v_of_edge:
-                The destination node of the edge. If it is a :class:`Node`,
-                its ``node_id`` is used as the destination. Otherwise, it
-                is assumed to be the ``node_id`` of the destination.
+                The destination node of the edge. Can be a :class:`Node` or
+                its tuple id.
             **attr:
                 Additional attributes to be added to the edge.
 
@@ -199,8 +210,9 @@ class JobShopGraph:
             )
         edge_type = attr.pop("type", None)
         if edge_type is None:
-            u_node = self.nodes[u_of_edge]
-            v_node = self.nodes[v_of_edge]
+            # Changed: Use _nodes_map for efficient lookup
+            u_node = self._nodes_map[u_of_edge]
+            v_node = self._nodes_map[v_of_edge]
             edge_type = (
                 u_node.node_type.name.lower(),
                 "to",
@@ -208,37 +220,50 @@ class JobShopGraph:
             )
         self.graph.add_edge(u_of_edge, v_of_edge, type=edge_type, **attr)
 
-    def remove_node(self, node_id: int) -> None:
-        """Removes a node from the graph and the isolated nodes that result
-        from the removal.
+    def remove_node(self, node_id: tuple[str, int]) -> None:
+        """Removes a node from the graph.
 
         Args:
             node_id:
-                The id of the node to remove.
+                The tuple id of the node to remove.
         """
         self.graph.remove_node(node_id)
-        self.removed_nodes[node_id] = True
+        # Changed: Update removed_nodes dictionary
+        node_type_name, local_id = node_id
+        if local_id < len(self.removed_nodes[node_type_name]):
+            self.removed_nodes[node_type_name][local_id] = True
 
     def remove_isolated_nodes(self) -> None:
         """Removes isolated nodes from the graph."""
         isolated_nodes = list(nx.isolates(self.graph))
-        for isolated_node in isolated_nodes:
-            self.removed_nodes[isolated_node] = True
+        for isolated_node_id in isolated_nodes:
+            # Changed: Update removed_nodes dictionary for each isolated node
+            node_type_name, local_id = isolated_node_id
+            if local_id < len(self.removed_nodes[node_type_name]):
+                self.removed_nodes[node_type_name][local_id] = True
 
         self.graph.remove_nodes_from(isolated_nodes)
 
-    def is_removed(self, node: int | Node) -> bool:
+    def is_removed(self, node: tuple[str, int] | Node) -> bool:
         """Returns whether the node is removed from the graph.
 
         Args:
             node:
-                The node to check. If it is a ``Node``, its `node_id` is used
-                as the node to check. Otherwise, it is assumed to be the
-                ``node_id`` of the node to check.
+                The node to check. Can be a :class:`Node` or its tuple id.
         """
         if isinstance(node, Node):
-            node = node.node_id
-        return self.removed_nodes[node]
+            node_id = node.node_id
+        else:
+            node_id = node
+
+        # Changed: Check removed_nodes dictionary
+        node_type_name, local_id = node_id
+        type_removed_list = self.removed_nodes[node_type_name]
+
+        if local_id >= len(type_removed_list):
+            return False  # Node was never added or list is out of sync
+
+        return type_removed_list[local_id]
 
     def non_removed_nodes(self) -> list[Node]:
         """Returns the nodes that are not removed from the graph."""
