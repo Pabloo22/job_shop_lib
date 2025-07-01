@@ -9,20 +9,33 @@ Problem step-by-step.
     HistoryObserver
     UnscheduledOperationsObserver
     OptimalOperationsObserver
-    ReadyOperationsFilter
     DispatcherObserverConfig
-    filter_dominated_operations
-    filter_non_immediate_machines
-    create_composite_operation_filter
+    ReadyOperationsFilter
     ReadyOperationsFilterType
     ready_operations_filter_factory
+    filter_dominated_operations
+    filter_non_immediate_machines
+    filter_non_idle_machines
+    filter_non_immediate_operations
+    create_composite_operation_filter
+    StartTimeCalculator
+    no_setup_time_calculator
+    get_machine_dependent_setup_time_calculator
+    get_matrix_setup_time_calculator
+    get_breakdown_calculator
+    get_job_dependent_setup_calculator
 
 Dispatching refers to the decision-making process of selecting which job
 should be processed next on a particular machine when that machine becomes
 available.
 """
 
-from ._dispatcher import Dispatcher, DispatcherObserver
+from ._dispatcher import (
+    Dispatcher,
+    DispatcherObserver,
+    StartTimeCalculator,
+    no_setup_time_calculator,
+)
 from ._history_observer import (
     HistoryObserver,
 )
@@ -35,6 +48,12 @@ from ._ready_operation_filters import (
     filter_non_idle_machines,
     filter_non_immediate_operations,
 )
+from ._start_time_calculators import (
+    get_machine_dependent_setup_time_calculator,
+    get_breakdown_calculator,
+    get_job_dependent_setup_calculator,
+    get_matrix_setup_time_calculator,
+)
 from ._dispatcher_observer_config import DispatcherObserverConfig
 from ._factories import (
     ReadyOperationsFilterType,
@@ -45,17 +64,24 @@ from ._factories import (
 
 __all__ = [
     "Dispatcher",
-    "filter_dominated_operations",
-    "filter_non_immediate_machines",
-    "create_composite_operation_filter",
+    "DispatcherObserver",
+    "StartTimeCalculator",
+    "HistoryObserver",
+    "UnscheduledOperationsObserver",
+    "OptimalOperationsObserver",
+    "DispatcherObserverConfig",
+    "ReadyOperationsFilter",
     "ReadyOperationsFilterType",
     "ready_operations_filter_factory",
-    "DispatcherObserver",
-    "HistoryObserver",
-    "DispatcherObserverConfig",
-    "UnscheduledOperationsObserver",
-    "ReadyOperationsFilter",
+    "filter_dominated_operations",
+    "filter_non_immediate_machines",
     "filter_non_idle_machines",
     "filter_non_immediate_operations",
-    "OptimalOperationsObserver",
+    "create_composite_operation_filter",
+    "no_setup_time_calculator",
+    "get_machine_dependent_setup_time_calculator",
+    "StartTimeCalculator",
+    "get_matrix_setup_time_calculator",
+    "get_breakdown_calculator",
+    "get_job_dependent_setup_calculator",
 ]

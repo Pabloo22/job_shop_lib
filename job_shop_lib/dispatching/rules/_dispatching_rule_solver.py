@@ -1,6 +1,5 @@
 """Home of the `DispatchingRuleSolver` class."""
 
-from typing import Optional, Union
 from collections.abc import Callable, Iterable
 
 from job_shop_lib import JobShopInstance, Schedule, Operation, BaseSolver
@@ -66,24 +65,19 @@ class DispatchingRuleSolver(BaseSolver):
 
     def __init__(
         self,
-        dispatching_rule: Union[
-            str, Callable[[Dispatcher], Operation]
-        ] = DispatchingRuleType.MOST_WORK_REMAINING,
-        machine_chooser: Union[
-            str, Callable[[Dispatcher, Operation], int]
-        ] = MachineChooserType.FIRST,
-        ready_operations_filter: Optional[
-            Union[
-                Iterable[
-                    Union[
-                        ReadyOperationsFilter, str, ReadyOperationsFilterType
-                    ]
-                ],
-                str,
-                ReadyOperationsFilterType,
-                ReadyOperationsFilter,
-            ]
-        ] = (
+        dispatching_rule: (
+            str | Callable[[Dispatcher], Operation]
+        ) = DispatchingRuleType.MOST_WORK_REMAINING,
+        machine_chooser: (
+            str | Callable[[Dispatcher, Operation], int]
+        ) = MachineChooserType.FIRST,
+        ready_operations_filter: (
+            Iterable[ReadyOperationsFilter | str | ReadyOperationsFilterType]
+            | str
+            | ReadyOperationsFilterType
+            | ReadyOperationsFilter
+            | None
+        ) = (
             ReadyOperationsFilterType.DOMINATED_OPERATIONS,
             ReadyOperationsFilterType.NON_IMMEDIATE_OPERATIONS,
         ),
@@ -108,7 +102,7 @@ class DispatchingRuleSolver(BaseSolver):
     def solve(
         self,
         instance: JobShopInstance,
-        dispatcher: Optional[Dispatcher] = None,
+        dispatcher: Dispatcher | None = None,
     ) -> Schedule:
         """Solves the instance using the dispatching rule and machine chooser
         algorithms.
@@ -154,48 +148,3 @@ class DispatchingRuleSolver(BaseSolver):
         selected_operation = self.dispatching_rule(dispatcher)
         machine_id = self.machine_chooser(dispatcher, selected_operation)
         dispatcher.dispatch(selected_operation, machine_id)
-
-
-if __name__ == "__main__":
-    import time
-    import cProfile
-    # import pstats
-    # from io import StringIO
-    from job_shop_lib.benchmarking import (
-        # load_benchmark_instance,
-        load_all_benchmark_instances,
-    )
-
-    # from job_shop_lib.dispatching.rules._dispatching_rules_functions import (
-    #     most_work_remaining_rule_2,
-    # )
-
-    # ta_instances = [
-    #     load_benchmark_instance(f"ta{i:02d}") for i in range(1, 81)
-    # ]
-    ta_instances = load_all_benchmark_instances().values()
-    solver = DispatchingRuleSolver(
-        dispatching_rule="most_work_remaining", ready_operations_filter=None
-    )
-
-    start = time.perf_counter()
-
-    # Create a Profile object
-    profiler = cProfile.Profile()
-
-    # Run the code under profiling
-    # profiler.enable()
-    for instance_ in ta_instances:
-        solver.solve(instance_)
-    # profiler.disable()
-
-    end = time.perf_counter()
-
-    # Print elapsed time
-    print(f"Elapsed time: {end - start:.2f} seconds.")
-
-    # Print profiling results
-    # s = StringIO()
-    # ps = pstats.Stats(profiler, stream=s).sort_stats("cumulative")
-    # profiler.print_stats("cumtime")  # Print top 20 time-consuming functions
-    # print(s.getvalue())

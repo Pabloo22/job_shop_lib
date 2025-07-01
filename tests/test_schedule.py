@@ -115,9 +115,7 @@ def test_from_job_sequences_invalid(
         [1, 0, 2],
     ]
     with pytest.raises(ValidationError):
-        Schedule.from_job_sequences(
-            example_job_shop_instance, job_sequences
-        )
+        Schedule.from_job_sequences(example_job_shop_instance, job_sequences)
 
 
 def test_to_dict(example_job_shop_instance: JobShopInstance):
@@ -132,6 +130,48 @@ def test_to_dict(example_job_shop_instance: JobShopInstance):
     schedule_dict = schedule.to_dict()
     new_schedule = Schedule.from_dict(**schedule_dict)
     assert schedule == new_schedule
+
+
+def test_from_partial_job_sequences(
+    example_job_shop_instance: JobShopInstance,
+):
+    job_sequences = [
+        [0],
+        [0],
+        [0],
+    ]
+    schedule = Schedule.from_job_sequences(
+        example_job_shop_instance, job_sequences
+    )
+    assert not schedule.is_complete()
+
+
+def test_from_partial_job_sequences_invalid(
+    example_job_shop_instance: JobShopInstance,
+):
+    job_sequences = [
+        [0],
+        [0],
+        [1],
+    ]
+    with pytest.raises(ValidationError):
+        Schedule.from_job_sequences(example_job_shop_instance, job_sequences)
+
+
+def test_from_dict_partial(
+    example_job_shop_instance: JobShopInstance,
+):
+    job_sequences = [
+        [0],
+        [0],
+        [0],
+    ]
+    schedule = Schedule.from_job_sequences(
+        example_job_shop_instance, job_sequences
+    )
+    schedule_dict = schedule.to_dict()
+    new_schedule = Schedule.from_dict(**schedule_dict)
+    assert not new_schedule.is_complete()
 
 
 if __name__ == "__main__":

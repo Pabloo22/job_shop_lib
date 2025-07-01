@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Union, Dict, Optional
+from typing import Any
 from collections import deque
 
 from job_shop_lib import ScheduledOperation, JobShopInstance
@@ -10,7 +10,7 @@ from job_shop_lib.exceptions import ValidationError
 
 
 class Schedule:
-    """Data structure to store a complete or partial solution for a particular
+    r"""Data structure to store a complete or partial solution for a particular
     :class:`JobShopInstance`.
 
     A schedule is a list of lists of :class:`ScheduledOperation` objects. Each
@@ -33,7 +33,7 @@ class Schedule:
             A list of lists of :class:`ScheduledOperation` objects. Each
             list represents the order of operations on a machine. If
             not provided, the schedule is initialized as an empty schedule.
-        **metadata:
+        \**metadata:
             Additional information about the schedule.
     """
 
@@ -55,7 +55,7 @@ class Schedule:
     def __init__(
         self,
         instance: JobShopInstance,
-        schedule: Optional[List[List[ScheduledOperation]]] = None,
+        schedule: list[list[ScheduledOperation]] | None = None,
         **metadata: Any,
     ):
         if schedule is None:
@@ -65,19 +65,19 @@ class Schedule:
 
         self.instance: JobShopInstance = instance
         self._schedule = schedule
-        self.metadata: Dict[str, Any] = metadata
+        self.metadata: dict[str, Any] = metadata
 
     def __repr__(self) -> str:
         return str(self.schedule)
 
     @property
-    def schedule(self) -> List[List[ScheduledOperation]]:
+    def schedule(self) -> list[list[ScheduledOperation]]:
         """A list of lists of :class:`ScheduledOperation` objects. Each list
         represents the order of operations on a machine."""
         return self._schedule
 
     @schedule.setter
-    def schedule(self, new_schedule: List[List[ScheduledOperation]]):
+    def schedule(self, new_schedule: list[list[ScheduledOperation]]):
         Schedule.check_schedule(new_schedule)
         self._schedule = new_schedule
 
@@ -103,7 +103,7 @@ class Schedule:
                 - **"metadata"**: A dictionary with additional information
                   about the schedule.
         """
-        job_sequences: List[List[int]] = []
+        job_sequences: list[list[int]] = []
         for machine_schedule in self.schedule:
             job_sequences.append(
                 [operation.job_id for operation in machine_schedule]
@@ -117,11 +117,27 @@ class Schedule:
 
     @staticmethod
     def from_dict(
-        instance: Union[Dict[str, Any], JobShopInstance],
-        job_sequences: List[List[int]],
-        metadata: Optional[Dict[str, Any]] = None,
+        instance: dict[str, Any] | JobShopInstance,
+        job_sequences: list[list[int]],
+        metadata: dict[str, Any] | None = None,
     ) -> Schedule:
-        """Creates a schedule from a dictionary representation."""
+        """Creates a schedule from a dictionary representation.
+
+        Args:
+            instance:
+                The instance to create the schedule for. Can be a dictionary
+                representation of a :class:`JobShopInstance` or a
+                :class:`JobShopInstance` object.
+            job_sequences:
+                A list of lists of job ids. Each list of job ids represents the
+                order of operations on the machine. The machine that the list
+                corresponds to is determined by the index of the list.
+            metadata:
+                A dictionary with additional information about the schedule.
+
+        Returns:
+            A :class:`Schedule` object with the given job sequences.
+        """
         if isinstance(instance, dict):
             instance = JobShopInstance.from_matrices(**instance)
         schedule = Schedule.from_job_sequences(instance, job_sequences)
@@ -131,7 +147,7 @@ class Schedule:
     @staticmethod
     def from_job_sequences(
         instance: JobShopInstance,
-        job_sequences: List[List[int]],
+        job_sequences: list[list[int]],
     ) -> Schedule:
         """Creates an active schedule from a list of job sequences.
 
@@ -157,7 +173,7 @@ class Schedule:
         dispatcher.reset()
         raw_solution_deques = [deque(job_ids) for job_ids in job_sequences]
 
-        while not dispatcher.schedule.is_complete():
+        while any(job_seq for job_seq in raw_solution_deques):
             at_least_one_operation_scheduled = False
             for machine_id, job_ids in enumerate(raw_solution_deques):
                 if not job_ids:
@@ -240,7 +256,7 @@ class Schedule:
         return previous_operation.end_time <= scheduled_operation.start_time
 
     @staticmethod
-    def check_schedule(schedule: List[List[ScheduledOperation]]):
+    def check_schedule(schedule: list[list[ScheduledOperation]]):
         """Checks if a schedule is valid and raises a
         :class:`~exceptions.ValidationError` if it is not.
 

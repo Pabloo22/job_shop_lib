@@ -1,6 +1,5 @@
 """Home of the `JobShopGraph` class."""
 
-from typing import List, Union, Dict
 import collections
 import networkx as nx
 
@@ -63,23 +62,23 @@ class JobShopGraph:
         self.graph = nx.DiGraph()
         self.instance = instance
 
-        self._nodes: List[Node] = []
-        self._nodes_by_type: Dict[NodeType, List[Node]] = (
+        self._nodes: list[Node] = []
+        self._nodes_by_type: dict[NodeType, list[Node]] = (
             collections.defaultdict(list)
         )
-        self._nodes_by_machine: List[List[Node]] = [
+        self._nodes_by_machine: list[list[Node]] = [
             [] for _ in range(instance.num_machines)
         ]
-        self._nodes_by_job: List[List[Node]] = [
+        self._nodes_by_job: list[list[Node]] = [
             [] for _ in range(instance.num_jobs)
         ]
         self._next_node_id = 0
-        self.removed_nodes: List[bool] = []
+        self.removed_nodes: list[bool] = []
         if add_operation_nodes:
             self.add_operation_nodes()
 
     @property
-    def nodes(self) -> List[Node]:
+    def nodes(self) -> list[Node]:
         """List of all nodes added to the graph.
 
         It may contain nodes that have been removed from the graph.
@@ -87,7 +86,7 @@ class JobShopGraph:
         return self._nodes
 
     @property
-    def nodes_by_type(self) -> Dict[NodeType, List[Node]]:
+    def nodes_by_type(self) -> dict[NodeType, list[Node]]:
         """Dictionary mapping node types to lists of nodes.
 
         It may contain nodes that have been removed from the graph.
@@ -95,7 +94,7 @@ class JobShopGraph:
         return self._nodes_by_type
 
     @property
-    def nodes_by_machine(self) -> List[List[Node]]:
+    def nodes_by_machine(self) -> list[list[Node]]:
         """List of lists mapping machine ids to operation nodes.
 
         It may contain nodes that have been removed from the graph.
@@ -103,7 +102,7 @@ class JobShopGraph:
         return self._nodes_by_machine
 
     @property
-    def nodes_by_job(self) -> List[List[Node]]:
+    def nodes_by_job(self) -> list[list[Node]]:
         """List of lists mapping job ids to operation nodes.
 
         It may contain nodes that have been removed from the graph.
@@ -163,11 +162,11 @@ class JobShopGraph:
 
     def add_edge(
         self,
-        u_of_edge: Union[Node, int],
-        v_of_edge: Union[Node, int],
+        u_of_edge: Node | int,
+        v_of_edge: Node | int,
         **attr,
     ) -> None:
-        """Adds an edge to the graph.
+        r"""Adds an edge to the graph.
 
         It automatically determines the edge type based on the source and
         destination nodes unless explicitly provided in the ``attr`` argument
@@ -183,7 +182,7 @@ class JobShopGraph:
                 The destination node of the edge. If it is a :class:`Node`,
                 its ``node_id`` is used as the destination. Otherwise, it
                 is assumed to be the ``node_id`` of the destination.
-            **attr:
+            \**attr:
                 Additional attributes to be added to the edge.
 
         Raises:
@@ -228,7 +227,7 @@ class JobShopGraph:
 
         self.graph.remove_nodes_from(isolated_nodes)
 
-    def is_removed(self, node: Union[int, Node]) -> bool:
+    def is_removed(self, node: int | Node) -> bool:
         """Returns whether the node is removed from the graph.
 
         Args:
@@ -241,7 +240,7 @@ class JobShopGraph:
             node = node.node_id
         return self.removed_nodes[node]
 
-    def non_removed_nodes(self) -> List[Node]:
+    def non_removed_nodes(self) -> list[Node]:
         """Returns the nodes that are not removed from the graph."""
         return [node for node in self._nodes if not self.is_removed(node)]
 

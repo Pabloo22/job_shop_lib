@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "job-shop-lib"
-version = "1.0.1"
+version = "1.1.2"
 description = "An easy-to-use and modular Python library for the Job Shop Scheduling Problem (JSSP)"
 authors = ["Pabloo22 <pablete.arino@gmail.com>"]
 license = "MIT"
@@ -10,12 +10,16 @@ include = ["job_shop_lib/benchmarking/benchmark_instances.json", "job_shop_lib/p
 
 [tool.poetry.dependencies]
 python = "^3.10"
-ortools = "^9.9"
+ortools = [
+    { version = "^9.9", markers = "sys_platform != 'darwin'" },
+    { version = ">=9.9,<9.13", markers = "sys_platform == 'darwin'" }
+]
 matplotlib = "^3"
-pyarrow = "^15.0.0"  # An optional pandas' dependency that will be required in the future
+pyarrow = ">=15,<21"  # An optional pandas' dependency that will be required in the future
 networkx = "^3"
 imageio = {extras = ["ffmpeg"], version = "^2.34.1"}
 pygraphviz = {version = "^1.12", optional = true}
+
 numpy = "^1.26.4"
 gymnasium = "^1.0.0a1"
 
@@ -24,7 +28,7 @@ optional = true
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.0.0"
-pytest-cov = "^4.1.0"
+pytest-cov = ">=4.1,<7.0"
 pytest-mpl = "^0.17.0"
 
 [tool.poetry.group.lint]
@@ -33,7 +37,8 @@ optional = true
 [tool.poetry.group.lint.dependencies]
 flake8 = "^7.0.0"
 mypy = "^1.8.0"
-pydoclint = {extras = ["flake8"], version = "^0.5.9"}
+pydoclint = {extras = ["flake8"], version = ">=0.5.9,<0.7.0"}
+flake8-rst-docstrings = "^0.3.1"
 
 [tool.poetry.group.notebooks]
 optional = true
@@ -43,25 +48,18 @@ ipykernel = "^6.29.2"
 nbconvert = "^7.16.0"
 pandas = "^2.2.1"
 
+[tool.poetry.group.docs]
+optional = true
 
 [tool.poetry.group.docs.dependencies]
-sphinx = "^7.3.7"
+sphinx = ">=7.3.7,<9.0.0"
 furo = "^2024.5.6"
 nbsphinx = "^0.9.4"
 nbsphinx-link = "^1.3.0"
-myst-parser = "^3.0.1"
+myst-parser = ">=3.0.1,<5.0.0"
 pandoc = "^2.3"
 pygments = "^2.18.0"
 ipython = "^8.31.0"
-
-[tool.poetry.group.claude.dependencies]
-anthropic = "^0.31.2"
-python-dotenv = "^1.0.1"
-tavily-python = "^0.3.5"
-pillow = "^10.4.0"
-rich = "^13.7.1"
-aiohttp = "^3.9.5"
-prompt-toolkit = "^3.0.47"
 
 [tool.poetry.extras]
 pygraphviz = ["pygraphviz"]
@@ -86,3 +84,4 @@ filterwarnings = [
     "ignore::DeprecationWarning:google._upb._message:488",
     "ignore::DeprecationWarning:importlib._bootstrap:488"
 ]
+mpl-baseline-path = "tests/visualization/baseline"

@@ -3,7 +3,6 @@
 import collections
 from collections.abc import Iterable
 import itertools
-from typing import Deque, List
 
 from job_shop_lib import Operation, ScheduledOperation
 from job_shop_lib.dispatching import DispatcherObserver, Dispatcher
@@ -19,7 +18,9 @@ class UnscheduledOperationsObserver(DispatcherObserver):
 
     def __init__(self, dispatcher: Dispatcher, *, subscribe: bool = True):
         super().__init__(dispatcher, subscribe=subscribe)
-        self.unscheduled_operations_per_job: List[Deque[Operation]] = []
+        self.unscheduled_operations_per_job: list[
+            collections.deque[Operation]
+        ] = []
         self.reset()
         # In case the dispatcher has already scheduled some operations,
         # we need to remove them.

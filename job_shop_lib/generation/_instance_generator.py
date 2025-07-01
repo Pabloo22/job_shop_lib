@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 
 import random
-from typing import Iterator, Optional, Tuple, Union
+from typing import Iterator
 
 from job_shop_lib import JobShopInstance
 from job_shop_lib.exceptions import UninitializedAttributeError
@@ -52,12 +52,12 @@ class InstanceGenerator(ABC):
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        num_jobs: Union[int, Tuple[int, int]] = (10, 20),
-        num_machines: Union[int, Tuple[int, int]] = (5, 10),
-        duration_range: Tuple[int, int] = (1, 99),
+        num_jobs: int | tuple[int, int] = (10, 20),
+        num_machines: int | tuple[int, int] = (5, 10),
+        duration_range: tuple[int, int] = (1, 99),
         name_suffix: str = "generated_instance",
-        seed: Optional[int] = None,
-        iteration_limit: Optional[int] = None,
+        seed: int | None = None,
+        iteration_limit: int | None = None,
     ):
         if isinstance(num_jobs, int):
             num_jobs = (num_jobs, num_jobs)
@@ -78,8 +78,8 @@ class InstanceGenerator(ABC):
     @abstractmethod
     def generate(
         self,
-        num_jobs: Optional[int] = None,
-        num_machines: Optional[int] = None,
+        num_jobs: int | None = None,
+        num_machines: int | None = None,
     ) -> JobShopInstance:
         """Generates a single job shop instance
 

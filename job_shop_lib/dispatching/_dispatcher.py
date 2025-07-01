@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, TypeVar, List, Optional, Type, Set
+from typing import Any, TypeVar
 from collections.abc import Callable
 from functools import wraps
 
@@ -14,6 +14,37 @@ from job_shop_lib import (
     Operation,
 )
 from job_shop_lib.exceptions import ValidationError
+
+
+# Type alias for start time calculator callable
+StartTimeCalculator = Callable[["Dispatcher", Operation, int], int]
+
+
+def no_setup_time_calculator(
+    dispatcher: Dispatcher, operation: Operation, machine_id: int
+) -> int:
+    """Default start time calculator that implements the standard behavior.
+
+    The start time is the maximum of the next available time for the
+    machine and the next available time for the job to which the
+    operation belongs.
+
+    Args:
+        dispatcher:
+            The dispatcher instance.
+        operation:
+            The operation to be scheduled.
+        machine_id:
+            The id of the machine on which the operation is to be
+            scheduled.
+
+    Returns:
+        The start time for the operation on the given machine.
+    """
+    return max(
+        dispatcher.machine_next_available_time[machine_id],
+        dispatcher.job_next_available_time[operation.job_id],
+    )
 
 
 # Added here to avoid circular imports
@@ -52,7 +83,7 @@ class DispatcherObserver(abc.ABC):
         class HistoryObserver(DispatcherObserver):
             def __init__(self, dispatcher: Dispatcher):
                 super().__init__(dispatcher)
-                self.history: List[ScheduledOperation] = []
+                self.history: list[ScheduledOperation] = []
 
             def update(self, scheduled_operation: ScheduledOperation):
                 self.history.append(scheduled_operation)
@@ -192,6 +223,14 @@ class Dispatcher:
             list of operations as input and return a list of operations
             that are ready to be scheduled. If ``None``, no filtering is
             done.
+        start_time_calculator:
+            A function that calculates the start time for a given operation
+            on a given machine. The function should take a dispatcher, an
+            operation and a machine id as input and return the start time for
+            the operation. Defaults to the standard calculation which is the
+            maximum of the machine's next available time and the job's next
+            available time. This allows for implementing context-dependent
+            setup times, downtime, and machine breakdowns.
     """
 
     __slots__ = {
@@ -204,6 +243,10 @@ class Dispatcher:
             "A function that filters out operations that are not ready to be "
             "scheduled."
         ),
+        "start_time_calculator": (
+            "A function that calculates the start time for a given operation "
+            "on a given machine."
+        ),
         "subscribers": "A list of observers subscribed to the dispatcher.",
         "_cache": "A dictionary to cache the results of the cached methods.",
     }
@@ -212,14 +255,18 @@ class Dispatcher:
         self,
         instance: JobShopInstance,
         ready_operations_filter: (
-            Optional[Callable[[Dispatcher, List[Operation]], List[Operation]]]
+            Callable[[Dispatcher, list[Operation]], list[Operation]] | None
         ) = None,
+        start_time_calculator: StartTimeCalculator = (
+            no_setup_time_calculator
+        ),
     ) -> None:
 
         self.instance = instance
         self.schedule = Schedule(self.instance)
         self.ready_operations_filter = ready_operations_filter
-        self.subscribers: List[DispatcherObserver] = []
+        self.start_time_calculator = start_time_calculator
+        self.subscribers: list[DispatcherObserver] = []
 
         self._machine_next_available_time = [0] * self.instance.num_machines
         self._job_next_operation_index = [0] * self.instance.num_jobs
@@ -233,18 +280,18 @@ class Dispatcher:
         return str(self)
 
     @property
-    def machine_next_available_time(self) -> List[int]:
+    def machine_next_available_time(self) -> list[int]:
         """Returns the next available time for each machine."""
         return self._machine_next_available_time
 
     @property
-    def job_next_operation_index(self) -> List[int]:
+    def job_next_operation_index(self) -> list[int]:
         """Returns the index of the next operation to be scheduled for each
         job."""
         return self._job_next_operation_index
 
     @property
-    def job_next_available_time(self) -> List[int]:
+    def job_next_available_time(self) -> list[int]:
         """Returns the next available time for each job."""
         return self._job_next_available_time
 
@@ -267,7 +314,7 @@ class Dispatcher:
             subscriber.reset()
 
     def dispatch(
-        self, operation: Operation, machine_id: Optional[int] = None
+        self, operation: Operation, machine_id: int | None = None
     ) -> None:
         """Schedules the given operation on the given machine.
 
@@ -285,8 +332,10 @@ class Dispatcher:
                 :attr:`~job_shop_lib.Operation.machine_id` attribute is used.
 
         Raises:
-            ValidationError: If the operation is not ready to be scheduled.
-            UninitializedAttributeError: If the operation has multiple
+            ValidationError:
+                If the operation is not ready to be scheduled.
+            UninitializedAttributeError:
+                If the operation has multiple
                 machines in its list and no ``machine_id`` is provided.
         """
 
@@ -327,7 +376,8 @@ class Dispatcher:
         """Computes the start time for the given operation on the given
         machine.
 
-        The start time is the maximum of the next available time for the
+        Uses the configured start time calculator to compute the start time.
+        By default, this is the maximum of the next available time for the
         machine and the next available time for the job to which the
         operation belongs.
 
@@ -338,10 +388,7 @@ class Dispatcher:
                 The id of the machine on which the operation is to be
                 scheduled.
         """
-        return max(
-            self._machine_next_available_time[machine_id],
-            self._job_next_available_time[operation.job_id],
-        )
+        return self.start_time_calculator(self, operation, machine_id)
 
     def _update_tracking_attributes(
         self, scheduled_operation: ScheduledOperation
@@ -362,11 +409,11 @@ class Dispatcher:
 
     def create_or_get_observer(
         self,
-        observer: Type[ObserverType],
+        observer: type[ObserverType],
         condition: Callable[[DispatcherObserver], bool] = lambda _: True,
         **kwargs,
     ) -> ObserverType:
-        """Creates a new observer of the specified type or returns an existing
+        r"""Creates a new observer of the specified type or returns an existing
         observer of the same type if it already exists in the dispatcher's list
         of observers.
 
@@ -377,7 +424,7 @@ class Dispatcher:
                 A function that takes an observer and returns True if it is
                 the observer to be retrieved. By default, it returns True for
                 all observers.
-            **kwargs:
+            \**kwargs:
                 Additional keyword arguments to be passed to the observer's
                 constructor.
         """
@@ -401,7 +448,7 @@ class Dispatcher:
         current_time = self.min_start_time(available_operations)
         return current_time
 
-    def min_start_time(self, operations: List[Operation]) -> int:
+    def min_start_time(self, operations: list[Operation]) -> int:
         """Returns the minimum start time of the available operations."""
         if not operations:
             return self.schedule.makespan()
@@ -413,7 +460,7 @@ class Dispatcher:
         return int(min_start_time)
 
     @_dispatcher_cache
-    def available_operations(self) -> List[Operation]:
+    def available_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing, optionally
         filtering out operations using the filter function.
 
@@ -433,7 +480,7 @@ class Dispatcher:
         return available_operations
 
     @_dispatcher_cache
-    def raw_ready_operations(self) -> List[Operation]:
+    def raw_ready_operations(self) -> list[Operation]:
         """Returns a list of available operations for processing without
         applying the filter function.
 
@@ -449,7 +496,7 @@ class Dispatcher:
         return available_operations
 
     @_dispatcher_cache
-    def unscheduled_operations(self) -> List[Operation]:
+    def unscheduled_operations(self) -> list[Operation]:
         """Returns the list of operations that have not been scheduled."""
         unscheduled_operations = []
         for job_id, next_position in enumerate(self._job_next_operation_index):
@@ -458,7 +505,7 @@ class Dispatcher:
         return unscheduled_operations
 
     @_dispatcher_cache
-    def scheduled_operations(self) -> List[ScheduledOperation]:
+    def scheduled_operations(self) -> list[ScheduledOperation]:
         """Returns the list of operations that have been scheduled."""
         scheduled_operations = []
         for machine_schedule in self.schedule.schedule:
@@ -466,7 +513,7 @@ class Dispatcher:
         return scheduled_operations
 
     @_dispatcher_cache
-    def available_machines(self) -> List[int]:
+    def available_machines(self) -> list[int]:
         """Returns the list of ready machines."""
         available_operations = self.available_operations()
         available_machines = set()
@@ -475,7 +522,7 @@ class Dispatcher:
         return list(available_machines)
 
     @_dispatcher_cache
-    def available_jobs(self) -> List[int]:
+    def available_jobs(self) -> list[int]:
         """Returns the list of ready jobs."""
         available_operations = self.available_operations()
         available_jobs = set(
@@ -530,7 +577,7 @@ class Dispatcher:
         return scheduled_operation.end_time - adjusted_start_time
 
     @_dispatcher_cache
-    def completed_operations(self) -> Set[ScheduledOperation]:
+    def completed_operations(self) -> set[ScheduledOperation]:
         """Returns the set of operations that have been completed.
 
         This method returns the operations that have been scheduled and the
@@ -542,7 +589,7 @@ class Dispatcher:
         return completed_operations
 
     @_dispatcher_cache
-    def uncompleted_operations(self) -> List[Operation]:
+    def uncompleted_operations(self) -> list[Operation]:
         """Returns the list of operations that have not been completed yet.
 
         This method checks for operations that either haven't been scheduled
@@ -561,7 +608,7 @@ class Dispatcher:
         return uncompleted_operations
 
     @_dispatcher_cache
-    def ongoing_operations(self) -> List[ScheduledOperation]:
+    def ongoing_operations(self) -> list[ScheduledOperation]:
         """Returns the list of operations that are currently being processed.
 
         This method returns the operations that have been scheduled and are

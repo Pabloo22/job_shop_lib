@@ -4,6 +4,7 @@ job shop scheduling problem.
 Currently, the following classes and utilities are available:
 
 .. autosummary::
+    :nosignatures:
 
     GraphUpdater
     ResidualGraphUpdater
@@ -20,7 +21,7 @@ from ._disjunctive_graph_updater import DisjunctiveGraphUpdater
 
 __all__ = [
     "GraphUpdater",
-    "remove_completed_operations",
     "ResidualGraphUpdater",
     "DisjunctiveGraphUpdater",
+    "remove_completed_operations",
 ]

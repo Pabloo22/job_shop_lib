@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 from functools import cached_property
 from typing import Any, List, Union, Dict
-
 import numpy as np
 from numpy.typing import NDArray
 
@@ -13,11 +12,11 @@ from job_shop_lib import Operation
 
 
 class JobShopInstance:
-    """Data structure to store a Job Shop Scheduling Problem instance.
+    r"""Data structure to store a Job Shop Scheduling Problem instance.
 
     Additional attributes such as ``num_machines`` or ``durations_matrix`` can
-    be computed from the instance and are cached for performance if they
-    require expensive computations.
+    be computed from the instance and are cached for performance since they
+    might require expensive computations.
 
     Methods:
 
@@ -51,14 +50,14 @@ class JobShopInstance:
         total_duration
 
     Attributes:
-        jobs (List[List[Operation]]):
+        jobs (list[list[Operation]]):
             A list of lists of operations. Each list of operations represents
             a job, and the operations are ordered by their position in the job.
             The ``job_id``, ``position_in_job``, and ``operation_id``
             attributes of the operations are set when the instance is created.
         name (str):
             A string with the name of the instance.
-        metadata (Dict[str, Any]):
+        metadata (dict[str, Any]):
             A dictionary with additional information about the instance.
 
     Args:
@@ -75,22 +74,22 @@ class JobShopInstance:
             attributes of the operations are set when the instance is created.
             See :meth:`set_operation_attributes` for more information. Defaults
             to True.
-        **metadata:
+        \**metadata:
             Additional information about the instance.
     """
 
     def __init__(
         self,
-        jobs: List[List[Operation]],
+        jobs: list[list[Operation]],
         name: str = "JobShopInstance",
         set_operation_attributes: bool = True,
         **metadata: Any,
     ):
-        self.jobs: List[List[Operation]] = jobs
+        self.jobs: list[list[Operation]] = jobs
         if set_operation_attributes:
             self.set_operation_attributes()
         self.name: str = name
-        self.metadata: Dict[str, Any] = metadata
+        self.metadata: dict[str, Any] = metadata
 
     def set_operation_attributes(self):
         """Sets the ``job_id``, ``position_in_job``, and ``operation_id``
@@ -125,13 +124,13 @@ class JobShopInstance:
     @classmethod
     def from_taillard_file(
         cls,
-        file_path: Union[os.PathLike, str, bytes],
+        file_path: os.PathLike | str | bytes,
         encoding: str = "utf-8",
         comment_symbol: str = "#",
-        name: Union[str, None] = None,
+        name: str | None = None,
         **metadata: Any,
     ) -> JobShopInstance:
-        """Creates a JobShopInstance from a file following Taillard's format.
+        r"""Creates a JobShopInstance from a file following Taillard's format.
 
         Args:
             file_path:
@@ -144,7 +143,7 @@ class JobShopInstance:
             name:
                 A string with the name of the instance. If not provided, the
                 name of the instance is set to the name of the file.
-            **metadata:
+            \**metadata:
                 Additional information about the instance.
 
         Returns:
@@ -178,7 +177,7 @@ class JobShopInstance:
                 name = name.split(".")[0]
         return cls(jobs=jobs, name=name, **metadata)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Returns a dictionary representation of the instance.
 
         This representation is useful for saving the instance to a JSON file,
@@ -186,7 +185,7 @@ class JobShopInstance:
         like Taillard's.
 
         Returns:
-            Dict[str, Any]: The returned dictionary has the following
+            dict[str, Any]: The returned dictionary has the following
             structure:
 
             .. code-block:: python
@@ -208,10 +207,10 @@ class JobShopInstance:
     @classmethod
     def from_matrices(
         cls,
-        duration_matrix: List[List[int]],
-        machines_matrix: List[List[List[int]]] | List[List[int]],
+        duration_matrix: list[list[int]],
+        machines_matrix: list[list[list[int]]] | list[list[int]],
         name: str = "JobShopInstance",
-        metadata: Dict[str, Any] | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> JobShopInstance:
         """Creates a :class:`JobShopInstance` from duration and machines
         matrices.
@@ -221,7 +220,7 @@ class JobShopInstance:
                 A list of lists of integers. The i-th list contains the
                 durations of the operations of the job with id i.
             machines_matrix:
-            A list of lists of lists of integers if the
+                A list of lists of lists of integers if the
                 instance is flexible, or a list of lists of integers if the
                 instance is not flexible. The i-th list contains the machines
                 in which the operations of the job with id i can be processed.
@@ -233,7 +232,7 @@ class JobShopInstance:
         Returns:
             A :class:`JobShopInstance` object.
         """
-        jobs: List[List[Operation]] = [[] for _ in range(len(duration_matrix))]
+        jobs: list[list[Operation]] = [[] for _ in range(len(duration_matrix))]
 
         num_jobs = len(duration_matrix)
         for job_id in range(num_jobs):
@@ -373,16 +372,17 @@ class JobShopInstance:
         machines_matrix = self.machines_matrix
         if self.is_flexible:
             # False positive from mypy, the type of machines_matrix is
-            # List[List[List[int]]] here
+            # list[list[list[int]]] here
             return self._fill_matrix_with_nans_3d(
                 machines_matrix  # type: ignore[arg-type]
             )
 
         # False positive from mypy, the type of machines_matrix is
-        # List[List[int]] here
+        # list[list[int]] here
         return self._fill_matrix_with_nans_2d(
             machines_matrix  # type: ignore[arg-type]
         )
+
 
     @cached_property
     def operations_by_machine(self) -> List[List[Operation]]:
@@ -391,7 +391,7 @@ class JobShopInstance:
         The i-th list contains the operations that can be processed in the
         machine with id i.
         """
-        operations_by_machine: List[List[Operation]] = [
+        operations_by_machine: list[list[Operation]] = [
             [] for _ in range(self.num_machines)
         ]
         for job in self.jobs:
@@ -423,6 +423,7 @@ class JobShopInstance:
 
     @cached_property
     def max_duration_per_machine(self) -> List[int]:
+
         """Returns the maximum duration of each machine in the instance.
 
         The maximum duration of the machine with id i is stored in the i-th
@@ -450,7 +451,8 @@ class JobShopInstance:
         returned list.
         """
         return [sum(op.duration for op in job) for job in self.jobs]
-
+      
+     
     @cached_property
     def machine_loads(self) -> List[int]:
         """Returns the total machine load of each machine in the instance.
@@ -476,7 +478,7 @@ class JobShopInstance:
 
     @staticmethod
     def _fill_matrix_with_nans_2d(
-        matrix: List[List[int]],
+        matrix: list[list[int]],
     ) -> NDArray[np.float32]:
         """Fills a matrix with ``np.nan`` values.
 
@@ -498,7 +500,7 @@ class JobShopInstance:
 
     @staticmethod
     def _fill_matrix_with_nans_3d(
-        matrix: List[List[List[int]]],
+        matrix: list[list[list[int]]],
     ) -> NDArray[np.float32]:
         """Fills a 3D matrix with ``np.nan`` values.
 

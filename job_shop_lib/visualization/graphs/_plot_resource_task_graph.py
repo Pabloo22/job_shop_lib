@@ -10,7 +10,7 @@ all operation nodes from the same job are connected by non-directed edges too.
 
 from collections.abc import Callable
 from copy import deepcopy
-from typing import Optional, Any, Tuple, Dict, Union, List
+from typing import Any
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -22,24 +22,22 @@ from job_shop_lib.graphs import NodeType, JobShopGraph, Node
 def plot_resource_task_graph(
     job_shop_graph: JobShopGraph,
     *,
-    title: Optional[str] = None,
-    figsize: Tuple[int, int] = (10, 10),
-    layout: Optional[Dict[Node, Tuple[float, float]]] = None,
+    title: str | None = None,
+    figsize: tuple[int, int] = (10, 10),
+    layout: dict[Node, tuple[float, float]] | None = None,
     node_size: int = 1200,
     node_font_color: str = "k",
     font_size: int = 10,
     alpha: float = 0.95,
     add_legend: bool = False,
-    node_shapes: Optional[Dict[str, str]] = None,
-    node_color_map: Optional[
-        Callable[[Node], Tuple[float, float, float, float]]
-    ] = None,
-    default_node_color: Union[
-        str, Tuple[float, float, float, float]
-    ] = "lightblue",
+    node_shapes: dict[str, str] | None = None,
+    node_color_map: (
+        Callable[[Node], tuple[float, float, float, float]] | None
+    ) = None,
+    default_node_color: str | tuple[float, float, float, float] = "lightblue",
     machine_color_map_name: str = "tab10",
     legend_text: str = "$p_{ij}$ = duration of $O_{ij}$",
-    edge_additional_params: Optional[Dict[str, Any]] = None,
+    edge_additional_params: dict[str, Any] | None = None,
     draw_only_one_edge: bool = False,
 ) -> plt.Figure:
     """Returns a plot of the hetereogeneous graph of the instance.
@@ -88,7 +86,7 @@ def plot_resource_task_graph(
     """
     if title is None:
         title = (
-            "Heterogeneous Graph Visualization:"
+            "Heterogeneous Graph Visualization: "
             f"{job_shop_graph.instance.name}"
         )
     # Create a new figure and axis
@@ -203,17 +201,17 @@ def _get_node_label(node: Node) -> str:
 
 
 def _color_to_rgba(
-    color: Union[str, Tuple[float, float, float, float]]
-) -> Tuple[float, float, float, float]:
+    color: str | tuple[float, float, float, float],
+) -> tuple[float, float, float, float]:
     if isinstance(color, str):
         return mcolors.to_rgba(color)
     return color
 
 
 def color_nodes_by_machine(
-    machine_colors: Dict[int, Tuple[float, float, float, float]],
-    default_color: Union[str, Tuple[float, float, float, float]],
-) -> Callable[[Node], Tuple[float, float, float, float]]:
+    machine_colors: dict[int, tuple[float, float, float, float]],
+    default_color: str | tuple[float, float, float, float],
+) -> Callable[[Node], tuple[float, float, float, float]]:
     """Returns a function that assigns a color to a node based on its type.
 
     The function returns a color based on the node type. If the node is an
@@ -234,7 +232,7 @@ def color_nodes_by_machine(
         values of the color to use in the plot.
     """
 
-    def _get_node_color(node: Node) -> Tuple[float, float, float, float]:
+    def _get_node_color(node: Node) -> tuple[float, float, float, float]:
         if node.node_type == NodeType.OPERATION:
             return machine_colors[node.operation.machine_id]
         if node.node_type == NodeType.MACHINE:
@@ -252,7 +250,7 @@ def three_columns_layout(
     rightmost_position: float = 0.9,
     topmost_position: float = 1.0,
     bottommost_position: float = 0.0,
-) -> Dict[Node, Tuple[float, float]]:
+) -> dict[Node, tuple[float, float]]:
     """Generates coordinates for a three-column grid layout.
 
     1. Left column: Machine nodes (M1, M2, etc.)
@@ -321,7 +319,7 @@ def three_columns_layout(
     total_positions = len(operation_nodes) + len(global_nodes) * 2
     y_spacing = (topmost_position - bottommost_position) / total_positions
 
-    layout: Dict[Node, Tuple[float, float]] = {}
+    layout: dict[Node, tuple[float, float]] = {}
 
     machines_spacing_multiplier = len(operation_nodes) // len(machine_nodes)
     layout.update(
@@ -364,7 +362,7 @@ def three_columns_layout(
 
 def _get_x_positions(
     leftmost_position: float, rightmost_position: float
-) -> Dict[str, float]:
+) -> dict[str, float]:
     center_position = (
         leftmost_position + (rightmost_position - leftmost_position) / 2
     )
@@ -376,12 +374,12 @@ def _get_x_positions(
 
 
 def _assign_positions_from_top(
-    nodes: List[Node],
+    nodes: list[Node],
     x: float,
     top: float,
     y_spacing: float,
-) -> Dict[Node, Tuple[float, float]]:
-    layout: Dict[Node, Tuple[float, float]] = {}
+) -> dict[Node, tuple[float, float]]:
+    layout: dict[Node, tuple[float, float]] = {}
     for i, node in enumerate(nodes):
         y = top - (i + 1) * y_spacing
         layout[node] = (x, y)

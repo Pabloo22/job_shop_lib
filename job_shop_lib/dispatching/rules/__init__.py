@@ -3,17 +3,19 @@
 Main objects:
 
 .. autosummary::
+    :nosignatures:
 
     DispatchingRuleSolver
-    dispatching_rule_factory
     DispatchingRuleType
-    MachineChooserType
     dispatching_rule_factory
+    MachineChooserType
     machine_chooser_factory
+    MachineChooser
 
 Dispatching rules:
 
 .. autosummary::
+    :nosignatures:
 
     shortest_processing_time_rule
     first_come_first_served_rule
@@ -27,6 +29,7 @@ Dispatching rules:
 Dispatching rule scorers:
 
 .. autosummary::
+    :nosignatures:
 
     shortest_processing_time_score
     first_come_first_served_score
@@ -65,6 +68,11 @@ from ._dispatching_rule_solver import DispatchingRuleSolver
 
 
 __all__ = [
+    "DispatchingRuleSolver",
+    "DispatchingRuleType",
+    "dispatching_rule_factory",
+    "MachineChooserType",
+    "machine_chooser_factory",
     "shortest_processing_time_rule",
     "first_come_first_served_rule",
     "most_work_remaining_rule",
@@ -72,16 +80,11 @@ __all__ = [
     "random_operation_rule",
     "score_based_rule",
     "score_based_rule_with_tie_breaker",
+    "observer_based_most_work_remaining_rule",
     "shortest_processing_time_score",
     "first_come_first_served_score",
     "MostWorkRemainingScorer",
     "most_operations_remaining_score",
     "random_score",
-    "dispatching_rule_factory",
-    "DispatchingRuleType",
-    "MachineChooserType",
-    "machine_chooser_factory",
     "MachineChooser",
-    "DispatchingRuleSolver",
-    "observer_based_most_work_remaining_rule",
 ]

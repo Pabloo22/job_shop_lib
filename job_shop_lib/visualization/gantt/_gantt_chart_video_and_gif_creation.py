@@ -3,7 +3,7 @@
 import os
 import pathlib
 import shutil
-from typing import Sequence, Protocol, Optional, List, Any
+from typing import Sequence, Protocol, Any
 
 import imageio
 import matplotlib.pyplot as plt
@@ -43,9 +43,9 @@ class PartialGanttChartPlotter(Protocol):
     def __call__(
         self,
         schedule: Schedule,
-        makespan: Optional[int] = None,
-        available_operations: Optional[List[Operation]] = None,
-        current_time: Optional[int] = None,
+        makespan: int | None = None,
+        available_operations: list[Operation] | None = None,
+        current_time: int | None = None,
     ) -> Figure:
         """Plots a Gantt chart for an unfinished schedule.
 
@@ -65,19 +65,21 @@ class PartialGanttChartPlotter(Protocol):
 
 
 def get_partial_gantt_chart_plotter(
-    title: Optional[str] = None,
+    title: str | None = None,
     cmap: str = "viridis",
     show_available_operations: bool = False,
     **kwargs: Any,
 ) -> PartialGanttChartPlotter:
-    """Returns a function that plots a Gantt chart for an unfinished schedule.
+    r"""Returns a function that plots a Gantt chart for an unfinished schedule.
 
     Args:
-        title: The title of the Gantt chart.
-        cmap: The name of the colormap to use.
+        title:
+            The title of the Gantt chart.
+        cmap:
+            The name of the colormap to use.
         show_available_operations:
             Whether to show the available operations in the Gantt chart.
-        **kwargs: Additional keyword arguments to pass to the
+        \*\*kwargs: Additional keyword arguments to pass to the
             :func:`plot_gantt_chart` function.
 
     Returns:
@@ -95,9 +97,9 @@ def get_partial_gantt_chart_plotter(
 
     def plot_function(
         schedule: Schedule,
-        makespan: Optional[int] = None,
-        available_operations: Optional[List[Operation]] = None,
-        current_time: Optional[int] = None,
+        makespan: int | None = None,
+        available_operations: list[Operation] | None = None,
+        current_time: int | None = None,
     ) -> Figure:
         fig, ax = plot_gantt_chart(
             schedule, title=title, cmap_name=cmap, xlim=makespan, **kwargs
@@ -136,14 +138,14 @@ def get_partial_gantt_chart_plotter(
 # pylint: disable=too-many-arguments
 def create_gantt_chart_gif(
     instance: JobShopInstance,
-    gif_path: Optional[str] = None,
-    solver: Optional[DispatchingRuleSolver] = None,
-    plot_function: Optional[PartialGanttChartPlotter] = None,
+    gif_path: str | None = None,
+    solver: DispatchingRuleSolver | None = None,
+    plot_function: PartialGanttChartPlotter | None = None,
     fps: int = 1,
     remove_frames: bool = True,
-    frames_dir: Optional[str] = None,
+    frames_dir: str | None = None,
     plot_current_time: bool = True,
-    schedule_history: Optional[Sequence[ScheduledOperation]] = None,
+    schedule_history: Sequence[ScheduledOperation] | None = None,
 ) -> None:
     """Creates a GIF of the schedule being built.
 
@@ -205,14 +207,14 @@ def create_gantt_chart_gif(
 # pylint: disable=too-many-arguments
 def create_gantt_chart_video(
     instance: JobShopInstance,
-    video_path: Optional[str] = None,
-    solver: Optional[DispatchingRuleSolver] = None,
-    plot_function: Optional[PartialGanttChartPlotter] = None,
+    video_path: str | None = None,
+    solver: DispatchingRuleSolver | None = None,
+    plot_function: PartialGanttChartPlotter | None = None,
     fps: int = 1,
     remove_frames: bool = True,
-    frames_dir: Optional[str] = None,
+    frames_dir: str | None = None,
     plot_current_time: bool = True,
-    schedule_history: Optional[Sequence[ScheduledOperation]] = None,
+    schedule_history: Sequence[ScheduledOperation] | None = None,
 ) -> None:
     """Creates a video of the schedule being built.
 
@@ -271,10 +273,10 @@ def create_gantt_chart_video(
 def create_gantt_chart_frames(
     frames_dir: str,
     instance: JobShopInstance,
-    solver: Optional[DispatchingRuleSolver],
+    solver: DispatchingRuleSolver | None,
     plot_function: PartialGanttChartPlotter,
     plot_current_time: bool = True,
-    schedule_history: Optional[Sequence[ScheduledOperation]] = None,
+    schedule_history: Sequence[ScheduledOperation] | None = None,
 ) -> None:
     """Creates frames of the Gantt chart for the schedule being built.
 
@@ -414,7 +416,7 @@ def resize_image_to_macro_block(
     return image
 
 
-def _load_images(frames_dir: str) -> List:
+def _load_images(frames_dir: str) -> list:
     frames = [
         os.path.join(frames_dir, frame)
         for frame in sorted(os.listdir(frames_dir))

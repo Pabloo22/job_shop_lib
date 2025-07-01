@@ -6,6 +6,7 @@
 
 [![Tests](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml/badge.svg)](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml)
 [![Documentation Status](https://readthedocs.org/projects/job-shop-lib/badge/?version=latest)](https://job-shop-lib.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/Pabloo22/job_shop_lib/graph/badge.svg?token=DWXLYJWAOZ)](https://codecov.io/gh/Pabloo22/job_shop_lib)
 ![Python versions](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -26,9 +27,7 @@ See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcoww
 
 <!-- start installation -->
 
-JobShopLib is distributed on [PyPI](https://pypi.org/project/job-shop-lib/) and it supports Python 3.10+.
-
-You can install the latest stable version using `pip`:
+JobShopLib is distributed on [PyPI](https://pypi.org/project/job-shop-lib/). You can install the latest stable version using `pip`:
 
 ```bash
 pip install job-shop-lib
@@ -44,7 +43,7 @@ pip install job-shop-lib
 
 - **Benchmark Instances**: Load well-known benchmark instances directly from the library without manual downloading. See [Load Benchmark Instances](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/05-Load-Benchmark-Instances.ipynb).
 
-- **Random Instance Generation**: Create random instances with customizable sizes and properties or augment existing ones. See [`generation`](job_shop_lib/generation) package.
+- **Random Instance Generation**: Create random instances with customizable sizes and properties. See [`generation`](job_shop_lib/generation) package.
 
 - **Multiple Solvers**:
   - **Constraint Programming Solver**: OR-Tools' CP-SAT solver. See [Solving the Problem](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/02-Solving-the-Problem.ipynb).
@@ -61,6 +60,24 @@ pip install job-shop-lib
 - **Gymnasium Environments**: Two environments for solving the problem with graph neural networks (GNNs) or any other method, and reinforcement learning (RL). See [SingleJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/10-MultiJobShopGraphEnv.ipynb).
 
 <!-- end key features -->
+
+## Publication :scroll:
+
+For an in-depth explanation of the library (v1.0.0), including its design, features, reinforcement learning environments, and some experiments, please refer to my [Bachelor's thesis](https://www.arxiv.org/abs/2506.13781).
+
+You can also cite the library using the following BibTeX entry:
+
+```bibtex
+@misc{arino2025jobshoplib,
+      title={Solving the Job Shop Scheduling Problem with Graph Neural Networks: A Customizable Reinforcement Learning Environment}, 
+      author={Pablo Ariño Fernández},
+      year={2025},
+      eprint={2506.13781},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2506.13781}, 
+}
+```
 
 ## Some Examples :rocket:
 
@@ -110,7 +127,7 @@ The contributions to this benchmark dataset are as follows:
 
 - `orb01-10`: by Applegate and Cook (1991).
 
-- `swb01-20`: by Storer et al. (1992).
+- `swv01-20`: by Storer et al. (1992).
 
 - `yn1-4`: by Yamada and Nakano (1992).
 
@@ -227,7 +244,15 @@ Additionally, the graph includes **disjunctive edges** between operations that u
 ```python
 from job_shop_lib.visualization import plot_disjunctive_graph
 
-fig = plot_disjunctive_graph(instance)
+fig = plot_disjunctive_graph(
+    instance,
+    figsize=(6, 4),
+    draw_disjunctive_edges="single_edge",
+    disjunctive_edges_additional_params={
+        "arrowstyle": "<|-|>",
+        "connectionstyle": "arc3,rad=0.15",
+    },
+)
 plt.show()
 ```
 
@@ -283,9 +308,9 @@ from job_shop_lib.graphs import (
 )
 from job_shop_lib.visualization import plot_resource_task_graph
 
-complete_resource_task_graph = build_complete_resource_task_graph(instance)
+resource_task_graph = build_resource_task_graph(instance)
 
-fig = plot_resource_task_graph(complete_agent_task_graph)
+fig = plot_resource_task_graph(resource_task_graph)
 plt.show()
 ```
 
@@ -298,31 +323,82 @@ plt.show()
 
 The library generalizes this graph by allowing the addition of job nodes and a global one (see `build_resource_task_graph_with_jobs` and `build_resource_task_graph`).
 
-For more details, check the [examples](examples) folder.
+### Gymnasium Environments
 
-## Installation for development
+<div align="center">
+<img src="docs/source/images/rl_diagram.png">
+</div>
+<br>
 
-<!-- start installation development -->
 
-1. Clone the repository.
+The `SingleJobShopGraphEnv` allows to learn from a single job shop instance, while the `MultiJobShopGraphEnv` generates a new instance at each reset. For an in-depth explanation of the environments see chapter 7 of my [Bachelor's thesis](https://www.arxiv.org/abs/2506.13781).
 
-```bash
-git clone https://github.com/Pabloo22/job_shop_lib.git
-cd job_shop_lib
+```python
+from IPython.display import clear_output
+
+from job_shop_lib.reinforcement_learning import (
+    # MakespanReward,
+    SingleJobShopGraphEnv,
+    ObservationSpaceKey,
+    IdleTimeReward,
+    ObservationDict,
+)
+from job_shop_lib.dispatching.feature_observers import (
+    FeatureObserverType,
+    FeatureType,
+)
+from job_shop_lib.dispatching import DispatcherObserverConfig
+
+
+instance = load_benchmark_instance("ft06")
+job_shop_graph = build_disjunctive_graph(instance)
+feature_observer_configs = [
+    DispatcherObserverConfig(
+        FeatureObserverType.IS_READY,
+        kwargs={"feature_types": [FeatureType.JOBS]},
+    )
+]
+
+env = SingleJobShopGraphEnv(
+    job_shop_graph=job_shop_graph,
+    feature_observer_configs=feature_observer_configs,
+    reward_function_config=DispatcherObserverConfig(IdleTimeReward),
+    render_mode="human",  # Try "save_video"
+    render_config={
+        "video_config": {"fps": 4}
+    }
+)
+
+
+def random_action(observation: ObservationDict) -> tuple[int, int]:
+    ready_jobs = []
+    for job_id, is_ready in enumerate(
+        observation[ObservationSpaceKey.JOBS.value].ravel()
+    ):
+        if is_ready == 1.0:
+            ready_jobs.append(job_id)
+
+    job_id = random.choice(ready_jobs)
+    machine_id = -1  # We can use -1 if each operation can only be scheduled
+    # on one machine.
+    return (job_id, machine_id)
+
+
+done = False
+obs, _ = env.reset()
+while not done:
+    action = random_action(obs)
+    obs, reward, done, *_ = env.step(action)
+    if env.render_mode == "human":
+        env.render()
+        clear_output(wait=True)
+
+if env.render_mode == "save_video" or env.render_mode == "save_gif":
+    env.render()
 ```
 
-2. Install [poetry](https://python-poetry.org/docs/) if you don't have it already:
-
-```bash
-pip install poetry
-```
-
-3. Install dependencies:
-```bash
-make poetry_install_all 
-```
-
-<!-- end installation development -->
+## Contributing :handshake:
+Any contribution is welcome, whether it's a small bug or documentation fix or a new feature! See the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute to this project.
 
 ## License :scroll:
 
@@ -359,4 +435,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
  - E. Taillard, "Benchmarks for basic scheduling problems," European
      Journal of Operational Research, vol. 64, no. 2, pp. 278–285, 1993.
 
-- Park, Junyoung, Sanjar Bakhtiyar, and Jinkyoo Park. "ScheduleNet: Learn to solve multi-agent scheduling problems with reinforcement learning." arXiv preprint arXiv:2106.03051, 2021. 
+  - Park, Junyoung, Sanjar Bakhtiyar, and Jinkyoo Park. "ScheduleNet: Learn to solve multi-agent scheduling problems with reinforcement learning." arXiv preprint arXiv:2106.03051, 2021. 

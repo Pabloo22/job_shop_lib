@@ -1,6 +1,5 @@
 """Home of the `IsCompletedObserver` class."""
 
-from typing import Optional, Union, List
 import numpy as np
 
 from job_shop_lib import ScheduledOperation
@@ -40,7 +39,7 @@ class IsCompletedObserver(FeatureObserver):
         self,
         dispatcher: Dispatcher,
         *,
-        feature_types: Optional[Union[List[FeatureType], FeatureType]] = None,
+        feature_types: list[FeatureType] | FeatureType | None = None,
         subscribe: bool = True,
     ):
         feature_types = self._get_feature_types_list(feature_types)
@@ -86,8 +85,7 @@ class IsCompletedObserver(FeatureObserver):
             for op in self.dispatcher.completed_operations():
                 num_completed_ops_per_job[op.operation.job_id] += 1
             self.features[FeatureType.JOBS][:, 0] = (
-                num_completed_ops_per_job
-                == self._num_of_operations_per_job
+                num_completed_ops_per_job == self._num_of_operations_per_job
             ).astype(np.float32)
 
     def reset(self):

@@ -1,5 +1,10 @@
 import pytest
-from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib import (
+    JobShopInstance,
+    Operation,
+    Schedule,
+)
+from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
     MultiJobShopGraphEnv,
@@ -31,15 +36,15 @@ def job_shop_instance():
 
 @pytest.fixture
 def example_job_shop_instance():
-    m1 = 0
-    m2 = 1
-    m3 = 2
+    m0 = 0
+    m1 = 1
+    m2 = 2
 
-    job_1 = [Operation(m1, 1), Operation(m2, 1), Operation(m3, 7)]
-    job_2 = [Operation(m2, 5), Operation(m3, 1), Operation(m1, 1)]
-    job_3 = [Operation(m3, 1), Operation(m1, 3), Operation(m2, 2)]
+    job_0 = [Operation(m0, 1), Operation(m1, 1), Operation(m2, 7)]
+    job_1 = [Operation(m1, 5), Operation(m2, 1), Operation(m0, 1)]
+    job_2 = [Operation(m2, 1), Operation(m0, 3), Operation(m1, 2)]
 
-    jobs = [job_1, job_2, job_3]
+    jobs = [job_0, job_1, job_2]
 
     instance = JobShopInstance(
         jobs,
@@ -96,6 +101,22 @@ def irregular_job_shop_instance():
         name="Irregular",
     )
     return instance
+
+
+@pytest.fixture
+def flexible_job_shop_instance2x2():
+    """Create a simple job shop instance for testing."""
+    jobs = [
+        [
+            Operation(machines=[0, 1], duration=3),
+            Operation(machines=[0, 1], duration=2),
+        ],
+        [
+            Operation(machines=[0, 1], duration=4),
+            Operation(machines=[0, 1], duration=1),
+        ],
+    ]
+    return JobShopInstance(jobs, name="test_instance")
 
 
 @pytest.fixture
@@ -189,3 +210,34 @@ def multi_job_shop_graph_env() -> MultiJobShopGraphEnv:
     )
 
     return env
+
+
+@pytest.fixture
+def example_schedule(  # W0621 = redefined-outer-name
+    example_job_shop_instance: JobShopInstance,  # pylint: disable=W0621
+) -> Schedule:
+    """Creates a simple schedule for testing using DispatchingRuleSolver."""
+    instance = example_job_shop_instance
+    solver = DispatchingRuleSolver()
+    schedule = solver.solve(instance)
+    return schedule
+
+
+@pytest.fixture
+def instance_with_recirculation() -> JobShopInstance:
+    """Create a job shop instance with recirculation."""
+    m0 = 0
+    m1 = 1
+    m2 = 2
+
+    job_0 = [Operation(m0, 1), Operation(m1, 1), Operation(m0, 7)]
+    job_1 = [Operation(m1, 5), Operation(m2, 1), Operation(m1, 1)]
+    job_2 = [Operation(m2, 1), Operation(m0, 3), Operation(m1, 2)]
+
+    jobs = [job_0, job_1, job_2]
+
+    instance = JobShopInstance(
+        jobs,
+        name="Recirculation",
+    )
+    return instance

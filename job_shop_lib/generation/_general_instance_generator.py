@@ -1,7 +1,4 @@
-"""Home of the `BasicGenerator` class."""
-
-from typing import Optional, Tuple, Union
-import random
+import numpy as np
 
 from job_shop_lib import JobShopInstance
 from job_shop_lib.exceptions import ValidationError
@@ -79,17 +76,18 @@ class GeneralInstanceGenerator(InstanceGenerator):
             Maximum number of instances to generate in iteration mode.
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
-        num_jobs: Union[int, Tuple[int, int]] = (10, 20),
-        num_machines: Union[int, Tuple[int, int]] = (5, 10),
-        duration_range: Tuple[int, int] = (1, 99),
+        num_jobs: int | tuple[int, int] = (10, 20),
+        num_machines: int | tuple[int, int] = (5, 10),
+        duration_range: tuple[int, int] = (1, 99),
         allow_less_jobs_than_machines: bool = True,
         allow_recirculation: bool = False,
-        machines_per_operation: Union[int, Tuple[int, int]] = 1,
+        machines_per_operation: int | tuple[int, int] = 1,
         name_suffix: str = "classic_generated_instance",
-        seed: Optional[int] = None,
-        iteration_limit: Optional[int] = None,
+        seed: int | None = None,
+        iteration_limit: int | None = None,
     ):
         super().__init__(
             num_jobs=num_jobs,
@@ -114,8 +112,8 @@ class GeneralInstanceGenerator(InstanceGenerator):
         self.allow_recirculation = allow_recirculation
         self.name_suffix = name_suffix
 
-        if seed is not None:
-            random.seed(seed)
+        # Create a dedicated random number generator instance
+        self.rng = np.random.default_rng(seed)
 
     def __repr__(self) -> str:
         return (
@@ -127,17 +125,23 @@ class GeneralInstanceGenerator(InstanceGenerator):
 
     def generate(
         self,
-        num_jobs: Optional[int] = None,
-        num_machines: Optional[int] = None,
+        num_jobs: int | None = None,
+        num_machines: int | None = None,
     ) -> JobShopInstance:
         if num_jobs is None:
-            num_jobs = random.randint(*self.num_jobs_range)
+            num_jobs = int(
+                self.rng.integers(
+                    self.num_jobs_range[0], self.num_jobs_range[1] + 1
+                )
+            )
 
         if num_machines is None:
             min_num_machines, max_num_machines = self.num_machines_range
             if not self.allow_less_jobs_than_machines:
                 min_num_machines = min(num_jobs, max_num_machines)
-            num_machines = random.randint(min_num_machines, max_num_machines)
+            num_machines = int(
+                self.rng.integers(min_num_machines, max_num_machines + 1)
+            )
         elif (
             not self.allow_less_jobs_than_machines and num_jobs < num_machines
         ):
@@ -147,15 +151,15 @@ class GeneralInstanceGenerator(InstanceGenerator):
             )
 
         duration_matrix = generate_duration_matrix(
-            num_jobs, num_machines, self.duration_range
+            num_jobs, num_machines, self.duration_range, self.rng
         )
         if self.allow_recirculation:
             machine_matrix = generate_machine_matrix_with_recirculation(
-                num_jobs, num_machines
+                num_jobs, num_machines, self.rng
             )
         else:
             machine_matrix = generate_machine_matrix_without_recirculation(
-                num_jobs, num_machines
+                num_jobs, num_machines, self.rng
             )
 
         return JobShopInstance.from_matrices(

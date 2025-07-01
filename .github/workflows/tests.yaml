@@ -12,17 +12,29 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ubuntu-latest, windows-latest]
+        operating-system: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.10", "3.11", "3.12"]
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Install Graphviz
+      run: |
+        if [[ "${{ runner.os }}" == "Linux" ]]; then
+          # Add libgraphviz-dev for headers needed to build pygraphviz
+          sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev
+        elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          brew install graphviz
+        elif [[ "${{ runner.os }}" == "Windows" ]]; then
+          choco install graphviz
+        fi
+      shell: bash
 
     - name: Install dependencies
       run: |
@@ -30,8 +42,11 @@ jobs:
         pip install poetry==1.7
         poetry install --with test
 
-    - name: Run tests
-      run: poetry run pytest -v --cov=job_shop_lib -m "not mpl_image_compare"
+    - name: Run tests and generate coverage report
+      run: poetry run pytest -v --cov=job_shop_lib --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
 
   lint:
 
@@ -39,12 +54,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.11
+        python-version: "3.11"
 
     - name: Install dependencies
       run: |

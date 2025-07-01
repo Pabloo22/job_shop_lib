@@ -1,2 +1,7 @@
 [flake8]
 extend-ignore = E203
+# Tell flake8-rst-docstrings about Sphinx directives/roles
+rst-directives = autosummary,seealso,deprecated,doctest
+rst-roles = class,meth,func,attr
+# Ignore test files for documentation checks
+exclude = tests/*

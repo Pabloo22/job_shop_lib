@@ -1,6 +1,6 @@
 # Contributing to This Project
 
-Thank you for your interest in contributing to our project! We value the contributions of each community member and want to make the contribution process as smooth as possible.
+Thank you for your interest in contributing to our project! I (Pablo Ariño) started this project as part of my bachelor's thesis, which it's already finished. Therefore, this project depends mainly on you, the community, to keep it alive and improve it. I'll do my best to help you with your contributions. Any contribution is welcome, whether it's a small bug or documentation fix or a new feature.
 
 ## Before You Start
 
@@ -10,12 +10,12 @@ Thank you for your interest in contributing to our project! We value the contrib
 ## Development Process
 
 1. Fork the repository
-2. Create a new branch for your feature or bug fix
-3. Make your changes
-4. Write or update tests (we use pytest)
-5. Ensure all tests pass
-6. Run the linting checks
-7. Submit a pull request
+2. Create a new branch for your feature or fix
+3. Make your changes, including writing or updating tests (we use `pytest`)
+4. Ensure all tests pass (`make test`)
+5. Run the linting checks (`make lint`)
+6. Check for issues with the documentation formatting (`make html_docs` and open the generated HTML files in your browser)
+7. Submit a pull request. It must contain a clear description of the changes and reference any related issues
 
 ## Setting Up Your Development Environment
 
@@ -43,23 +43,16 @@ The project includes several helpful commands in the Makefile:
 - `make html_docs` - Generate HTML documentation
 - `make clean_docs` - Clean the documentation build directory
 
-## Testing
-
-- All new features should include appropriate pytest tests
-- Ensure all existing tests pass before submitting your PR
-- Run tests with `pytest` in the project root
-
 ## Code Style
 
-- We use **Black** with line length of 88 characters for code formatting
-- Follow the **Google Style Guide** for docstrings
-- Include docstrings for all new functions and classes
+- We use **Black** with line length of 79 characters for code formatting
+- Include docstrings for all new functions and classes. Follow the [**Google Style Guide**](https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings) for docstrings, but check the existing code's style. Some discrepancies with this guide may exist to comply with `sphinx` (e.g., classes' docstring contain `__init__`'s arguments)
 - Keep your changes focused on the specific issue/feature at hand
 
 ## Pull Request Process
 
-1. Update the README.md or documentation with details of changes if needed
-2. Update the requirements.txt if you've added dependencies
+1. Update the `README.md` or documentation with details of changes if needed
+2. Update the `pyproject.toml` and `poetry.lock` if you've added dependencies
 3. Your PR will be reviewed by maintainers, who may request changes
 4. Once approved, your PR will be merged
 
@@ -74,6 +67,5 @@ If you need assistance or have questions about your contribution, you can:
 
 - Be respectful and inclusive in your interactions
 - Constructive criticism is welcome, but be kind
-- Focus on what is best for the community and project
 
 Thank you for contributing!
