@@ -155,8 +155,8 @@ def test_remove_node(example_job_shop_instance):
     for node_id in nodes_to_remove:
         assert graph.is_removed(node_id)
 
-    with pytest.raises(nx.NetworkXError) as excinfo:
-        # Seeing all edges of removed nodes just returns an empty list, not an error
+    with pytest.raises(nx.NetworkXError):
+        # Seeing all edges of removed nodesreturns an empty list, not an error
         # So we try to access an edge that should not exist
         last_removed_node_id = nodes_to_remove[-1]
         graph.graph.remove_edge(last_removed_node_id, ("SOURCE", 0))
