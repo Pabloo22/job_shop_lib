@@ -21,7 +21,7 @@ imageio = {extras = ["ffmpeg"], version = "^2.34.1"}
 pygraphviz = {version = "^1.12", optional = true}
 
 numpy = ">=1.26.4,<3.0.0"
-gymnasium = "^1.0.0a1"
+gymnasium = "^1.0.0"
 
 [tool.poetry.group.test]
 optional = true
