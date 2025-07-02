@@ -39,11 +39,6 @@ class JobShopGraph:
 
     __slots__ = {
         "instance": "The job shop instance that the graph represents.",
-        "graph": (
-            "The directed graph representing the job shop, where nodes are "
-            "operations, machines, jobs, or abstract concepts like global, "
-            "source, and sink, with edges indicating dependencies."
-        ),
         "_nodes": "List of all nodes added to the graph.",
         "_nodes_map": "Dictionary mapping node tuple ids to Node objects.",
         "_nodes_by_type": "Dictionary mapping node types to lists of nodes.",
@@ -58,12 +53,14 @@ class JobShopGraph:
             "Dictionary mapping node types to a list of boolean values "
             "indicating whether a node has been removed from the graph."
         ),
+        "edge_index_dict": (
+            "Stores graph connectivity, keyed by ('source', 'to', 'dest')."
+        ),
     }
 
     def __init__(
         self, instance: JobShopInstance, add_operation_nodes: bool = True
     ):
-        self.graph = nx.DiGraph()
         self.instance = instance
 
         self._nodes: list[Node] = []
@@ -83,9 +80,33 @@ class JobShopGraph:
         self.removed_nodes: dict[str, list[bool]] = collections.defaultdict(
             list
         )
+        self.edge_index_dict: dict[
+            tuple[str, str, str], list[tuple[str, int] | Node]
+        ] = collections.defaultdict(list)
+
         if add_operation_nodes:
             self.add_operation_nodes()
 
+    @property
+    def graph(self) -> nx.DiGraph:
+        """Constructs and returns a networkx.DiGraph object on-demand.
+
+        The generated graph respects all node removals, containing only the
+        active nodes and the edges between them.
+        """
+        g = nx.DiGraph()
+        # Add only the nodes that have not been removed
+        for node_id, node_obj in self._nodes_map.items():
+            if not self.is_removed(node_id):
+                g.add_node(node_id, **{NODE_ATTR: node_obj})
+
+        # Add edges, ensuring both endpoints are active nodes
+        for edge_type, edge_list in self.edge_index_dict.items():
+            for u, v in edge_list:
+                if not self.is_removed(u) and not self.is_removed(v):
+                    g.add_edge(u.node_id, v.node_id, type=edge_type)
+        return g
+    
     @property
     def nodes(self) -> list[Node]:
         """List of all nodes added to the graph.
@@ -121,7 +142,7 @@ class JobShopGraph:
     @property
     def num_edges(self) -> int:
         """Number of edges in the graph."""
-        return self.graph.number_of_edges()
+        return sum(len(edges) for edges in self.edge_index_dict.values())
 
     @property
     def num_job_nodes(self) -> int:
@@ -160,7 +181,6 @@ class JobShopGraph:
         new_id = (node_type_name, local_id)
 
         node_for_adding.node_id = new_id
-        self.graph.add_node(new_id, **{NODE_ATTR: node_for_adding})
         self._nodes_by_type[node_for_adding.node_type].append(node_for_adding)
         self._nodes.append(node_for_adding)
         self._nodes_map[new_id] = node_for_adding
@@ -200,49 +220,62 @@ class JobShopGraph:
             ValidationError: If ``u_of_edge`` or ``v_of_edge`` are not in the
                 graph.
         """
-        if isinstance(u_of_edge, Node):
-            u_of_edge = u_of_edge.node_id
-        if isinstance(v_of_edge, Node):
-            v_of_edge = v_of_edge.node_id
-        if u_of_edge not in self.graph or v_of_edge not in self.graph:
+        if isinstance(u_of_edge, tuple):
+            u_of_edge = self._nodes_map.get((u_of_edge[0], u_of_edge[1]))
+        if isinstance(v_of_edge, tuple):
+            v_of_edge = self._nodes_map.get((v_of_edge[0], v_of_edge[1]))
+        if u_of_edge is None or v_of_edge is None:
             raise ValidationError(
-                "`u_of_edge` and `v_of_edge` must be in the graph."
+                "`u_of_edge` and `v_of_edge` must have been added to the graph."
             )
         edge_type = attr.pop("type", None)
         if edge_type is None:
-            # Changed: Use _nodes_map for efficient lookup
-            u_node = self._nodes_map[u_of_edge]
-            v_node = self._nodes_map[v_of_edge]
             edge_type = (
-                u_node.node_type.name.lower(),
+                u_of_edge.node_id[0],
                 "to",
-                v_node.node_type.name.lower(),
+                v_of_edge.node_id[0]
             )
-        self.graph.add_edge(u_of_edge, v_of_edge, type=edge_type, **attr)
+        self.edge_index_dict[edge_type].append((u_of_edge, v_of_edge))
 
     def remove_node(self, node_id: tuple[str, int]) -> None:
-        """Removes a node from the graph.
+        """Marks a node as removed and deletes all edges connected to it.
 
-        Args:
-            node_id:
-                The tuple id of the node to remove.
+        This operation can be slow if the graph is large, as it rebuilds
+        the entire edge dictionary.
         """
-        self.graph.remove_node(node_id)
-        # Changed: Update removed_nodes dictionary
+        # First, flag the node as removed so it's consistently marked
         node_type_name, local_id = node_id
         if local_id < len(self.removed_nodes[node_type_name]):
             self.removed_nodes[node_type_name][local_id] = True
-
+        else:
+            return  # Node doesn't exist, nothing to do
+    
+        # Remove all edges connected to the node
+        for edge_type, edge_list in self.edge_index_dict.items():
+            # Only check lists where the node type could possibly appear
+            if not isinstance(edge_type, tuple):
+                self.edge_index_dict[edge_type] = [
+                    (u, v) for u, v in edge_list if u != node_id and v != node_id
+                ]
+            else:
+                if node_type_name in (edge_type[0], edge_type[2]):
+                    self.edge_index_dict[edge_type] = [
+                        (u, v) for u, v in edge_list if u != node_id and v != node_id
+                    ]
+                    
     def remove_isolated_nodes(self) -> None:
         """Removes isolated nodes from the graph."""
-        isolated_nodes = list(nx.isolates(self.graph))
-        for isolated_node_id in isolated_nodes:
-            # Changed: Update removed_nodes dictionary for each isolated node
-            node_type_name, local_id = isolated_node_id
+        active_nodes = {node.node_id for node in self.non_removed_nodes()}
+        nodes_with_edges = set()
+        for edge_list in self.edge_index_dict.values():
+            for u, v in edge_list:
+                nodes_with_edges.add(u.node_id if isinstance(u, Node) else u)
+                nodes_with_edges.add(v.node_id if isinstance(v, Node) else v)
+        isolated_node_ids = active_nodes - nodes_with_edges
+        for node_id in isolated_node_ids:
+            node_type_name, local_id = node_id
             if local_id < len(self.removed_nodes[node_type_name]):
                 self.removed_nodes[node_type_name][local_id] = True
-
-        self.graph.remove_nodes_from(isolated_nodes)
 
     def is_removed(self, node: tuple[str, int] | Node) -> bool:
         """Returns whether the node is removed from the graph.
