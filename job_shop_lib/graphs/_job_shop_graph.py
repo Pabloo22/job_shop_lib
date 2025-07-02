@@ -81,7 +81,7 @@ class JobShopGraph:
             list
         )
         self.edge_index_dict: dict[
-            tuple[str, str, str], list[tuple[str, int] | Node]
+            tuple[str, str, str], list[Node]
         ] = collections.defaultdict(list)
 
         if add_operation_nodes:
@@ -106,7 +106,7 @@ class JobShopGraph:
                 if not self.is_removed(u) and not self.is_removed(v):
                     g.add_edge(u.node_id, v.node_id, type=edge_type)
         return g
-    
+
     @property
     def nodes(self) -> list[Node]:
         """List of all nodes added to the graph.
@@ -221,20 +221,16 @@ class JobShopGraph:
                 graph.
         """
         if isinstance(u_of_edge, tuple):
-            u_of_edge = self._nodes_map.get((u_of_edge[0], u_of_edge[1]))
+            u_of_edge = self._nodes_map.get(u_of_edge)
         if isinstance(v_of_edge, tuple):
-            v_of_edge = self._nodes_map.get((v_of_edge[0], v_of_edge[1]))
+            v_of_edge = self._nodes_map.get(v_of_edge)
         if u_of_edge is None or v_of_edge is None:
             raise ValidationError(
-                "`u_of_edge` and `v_of_edge` must have been added to the graph."
+                "`u_of_edge` and `v_of_edge` mut be in graph."
             )
         edge_type = attr.pop("type", None)
         if edge_type is None:
-            edge_type = (
-                u_of_edge.node_id[0],
-                "to",
-                v_of_edge.node_id[0]
-            )
+            edge_type = (u_of_edge.node_id[0], "to", v_of_edge.node_id[0])
         self.edge_index_dict[edge_type].append((u_of_edge, v_of_edge))
 
     def remove_node(self, node_id: tuple[str, int]) -> None:
@@ -249,20 +245,24 @@ class JobShopGraph:
             self.removed_nodes[node_type_name][local_id] = True
         else:
             return  # Node doesn't exist, nothing to do
-    
+
         # Remove all edges connected to the node
         for edge_type, edge_list in self.edge_index_dict.items():
             # Only check lists where the node type could possibly appear
             if not isinstance(edge_type, tuple):
                 self.edge_index_dict[edge_type] = [
-                    (u, v) for u, v in edge_list if u != node_id and v != node_id
+                    (u, v)
+                    for u, v in edge_list
+                    if u != node_id and v != node_id
                 ]
             else:
                 if node_type_name in (edge_type[0], edge_type[2]):
                     self.edge_index_dict[edge_type] = [
-                        (u, v) for u, v in edge_list if u != node_id and v != node_id
+                        (u, v)
+                        for u, v in edge_list
+                        if u != node_id and v != node_id
                     ]
-                    
+
     def remove_isolated_nodes(self) -> None:
         """Removes isolated nodes from the graph."""
         active_nodes = {node.node_id for node in self.non_removed_nodes()}
