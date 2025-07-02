@@ -40,7 +40,9 @@ class JobShopGraph:
     __slots__ = {
         "instance": "The job shop instance that the graph represents.",
         "_nodes": "List of all nodes added to the graph.",
-        "_nodes_map": "Dictionary mapping node tuple ids to Node objects.",
+        "_nodes_map": (
+            "Dictionary mapping node ids to nodes for quick access."
+        ),
         "_nodes_by_type": "Dictionary mapping node types to lists of nodes.",
         "_nodes_by_machine": (
             "List of lists mapping machine ids to operation nodes."
@@ -80,9 +82,9 @@ class JobShopGraph:
         self.removed_nodes: dict[str, list[bool]] = collections.defaultdict(
             list
         )
-        self.edge_index_dict: dict[
-            tuple[str, str, str], list[Node]
-        ] = collections.defaultdict(list)
+        self.edge_index_dict: dict[tuple[str, str, str], list[Node]] = (
+            collections.defaultdict(list)
+        )
 
         if add_operation_nodes:
             self.add_operation_nodes()
@@ -96,15 +98,15 @@ class JobShopGraph:
         """
         g = nx.DiGraph()
         # Add only the nodes that have not been removed
-        for node_id, node_obj in self._nodes_map.items():
-            if not self.is_removed(node_id):
-                g.add_node(node_id, **{NODE_ATTR: node_obj})
+        for node_obj in self.non_removed_nodes():
+            g.add_node(node_obj.node_id, **{NODE_ATTR: node_obj})
 
-        # Add edges, ensuring both endpoints are active nodes
+        # Add edges as edges from removed nodes are not included
+        # in the graph, as the process of removing nodes also removes
+        # all edges connected to them.
         for edge_type, edge_list in self.edge_index_dict.items():
             for u, v in edge_list:
-                if not self.is_removed(u) and not self.is_removed(v):
-                    g.add_edge(u.node_id, v.node_id, type=edge_type)
+                g.add_edge(u.node_id, v.node_id, type=edge_type)
         return g
 
     @property
