@@ -55,12 +55,19 @@ class JobShopGraph:
             "Dictionary mapping node types to a list of boolean values "
             "indicating whether a node has been removed from the graph."
         ),
-        "adjacency": (
-            "Stores graph adjacency information, mapping nodes to their "
-            "neighbors based on edge types. The keys are either node types "
-            "or tuples of (source_node_type, 'to', destination_node_type), "
-            "and the values are lists of nodes that are connected to the "
-            "key node type or tuple."
+        "adjacency_in": (
+            "Stores graph adjacency information of incoming edges,"
+            "mapping nodes to their neighbors based on edge types. The "
+            "keys are either node types or tuples of (source_node_type, "
+            "'to', destination_node_type), and the values are lists of "   
+            "nodes that are connected to the key node type or tuple."
+        ),
+        "adjacency_out": (
+            "Stores graph adjacency information of outgoing edges,"
+            "mapping nodes to their neighbors based on edge types. The "
+            "keys are either node types or tuples of (source_node_type, "
+            "'to', destination_node_type), and the values are lists of "
+            "nodes that are connected to the key node type or tuple."
         ),
     }
 
@@ -86,8 +93,11 @@ class JobShopGraph:
         self.removed_nodes: dict[str, list[bool]] = collections.defaultdict(
             list
         )
-        self.adjacency: dict[
-            Node, dict[tuple[str, str, str] | NodeType, list[Node]]
+        self.adjacency_in: dict[
+            Node, dict[tuple[str, str, str] | NodeType, set[Node]]
+        ] = {}
+        self.adjacency_out: dict[
+            Node, dict[tuple[str, str, str] | NodeType, set[Node]]
         ] = {}
 
         if add_operation_nodes:
@@ -108,7 +118,7 @@ class JobShopGraph:
         # Add edges as edges from removed nodes are not included
         # in the graph, as the process of removing nodes also removes
         # all edges connected to them.
-        for node, neighbors in self.adjacency.items():
+        for node, neighbors in self.adjacency_out.items():
             for edge_type, neighbor_nodes in neighbors.items():
                 for neighbor in neighbor_nodes:
                     g.add_edge(
@@ -155,8 +165,8 @@ class JobShopGraph:
         """Number of edges in the graph."""
         return sum(
             len(neighbors)
-            for node in self._nodes
-            for neighbors in self.adjacency.get(node, {}).values()
+            for edges_by_type in self.adjacency_out.values()
+            for neighbors in edges_by_type.values()
         )
 
     @property
@@ -208,7 +218,10 @@ class JobShopGraph:
             for machine_id in operation.machines:
                 self._nodes_by_machine[machine_id].append(node_for_adding)
 
-        self.adjacency[node_for_adding] = collections.defaultdict(list)
+        # Initialize adjacency lists for the new node
+        self.adjacency_in[node_for_adding] = collections.defaultdict(set)
+        self.adjacency_out[node_for_adding] = collections.defaultdict(set)
+
 
     def add_edge(
         self,
@@ -252,7 +265,9 @@ class JobShopGraph:
         edge_type = attr.pop("type", None)
         if edge_type is None:
             edge_type = (u_of_edge.node_id[0], "to", v_of_edge.node_id[0])
-        self.adjacency[u_of_edge][edge_type].append(v_of_edge)
+
+        self.adjacency_in[v_of_edge][edge_type].add(u_of_edge)
+        self.adjacency_out[u_of_edge][edge_type].add(v_of_edge)
 
     def remove_node(self, node_id: tuple[str, int]) -> None:
         """Marks a node as removed and deletes all edges connected to it.
@@ -277,48 +292,51 @@ class JobShopGraph:
         node_to_remove = self._nodes_map[node_id]
 
         # 3. Remove all INCOMING edges pointing to the node.
-        #    We must iterate through every node in the graph to check its neighbors.
-        #    Iterate over a copy using .items() to allow for modification.
-        for source_node, edges in self.adjacency.items():
-            for edge_type, neighbors in edges.items():
-                # Rebuild the neighbor list, excluding the node we're removing.
-                # This is safer and often clearer than repeated .remove() calls.
-                self.adjacency[source_node][edge_type] = [
-                    neighbor for neighbor in neighbors if neighbor != node_to_remove
-                ]
+        #    This removes the node's own entry from the adjacency dictionary.
+        out_edges = self.adjacency_out.get(node_to_remove, {})
+        for edge_type, neighbors in out_edges.items():
+            # Remove the node from all neighbors' adjacency lists
+            for neighbor in neighbors:
+                if neighbor in self.adjacency_in:
+                    self.adjacency_in[neighbor].setdefault(
+                        edge_type, set()
+                    ).discard(node_to_remove)
 
         # 4. Remove all OUTGOING edges from the node.
         #    This removes the node's own entry from the adjacency dictionary.
-        if node_to_remove in self.adjacency:
-            del self.adjacency[node_to_remove]
+        in_edges = self.adjacency_in.get(node_to_remove, {})
+        for edge_type, neighbors in in_edges.items():
+            # Remove the node from all neighbors' adjacency lists
+            for neighbor in neighbors:
+                if neighbor in self.adjacency_out:
+                    self.adjacency_out[neighbor].setdefault(
+                        edge_type, set()
+                    ).discard(node_to_remove)
         
         # 5. Finally, remove the node from the quick-access map itself.
-        #del self._nodes_map[node_id]
+        del self.adjacency_in[node_to_remove]
+        del self.adjacency_out[node_to_remove]
 
     def remove_isolated_nodes(self) -> None:
         """Removes isolated nodes from the graph."""
 
-        # Set of all nodes with outgoing edges
-        nodes_with_outgoing = {
-            node
-            for node in self.non_removed_nodes()
-            if any(self.adjacency.get(node, {}).values())
-        }
 
-        # Set of all nodes with incoming edges
-        nodes_with_incoming = set()
-        for neighbors_dict in self.adjacency.values():
-            for neighbor_list in neighbors_dict.values():
-                nodes_with_incoming.update(neighbor_list)
-
-        connected_nodes = nodes_with_outgoing.union(nodes_with_incoming)
-
-        # All nodes not connected at all
-        isolated_nodes = [
-            node.node_id for node in self.non_removed_nodes()
-            if node not in connected_nodes
-        ]
-
+        # get isolated nodes, meaning nodes with no incoming or outgoing edges, for all edge types, meaning only empty lists
+        isolated_nodes = set()
+        for node in self._nodes:
+            cond1 = False
+            cond2 = False
+            if node in self.adjacency_in:
+                cond1 = all(
+                    not neighbors for neighbors in self.adjacency_in[node].values()
+                )
+            if node in self.adjacency_out:
+                cond2 = all(
+                    not neighbors for neighbors in self.adjacency_out[node].values()
+                )
+            if cond1 and cond2:
+                isolated_nodes.add(node.node_id)
+                
         # Remove isolated nodes
         for node in isolated_nodes:
             self.remove_node(node)
