@@ -325,11 +325,9 @@ class JobShopInstance:
             return [
                 [operation.machines for operation in job] for job in self.jobs
             ]
-        else:
-            return [
-                [operation.machine_id for operation in job]
-                for job in self.jobs
-            ]
+        return [
+            [operation.machine_id for operation in job] for job in self.jobs
+        ]
 
     @cached_property
     def durations_matrix_array(self) -> NDArray[np.float32]:
@@ -383,7 +381,6 @@ class JobShopInstance:
             machines_matrix  # type: ignore[arg-type]
         )
 
-
     @cached_property
     def operations_by_machine(self) -> List[List[Operation]]:
         """Returns a list of lists of operations.
@@ -423,7 +420,6 @@ class JobShopInstance:
 
     @cached_property
     def max_duration_per_machine(self) -> List[int]:
-
         """Returns the maximum duration of each machine in the instance.
 
         The maximum duration of the machine with id i is stored in the i-th
@@ -451,8 +447,7 @@ class JobShopInstance:
         returned list.
         """
         return [sum(op.duration for op in job) for job in self.jobs]
-      
-     
+
     @cached_property
     def machine_loads(self) -> List[int]:
         """Returns the total machine load of each machine in the instance.
