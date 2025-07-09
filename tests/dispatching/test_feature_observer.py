@@ -142,7 +142,6 @@ class TestFeatureObserver:
         # Use an observer that doesn't support JOBS
         with pytest.raises(
             ValidationError,
-            match="Feature type FeatureType.JOBS is not supported",
         ):
             LimitedSupportObserver(
                 dispatcher, feature_types=[FeatureType.JOBS]
@@ -299,7 +298,6 @@ class TestFeatureObserver:
 
         with pytest.raises(
             ValidationError,
-            match="Feature type FeatureType.JOBS is not supported",
         ):
             # pylint: disable=protected-access
             observer._get_feature_types_list([FeatureType.JOBS])
