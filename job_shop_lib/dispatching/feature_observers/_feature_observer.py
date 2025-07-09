@@ -92,6 +92,9 @@ class FeatureObserver(DispatcherObserver):
                 feature_type: self._feature_sizes
                 for feature_type in feature_types
             }
+        else:
+            feature_size = self._feature_sizes
+
         super().__init__(dispatcher, subscribe=subscribe)
 
         number_of_entities = {
