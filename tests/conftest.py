@@ -9,7 +9,7 @@ from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
     MultiJobShopGraphEnv,
 )
-from job_shop_lib.dispatching import DispatcherObserverConfig
+from job_shop_lib.dispatching import DispatcherObserverConfig, Dispatcher
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserverType,
     FeatureType,
@@ -52,6 +52,14 @@ def example_job_shop_instance():
         lower_bound=7,
     )
     return instance
+
+
+@pytest.fixture
+def dispatcher(  # pylint: disable=redefined-outer-name
+    example_job_shop_instance: JobShopInstance,
+) -> Dispatcher:
+    """Provides a Dispatcher instance for the example_job_shop_instance."""
+    return Dispatcher(example_job_shop_instance)
 
 
 @pytest.fixture
