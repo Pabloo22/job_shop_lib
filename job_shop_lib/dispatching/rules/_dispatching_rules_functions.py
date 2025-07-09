@@ -136,7 +136,7 @@ def first_come_first_served_score(dispatcher: Dispatcher) -> list[int]:
     num_jobs = dispatcher.instance.num_jobs
     scores = [0] * num_jobs
     for operation in dispatcher.available_operations():
-        scores[operation.job_id] = operation.operation_id
+        scores[operation.job_id] = -operation.operation_id
     return scores
 
 
