@@ -24,6 +24,7 @@ Problem step-by-step.
     get_matrix_setup_time_calculator
     get_breakdown_calculator
     get_job_dependent_setup_calculator
+    get_arrival_calculator
 
 Dispatching refers to the decision-making process of selecting which job
 should be processed next on a particular machine when that machine becomes
@@ -53,6 +54,7 @@ from ._start_time_calculators import (
     get_breakdown_calculator,
     get_job_dependent_setup_calculator,
     get_matrix_setup_time_calculator,
+    get_arrival_calculator,
 )
 from ._dispatcher_observer_config import DispatcherObserverConfig
 from ._factories import (
@@ -84,4 +86,5 @@ __all__ = [
     "get_matrix_setup_time_calculator",
     "get_breakdown_calculator",
     "get_job_dependent_setup_calculator",
+    "get_arrival_calculator",
 ]

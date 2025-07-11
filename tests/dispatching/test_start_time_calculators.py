@@ -8,6 +8,7 @@ from job_shop_lib.dispatching import (
     get_machine_dependent_setup_time_calculator,
     get_breakdown_calculator,
     get_job_dependent_setup_calculator,
+    get_arrival_calculator,
 )
 
 
@@ -228,6 +229,73 @@ def test_get_job_dependent_setup_calculator(
         dispatcher.start_time(job_2_op_1, 0)
         == no_setup_time_calculator(dispatcher, job_2_op_1, 0) + 3
     )
+
+
+def test_get_arrival_calculator(
+    flexible_job_shop_instance2x2: JobShopInstance,
+):
+    """Test the arrival time calculator."""
+
+    # create arrival times matrix
+    arrival_times = [
+        [0, 5],  # Job0: operation0 arrives at 0, operation1 at 5
+        [2, 10],  # Job1: operation0 arrives at 2, operation1 at 10
+    ]
+
+    # Test with the available arrival times matrix
+    arrival_calculator = get_arrival_calculator(arrival_times)
+    dispatcher = Dispatcher(
+        flexible_job_shop_instance2x2, start_time_calculator=arrival_calculator
+    )
+
+    job0_op0 = flexible_job_shop_instance2x2.jobs[0][0]  # job_id=0, pos=0
+    job0_op1 = flexible_job_shop_instance2x2.jobs[0][1]  # job_id=0, pos=1
+    job1_op0 = flexible_job_shop_instance2x2.jobs[1][0]  # job_id=1, pos=0
+    job1_op1 = flexible_job_shop_instance2x2.jobs[1][1]  # job_id=1, pos=1
+
+    # check arrival times are respected
+    assert (
+        dispatcher.start_time(job0_op0, 0) == 0
+    )  # Default=0, arrival=0 -> max=0
+    assert (
+        dispatcher.start_time(job1_op0, 1) == 2
+    )  # Default=0, arrival=2 -> max=2
+    assert (
+        dispatcher.start_time(job0_op1, 0) == 5
+    )  # Default=0, arrival=5 -> max=5
+    assert (
+        dispatcher.start_time(job1_op1, 1) == 10
+    )  # Default=0, arrival=10->max=10
+
+    # Test metadata fallback
+    flexible_job_shop_instance2x2.metadata["arrival_times_matrix"] = (
+        arrival_times
+    )
+    arrival_calculator_meta = get_arrival_calculator(None)
+
+    dispatcher_meta = Dispatcher(
+        flexible_job_shop_instance2x2,
+        start_time_calculator=arrival_calculator_meta,
+    )
+
+    assert dispatcher_meta.start_time(job0_op0, 0) == 0
+    assert dispatcher_meta.start_time(job1_op0, 1) == 2
+
+    # Test no setup behavior
+    del flexible_job_shop_instance2x2.metadata["arrival_times_matrix"]
+    arrival_calculator_none = get_arrival_calculator(None)
+    dispatcher_none = Dispatcher(
+        flexible_job_shop_instance2x2,
+        start_time_calculator=arrival_calculator_none,
+    )
+
+    default_start = no_setup_time_calculator(dispatcher_none, job0_op0, 0)
+    assert dispatcher_none.start_time(job0_op0, 0) == default_start
+
+    # Test max(default_start, arrival_time) behavior
+    dispatcher.dispatch(job0_op0, 0)  # Start at 0, duration=3 → ends at 3
+    default_next = max(3, dispatcher_none.job_next_available_time[0])
+    assert dispatcher.start_time(job0_op1, 0) == max(default_next, 5)
 
 
 if __name__ == "__main__":
