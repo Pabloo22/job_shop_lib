@@ -54,6 +54,7 @@ from ._start_time_calculators import (
     get_breakdown_calculator,
     get_job_dependent_setup_calculator,
     get_matrix_setup_time_calculator,
+    get_arrival_calculator,
 )
 from ._dispatcher_observer_config import DispatcherObserverConfig
 from ._factories import (
