@@ -35,7 +35,23 @@ def first_come_first_served_rule(dispatcher: Dispatcher) -> Operation:
 
 
 def most_work_remaining_rule(dispatcher: Dispatcher) -> Operation:
-    """Dispatches the operation which job has the most remaining work."""
+    """Dispatches the operation which job has the most remaining work.
+
+    The remaining work of a job is defined as the sum of the durations of
+    all unscheduled operations in that job. The operation with the highest
+    remaining work is selected for dispatching. Note that uncompleted
+    but scheduled operations are not considered in this rule, only
+    unscheduled operations are taken into account.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` instance
+            containing the job shop instance and the current state of the
+            schedule.
+
+    Returns:
+        The operation that belongs to the job with the most remaining work.
+    """
     job_remaining_work = [0] * dispatcher.instance.num_jobs
     for operation in dispatcher.unscheduled_operations():
         job_remaining_work[operation.job_id] += operation.duration
@@ -47,7 +63,23 @@ def most_work_remaining_rule(dispatcher: Dispatcher) -> Operation:
 
 
 def most_operations_remaining_rule(dispatcher: Dispatcher) -> Operation:
-    """Dispatches the operation which job has the most remaining operations."""
+    """Dispatches the operation which job has the most remaining operations.
+
+    The remaining operations of a job are defined as the number of
+    uncompleted operations in that job. The operation with the highest
+    number of remaining operations is selected for dispatching. Note that
+    uncompleted but scheduled operations are considered in this rule.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` instance
+            containing the job shop instance and the current state of the
+            schedule.
+
+    Returns:
+        The operation that belongs to the job with the most remaining
+        operations.
+    """
     job_remaining_operations = [0] * dispatcher.instance.num_jobs
     for operation in dispatcher.uncompleted_operations():
         job_remaining_operations[operation.job_id] += 1
@@ -69,7 +101,9 @@ def score_based_rule(
     """Creates a dispatching rule based on a scoring function.
 
     Args:
-        score_function: A function that takes a Dispatcher instance as input
+        score_function:
+            A function that takes a
+            :class:`~job_shop_lib.dispatching.Dispatcher` instance as input
             and returns a list of scores for each job.
 
     Returns:
@@ -97,7 +131,9 @@ def score_based_rule_with_tie_breaker(
     still a tie, the third scoring function is used, and so on.
 
     Args:
-        score_functions: A list of scoring functions that take a Dispatcher
+        score_functions
+            A list of scoring functions that take a
+            :class:`~job_shop_lib.dispatching.Dispatcher`
             instance as input and return a list of scores for each job.
     """
 
@@ -123,7 +159,21 @@ def score_based_rule_with_tie_breaker(
 
 
 def shortest_processing_time_score(dispatcher: Dispatcher) -> list[int]:
-    """Scores each job based on the duration of the next operation."""
+    """Scores each job based on the duration of the next operation.
+
+    The score is the negative duration of the next operation in each job.
+    This means that jobs with shorter next operations will have higher scores.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` instance
+            containing the job shop instance and the current state of the
+            schedule.
+
+    Returns:
+        A list of scores for each job, where the score is the negative
+        duration of the next operation in that job.
+    """
     num_jobs = dispatcher.instance.num_jobs
     scores = [0] * num_jobs
     for operation in dispatcher.available_operations():
@@ -132,11 +182,26 @@ def shortest_processing_time_score(dispatcher: Dispatcher) -> list[int]:
 
 
 def first_come_first_served_score(dispatcher: Dispatcher) -> list[int]:
-    """Scores each job based on the position of the next operation."""
+    """Scores each job based on the position of the next operation.
+
+    The score is the negative position of the next operation in each job.
+    This means that jobs with operations that are earlier in the job will have
+    higher scores.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` instance
+            containing the job shop instance and the current state of the
+            schedule.
+
+    Returns:
+        A list of scores for each job, where the score is the negative
+        position of the next operation in that job.
+    """
     num_jobs = dispatcher.instance.num_jobs
     scores = [0] * num_jobs
     for operation in dispatcher.available_operations():
-        scores[operation.job_id] = operation.operation_id
+        scores[operation.job_id] = -operation.operation_id
     return scores
 
 
@@ -145,8 +210,8 @@ class MostWorkRemainingScorer:  # pylint: disable=too-few-public-methods
 
     This class is conceptually a function: it can be called with a
     :class:`~job_shop_lib.dispatching.Dispatcher` instance as input, and it
-    returns a list of scores for each job. The reason for using a class instead
-    of a function is to cache the observers that are created for each
+    returns a list of scores for each job. The reason for using a class
+    instead of a function is to cache the observers that are created for each
     dispatcher instance. This way, the observers do not have to be retrieved
     every time the function is called.
 
@@ -195,10 +260,26 @@ class MostWorkRemainingScorer:  # pylint: disable=too-few-public-methods
 observer_based_most_work_remaining_rule = score_based_rule(
     MostWorkRemainingScorer()
 )
+"""Dispatching rule that uses the :class:`MostWorkRemainingScorer` to select
+the next operation."""
 
 
 def most_operations_remaining_score(dispatcher: Dispatcher) -> list[int]:
-    """Scores each job based on the remaining operations in the job."""
+    """Scores each job based on the remaining operations in the job.
+
+    The score is the number of uncompleted operations in each job. This means
+    that jobs with more uncompleted operations will have higher scores.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` instance
+            containing the job shop instance and the current state of the
+            schedule.
+
+    Returns:
+        A list of scores for each job, where the score is the number of
+        uncompleted operations in that job.
+    """
     num_jobs = dispatcher.instance.num_jobs
     scores = [0] * num_jobs
     for operation in dispatcher.uncompleted_operations():
@@ -207,7 +288,21 @@ def most_operations_remaining_score(dispatcher: Dispatcher) -> list[int]:
 
 
 def random_score(dispatcher: Dispatcher) -> list[int]:
-    """Scores each job randomly."""
+    """Scores each job randomly.
+
+    This function generates a random score for each job in the job shop
+    instance. The scores are integers between 0 and 100, inclusive.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` instance
+            containing the job shop instance and the current state of the
+            schedule.
+
+    Returns:
+        A list of random scores for each job, where each score is an integer
+        between 0 and 100.
+    """
     return [
         random.randint(0, 100) for _ in range(dispatcher.instance.num_jobs)
     ]
