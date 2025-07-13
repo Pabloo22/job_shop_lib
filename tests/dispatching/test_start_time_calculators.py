@@ -298,5 +298,11 @@ def test_get_arrival_calculator(
     assert dispatcher.start_time(job0_op1, 0) == max(default_next, 5)
 
 
+def test_get_arrival_calculator_machine_ready_time_later_than_arrival(
+    flexible_job_shop_instance2x2: JobShopInstance,
+):
+    """Test the arrival time calculator when machine ready time is later than arrival."""
+
+
 if __name__ == "__main__":
     pytest.main(["-vv", __file__])
