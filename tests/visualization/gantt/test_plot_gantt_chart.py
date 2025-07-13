@@ -1,6 +1,5 @@
 import pytest
 from matplotlib.figure import Figure
-import sys
 import matplotlib
 
 from job_shop_lib import Schedule

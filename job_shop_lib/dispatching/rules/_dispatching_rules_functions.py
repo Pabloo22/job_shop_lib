@@ -24,12 +24,16 @@ def shortest_processing_time_rule(dispatcher: Dispatcher) -> Operation:
         dispatcher.available_operations(),
         key=lambda operation: operation.duration,
     )
+
+
 def largest_processing_time_rule(dispatcher: Dispatcher) -> Operation:
     """Dispatches the operation with the longest duration."""
     return max(
         dispatcher.available_operations(),
         key=lambda operation: operation.duration,
     )
+
+
 def largest_processing_time_score(dispatcher: Dispatcher) -> list[int]:
     """Scores each job based on the duration of the next operation.
 
@@ -51,7 +55,6 @@ def largest_processing_time_score(dispatcher: Dispatcher) -> list[int]:
     for operation in dispatcher.available_operations():
         scores[operation.job_id] = operation.duration
     return scores
-
 
 
 def first_come_first_served_rule(dispatcher: Dispatcher) -> Operation:

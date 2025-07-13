@@ -19,7 +19,7 @@ from job_shop_lib.dispatching.rules import (
     most_work_remaining_rule,
 )
 from job_shop_lib.dispatching.rules._dispatching_rules_functions import (
-    largest_processing_time_rule
+    largest_processing_time_rule,
 )
 
 
@@ -66,7 +66,9 @@ def dispatching_rule_factory(
         DispatchingRuleType.SHORTEST_PROCESSING_TIME: (
             shortest_processing_time_rule
         ),
-        DispatchingRuleType.LARGEST_PROCESSING_TIME: largest_processing_time_rule,
+        DispatchingRuleType.LARGEST_PROCESSING_TIME: (
+            largest_processing_time_rule
+        ),
         DispatchingRuleType.FIRST_COME_FIRST_SERVED: (
             first_come_first_served_rule
         ),
@@ -80,10 +82,11 @@ def dispatching_rule_factory(
     try:
         rule_enum = DispatchingRuleType(dispatching_rule)
     except ValueError:
+        available = ', '.join(r.value for r in DispatchingRuleType)
         raise ValidationError(
-            f"Dispatching rule {dispatching_rule} not recognized. Available "
-            f"dispatching rules: {', '.join(r.value for r in DispatchingRuleType)}."
+            f"Dispatching rule {dispatching_rule} not recognized. "
+            f"Available dispatching rules: {available}."
         )
-
-
-    return dispatching_rules[rule_enum]  # type: ignore[index]       
+    return dispatching_rules[
+        rule_enum
+    ]
