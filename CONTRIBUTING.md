@@ -18,24 +18,30 @@ Thank you for your interest in contributing to our project! I (Pablo Ariño) sta
 7. Submit a pull request. It must contain a clear description of the changes and reference any related issues
 
 ## Commit Messages
-The structure of a commit should nbe the following:
+
+The structure of a commit should be the following:
+
 ```
 [Label] BREAKING CHANGE: Short description under 50 characters (#N)
 
 A more detailed description if needed. This body must begin one blank line after
 the description and should mention the specific changes and the reasoning behind them.
 This body is free-form.
-````
+```
+
 Some considerations:
+
 - "BREAKING CHANGE:" This should be added if the commit contains changes that break the backward compatibility of the code. Introducing
-this type of changes require updating the major version of the libray. This shouldn't be done in the same commit though. Typically,
-major versions will be worked on inside their own branch (i.e, v2.0.0), and once all the changes are made, the major version is updated and the
-changes merged. Don't introduce breaking changes without prior confirmation from a library maintainer.
+  this type of changes require updating the major version of the library. This shouldn't be done in the same commit though. Typically,
+  major versions will be worked on inside their own branch (i.e, v2.0.0), and once all the changes are made, the major version is updated and the
+  changes merged. Don't introduce breaking changes without prior confirmation from a library maintainer.
 - Here, "#N" makes reference to the specific issue that the commit solves. This is important to quickly identify the commits that
-solved a specific issue.
+  solved a specific issue.
 
 ### Commit labels
+
 We prefix commit messages with one the following labels written between brackets:
+
 - "[Feature]": For adding a specific, identifiable part of the code that provides a particular function or capability of the software.
 - "[BugFix]": For commits that solve an error or flaw in the code that causes it to behave in an unintended or incorrect way.
 - "[Refactor]": Refactoring is the process of restructuring existing code, altering its internal structure without changing its external behavior. However, code refactoring aimed to solve linting problems exclusively shouldn't use this label, but "[Lint]".
@@ -45,8 +51,9 @@ We prefix commit messages with one the following labels written between brackets
 - "[Lint]": When addressing problems raised by mypy, flake8, pylint, or other linters. If the change is not an error or a warning raised by a linter, then it's consider refactoring.
 
 If a commit contains changes that may fall in more than one of the above labels, two options are possible:
+
 1. Use the label with the highest priority. The above list of labels is written in order of priority (Feature > BugFix > Refactor > CI > Chore > Docs > Lint). For example, if a commit adds a new function (a feature), it's also expected to contain tests and documentation for it. Thus, in this case, it's recommended to simply use the "[Feature]" label.
-2. Combine two labels using "+". Needing to do this is a sign that changes could be better splitted into two different commits. However, if you consider them to be highly related and want to emphasize that two or more types of changes were made, you can use the "+" to combine more than one feature inside the brackets. For example, if there is a bug with the documentation, it would be reasonable to use "[BugFix + Docs]". Similary, if a bugfix, requires a significant refactoring, "[BugFix + Refactor]" could be used.
+2. Combine two labels using "+". Needing to do this is a sign that changes could be better splitted into two different commits. However, if you consider them to be highly related and want to emphasize that two or more types of changes were made, you can use the "+" to combine more than one feature inside the brackets. For example, if there is a bug with the documentation, it would be reasonable to use "[BugFix + Docs]". Similarly, if a bugfix, requires a significant refactoring, "[BugFix + Refactor]" could be used.
 
 ## Setting Up Your Development Environment
 
