@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import functools
 from typing import Any
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -289,7 +290,7 @@ class JobShopInstance:
         )
 
     @functools.cached_property
-    def durations_matrix(self) -> List[List[int]]:
+    def durations_matrix(self) -> list[list[int]]:
         """Returns the duration matrix of the instance.
 
         The duration of the operation with ``job_id`` i and ``position_in_job``
@@ -304,7 +305,7 @@ class JobShopInstance:
         return [[operation.duration for operation in job] for job in self.jobs]
 
     @functools.cached_property
-    def machines_matrix(self) -> Union[List[List[List[int]]], List[List[int]]]:
+    def machines_matrix(self) -> list[list[list[int]]] | list[list[int]]:
         """Returns the machines matrix of the instance.
 
         If the instance is flexible (i.e., if any operation has more than one
@@ -382,7 +383,7 @@ class JobShopInstance:
         )
 
     @functools.cached_property
-    def operations_by_machine(self) -> List[List[Operation]]:
+    def operations_by_machine(self) -> list[list[Operation]]:
         """Returns a list of lists of operations.
 
         The i-th list contains the operations that can be processed in the
@@ -408,7 +409,7 @@ class JobShopInstance:
         )
 
     @functools.cached_property
-    def max_duration_per_job(self) -> List[float]:
+    def max_duration_per_job(self) -> list[float]:
         """Returns the maximum duration of each job in the instance.
 
         The maximum duration of the job with id i is stored in the i-th
@@ -419,7 +420,7 @@ class JobShopInstance:
         return [max(op.duration for op in job) for job in self.jobs]
 
     @functools.cached_property
-    def max_duration_per_machine(self) -> List[int]:
+    def max_duration_per_machine(self) -> list[int]:
         """Returns the maximum duration of each machine in the instance.
 
         The maximum duration of the machine with id i is stored in the i-th
@@ -438,7 +439,7 @@ class JobShopInstance:
         return max_duration_per_machine
 
     @functools.cached_property
-    def job_durations(self) -> List[int]:
+    def job_durations(self) -> list[int]:
         """Returns a list with the duration of each job in the instance.
 
         The duration of a job is the sum of the durations of its operations.
@@ -449,7 +450,7 @@ class JobShopInstance:
         return [sum(op.duration for op in job) for job in self.jobs]
 
     @functools.cached_property
-    def machine_loads(self) -> List[int]:
+    def machine_loads(self) -> list[int]:
         """Returns the total machine load of each machine in the instance.
 
         The total machine load of a machine is the sum of the durations of the
