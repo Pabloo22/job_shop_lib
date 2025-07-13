@@ -82,10 +82,9 @@ def dispatching_rule_factory(
     try:
         rule_enum = DispatchingRuleType(dispatching_rule)
     except ValueError:
-        available = ', '.join(r.value for r in DispatchingRuleType)
         raise ValidationError(
-            f"Dispatching rule {dispatching_rule} not recognized. "
-            f"Available dispatching rules: {available}."
+            f"Dispatching rule {dispatching_rule} not recognized. Available "
+            f"dispatching rules: {', '.join(dispatching_rules)}."
         )
     return dispatching_rules[
         rule_enum
