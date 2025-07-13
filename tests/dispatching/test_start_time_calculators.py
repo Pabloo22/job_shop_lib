@@ -319,5 +319,31 @@ def test_get_arrival_calculator_machine_ready_time_later_than_arrival(
     assert dispatcher.start_time(job0_op0, 0) == 10
 
 
+def test_get_arrival_calculator_numpy_array(
+    flexible_job_shop_instance2x2: JobShopInstance,
+):
+    """Test that arrival calculator works with NumPy arrays."""
+    import numpy as np
+
+    arrival_times = np.array(
+        [
+            [0, 5],  # Job0: operation0 arrives at 0, operation1 at 5
+            [2, 10],  # Job1: operation0 arrives at 2, operation1 at 10
+        ]
+    )
+
+    arrival_calculator = get_arrival_calculator(arrival_times)
+    dispatcher = Dispatcher(
+        flexible_job_shop_instance2x2, start_time_calculator=arrival_calculator
+    )
+
+    job0_op0 = flexible_job_shop_instance2x2.jobs[0][0]
+    job1_op0 = flexible_job_shop_instance2x2.jobs[1][0]
+
+    # Check arrival times are respected
+    assert dispatcher.start_time(job0_op0, 0) == 0
+    assert dispatcher.start_time(job1_op0, 1) == 2
+
+
 if __name__ == "__main__":
     pytest.main(["-vv", __file__])
