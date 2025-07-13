@@ -219,8 +219,8 @@ def get_arrival_calculator(
     Example:
         >>> arrival_calc = get_arrival_calculator([[0, 2], [1, 0]])
         >>> dispatcher = Dispatcher(
-            instance, start_time_calculator=arrival_calc
-            )
+        ...     instance, start_time_calculator=arrival_calc
+        ... )
     """
 
     def calculator(
