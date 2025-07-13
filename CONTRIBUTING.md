@@ -32,7 +32,7 @@ This body is free-form.
 Some considerations:
 
 - "BREAKING CHANGE:" This should be added if the commit contains changes that break the backward compatibility of the code. Introducing
-  this type of changes require updating the major version of the libray. This shouldn't be done in the same commit though. Typically,
+  this type of changes require updating the major version of the library. This shouldn't be done in the same commit though. Typically,
   major versions will be worked on inside their own branch (i.e, v2.0.0), and once all the changes are made, the major version is updated and the
   changes merged. Don't introduce breaking changes without prior confirmation from a library maintainer.
 - Here, "#N" makes reference to the specific issue that the commit solves. This is important to quickly identify the commits that
