@@ -208,9 +208,10 @@ def get_arrival_calculator(
 
     Args:
         arrival_times:
-            A 2D matrix where ``arrival_times[i][j]`` is the arrival time
-            for the operation at index ``j`` of job ``i``. If ``None``, the
-            calculator will attempt to retrieve it from the dispatcher metadata.
+            A 2D matrix where ``arrival_times[i][j]`` is the
+            arrival time for the operation at index ``j`` of
+            job ``i``. If ``None``, the calculator will
+            attempt to retrieve it from the dispatcher metadata.
 
     Returns:
         A start time calculator function that uses the arrival times.
