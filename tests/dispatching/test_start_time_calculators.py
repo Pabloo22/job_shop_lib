@@ -302,6 +302,21 @@ def test_get_arrival_calculator_machine_ready_time_later_than_arrival(
     flexible_job_shop_instance2x2: JobShopInstance,
 ):
     """Test the arrival time calculator when machine ready time is later than arrival."""
+    arrival_times = [
+        [0, 0],  # Job0: both operations available at time 0
+        [0, 0],  # Job1: both operations available at time 0
+    ]
+    arrival_calculator = get_arrival_calculator(arrival_times)
+    dispatcher = Dispatcher(
+        flexible_job_shop_instance2x2, start_time_calculator=arrival_calculator
+    )
+
+    # Make machine 0 busy until time 10
+    dispatcher.machine_next_available_time[0] = 10
+    job0_op0 = flexible_job_shop_instance2x2.jobs[0][0]
+
+    # Operation arrival=0 but machine ready=10 → start time=10
+    assert dispatcher.start_time(job0_op0, 0) == 10
 
 
 if __name__ == "__main__":
