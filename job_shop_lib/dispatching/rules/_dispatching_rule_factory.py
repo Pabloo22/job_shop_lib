@@ -18,12 +18,16 @@ from job_shop_lib.dispatching.rules import (
     random_operation_rule,
     most_work_remaining_rule,
 )
+from job_shop_lib.dispatching.rules._dispatching_rules_functions import (
+    largest_processing_time_rule
+)
 
 
 class DispatchingRuleType(str, Enum):
     """Enumeration of dispatching rules for the job shop scheduling problem."""
 
     SHORTEST_PROCESSING_TIME = "shortest_processing_time"
+    LARGEST_PROCESSING_TIME = "largest_processing_time"
     FIRST_COME_FIRST_SERVED = "first_come_first_served"
     MOST_WORK_REMAINING = "most_work_remaining"
     MOST_OPERATIONS_REMAINING = "most_operations_remaining"
@@ -62,6 +66,7 @@ def dispatching_rule_factory(
         DispatchingRuleType.SHORTEST_PROCESSING_TIME: (
             shortest_processing_time_rule
         ),
+        DispatchingRuleType.LARGEST_PROCESSING_TIME: largest_processing_time_rule,
         DispatchingRuleType.FIRST_COME_FIRST_SERVED: (
             first_come_first_served_rule
         ),
@@ -72,11 +77,13 @@ def dispatching_rule_factory(
         DispatchingRuleType.RANDOM: random_operation_rule,
     }
 
-    dispatching_rule = dispatching_rule.lower()
-    if dispatching_rule not in dispatching_rules:
+    try:
+        rule_enum = DispatchingRuleType(dispatching_rule)
+    except ValueError:
         raise ValidationError(
             f"Dispatching rule {dispatching_rule} not recognized. Available "
-            f"dispatching rules: {', '.join(dispatching_rules)}."
+            f"dispatching rules: {', '.join(r.value for r in DispatchingRuleType)}."
         )
 
-    return dispatching_rules[dispatching_rule]  # type: ignore[index]
+
+    return dispatching_rules[rule_enum]  # type: ignore[index]       

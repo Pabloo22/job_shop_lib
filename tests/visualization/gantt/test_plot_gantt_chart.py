@@ -1,9 +1,19 @@
 import pytest
 from matplotlib.figure import Figure
+import sys
+import matplotlib
 
 from job_shop_lib import Schedule
 from job_shop_lib.visualization.gantt import plot_gantt_chart
 
+# Skip all tests in this file if Tkinter is missing
+try:
+    import tkinter
+except ImportError:
+    pytest.skip("Tkinter is not available, skipping plot tests.", allow_module_level=True)
+
+
+matplotlib.use("Agg")
 
 @pytest.mark.mpl_image_compare(
     style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}

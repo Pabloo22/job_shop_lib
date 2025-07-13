@@ -24,6 +24,34 @@ def shortest_processing_time_rule(dispatcher: Dispatcher) -> Operation:
         dispatcher.available_operations(),
         key=lambda operation: operation.duration,
     )
+def largest_processing_time_rule(dispatcher: Dispatcher) -> Operation:
+    """Dispatches the operation with the longest duration."""
+    return max(
+        dispatcher.available_operations(),
+        key=lambda operation: operation.duration,
+    )
+def largest_processing_time_score(dispatcher: Dispatcher) -> list[int]:
+    """Scores each job based on the duration of the next operation.
+
+    The score is the duration of the next operation in each job.
+    Jobs with longer next operations will have higher scores.
+
+    Args:
+        dispatcher:
+            The :class:`~job_shop_lib.dispatching.Dispatcher` instance
+            containing the job shop instance and the current state of the
+            schedule.
+
+    Returns:
+        A list of scores for each job, where the score is the duration of
+        the next operation in that job.
+    """
+    num_jobs = dispatcher.instance.num_jobs
+    scores = [0] * num_jobs
+    for operation in dispatcher.available_operations():
+        scores[operation.job_id] = operation.duration
+    return scores
+
 
 
 def first_come_first_served_rule(dispatcher: Dispatcher) -> Operation:
