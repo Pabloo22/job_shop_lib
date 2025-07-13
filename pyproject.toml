@@ -19,7 +19,6 @@ pyarrow = ">=15,<21"  # An optional pandas' dependency that will be required in 
 networkx = "^3"
 imageio = {extras = ["ffmpeg"], version = "^2.34.1"}
 pygraphviz = {version = "^1.12", optional = true}
-
 numpy = ">=1.26.4,<3.0.0"
 gymnasium = "^1.0.0"
 
