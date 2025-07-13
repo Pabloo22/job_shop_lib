@@ -293,9 +293,9 @@ def test_get_arrival_calculator(
     assert dispatcher_none.start_time(job0_op0, 0) == default_start
 
     # Test max(default_start, arrival_time) behavior
-    dispatcher.dispatch(job0_op0, 0)  # Start at 0, duration=3 → ends at 3
+    dispatcher_none.dispatch(job0_op0, 0)  # Start at 0, duration=3 → ends at 3
     default_next = max(3, dispatcher_none.job_next_available_time[0])
-    assert dispatcher.start_time(job0_op1, 0) == max(default_next, 5)
+    assert dispatcher_none.start_time(job0_op1, 0) == max(default_next, 5)
 
 
 def test_get_arrival_calculator_machine_ready_time_later_than_arrival(
