@@ -64,7 +64,7 @@ ipython = "^8.31.0"
 pygraphviz = ["pygraphviz"]
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core==1.8.2"]  # Enforces specific Poetry version
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
