@@ -209,8 +209,10 @@ def get_arrival_calculator(
     Args:
         arrival_times:
             A 2D matrix where arrival_times[i][j] is the arrival time
-            for operation ``i`` on machine ``j``. If None, it defaults to
-            no setup time.
+            for operation ``i`` on machine ``j``. If `None`, it defaults to
+            ignoring arrival time constraints if the matrix cannot be found
+            in the dispatcher instance metadata `dispatcher.instance
+            .metadata["arrival_times_matrix"]`.
 
     Returns:
         A start time calculator function that uses the arrival times.
