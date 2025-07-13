@@ -200,11 +200,10 @@ def get_arrival_calculator(
 ) -> StartTimeCalculator:
     """Returns a start time calculator that respects operation arrival times.
 
-    This calculator uses a predefined matrix of arrival times to make sure
-    that no operation can start before its arrival time on a machine. If the
-    arrival_time matrix is not provided, it defaults to the a key argument of
-    the "arrival_times_matrix" in the instance metadata retrieved from the
-    dispatcher instance.
+    This calculator uses a predefined matrix of arrival times to ensures that
+    no operation begins before its specified arrival time. If the ``arrival_times``
+    matrix isn't provided directly, the calculator attempts to retrieve it from
+    the dispatcher's instance metadata using the key ``"arrival_times_matrix"``.
 
     Args:
         arrival_times:
