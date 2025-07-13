@@ -230,14 +230,14 @@ def get_arrival_calculator(
         default_start_time = no_setup_time_calculator(
             dispatcher, operation, machine_id
         )
-        arrivalMatrix = arrival_times
-        if arrivalMatrix is None:
-            arrivalMatrix = dispatcher.instance.metadata.get(
+        arrival_matrix = arrival_times
+        if arrival_matrix is None:
+            arrival_matrix = dispatcher.instance.metadata.get(
                 "arrival_times_matrix"
             )
-        if arrivalMatrix is None:
+        if arrival_matrix is None:
             return default_start_time
-        operation_arrival_time = arrivalMatrix[operation.job_id][
+        operation_arrival_time = arrival_matrix[operation.job_id][
             operation.position_in_job
         ]
         return max(default_start_time, operation_arrival_time)
