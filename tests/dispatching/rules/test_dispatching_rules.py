@@ -10,7 +10,7 @@ from job_shop_lib.dispatching.feature_observers import (
     FeatureType,
     IsReadyObserver,
 )
-from job_shop_lib.dispatching.rules._dispatching_rules_functions import (
+from job_shop_lib.dispatching.rules import (
     first_come_first_served_rule,
     most_operations_remaining_rule,
     most_work_remaining_rule,
