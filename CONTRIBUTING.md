@@ -53,7 +53,7 @@ We prefix commit messages with one the following labels written between brackets
 If a commit contains changes that may fall in more than one of the above labels, two options are possible:
 
 1. Use the label with the highest priority. The above list of labels is written in order of priority (Feature > BugFix > Refactor > CI > Chore > Docs > Lint). For example, if a commit adds a new function (a feature), it's also expected to contain tests and documentation for it. Thus, in this case, it's recommended to simply use the "[Feature]" label.
-2. Combine two labels using "+". Needing to do this is a sign that changes could be better splitted into two different commits. However, if you consider them to be highly related and want to emphasize that two or more types of changes were made, you can use the "+" to combine more than one feature inside the brackets. For example, if there is a bug with the documentation, it would be reasonable to use "[BugFix + Docs]". Similary, if a bugfix, requires a significant refactoring, "[BugFix + Refactor]" could be used.
+2. Combine two labels using "+". Needing to do this is a sign that changes could be better splitted into two different commits. However, if you consider them to be highly related and want to emphasize that two or more types of changes were made, you can use the "+" to combine more than one feature inside the brackets. For example, if there is a bug with the documentation, it would be reasonable to use "[BugFix + Docs]". Similarly, if a bugfix, requires a significant refactoring, "[BugFix + Refactor]" could be used.
 
 ## Setting Up Your Development Environment
 
