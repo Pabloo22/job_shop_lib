@@ -89,7 +89,9 @@ class ORToolsSolver(BaseSolver):
         """
         # Re-defined here since we already add metadata to the schedule in
         # the solve method.
-        return self.solve(instance)
+        return self.solve(
+            instance, arrival_times=arrival_times, deadlines=deadlines
+        )
 
     def solve(self, instance: JobShopInstance) -> Schedule:
         """Creates the variables, constraints and objective, and solves the
