@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Sequence
 import time
 
 from ortools.sat.python import cp_model
@@ -64,7 +64,12 @@ class ORToolsSolver(BaseSolver):
         self.solver = cp_model.CpSolver()
         self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
 
-    def __call__(self, instance: JobShopInstance) -> Schedule:
+    def __call__(
+        self,
+        instance: JobShopInstance,
+        arrival_times: Sequence[Sequence[int]] | None = None,
+        deadlines: Sequence[Sequence[int]] | None = None,
+    ) -> Schedule:
         """Equivalent to calling the :meth:`~ORToolsSolver.solve` method.
 
         This method is necessary because, in JobShopLib, solvers are defined
