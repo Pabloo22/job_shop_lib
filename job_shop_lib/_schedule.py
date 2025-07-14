@@ -307,3 +307,11 @@ class Schedule:
             return False
 
         return self.schedule == value.schedule
+
+    def copy(self) -> Schedule:
+        """Returns a copy of the schedule."""
+        return Schedule(
+            self.instance,
+            [machine_schedule.copy() for machine_schedule in self.schedule],
+            **self.metadata,
+        )
