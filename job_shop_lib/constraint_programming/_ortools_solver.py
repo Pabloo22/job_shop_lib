@@ -142,7 +142,12 @@ class ORToolsSolver(BaseSolver):
         }
         return self._create_schedule(instance, metadata)
 
-    def _initialize_model(self, instance: JobShopInstance):
+    def _initialize_model(
+        self,
+        instance: JobShopInstance,
+        arrival_times: Sequence[Sequence[int]] | None = None,
+        deadlines: Sequence[Sequence[int]] | None = None,
+    ):
         """Initializes the model with variables, constraints and objective.
 
         The model is initialized with two variables for each operation: start
@@ -161,7 +166,9 @@ class ORToolsSolver(BaseSolver):
             self.solver.parameters.max_time_in_seconds = (
                 self.max_time_in_seconds
             )
-        self._create_variables(instance)
+        self._create_variables(
+            instance, arrival_times=arrival_times, deadlines=deadlines
+        )
         self._add_constraints(instance)
         self._set_objective(instance)
 
