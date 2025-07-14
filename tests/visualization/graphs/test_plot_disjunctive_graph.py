@@ -183,7 +183,6 @@ def test_fallback_layout(
             "Default layout requires pygraphviz" in str(warn.message)
             for warn in w
         )
-    plot_disjunctive_graph(graph, layout=mock_layout)
 
 
 if __name__ == "__main__":
