@@ -1,6 +1,7 @@
 import pytest
 from job_shop_lib import Schedule, ScheduledOperation, JobShopInstance
 from job_shop_lib.exceptions import ValidationError
+from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.rules import (
     DispatchingRuleSolver,
     DispatchingRuleType,
@@ -67,7 +68,9 @@ def test_from_job_sequences_2(
                 scheduled_operation.operation.job_id
             )
 
-    schedule = Schedule.from_job_sequences(instance, job_sequences)
+    schedule = Schedule.from_job_sequences(
+        instance, job_sequences, dispatcher=Dispatcher(instance=instance)
+    )
     assert schedule == expected_schedule
 
 
