@@ -210,15 +210,35 @@ class ORToolsSolver(BaseSolver):
             instance=instance, schedule=sorted_schedule, **metadata
         )
 
-    def _create_variables(self, instance: JobShopInstance):
+    def _create_variables(
+        self,
+        instance: JobShopInstance,
+        arrival_times: Sequence[Sequence[int]] | None = None,
+        deadlines: Sequence[Sequence[int]] | None = None,
+    ):
         """Creates two variables for each operation: start and end time."""
         for job in instance.jobs:
             for operation in job:
+                # Initial Niave Bounds
+                lower_bound = 0
+                upper_bound = instance.total_duration
+
+                if arrival_times is not None:
+                    lower_bound = arrival_times[operation.job_id][
+                        operation.position_in_job
+                    ]
+
+                if deadlines is not None:
+                    op_deadline = deadlines[operation.job_id][
+                        operation.position_in_job
+                    ]
+                    upper_bound = op_deadline
+
                 start_var = self.model.NewIntVar(
-                    0, instance.total_duration, f"start_{operation}"
+                    lower_bound, upper_bound, f"start_{operation}"
                 )
                 end_var = self.model.NewIntVar(
-                    0, instance.total_duration, f"end_{operation}"
+                    lower_bound, upper_bound, f"end_{operation}"
                 )
                 self._operations_start[operation] = (start_var, end_var)
                 self.model.Add(end_var == start_var + operation.duration)
