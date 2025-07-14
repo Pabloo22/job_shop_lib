@@ -93,7 +93,12 @@ class ORToolsSolver(BaseSolver):
             instance, arrival_times=arrival_times, deadlines=deadlines
         )
 
-    def solve(self, instance: JobShopInstance) -> Schedule:
+    def solve(
+        self,
+        instance: JobShopInstance,
+        arrival_times: Sequence[Sequence[int]] | None = None,
+        deadlines: Sequence[Sequence[int]] | None = None,
+    ) -> Schedule:
         """Creates the variables, constraints and objective, and solves the
         problem.
 
