@@ -61,10 +61,6 @@ pandoc = "^2.3"
 pygments = "^2.18.0"
 ipython = "^8.31.0"
 
-
-[tool.poetry.group.dev.dependencies]
-black = "^25.1.0"
-
 [tool.poetry.extras]
 pygraphviz = ["pygraphviz"]
 
