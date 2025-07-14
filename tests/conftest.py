@@ -3,6 +3,7 @@ from job_shop_lib import (
     JobShopInstance,
     Operation,
     Schedule,
+    ScheduledOperation,
 )
 from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 from job_shop_lib.reinforcement_learning import (
@@ -24,8 +25,8 @@ from job_shop_lib.graphs import (
 from job_shop_lib.benchmarking import load_benchmark_instance
 
 
-@pytest.fixture
-def job_shop_instance():
+@pytest.fixture(name="job_shop_instance")
+def job_shop_instance_fixture():
     jobs = [
         [Operation(0, 10), Operation(1, 20)],
         [Operation(1, 15), Operation(2, 10)],
@@ -259,3 +260,25 @@ def minimal_infeasible_instance():
         [Operation(0, 10)],  # Another operation on same machine
     ]
     return JobShopInstance(jobs, name="MinimalInfeasible")
+
+
+@pytest.fixture(name="complete_schedule")
+def complete_schedule_fixture(job_shop_instance):
+    schedule = Schedule(instance=job_shop_instance, check=True)
+    operations = [
+        ScheduledOperation(
+            job_shop_instance.jobs[0][0], start_time=0, machine_id=0
+        ),
+        ScheduledOperation(
+            job_shop_instance.jobs[0][1], start_time=0, machine_id=1
+        ),
+        ScheduledOperation(
+            job_shop_instance.jobs[1][0], start_time=100, machine_id=1
+        ),
+        ScheduledOperation(
+            job_shop_instance.jobs[1][1], start_time=100, machine_id=2
+        ),
+    ]
+    for op in operations:
+        schedule.add(op)
+    return schedule
