@@ -25,8 +25,8 @@ from job_shop_lib.dispatching.rules import (
     random_score,
     largest_processing_time_rule,
     largest_processing_time_score,
+    dispatching_rule_factory,
 )
-from job_shop_lib.dispatching.rules._dispatching_rule_factory import dispatching_rule_factory
 
 
 def test_shortest_processing_time_rule(dispatcher: Dispatcher):
@@ -196,7 +196,6 @@ def test_largest_processing_time_score(dispatcher: Dispatcher):
     for operation in dispatcher.available_operations():
         expected_scores[operation.job_id] = operation.duration
     assert scores == expected_scores
-
 
 
 def test_largest_processing_time_rule_factory():
