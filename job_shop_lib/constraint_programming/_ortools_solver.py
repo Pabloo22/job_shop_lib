@@ -119,7 +119,9 @@ class ORToolsSolver(BaseSolver):
                 If no solution could be found for the given problem within the
                 time limit.
         """
-        self._initialize_model(instance)
+        self._initialize_model(
+            instance, arrival_times=arrival_times, deadlines=deadlines
+        )
 
         start_time = time.perf_counter()
         status = self.solver.Solve(self.model)
