@@ -86,3 +86,14 @@ def test_solver_with_arrival_times_and_deadlines(example_job_shop_instance):
 
 def test_infeasible_constraints(minimal_infeasible_instance):
     """Tests the CP Solver raises an error for infeasible constraints."""
+    arrival_times = [[0], [0]]
+    deadlines = [[5], [5]]
+
+    solver = ORToolsSolver()
+
+    with pytest.raises(NoSolutionFoundError):
+        solver.solve(
+            minimal_infeasible_instance,
+            arrival_times=arrival_times,
+            deadlines=deadlines,
+        )
