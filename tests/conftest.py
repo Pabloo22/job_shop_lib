@@ -249,3 +249,13 @@ def instance_with_recirculation() -> JobShopInstance:
         name="Recirculation",
     )
     return instance
+
+
+@pytest.fixture
+def minimal_infeasible_instance():
+    """Creates a minimal instance that's infeasible with tight constraints."""
+    jobs = [
+        [Operation(0, 10)],  # Operation takes 10 time units
+        [Operation(0, 10)],  # Another operation on same machine
+    ]
+    return JobShopInstance(jobs, name="MinimalInfeasible")
