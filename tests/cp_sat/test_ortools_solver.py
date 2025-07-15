@@ -40,3 +40,12 @@ def test_solver_with_arrival_times(example_job_shop_instance):
             assert (
                 scheduled_op.start_time >= arrival_times[job_index][op_index]
             )
+
+
+def test_solver_with_deadlines(example_job_shop_instance):
+    """Tests the CP Solver correctly handles deadlines constraints."""
+    deadlines = [
+        [10, 15, 20],  # Job 0 operations
+        [8, 12, 15],  # Job 1 operations
+        [5, 10, 15],  # Job 2 operations
+    ]
