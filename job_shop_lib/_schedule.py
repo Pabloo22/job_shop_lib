@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
 from collections import deque
 
 from job_shop_lib import ScheduledOperation, JobShopInstance
 from job_shop_lib.exceptions import ValidationError
+
+if TYPE_CHECKING:
+    from job_shop_lib.dispatching import Dispatcher
 
 
 class Schedule:
@@ -148,6 +151,7 @@ class Schedule:
     def from_job_sequences(
         instance: JobShopInstance,
         job_sequences: list[list[int]],
+        dispatcher: Dispatcher | None = None,
     ) -> Schedule:
         """Creates an active schedule from a list of job sequences.
 
@@ -163,13 +167,27 @@ class Schedule:
                 A list of lists of job ids. Each list of job ids represents the
                 order of operations on the machine. The machine that the list
                 corresponds to is determined by the index of the list.
+            dispatcher:
+                A :class:`~job_shop_lib.dispatching.Dispatcher` to use for
+                scheduling. If not provided, a new dispatcher will be
+                created.
+
+                .. note::
+                    You will need to provide a dispatcher if you want to
+                    take into account start time calculators different from
+                    the default one.
 
         Returns:
             A :class:`Schedule` object with the given job sequences.
+
+        .. seealso::
+            See :mod:`job_shop_lib.dispatching` for more information
+            about dispatchers and the start time calculators available.
         """
         from job_shop_lib.dispatching import Dispatcher
 
-        dispatcher = Dispatcher(instance)
+        if dispatcher is None:
+            dispatcher = Dispatcher(instance)
         dispatcher.reset()
         raw_solution_deques = [deque(job_ids) for job_ids in job_sequences]
 
@@ -307,3 +325,11 @@ class Schedule:
             return False
 
         return self.schedule == value.schedule
+
+    def copy(self) -> Schedule:
+        """Returns a copy of the schedule."""
+        return Schedule(
+            self.instance,
+            [machine_schedule.copy() for machine_schedule in self.schedule],
+            **self.metadata,
+        )

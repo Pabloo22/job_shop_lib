@@ -193,3 +193,52 @@ def get_job_dependent_setup_calculator(
         return default_start + setup_time
 
     return calculator
+
+
+def get_arrival_calculator(
+    arrival_times: Sequence[Sequence[int]] | NDArray[np.integer] | None = None,
+) -> StartTimeCalculator:
+    """Returns a start time calculator that respects operation arrival times.
+
+    This calculator uses a predefined matrix of arrival times to
+    ensure that no operation begins before its specified arrival
+    time. If the ``arrival_times`` matrix isn't provided directly,
+    the calculator attempts to retrieve it from the dispatcher's
+    instance metadata using the key ``"arrival_times_matrix"``.
+
+    Args:
+        arrival_times:
+            A 2D matrix where ``arrival_times[i][j]`` is the
+            arrival time for the operation at index ``j`` of
+            job ``i``. If ``None``, the calculator will
+            attempt to retrieve it from the dispatcher metadata.
+
+    Returns:
+        A start time calculator function that uses the arrival times.
+
+    Example:
+        >>> arrival_calc = get_arrival_calculator([[0, 2], [1, 0]])
+        >>> dispatcher = Dispatcher(
+        ...     instance, start_time_calculator=arrival_calc
+        ... )
+    """
+
+    def calculator(
+        dispatcher: Dispatcher, operation: Operation, machine_id: int
+    ) -> int:
+        default_start_time = no_setup_time_calculator(
+            dispatcher, operation, machine_id
+        )
+        arrival_matrix = arrival_times
+        if arrival_matrix is None:
+            arrival_matrix = dispatcher.instance.metadata.get(
+                "arrival_times_matrix"
+            )
+        if arrival_matrix is None:
+            return default_start_time
+        operation_arrival_time = arrival_matrix[operation.job_id][
+            operation.position_in_job
+        ]
+        return max(default_start_time, operation_arrival_time)
+
+    return calculator

@@ -1,6 +1,6 @@
 """Home of the `InstanceGenerator` class."""
 
-import abc
+from abc import ABC, abstractmethod
 
 import random
 from typing import Iterator
@@ -9,7 +9,7 @@ from job_shop_lib import JobShopInstance
 from job_shop_lib.exceptions import UninitializedAttributeError
 
 
-class InstanceGenerator(abc.ABC):
+class InstanceGenerator(ABC):
     """Common interface for all generators.
 
     The class supports both single instance generation and iteration over
@@ -75,7 +75,7 @@ class InstanceGenerator(abc.ABC):
         self._current_iteration = 0
         self._iteration_limit = iteration_limit
 
-    @abc.abstractmethod
+    @abstractmethod
     def generate(
         self,
         num_jobs: int | None = None,
