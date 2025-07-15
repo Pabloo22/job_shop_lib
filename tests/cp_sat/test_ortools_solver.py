@@ -18,3 +18,7 @@ def test_solve_with_time_limit(example_job_shop_instance):
 
     with pytest.raises(NoSolutionFoundError):
         solver(example_job_shop_instance)
+
+
+def test_solver_with_arrival_times(example_job_shop_instance):
+    """Tests the CP Solver correctly handles arrival times constraints."""
