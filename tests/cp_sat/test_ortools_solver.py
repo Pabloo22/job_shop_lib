@@ -82,3 +82,7 @@ def test_solver_with_arrival_times_and_deadlines(example_job_shop_instance):
                 scheduled_op.start_time >= arrival_times[job_index][op_index]
             )
             assert completion_time <= deadlines[job_index][op_index]
+
+
+def test_infeasible_constraints(minimal_infeasible_instance):
+    """Tests the CP Solver raises an error for infeasible constraints."""
