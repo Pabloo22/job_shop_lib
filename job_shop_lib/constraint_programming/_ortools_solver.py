@@ -76,13 +76,16 @@ class ORToolsSolver(BaseSolver):
         as callables that receive an instance and return a schedule.
 
         Args:
-            instance: The job shop instance to be solved.
-            arrival_times: Optional arrival times for each operation.
-            If provided, the solver will ensure that operations do not
-            start before their respective arrival times.
-            deadlines: Optional deadlines for each operation.
-            If provided, the solver will ensure that operations are completed
-            before their respective deadlines.
+            instance:
+                The job shop instance to be solved.
+            arrival_times:
+                Optional arrival times for each operation.
+                If provided, the solver will ensure that operations do not
+                start before their respective arrival times.
+            deadlines:
+                Optional deadlines for each operation.
+                If provided, the solver will ensure that operations are
+                completed before their respective deadlines.
 
         Returns:
             The best schedule found by the solver.
@@ -109,13 +112,16 @@ class ORToolsSolver(BaseSolver):
         problem.
 
         Args:
-            instance: The job shop instance to be solved.
-            arrival_times: Optional arrival times for each operation.
-            If provided, the solver will ensure that operations do not
-            start before their respective arrival times.
-            deadlines: Optional deadlines for each operation.
-            If provided, the solver will ensure that operations are completed
-            before their respective deadlines.
+            instance:
+                The job shop instance to be solved.
+            arrival_times:
+                Optional arrival times for each operation.
+                If provided, the solver will ensure that operations do not
+                start before their respective arrival times.
+            deadlines:
+                Optional deadlines for each operation.
+                If provided, the solver will ensure that operations are
+                completed before their respective deadlines.
 
         Returns:
             The best schedule found by the solver.
@@ -219,7 +225,7 @@ class ORToolsSolver(BaseSolver):
         """Creates two variables for each operation: start and end time."""
         for job in instance.jobs:
             for operation in job:
-                # Initial Niave Bounds
+                # Initial Naive Bounds
                 lower_bound = 0
                 upper_bound = instance.total_duration
 
