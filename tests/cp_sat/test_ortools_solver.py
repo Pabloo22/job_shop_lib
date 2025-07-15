@@ -59,3 +59,26 @@ def test_solver_with_deadlines(example_job_shop_instance):
             scheduled_op = schedule.find_operation(operation)
             completion_time = scheduled_op.start_time + operation.duration
             assert completion_time <= deadlines[job_index][op_index]
+
+
+def test_solver_with_arrival_times_and_deadlines(example_job_shop_instance):
+    """Tests the CP Solver with both arrival times and deadlines together."""
+    arrival_times = [[0, 3, 6], [1, 4, 7], [0, 2, 4]]
+    deadlines = [[10, 15, 20], [9, 14, 18], [8, 12, 16]]
+
+    solver = ORToolsSolver()
+    schedule = solver.solve(
+        example_job_shop_instance,
+        arrival_times=arrival_times,
+        deadlines=deadlines,
+    )
+
+    # Verify constraints are satisfied
+    for job_index, job in enumerate(example_job_shop_instance.jobs):
+        for op_index, operation in enumerate(job):
+            scheduled_op = schedule.find_operation(operation)
+            completion_time = scheduled_op.start_time + operation.duration
+            assert (
+                scheduled_op.start_time >= arrival_times[job_index][op_index]
+            )
+            assert completion_time <= deadlines[job_index][op_index]
