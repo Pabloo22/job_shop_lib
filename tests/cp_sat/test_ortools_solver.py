@@ -73,14 +73,20 @@ def test_solver_with_arrival_times_and_deadlines(example_job_shop_instance):
         deadlines=deadlines,
     )
 
+    # Build mapping from operation to start time
+    operation_to_start = {}
+    for machine_schedule in schedule.schedule:
+        for scheduled_op in machine_schedule:
+            operation_to_start[scheduled_op.operation] = (
+                scheduled_op.start_time
+            )
+
     # Verify constraints are satisfied
     for job_index, job in enumerate(example_job_shop_instance.jobs):
         for op_index, operation in enumerate(job):
-            scheduled_op = schedule.find_operation(operation)
-            completion_time = scheduled_op.start_time + operation.duration
-            assert (
-                scheduled_op.start_time >= arrival_times[job_index][op_index]
-            )
+            start_time = operation_to_start[operation]
+            completion_time = start_time + operation.duration
+            assert start_time >= arrival_times[job_index][op_index]
             assert completion_time <= deadlines[job_index][op_index]
 
 
