@@ -18,6 +18,7 @@ Dispatching rules:
     :nosignatures:
 
     shortest_processing_time_rule
+    largest_processing_time_rule
     first_come_first_served_rule
     most_work_remaining_rule
     most_operations_remaining_rule
@@ -32,6 +33,7 @@ Dispatching rule scorers:
     :nosignatures:
 
     shortest_processing_time_score
+    largest_processing_time_score
     first_come_first_served_score
     MostWorkRemainingScorer
     most_operations_remaining_score
@@ -45,6 +47,8 @@ from ._dispatching_rules_functions import (
     most_work_remaining_rule,
     most_operations_remaining_rule,
     random_operation_rule,
+    largest_processing_time_score,
+    largest_processing_time_rule,
     score_based_rule,
     score_based_rule_with_tie_breaker,
     shortest_processing_time_score,
@@ -78,6 +82,8 @@ __all__ = [
     "most_work_remaining_rule",
     "most_operations_remaining_rule",
     "random_operation_rule",
+    "largest_processing_time_score",
+    "largest_processing_time_rule",
     "score_based_rule",
     "score_based_rule_with_tie_breaker",
     "observer_based_most_work_remaining_rule",

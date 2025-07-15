@@ -98,9 +98,7 @@ def generate_machine_matrix_without_recirculation(
         (num_jobs, 1),
     )
     # Shuffle the columns:
-    machine_matrix = np.apply_along_axis(
-        rng.permutation, 1, machine_matrix
-    )
+    machine_matrix = np.apply_along_axis(rng.permutation, 1, machine_matrix)
     return machine_matrix
 
 
