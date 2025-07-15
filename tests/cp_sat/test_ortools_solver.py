@@ -49,3 +49,13 @@ def test_solver_with_deadlines(example_job_shop_instance):
         [8, 12, 15],  # Job 1 operations
         [5, 10, 15],  # Job 2 operations
     ]
+
+    solver = ORToolsSolver()
+    schedule = solver.solve(example_job_shop_instance, deadlines=deadlines)
+
+    # Verify each operation finishes before its deadline
+    for job_index, job in enumerate(example_job_shop_instance.jobs):
+        for op_index, operation in enumerate(job):
+            scheduled_op = schedule.find_operation(operation)
+            completion_time = scheduled_op.start_time + operation.duration
+            assert completion_time <= deadlines[job_index][op_index]
