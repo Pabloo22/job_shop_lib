@@ -78,11 +78,11 @@ class ORToolsSolver(BaseSolver):
         Args:
             instance: The job shop instance to be solved.
             arrival_times: Optional arrival times for each operation.
-                If provided, the solver will ensure that operations do not
-                start before their respective arrival times.
+            If provided, the solver will ensure that operations do not
+            start before their respective arrival times.
             deadlines: Optional deadlines for each operation.
-                If provided, the solver will ensure that operations are completed
-                before their respective deadlines.
+            If provided, the solver will ensure that operations are completed
+            before their respective deadlines.
 
         Returns:
             The best schedule found by the solver.
@@ -111,11 +111,11 @@ class ORToolsSolver(BaseSolver):
         Args:
             instance: The job shop instance to be solved.
             arrival_times: Optional arrival times for each operation.
-                If provided, the solver will ensure that operations do not
-                start before their respective arrival times.
+            If provided, the solver will ensure that operations do not
+            start before their respective arrival times.
             deadlines: Optional deadlines for each operation.
-                If provided, the solver will ensure that operations are completed
-                before their respective deadlines.
+            If provided, the solver will ensure that operations are completed
+            before their respective deadlines.
 
         Returns:
             The best schedule found by the solver.
