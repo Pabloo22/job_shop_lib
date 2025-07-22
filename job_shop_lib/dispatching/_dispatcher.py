@@ -25,9 +25,8 @@ def no_setup_time_calculator(
 ) -> int:
     """Default start time calculator that implements the standard behavior.
 
-    The start time is the maximum of the next available time for the
-    machine and the next available time for the job to which the
-    operation belongs.
+    The start time is the maximum of the machine's next available time, the
+    job's next available time, and the operation's release date.
 
     Args:
         dispatcher:
@@ -44,6 +43,7 @@ def no_setup_time_calculator(
     return max(
         dispatcher.machine_next_available_time[machine_id],
         dispatcher.job_next_available_time[operation.job_id],
+        operation.release_date,
     )
 
 
@@ -552,7 +552,9 @@ class Dispatcher:
             for machine_id in operation.machines
         )
         job_start_time = self._job_next_available_time[operation.job_id]
-        return max(machine_earliest_start_time, job_start_time)
+        return max(
+            machine_earliest_start_time, job_start_time, operation.release_date
+        )
 
     def remaining_duration(
         self, scheduled_operation: ScheduledOperation
