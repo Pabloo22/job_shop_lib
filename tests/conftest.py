@@ -35,6 +35,22 @@ def job_shop_instance_fixture():
     return instance
 
 
+@pytest.fixture(name="job_shop_instance_with_extras")
+def job_shop_instance_with_extras_fixture():
+    jobs = [
+        [
+            Operation(0, 10, release_date=0, deadline=100, due_date=80),
+            Operation(1, 20, release_date=10, deadline=110, due_date=90),
+        ],
+        [
+            Operation(1, 15, release_date=5, deadline=105, due_date=85),
+            Operation(2, 10, release_date=15, deadline=115, due_date=95),
+        ],
+    ]
+    instance = JobShopInstance(jobs, "TestInstanceWithExtras")
+    return instance
+
+
 @pytest.fixture
 def example_job_shop_instance():
     m0 = 0

@@ -30,6 +30,16 @@ class Operation:
             an integer.
         duration:
             The time it takes to perform the operation.
+        release_date:
+            The earliest moment this operation can be scheduled to start.
+            Defaults to ``0``.
+        deadline:
+            A hard cutoff time by which the job must be finished. A schedule
+            is invalid if the job completes after this time. Defaults to
+            ``None``.
+        due_date:
+            The target completion time for the job. Finishing late is allowed
+            but incurs a penalty (e.g., tardiness). Defaults to ``None``.
     """
 
     __slots__ = {
@@ -41,6 +51,20 @@ class Operation:
         "duration": (
             "The time it takes to perform the operation. Often referred"
             " to as the processing time."
+        ),
+        "release_date": (
+            "The earliest moment this operation can be scheduled to start. "
+            "Defaults to ``0``."
+        ),
+        "deadline": (
+            "A hard cutoff time by which the job must be finished. A schedule "
+            "is invalid if the job completes after this time. Defaults to "
+            "``None``."
+        ),
+        "due_date": (
+            "The target completion time for the job. Finishing late is "
+            "allowed but incurs a penalty (e.g., tardiness). Defaults to "
+            "``None``."
         ),
         "job_id": (
             "The id of the job the operation belongs to. Defaults to -1. "
@@ -59,11 +83,21 @@ class Operation:
         ),
     }
 
-    def __init__(self, machines: int | list[int], duration: int):
+    def __init__(
+        self,
+        machines: int | list[int],
+        duration: int,
+        release_date: int = 0,
+        deadline: int | None = None,
+        due_date: int | None = None,
+    ):
         self.machines: list[int] = (
             [machines] if isinstance(machines, int) else machines
         )
         self.duration: int = duration
+        self.release_date: int = release_date
+        self.deadline: int | None = deadline
+        self.due_date: int | None = due_date
 
         # Defined outside the class by the JobShopInstance class:
         self.job_id: int = -1
@@ -93,9 +127,9 @@ class Operation:
     def is_initialized(self) -> bool:
         """Returns whether the operation has been initialized."""
         return (
-            self.job_id == -1
-            or self.position_in_job == -1
-            or self.operation_id == -1
+            self.job_id != -1
+            and self.position_in_job != -1
+            and self.operation_id != -1
         )
 
     def __hash__(self) -> int:
@@ -104,7 +138,16 @@ class Operation:
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, Operation):
             return False
-        return self.__slots__ == value.__slots__
+        return (
+            self.machines == value.machines
+            and self.duration == value.duration
+            and self.release_date == value.release_date
+            and self.deadline == value.deadline
+            and self.due_date == value.due_date
+            and self.job_id == value.job_id
+            and self.position_in_job == value.position_in_job
+            and self.operation_id == value.operation_id
+        )
 
     def __repr__(self) -> str:
         machines = (
