@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Sequence
 import functools
 from typing import Any
 import warnings
@@ -448,19 +449,39 @@ class JobShopInstance:
     def durations_matrix_array(self) -> NDArray[np.float32]:
         """Returns the duration matrix of the instance as a numpy array.
 
-        The returned array has shape (``num_jobs``,
-        ``max_num_operations_per_job``).
-        Non-existing operations are filled with ``np.nan``.
-
-        Example:
-            >>> jobs = [[Operation(0, 2), Operation(1, 3)], [Operation(0, 4)]]
-            >>> instance = JobShopInstance(jobs)
-            >>> instance.durations_matrix_array
-            array([[ 2.,  3.],
-                   [ 4., nan]], dtype=float32)
+        If the jobs have different number of operations, the matrix is
+        padded with ``np.nan`` to make it rectangular.
         """
-        duration_matrix = self.durations_matrix
-        return self._fill_matrix_with_nans_2d(duration_matrix)
+        return self._fill_matrix_with_nans_2d(self.durations_matrix)
+
+    @functools.cached_property
+    def release_dates_matrix_array(self) -> NDArray[np.float32]:
+        """Returns the release dates matrix of the instance as a numpy array.
+
+        If the jobs have different number of operations, the matrix is
+        padded with ``np.nan`` to make it rectangular.
+        """
+        return self._fill_matrix_with_nans_2d(self.release_dates_matrix)
+
+    @functools.cached_property
+    def deadlines_matrix_array(self) -> NDArray[np.float32]:
+        """Returns the deadlines matrix of the instance as a numpy array.
+
+        If the jobs have different number of operations, the matrix is
+        padded with ``np.nan`` to make it rectangular. None values are also
+        converted to ``np.nan``.
+        """
+        return self._fill_matrix_with_nans_2d(self.deadlines_matrix)
+
+    @functools.cached_property
+    def due_dates_matrix_array(self) -> NDArray[np.float32]:
+        """Returns the due dates matrix of the instance as a numpy array.
+
+        If the jobs have different number of operations, the matrix is
+        padded with ``np.nan`` to make it rectangular. None values are also
+        converted to ``np.nan``.
+        """
+        return self._fill_matrix_with_nans_2d(self.due_dates_matrix)
 
     @functools.cached_property
     def machines_matrix_array(self) -> NDArray[np.float32]:
@@ -588,31 +609,37 @@ class JobShopInstance:
 
     @staticmethod
     def _fill_matrix_with_nans_2d(
-        matrix: list[list[int]],
+        matrix: Sequence[Sequence[int | None]],
     ) -> NDArray[np.float32]:
-        """Fills a matrix with ``np.nan`` values.
+        """Creates a 2D numpy array padded with ``np.nan`` values.
 
         Args:
             matrix:
-                A list of lists of integers.
+                A list of lists of integers or Nones.
 
         Returns:
             A numpy array with the same shape as the input matrix, filled with
             ``np.nan`` values.
         """
-        max_length = max(len(row) for row in matrix)
+        if not matrix:
+            return np.array([], dtype=np.float32)
+
+        max_length = max(len(row) for row in matrix) if matrix else 0
         squared_matrix = np.full(
             (len(matrix), max_length), np.nan, dtype=np.float32
         )
         for i, row in enumerate(matrix):
-            squared_matrix[i, : len(row)] = row
+            processed_row = [
+                item if item is not None else np.nan for item in row
+            ]
+            squared_matrix[i, : len(processed_row)] = processed_row
         return squared_matrix
 
     @staticmethod
     def _fill_matrix_with_nans_3d(
         matrix: list[list[list[int]]],
     ) -> NDArray[np.float32]:
-        """Fills a 3D matrix with ``np.nan`` values.
+        """Creates a 3D numpy array padded with ``np.nan`` values.
 
         Args:
             matrix:
