@@ -5,6 +5,7 @@ from job_shop_lib.dispatching import (
     Dispatcher,
 )
 from job_shop_lib.dispatching.rules import DispatchingRuleSolver
+from job_shop_lib.exceptions import ValidationError
 
 
 def test_dispatch(example_job_shop_instance: JobShopInstance):
@@ -193,6 +194,34 @@ def test_is_ongoing(example_job_shop_instance: JobShopInstance):
     assert dispatcher.is_ongoing(scheduled_op_2)
     assert not dispatcher.is_ongoing(scheduled_op_1)
     assert not dispatcher.is_ongoing(scheduled_op_3)
+
+
+def test_next_operation(example_job_shop_instance: JobShopInstance):
+    """Tests the next_operation method of the Dispatcher."""
+    dispatcher = Dispatcher(example_job_shop_instance)
+
+    # Initially, next_operation should return the first operation of each job
+    assert dispatcher.next_operation(0) == example_job_shop_instance.jobs[0][0]
+    assert dispatcher.next_operation(1) == example_job_shop_instance.jobs[1][0]
+    assert dispatcher.next_operation(2) == example_job_shop_instance.jobs[2][0]
+
+    # Dispatch the first operation of job 0
+    dispatcher.dispatch(example_job_shop_instance.jobs[0][0], 0)
+
+    # Now, next_operation for job 0 should return the second operation
+    assert dispatcher.next_operation(0) == example_job_shop_instance.jobs[0][1]
+
+    # Dispatch all operations of job 1
+    dispatcher.dispatch(example_job_shop_instance.jobs[1][0], 1)
+    dispatcher.dispatch(example_job_shop_instance.jobs[1][1], 2)
+    dispatcher.dispatch(example_job_shop_instance.jobs[1][2], 0)
+
+    # All operations for job 1 are scheduled, so it should raise an error.
+    with pytest.raises(
+        ValidationError,
+        match="No more operations left for job 1 to schedule.",
+    ):
+        dispatcher.next_operation(1)
 
 
 if __name__ == "__main__":
