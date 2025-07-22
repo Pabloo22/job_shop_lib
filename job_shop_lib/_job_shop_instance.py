@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import functools
 from typing import Any
+import warnings
 
 import numpy as np
 from numpy.typing import NDArray
@@ -94,6 +95,24 @@ class JobShopInstance:
             self.set_operation_attributes()
         self.name: str = name
         self.metadata: dict[str, Any] = metadata
+
+        deprecated_keys = {
+            "release_dates_matrix",
+            "deadlines_matrix",
+            "due_dates_matrix",
+        }
+        if any(key in self.metadata for key in deprecated_keys):
+            warnings.warn(
+                "The use of 'release_dates_matrix', 'deadlines_matrix', or "
+                "'due_dates_matrix' in metadata is deprecated."
+                "Please add these attributes "
+                "directly to the Operation class. Not doing so may cause bugs "
+                "when using the dispatching module.You can use the "
+                "`JobShopInstance.from_matrices` method to create an "
+                "instance from 2D sequences. ",
+                DeprecationWarning,
+                stacklevel=2,
+            )
 
     def set_operation_attributes(self):
         """Sets the ``job_id``, ``position_in_job``, and ``operation_id``
@@ -617,9 +636,3 @@ class JobShopInstance:
             for j, inner_row in enumerate(row):
                 squared_matrix[i, j, : len(inner_row)] = inner_row
         return squared_matrix
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()
