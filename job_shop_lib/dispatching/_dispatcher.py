@@ -634,7 +634,11 @@ class Dispatcher:
     def is_ongoing(self, scheduled_operation: ScheduledOperation) -> bool:
         """Checks if the given operation is currently being processed."""
         current_time = self.current_time()
-        return scheduled_operation.start_time <= current_time
+        return (
+            scheduled_operation.start_time
+            <= current_time
+            < scheduled_operation.end_time
+        )
 
     def next_operation(self, job_id: int) -> Operation:
         """Returns the next operation to be scheduled for the given job.
