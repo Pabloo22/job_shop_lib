@@ -77,12 +77,13 @@ class DurationObserver(FeatureObserver):
             self.features[FeatureType.JOBS][job_id, 0] = job_duration
 
     def _update_operation_durations(
-        self, scheduled_operation: ScheduledOperation
+        self, unused_scheduled_operation: ScheduledOperation
     ):
-        operation_id = scheduled_operation.operation.operation_id
-        self.features[FeatureType.OPERATIONS][operation_id, 0] = (
-            self.dispatcher.remaining_duration(scheduled_operation)
-        )
+        for scheduled_operation in self.dispatcher.ongoing_operations():
+            operation_id = scheduled_operation.operation.operation_id
+            self.features[FeatureType.OPERATIONS][operation_id, 0] = (
+                self.dispatcher.remaining_duration(scheduled_operation)
+            )
 
     def _update_machine_durations(
         self, scheduled_operation: ScheduledOperation
