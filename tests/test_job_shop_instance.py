@@ -202,6 +202,48 @@ def test_duration_matrix_array():
     )
 
 
+def test_release_dates_matrix_array():
+    jobs = [
+        [
+            Operation(machines=0, duration=1, release_date=5),
+            Operation(machines=1, duration=2, release_date=10),
+        ],
+        [Operation(machines=1, duration=3, release_date=15)],
+    ]
+    instance = JobShopInstance(jobs=jobs)
+    assert str(instance.release_dates_matrix_array) == str(
+        np.array([[5.0, 10.0], [15.0, np.nan]], dtype=np.float32)
+    )
+
+
+def test_deadlines_matrix_array():
+    jobs = [
+        [
+            Operation(machines=0, duration=1, deadline=None),
+            Operation(machines=1, duration=2, deadline=110),
+        ],
+        [Operation(machines=1, duration=3, deadline=None)],
+    ]
+    instance = JobShopInstance(jobs=jobs)
+    assert str(instance.deadlines_matrix_array) == str(
+        np.array([[np.nan, 110.0], [np.nan, np.nan]], dtype=np.float32)
+    )
+
+
+def test_due_dates_matrix_array():
+    jobs = [
+        [
+            Operation(machines=0, duration=1, due_date=80),
+            Operation(machines=1, duration=2, due_date=None),
+        ],
+        [Operation(machines=1, duration=3, due_date=95)],
+    ]
+    instance = JobShopInstance(jobs=jobs)
+    assert str(instance.due_dates_matrix_array) == str(
+        np.array([[80.0, np.nan], [95.0, np.nan]], dtype=np.float32)
+    )
+
+
 def test_machine_matrix_array_3d():
     jobs = [
         [Operation(machines=0, duration=1), Operation(machines=1, duration=2)],
