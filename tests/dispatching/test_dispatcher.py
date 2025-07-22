@@ -3,6 +3,7 @@ import pytest
 from job_shop_lib import JobShopInstance
 from job_shop_lib.dispatching import (
     Dispatcher,
+    HistoryObserver,
 )
 from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 from job_shop_lib.exceptions import ValidationError
@@ -21,6 +22,9 @@ def test_dispatch(example_job_shop_instance: JobShopInstance):
 
     dispatcher.dispatch(job_1[0], machine_1)
     dispatcher.dispatch(job_1[1], machine_2)
+    # try to dispatch an operation that is not ready
+    with pytest.raises(ValidationError):
+        dispatcher.dispatch(job_3[2])
     dispatcher.dispatch(job_3[0], machine_3)
     dispatcher.dispatch(job_3[1], machine_1)
     dispatcher.dispatch(job_2[0], machine_2)
@@ -222,6 +226,16 @@ def test_next_operation(example_job_shop_instance: JobShopInstance):
         match="No more operations left for job 1 to schedule.",
     ):
         dispatcher.next_operation(1)
+
+
+def test_subscribe_and_unsubscribe(example_job_shop_instance: JobShopInstance):
+    """Tests the subscribe and unsubscribe methods of the Dispatcher."""
+    dispatcher = Dispatcher(example_job_shop_instance)
+
+    history_observer = HistoryObserver(dispatcher)
+    assert len(dispatcher.subscribers) == 1
+    dispatcher.unsubscribe(history_observer)
+    assert len(dispatcher.subscribers) == 0
 
 
 if __name__ == "__main__":
