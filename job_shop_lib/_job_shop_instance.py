@@ -40,6 +40,9 @@ class JobShopInstance:
         is_flexible
         durations_matrix
         machines_matrix
+        release_dates_matrix
+        deadlines_matrix
+        due_dates_matrix
         durations_matrix_array
         machines_matrix_array
         operations_by_machine
@@ -196,14 +199,25 @@ class JobShopInstance:
                     "duration_matrix": self.durations_matrix,
                     "machines_matrix": self.machines_matrix,
                     "metadata": self.metadata,
+                    # Optionally (if the instance has them):
+                    "release_dates_matrix": self.release_dates_matrix,
+                    "deadlines_matrix": self.deadlines_matrix,
+                    "due_dates_matrix": self.due_dates_matrix,
                 }
         """
-        return {
+        data = {
             "name": self.name,
             "duration_matrix": self.durations_matrix,
             "machines_matrix": self.machines_matrix,
             "metadata": self.metadata,
         }
+        if self.has_release_dates:
+            data["release_dates_matrix"] = self.release_dates_matrix
+        if self.has_deadlines:
+            data["deadlines_matrix"] = self.deadlines_matrix
+        if self.has_due_dates:
+            data["due_dates_matrix"] = self.due_dates_matrix
+        return data
 
     @classmethod
     def from_matrices(
@@ -212,6 +226,9 @@ class JobShopInstance:
         machines_matrix: list[list[list[int]]] | list[list[int]],
         name: str = "JobShopInstance",
         metadata: dict[str, Any] | None = None,
+        release_dates_matrix: list[list[int]] | None = None,
+        deadlines_matrix: list[list[int | None]] | None = None,
+        due_dates_matrix: list[list[int | None]] | None = None,
     ) -> JobShopInstance:
         """Creates a :class:`JobShopInstance` from duration and machines
         matrices.
@@ -219,16 +236,26 @@ class JobShopInstance:
         Args:
             duration_matrix:
                 A list of lists of integers. The i-th list contains the
-                durations of the operations of the job with id i.
+                durations of the operations of the job with id ``i``.
             machines_matrix:
                 A list of lists of lists of integers if the
                 instance is flexible, or a list of lists of integers if the
                 instance is not flexible. The i-th list contains the machines
-                in which the operations of the job with id i can be processed.
+                in which the operations of the job with id ``i`` can be
+                processed.
             name:
                 A string with the name of the instance.
             metadata:
                 A dictionary with additional information about the instance.
+            release_dates_matrix:
+                A list of lists of integers. The i-th list contains the
+                release dates of the operations of the job with id ``i``.
+            deadlines_matrix:
+                A list of lists of optional integers. The i-th list contains
+                the deadlines of the operations of the job with id ``i``.
+            due_dates_matrix:
+                A list of lists of optional integers. The i-th list contains
+                the due dates of the operations of the job with id ``i``.
 
         Returns:
             A :class:`JobShopInstance` object.
@@ -241,8 +268,29 @@ class JobShopInstance:
             for position_in_job in range(num_operations):
                 duration = duration_matrix[job_id][position_in_job]
                 machines = machines_matrix[job_id][position_in_job]
+                release_date = (
+                    release_dates_matrix[job_id][position_in_job]
+                    if release_dates_matrix
+                    else 0
+                )
+                deadline = (
+                    deadlines_matrix[job_id][position_in_job]
+                    if deadlines_matrix
+                    else None
+                )
+                due_date = (
+                    due_dates_matrix[job_id][position_in_job]
+                    if due_dates_matrix
+                    else None
+                )
                 jobs[job_id].append(
-                    Operation(duration=duration, machines=machines)
+                    Operation(
+                        duration=duration,
+                        machines=machines,
+                        release_date=release_date,
+                        deadline=deadline,
+                        due_date=due_date,
+                    )
                 )
 
         metadata = {} if metadata is None else metadata
@@ -290,6 +338,21 @@ class JobShopInstance:
         )
 
     @functools.cached_property
+    def has_release_dates(self) -> bool:
+        """Returns ``True`` if any operation has a release date > 0."""
+        return any(op.release_date > 0 for job in self.jobs for op in job)
+
+    @functools.cached_property
+    def has_deadlines(self) -> bool:
+        """Returns ``True`` if any operation has a deadline."""
+        return any(op.deadline is not None for job in self.jobs for op in job)
+
+    @functools.cached_property
+    def has_due_dates(self) -> bool:
+        """Returns ``True`` if any operation has a due date."""
+        return any(op.due_date is not None for job in self.jobs for op in job)
+
+    @functools.cached_property
     def durations_matrix(self) -> list[list[int]]:
         """Returns the duration matrix of the instance.
 
@@ -329,6 +392,38 @@ class JobShopInstance:
         return [
             [operation.machine_id for operation in job] for job in self.jobs
         ]
+
+    @functools.cached_property
+    def release_dates_matrix(self) -> list[list[int]]:
+        """Returns the release dates matrix of the instance.
+
+        The release date of the operation with ``job_id`` i and
+        ``position_in_job`` j is stored in the i-th position of the j-th list
+        of the returned matrix.
+        """
+        return [
+            [operation.release_date for operation in job] for job in self.jobs
+        ]
+
+    @functools.cached_property
+    def deadlines_matrix(self) -> list[list[int | None]]:
+        """Returns the deadlines matrix of the instance.
+
+        The deadline of the operation with ``job_id`` i and
+        ``position_in_job`` j is stored in the i-th position of the j-th list
+        of the returned matrix.
+        """
+        return [[operation.deadline for operation in job] for job in self.jobs]
+
+    @functools.cached_property
+    def due_dates_matrix(self) -> list[list[int | None]]:
+        """Returns the due dates matrix of the instance.
+
+        The due date of the operation with ``job_id`` i and
+        ``position_in_job`` j is stored in the i-th position of the j-th list
+        of the returned matrix.
+        """
+        return [[operation.due_date for operation in job] for job in self.jobs]
 
     @functools.cached_property
     def durations_matrix_array(self) -> NDArray[np.float32]:
