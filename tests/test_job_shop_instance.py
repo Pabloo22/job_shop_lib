@@ -230,5 +230,52 @@ def test_machine_matrix_array_2d():
     )
 
 
+def test_deprecation_warning_for_metadata():
+    """Tests that a deprecation warning is raised for deprecated keys."""
+    with pytest.warns(DeprecationWarning):
+        JobShopInstance(
+            jobs=[[Operation(0, 1)]],
+            name="test",
+            release_dates_matrix=[[0]],
+        )
+    with pytest.warns(DeprecationWarning):
+        JobShopInstance(
+            jobs=[[Operation(0, 1)]],
+            name="test",
+            deadlines_matrix=[[100]],
+        )
+    with pytest.warns(DeprecationWarning):
+        JobShopInstance(
+            jobs=[[Operation(0, 1)]],
+            name="test",
+            due_dates_matrix=[[80]],
+        )
+
+
+def test_eq():
+    """Test equality of JobShopInstance objects."""
+    instance1 = JobShopInstance(
+        jobs=[[Operation(0, 1)], [Operation(1, 2)]], name="test1"
+    )
+    instance2 = JobShopInstance(
+        jobs=[[Operation(0, 1)], [Operation(1, 2)]], name="test2"
+    )
+    instance3 = JobShopInstance(
+        jobs=[[Operation(0, 2)], [Operation(1, 3)]], name="test3"
+    )
+
+    assert instance1 == instance2
+    assert instance1 != instance3
+    assert instance1 != "not a JobShopInstance"
+
+
+def test_repr(job_shop_instance: JobShopInstance):
+    """Test the string representation of JobShopInstance."""
+    expected_repr = (
+        "JobShopInstance(name=TestInstance, num_jobs=2, "
+        "num_machines=3)"
+    )
+    assert repr(job_shop_instance) == expected_repr
+
 if __name__ == "__main__":
     pytest.main(["-vv", __file__])
