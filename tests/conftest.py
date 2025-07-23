@@ -80,6 +80,14 @@ def dispatcher(  # pylint: disable=redefined-outer-name
 
 
 @pytest.fixture
+def dispatcher_with_extras(
+    job_shop_instance_with_extras: JobShopInstance,
+) -> Dispatcher:
+    """Provides a Dispatcher for an instance with release/due dates."""
+    return Dispatcher(job_shop_instance_with_extras)
+
+
+@pytest.fixture
 def example_2_job_shop_instance():
     # Cada máquina se representa con un id (empezando por 0)
     m0 = 0
