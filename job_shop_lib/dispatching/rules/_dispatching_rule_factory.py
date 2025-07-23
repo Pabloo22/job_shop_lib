@@ -17,8 +17,6 @@ from job_shop_lib.dispatching.rules import (
     most_operations_remaining_rule,
     random_operation_rule,
     most_work_remaining_rule,
-)
-from job_shop_lib.dispatching.rules._dispatching_rules_functions import (
     largest_processing_time_rule,
 )
 
@@ -79,13 +77,11 @@ def dispatching_rule_factory(
         DispatchingRuleType.RANDOM: random_operation_rule,
     }
 
-    try:
-        rule_enum = DispatchingRuleType(dispatching_rule)
-    except ValueError:
+    dispatching_rule = dispatching_rule.lower()
+    if dispatching_rule not in dispatching_rules:
         raise ValidationError(
             f"Dispatching rule {dispatching_rule} not recognized. Available "
             f"dispatching rules: {', '.join(dispatching_rules)}."
         )
-    return dispatching_rules[
-        rule_enum
-    ]
+
+    return dispatching_rules[dispatching_rule]  # type: ignore[index]

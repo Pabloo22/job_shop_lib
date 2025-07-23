@@ -1,7 +1,7 @@
 import pytest
 from matplotlib.figure import Figure
 import matplotlib
-matplotlib.use("Agg")
+# matplotlib.use("Agg")
 
 from job_shop_lib import Schedule
 from job_shop_lib.visualization.gantt import plot_gantt_chart
