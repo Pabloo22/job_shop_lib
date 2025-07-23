@@ -96,3 +96,13 @@ def test_reset_features(dispatcher_with_extras: Dispatcher):
     np.testing.assert_array_equal(
         observer.features[FeatureType.OPERATIONS], initial_features
     )
+
+
+def test_attribute_map(dispatcher_with_extras: Dispatcher):
+    observer = DatesObserver(dispatcher_with_extras)
+    expected_map = {
+        "release_date": 0,
+        "deadline": 1,
+        "due_date": 2,
+    }
+    assert observer.attribute_map == expected_map
