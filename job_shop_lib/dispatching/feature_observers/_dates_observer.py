@@ -137,7 +137,6 @@ class DatesObserver(FeatureObserver):
         cols = [
             self._attribute_map[attr]
             for attr in self.attributes_to_observe
-            if attr in ["release_date", "deadline", "due_date"]
         ]
         self.features[FeatureType.OPERATIONS][:, cols] -= elapsed_time
 
