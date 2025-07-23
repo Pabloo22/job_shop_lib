@@ -14,6 +14,7 @@ dispatcher.
     PositionInJobObserver
     RemainingOperationsObserver
     IsCompletedObserver
+    DatesObserver
     FeatureObserverType
     feature_observer_factory
     FeatureObserverConfig
@@ -41,6 +42,7 @@ from ._is_scheduled_observer import IsScheduledObserver
 from ._position_in_job_observer import PositionInJobObserver
 from ._remaining_operations_observer import RemainingOperationsObserver
 from ._is_completed_observer import IsCompletedObserver
+from ._dates_observer import DatesObserver
 from ._factory import (
     FeatureObserverType,
     feature_observer_factory,
@@ -60,6 +62,7 @@ __all__ = [
     "PositionInJobObserver",
     "RemainingOperationsObserver",
     "IsCompletedObserver",
+    "DatesObserver",
     "FeatureObserverType",
     "feature_observer_factory",
     "FeatureObserverConfig",
