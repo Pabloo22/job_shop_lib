@@ -1,4 +1,4 @@
-"""Home of the `TimeAttributeObserver` class."""
+"""Home of the `DatesObserver` class."""
 
 from typing import Literal
 
