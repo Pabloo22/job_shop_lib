@@ -621,10 +621,7 @@ class JobShopInstance:
             A numpy array with the same shape as the input matrix, filled with
             ``np.nan`` values.
         """
-        if not matrix:
-            return np.array([], dtype=np.float32)
-
-        max_length = max(len(row) for row in matrix) if matrix else 0
+        max_length = max(len(row) for row in matrix)
         squared_matrix = np.full(
             (len(matrix), max_length), np.nan, dtype=np.float32
         )
