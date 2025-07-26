@@ -10,7 +10,7 @@ from job_shop_lib.dispatching.feature_observers import (
     FeatureType,
     IsReadyObserver,
 )
-from job_shop_lib.dispatching.rules._dispatching_rules_functions import (
+from job_shop_lib.dispatching.rules import (
     first_come_first_served_rule,
     most_operations_remaining_rule,
     most_work_remaining_rule,
@@ -23,6 +23,9 @@ from job_shop_lib.dispatching.rules._dispatching_rules_functions import (
     MostWorkRemainingScorer,
     most_operations_remaining_score,
     random_score,
+    largest_processing_time_rule,
+    largest_processing_time_score,
+    dispatching_rule_factory,
 )
 
 
@@ -176,3 +179,26 @@ def test_most_work_remaining_scorer_with_observer(
     scorer_selected_op = max(available_ops, key=lambda op: scores[op.job_id])
 
     assert rule_selected_op == scorer_selected_op
+
+
+def test_largest_processing_time_rule(dispatcher: Dispatcher):
+    """Tests that the largest_processing_time_rule selects the operation
+    with the longest duration."""
+    selected_operation = largest_processing_time_rule(dispatcher)
+    durations = [op.duration for op in dispatcher.available_operations()]
+    assert selected_operation.duration == max(durations)
+
+
+def test_largest_processing_time_score(dispatcher: Dispatcher):
+    """Tests the largest_processing_time_score function."""
+    scores = largest_processing_time_score(dispatcher)
+    expected_scores = [0] * dispatcher.instance.num_jobs
+    for operation in dispatcher.available_operations():
+        expected_scores[operation.job_id] = operation.duration
+    assert scores == expected_scores
+
+
+def test_largest_processing_time_rule_factory():
+    """Tests that the factory resolves the rule correctly."""
+    rule = dispatching_rule_factory("largest_processing_time")
+    assert rule.__name__ == "largest_processing_time_rule"
