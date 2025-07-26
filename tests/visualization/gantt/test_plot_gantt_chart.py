@@ -1,12 +1,9 @@
 import pytest
 from matplotlib.figure import Figure
-import matplotlib
-# matplotlib.use("Agg")
 
 from job_shop_lib import Schedule
 from job_shop_lib.visualization.gantt import plot_gantt_chart
 
-# Gantt Chart Plot Tests
 
 @pytest.mark.mpl_image_compare(
     style="default",
