@@ -45,3 +45,6 @@ class JobShopAnnealer(Annealer):
 
         idx1, idx2 = random.sample(range(len(sequence)), 2)
         sequence[idx1], sequence[idx2] = sequence[idx2], sequence[idx1]
+
+    def energy(self) -> float:
+        """Computes the makespan with penalties for constraint violations."""
