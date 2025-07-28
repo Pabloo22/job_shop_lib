@@ -1,5 +1,6 @@
 import pytest
 from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib.metaheuristics._sa_solver import SimulatedAnnealingSolver
 
 
 # Fixture for a simple job shop instance
@@ -41,3 +42,10 @@ def ft06_instance():
                 )
             jobs.append(operations)
     return JobShopInstance(jobs=jobs)
+
+
+# Basic Functionality Test
+def test_basic_functionality(simple_instance):
+    solver = SimulatedAnnealingSolver(
+        initial_temperature=100, steps=100, cool=0.95
+    )
