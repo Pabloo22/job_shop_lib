@@ -1,3 +1,4 @@
+import random
 from job_shop_lib import BaseSolver, JobShopInstance, Schedule
 from job_shop_lib.metaheuristics import JobShopAnnealer
 
@@ -29,3 +30,18 @@ class SimulatedAnnealingSolver(BaseSolver):
 
         best_state, _ = annealer.anneal()
         return Schedule.from_job_sequences(instance, best_state)
+
+    def _generate_initial_state(
+        self, instance: JobShopInstance
+    ) -> list[list[int]]:
+        """Generates random initial sequences for each machine."""
+        state = []
+        for machine_id in range(instance.num_machines):
+            job_ids = []
+            for job_id, job in enumerate(instance.jobs):
+                for operation in job:
+                    if machine_id in operation.machines:
+                        job_ids.append(job_id)
+            random.shuffle(job_ids)
+            state.append(job_ids)
+        return state
