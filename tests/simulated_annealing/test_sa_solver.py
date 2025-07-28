@@ -74,3 +74,17 @@ def test_initialization(simple_instance):
     )
 
     assert annealer.state == initial_state
+
+
+# Arrival Times constraint test
+def test_arrival_times_constraint(simple_instance):
+    # Set arrival times for jobs
+    simple_instance.arrival_times = [2, 3]  # Job0 arrives at t=2, Job1 at t=3
+
+    solver = SimulatedAnnealingSolver(
+        initial_temperature=1000,
+        steps=5000,
+        cool=0.95,
+        penalty_factor=1_000_000,
+    )
+    schedule = solver.solve(simple_instance)
