@@ -58,3 +58,8 @@ def test_basic_functionality(simple_instance):
 
     # validate the schedule
     schedule.validate()
+    
+
+# Initialization Test
+def test_initialization(simple_instance):
+    # Create a custom initial state
