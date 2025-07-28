@@ -13,7 +13,7 @@ except ImportError:
 from job_shop_lib import JobShopInstance, Schedule
 from job_shop_lib import Schedule as ScheduleBuilder
 from job_shop_lib import ScheduledOperation
-from job_shop_lib import ValidationError
+from job_shop_lib.exceptions import ValidationError
 
 
 class JobShopAnnealer(Annealer):
@@ -119,6 +119,6 @@ class JobShopAnnealer(Annealer):
                     and operation.operation_index == operation_index
                 ):
                     return operation
-        raise ValueError(
-            f"Scheduled operation not found for job {job_id} and operation index {operation_index}"
-        )
+                raise ValueError(
+                    f"Scheduled operation not found for job {job_id} and operation index {operation_index}"
+                )
