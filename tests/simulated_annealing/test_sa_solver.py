@@ -99,3 +99,19 @@ def test_arrival_times_constraint(simple_instance):
             if op.operation == first_op
         )
         assert scheduled_op.start_time >= simple_instance.arrival_times[job_id]
+
+
+# Deadlines constraint test
+def test_deadlines_constraint(simple_instance):
+    # Set deadlines for jobs
+    simple_instance.deadlines = [10, 8]  # Job0 deadline=10, Job1 deadline=8
+
+    solver = SimulatedAnnealingSolver(
+        initial_temperature=1000,
+        steps=5000,
+        cool=0.95,
+        penalty_factor=1_000_000,
+    )
+    schedule = solver.solve(simple_instance)
+
+    # Check last operation of each job completes before deadline
