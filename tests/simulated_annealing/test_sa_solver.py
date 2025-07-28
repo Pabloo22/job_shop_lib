@@ -15,4 +15,13 @@ def simple_instance():
             Operation(machine_id=1, duration=1, job_id=1, position_in_job=1),
         ],
     ]
-    return JobShopInstance(jobs=jobs, num_machines=2)
+    return JobShopInstance(jobs=jobs)
+
+
+# Fixture for ft06 instance
+@pytest.fixture
+def ft06_instance():
+    jobs = []
+    with open("ft06.txt", "r", encoding="utf-8") as f:
+        lines = f.readlines()[4:]  # Skip header
+        num_jobs, num_machines = map(int, lines[0].split())
