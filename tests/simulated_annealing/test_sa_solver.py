@@ -115,3 +115,13 @@ def test_deadlines_constraint(simple_instance):
     schedule = solver.solve(simple_instance)
 
     # Check last operation of each job completes before deadline
+    for job_id, job in enumerate(simple_instance.jobs):
+        last_op = job[-1]
+        scheduled_op = next(
+            op
+            for machine_schedule in schedule.schedule
+            for op in machine_schedule
+            if op.operation == last_op
+        )
+        completion_time = scheduled_op.start_time + last_op.duration
+        assert completion_time <= simple_instance.deadlines[job_id]
