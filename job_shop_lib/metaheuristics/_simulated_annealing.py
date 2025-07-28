@@ -1,6 +1,6 @@
 import random
 import logging
-from typing import Any, Sequence
+from typing import Any, Optional
 
 try:
     from simanneal import Annealer
@@ -93,3 +93,16 @@ class JobShopAnnealer(Annealer):
                     )
 
         return penalty
+
+    def _get_job_completion_times(
+        self, schedule: Schedule
+    ) -> list[Optional[int]]:
+        """Returns the completion time of the last operation for each job."""
+        completion_times = [0] * self.instance.num_jobs
+        for machine_schedule in schedule.schedule:
+            for operation in machine_schedule:
+                job_id = operation.job_id
+                if operation.end_time > completion_times[job_id]:
+                    completion_times[job_id] = operation.end_time
+
+        return completion_times
