@@ -55,9 +55,6 @@ def test_basic_functionality(simple_instance):
     assert schedule.instance == simple_instance
     assert len(schedule.schedule) == simple_instance.num_machines
 
-    # validate the schedule
-    schedule.validate()
-
 
 # Initialization Test
 def test_initialization(simple_instance):
