@@ -116,9 +116,9 @@ class JobShopAnnealer(Annealer):
             for operation in machine_schedule:
                 if (
                     operation.job_id == job_id
-                    and operation.operation_index == operation_index
+                    and operation.position_in_job == operation_index
                 ):
                     return operation
-                raise ValueError(
-                    f"Scheduled operation not found for job {job_id} and operation index {operation_index}"
-                )
+        raise ValueError(
+            f"Scheduled operation not found for job {job_id} and operation index {operation_index}"
+        )
