@@ -55,6 +55,11 @@ def test_basic_functionality(simple_instance):
     assert schedule.instance == simple_instance
     assert len(schedule.schedule) == simple_instance.num_machines
 
+    # Check that all operations are scheduled
+    scheduled_ops = sum(len(m) for m in schedule.schedule)
+    total_ops = sum(len(job) for job in simple_instance.jobs)
+    assert scheduled_ops == total_ops
+
 
 # Initialization Test
 def test_initialization(simple_instance):
