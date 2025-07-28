@@ -79,3 +79,17 @@ class JobShopAnnealer(Annealer):
                     penalty += self.penalty_factor * (
                         completion_time - deadlines[job_id]
                     )
+
+        if hasattr(self.instance, "arrival_times"):
+            arrival_times = self.instance.arrival_times
+            first_ops = [job[0] for job in self.instance.jobs]
+            for job_id, operation in enumerate(first_ops):
+                scheduled_op = self._find_scheduled_operation(
+                    schedule, job_id, 0
+                )
+                if scheduled_op.start_time < arrival_times[job_id]:
+                    penalty += self.penalty_factor * (
+                        arrival_times[job_id] - scheduled_op.start_time
+                    )
+
+        return penalty
