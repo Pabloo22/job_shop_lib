@@ -10,7 +10,9 @@ except ImportError:
         "Install with: pip install simanneal"
     )
 
-from job_shop_lib import JobShopInstance, Schedule
+from job_shop_lib import JobShopInstance
+from job_shop_lib import Schedule as ScheduleBuilder
+from job_shop_lib import ValidationError
 
 
 class JobShopAnnealer(Annealer):
@@ -48,3 +50,14 @@ class JobShopAnnealer(Annealer):
 
     def energy(self) -> float:
         """Computes the makespan with penalties for constraint violations."""
+        try:
+            schedule = ScheduleBuilder.from_job_sequences(
+                self.instance, self.state
+            )
+            makespan = schedule.makespan()
+            penalty = self._compute_penalties(schedule)
+            return makespan + penalty
+        except ValidationError as e:
+            # If the schedule is invalid, return a large penalty
+            logging.warning("Invalid schedule encountered: %s", e)
+            return float("inf")
