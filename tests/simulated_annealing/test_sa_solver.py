@@ -10,12 +10,12 @@ from job_shop_lib import Schedule
 def simple_instance():
     jobs = [
         [
-            Operation(machine_id=0, duration=3, job_id=0, position_in_job=0),
-            Operation(machine_id=1, duration=2, job_id=0, position_in_job=1),
+            Operation(machines=0, duration=3),
+            Operation(machines=1, duration=2),
         ],
         [
-            Operation(machine_id=0, duration=2, job_id=1, position_in_job=0),
-            Operation(machine_id=1, duration=1, job_id=1, position_in_job=1),
+            Operation(machines=0, duration=2),
+            Operation(machines=1, duration=1),
         ],
     ]
     return JobShopInstance(jobs=jobs)
@@ -36,7 +36,7 @@ def ft06_instance():
                 duration = int(data[2 * op_idx + 1])
                 operations.append(
                     Operation(
-                        machine_id=machine_id,
+                        machines=machine_id,
                         duration=duration,
                         job_id=job_id,
                         position_in_job=op_idx,
