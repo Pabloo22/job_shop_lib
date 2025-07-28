@@ -1,6 +1,7 @@
 import pytest
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.metaheuristics._sa_solver import SimulatedAnnealingSolver
+from job_shop_lib import Schedule
 
 
 # Fixture for a simple job shop instance
@@ -49,3 +50,11 @@ def test_basic_functionality(simple_instance):
     solver = SimulatedAnnealingSolver(
         initial_temperature=100, steps=100, cool=0.95
     )
+    schedule = solver.solve(simple_instance)
+
+    assert isinstance(schedule, Schedule)
+    assert schedule.instance == simple_instance
+    assert len(schedule.schedule) == simple_instance.num_machines
+
+    # validate the schedule
+    schedule.validate()
