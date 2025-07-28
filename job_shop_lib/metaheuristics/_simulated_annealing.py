@@ -10,7 +10,7 @@ except ImportError:
         "Install with: pip install simanneal"
     )
 
-from job_shop_lib import JobShopInstance
+from job_shop_lib import JobShopInstance, Schedule
 from job_shop_lib import Schedule as ScheduleBuilder
 from job_shop_lib import ValidationError
 
@@ -61,3 +61,6 @@ class JobShopAnnealer(Annealer):
             # If the schedule is invalid, return a large penalty
             logging.warning("Invalid schedule encountered: %s", e)
             return float("inf")
+
+    def _compute_penalties(self, schedule: Schedule) -> float:
+        """Calculates penalties for the constraints of deadline and arrival time violations."""
