@@ -132,8 +132,21 @@ def test_import():
     from job_shop_lib.metaheuristics import JobShopAnnealer
 
     assert JobShopAnnealer is not None
-    
+
 
 # Solution quality test of ft06 instance
 def test_solution_quality(ft06_instance):
-    
+    solver = SimulatedAnnealingSolver(
+        initial_temperature=10_000,
+        steps=50_000,
+        cool=0.99,
+        penalty_factor=1_000_000,
+    )
+
+    schedule = solver.solve(ft06_instance)
+    makespan = schedule.makespan()
+
+    # Known optimal makespan for ft06 is 55
+    # Allow some suboptimality due to stochastic nature
+    assert makespan <= 60  # Within 10% of optimal
+    print(f"\nft06 makespan: {makespan} (optimal=55)")
