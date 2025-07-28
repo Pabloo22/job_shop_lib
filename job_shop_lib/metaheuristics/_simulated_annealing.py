@@ -12,6 +12,7 @@ except ImportError:
 
 from job_shop_lib import JobShopInstance, Schedule
 from job_shop_lib import Schedule as ScheduleBuilder
+from job_shop_lib import ScheduledOperation
 from job_shop_lib import ValidationError
 
 
@@ -106,3 +107,8 @@ class JobShopAnnealer(Annealer):
                     completion_times[job_id] = operation.end_time
 
         return completion_times
+
+    def _find_scheduled_operation(
+        self, schedule: Schedule, job_id: int, operation_index: int
+    ) -> ScheduledOperation:
+        """Finds the scheduled operation for a given job and operation index."""
