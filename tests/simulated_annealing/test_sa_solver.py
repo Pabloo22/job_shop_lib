@@ -1,5 +1,6 @@
 import pytest
 from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib.metaheuristics import JobShopAnnealer
 from job_shop_lib.metaheuristics._sa_solver import SimulatedAnnealingSolver
 from job_shop_lib import Schedule
 
@@ -58,8 +59,18 @@ def test_basic_functionality(simple_instance):
 
     # validate the schedule
     schedule.validate()
-    
+
 
 # Initialization Test
 def test_initialization(simple_instance):
     # Create a custom initial state
+    initial_state = [
+        [0, 1],  # Machine 0: Job0 then Job1
+        [0, 1],  # Machine 1: Job0 then Job1
+    ]
+
+    annealer = JobShopAnnealer(
+        simple_instance, initial_state, penalty_factor=1_000_000
+    )
+
+    assert annealer.state == initial_state
