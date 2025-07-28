@@ -42,3 +42,6 @@ class JobShopAnnealer(Annealer):
         sequence = self.state[machine_id]
         if len(sequence) < 2:
             return
+
+        idx1, idx2 = random.sample(range(len(sequence)), 2)
+        sequence[idx1], sequence[idx2] = sequence[idx2], sequence[idx1]
