@@ -88,3 +88,14 @@ def test_arrival_times_constraint(simple_instance):
         penalty_factor=1_000_000,
     )
     schedule = solver.solve(simple_instance)
+
+    # Check first operation of each job starts after arrival time
+    for job_id, job in enumerate(simple_instance.jobs):
+        first_op = job[0]
+        scheduled_op = next(
+            op
+            for machine_schedule in schedule.schedule
+            for op in machine_schedule
+            if op.operation == first_op
+        )
+        assert scheduled_op.start_time >= simple_instance.arrival_times[job_id]
