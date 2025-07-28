@@ -38,8 +38,6 @@ def ft06_instance():
                     Operation(
                         machines=machine_id,
                         duration=duration,
-                        job_id=job_id,
-                        position_in_job=op_idx,
                     )
                 )
             jobs.append(operations)
