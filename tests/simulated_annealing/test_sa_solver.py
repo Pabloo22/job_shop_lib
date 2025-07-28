@@ -25,3 +25,19 @@ def ft06_instance():
     with open("ft06.txt", "r", encoding="utf-8") as f:
         lines = f.readlines()[4:]  # Skip header
         num_jobs, num_machines = map(int, lines[0].split())
+        for job_id in range(num_jobs):
+            operations = []
+            data = lines[job_id + 1].split()
+            for op_idx in range(num_machines):
+                machine_id = int(data[2 * op_idx])
+                duration = int(data[2 * op_idx + 1])
+                operations.append(
+                    Operation(
+                        machine_id=machine_id,
+                        duration=duration,
+                        job_id=job_id,
+                        position_in_job=op_idx,
+                    )
+                )
+            jobs.append(operations)
+    return JobShopInstance(jobs=jobs)
