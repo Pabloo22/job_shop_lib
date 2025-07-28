@@ -64,3 +64,18 @@ class JobShopAnnealer(Annealer):
 
     def _compute_penalties(self, schedule: Schedule) -> float:
         """Calculates penalties for the constraints of deadline and arrival time violations."""
+        if not hasattr(self.instance, "deadlines") and not hasattr(
+            self.instance, "arrival_times"
+        ):
+            return 0.0
+
+        job_completion_times = self._get_job_completion_times(schedule)
+        penalty = 0.0
+
+        if hasattr(self.instance, "deadlines"):
+            deadlines = self.instance.deadlines
+            for job_id, completion_time in enumerate(job_completion_times):
+                if completion_time > deadlines[job_id]:
+                    penalty += self.penalty_factor * (
+                        completion_time - deadlines[job_id]
+                    )
