@@ -112,3 +112,13 @@ class JobShopAnnealer(Annealer):
         self, schedule: Schedule, job_id: int, operation_index: int
     ) -> ScheduledOperation:
         """Finds the scheduled operation for a given job and operation index."""
+        for machine_schedule in schedule.schedule:
+            for operation in machine_schedule:
+                if (
+                    operation.job_id == job_id
+                    and operation.operation_index == operation_index
+                ):
+                    return operation
+        raise ValueError(
+            f"Scheduled operation not found for job {job_id} and operation index {operation_index}"
+        )
