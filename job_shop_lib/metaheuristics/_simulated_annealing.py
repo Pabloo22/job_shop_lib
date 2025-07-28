@@ -35,3 +35,10 @@ class JobShopAnnealer(Annealer):
         super().__init__(initial_state)
         self.instance = instance
         self.penalty_factor = penalty_factor
+
+    def move(self) -> None:
+        """Generates a neighbor state by swapping two operations."""
+        machine_id = random.randint(0, self.instance.num_machines - 1)
+        sequence = self.state[machine_id]
+        if len(sequence) < 2:
+            return
