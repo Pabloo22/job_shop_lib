@@ -56,7 +56,7 @@ class DispatchingRuleSolver(BaseSolver):
               If a list is provided, a composite filter will be created
               using the specified filters.
 
-    .. seealso::
+    .. see also::
         - :func:`job_shop_lib.dispatching.rules.dispatching_rule_factory`
         - :func:`job_shop_lib.dispatching.rules.machine_chooser_factory`
         - :func:`~job_shop_lib.dispatching.ready_operations_filter_factory`
