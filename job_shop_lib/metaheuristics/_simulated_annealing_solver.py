@@ -4,7 +4,33 @@ from job_shop_lib.metaheuristics import JobShopAnnealer
 
 
 class SimulatedAnnealingSolver(BaseSolver):
-    """Simulated Annealing Solver for Job Shop Scheduling."""
+    """Simulated Annealing Solver for Job Shop Scheduling.
+
+    Attributes:
+        initial_temperature: Initial temperature for the annealing process.
+        steps: Number of steps to perform in the annealing process.
+        cool: Cooling factor for the temperature.
+        penalty_factor: Factor to scale the penalty for infeasible solutions.
+
+    Args:
+        initial_temperature: Initial temperature for the annealing process.
+        It controls the probability of accepting worse solutions. That sets
+        the metropolis criterion.
+        steps: Number of steps to perform in the annealing process. It is
+        crucial for the convergence of the algorithm. It also specfies how
+        many iterations will be performed. Therefore, user can control the
+        expensiveness of the algorithm.
+        cool: Cooling factor for the temperature. It is used to reduce the
+        temperature after each step. A value between 0 and 1 is expected.
+        penalty_factor: Factor to scale the penalty for infeasible solutions.
+        It is used to penalize solutions that violate constraints, such as
+        arrival times and deadlines. A higher value increases the penalty
+        for infeasible solutions, making them less likely to be accepted.
+        It is used to calculate the energy of the solution.
+        It is used to calculate the makespan of the schedule.
+        It is used to calculate the penalties for constraint violations.
+
+    """
 
     def __init__(
         self,
