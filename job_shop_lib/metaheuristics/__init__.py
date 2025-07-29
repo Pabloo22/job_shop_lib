@@ -12,7 +12,7 @@ defining the objective function that complies with the constraints of the
 arrival times and deadlines.
 """
 
-from job_shop_lib.metaheuristics._simulated_annealing import JobShopAnnealer
+from job_shop_lib.metaheuristics._job_shop_annealer import JobShopAnnealer
 
 __all__ = [
     "JobShopAnnealer",
