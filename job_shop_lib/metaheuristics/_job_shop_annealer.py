@@ -18,7 +18,27 @@ from job_shop_lib.exceptions import ValidationError
 
 class JobShopAnnealer(Annealer):
     """Simulated Annealing implementation from simanneal API
-    for Job Shop Scheduling."""
+    for Job Shop Scheduling.
+
+    Attributes:
+        instance: The job shop instance to solve.
+        initial_state: Initial state of the schedule as a list of lists,
+            where each sublist represents the operations of a job.
+        penalty_factor: Factor to scale the penalty for infeasible solutions.
+
+    Args:
+        instance: The job shop instance to solve. It retrieves the jobs and machines
+            from the instance and uses them to create the schedule.
+        initial_state: Initial state of the schedule as a list of lists,
+            where each sublist represents the operations of a job.
+        penalty_factor: Factor to scale the penalty for infeasible solutions.
+            It is used to penalize solutions that violate constraints, such as
+            arrival times and deadlines. A higher value increases the penalty
+            for infeasible solutions, making them less likely to be accepted.
+            It is used to calculate the energy of the solution.
+            It is used to calculate the makespan of the schedule.
+            It is used to calculate the penalties for constraint violations.
+    """
 
     def __init__(
         self,
@@ -26,14 +46,6 @@ class JobShopAnnealer(Annealer):
         initial_state: list[list[int]],
         penalty_factor: int = 1_000_000,
     ):
-        """Initializes the annealer with a job shop instance and an initial state.
-
-        Args:
-            instance: The job shop instance to solve.
-            initial_state: Initial state of the schedule as a list of lists,
-                where each sublist represents the operations of a job.
-            penalty_factor: Factor to scale the penalty for infeasible solutions.
-        """
 
         super().__init__(initial_state)
         self.instance = instance
