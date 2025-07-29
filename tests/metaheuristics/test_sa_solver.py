@@ -1,7 +1,9 @@
 import pytest
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.metaheuristics import JobShopAnnealer
-from job_shop_lib.metaheuristics._sa_solver import SimulatedAnnealingSolver
+from job_shop_lib.metaheuristics._simulated_annealing_solver import (
+    SimulatedAnnealingSolver,
+)
 from job_shop_lib import Schedule
 
 
