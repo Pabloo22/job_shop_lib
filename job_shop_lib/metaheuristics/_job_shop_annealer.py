@@ -110,7 +110,7 @@ class JobShopAnnealer(Annealer):
 
     def _get_job_completion_times(
         self, schedule: Schedule
-    ) -> list[Optional[int]]:
+    ) -> list[Optional[int | None]]:
         """Returns the completion time of the last operation for each job."""
         completion_times = [0] * self.instance.num_jobs
         for machine_schedule in schedule.schedule:
