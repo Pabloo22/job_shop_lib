@@ -1,6 +1,6 @@
 import random
 import logging
-from typing import Any, Optional
+from typing import Optional
 
 try:
     from simanneal import Annealer
