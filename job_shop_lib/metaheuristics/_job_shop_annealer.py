@@ -27,8 +27,8 @@ class JobShopAnnealer(Annealer):
         penalty_factor: Factor to scale the penalty for infeasible solutions.
 
     Args:
-        instance: The job shop instance to solve. It retrieves the jobs and machines
-        from the instance and uses them to create the schedule.
+        instance: The job shop instance to solve. It retrieves the jobs and
+        machines from the instance and uses them to create the schedule.
         initial_state: Initial state of the schedule as a list of lists,
         where each sublist represents the operations of a job.
         penalty_factor: Factor to scale the penalty for infeasible solutions.
@@ -76,7 +76,8 @@ class JobShopAnnealer(Annealer):
             return float("inf")
 
     def _compute_penalties(self, schedule: Schedule) -> float:
-        """Calculates penalties for the constraints of deadline and arrival time violations."""
+        """Calculates penalties for the constraints of
+        deadline and arrival time violations."""
         if not hasattr(self.instance, "deadlines") and not hasattr(
             self.instance, "arrival_times"
         ):
@@ -123,7 +124,8 @@ class JobShopAnnealer(Annealer):
     def _find_scheduled_operation(
         self, schedule: Schedule, job_id: int, operation_index: int
     ) -> ScheduledOperation:
-        """Finds the scheduled operation for a given job and operation index."""
+        """Finds the scheduled operation for a given
+        job and operation index."""
         for machine_schedule in schedule.schedule:
             for operation in machine_schedule:
                 if (
@@ -132,5 +134,6 @@ class JobShopAnnealer(Annealer):
                 ):
                     return operation
         raise ValueError(
-            f"Scheduled operation not found for job {job_id} and operation index {operation_index}"
+            f"Scheduled operation not found for job {job_id} and "
+            f"operation index {operation_index}"
         )
