@@ -18,8 +18,14 @@ class SimulatedAnnealingSolver(BaseSolver):
         self.cool = cool
         self.penalty_factor = penalty_factor
 
-    def solve(self, instance: JobShopInstance) -> Schedule:
-        initial_state = self._generate_initial_state(instance)
+    def solve(
+        self,
+        instance: JobShopInstance,
+        initial_state: list[list[int]] | None = None,
+    ) -> Schedule:
+        if initial_state is None:
+            # Generate a random initial state if not provided
+            initial_state = self._generate_initial_state(instance)
         annealer = JobShopAnnealer(
             instance, initial_state, penalty_factor=self.penalty_factor
         )
