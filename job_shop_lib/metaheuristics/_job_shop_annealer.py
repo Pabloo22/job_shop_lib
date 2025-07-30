@@ -1,6 +1,5 @@
 import random
 import logging
-from typing import Sequence
 
 import simanneal
 
