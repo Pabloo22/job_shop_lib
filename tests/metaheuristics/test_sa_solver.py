@@ -105,13 +105,6 @@ def test_deadlines_constraint(simple_instance):
         assert completion_time <= simple_instance.deadlines[job_id]
 
 
-# Import test
-def test_import():
-    from job_shop_lib.metaheuristics import JobShopAnnealer
-
-    assert JobShopAnnealer is not None
-
-
 # Solution quality test of ft06 instance
 def test_solution_quality(ft06_instance):
     solver = SimulatedAnnealingSolver(
