@@ -4,8 +4,7 @@ from typing import Sequence
 
 import simanneal
 
-from job_shop_lib import JobShopInstance, Schedule
-from job_shop_lib import ScheduledOperation
+from job_shop_lib import JobShopInstance, Schedule, ScheduledOperation
 from job_shop_lib.exceptions import ValidationError
 
 
