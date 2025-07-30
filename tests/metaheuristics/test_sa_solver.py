@@ -7,7 +7,12 @@ from job_shop_lib.metaheuristics._simulated_annealing_solver import (
 )
 from job_shop_lib import Schedule
 
-ft06_instance = load_benchmark_instance("ft06")
+# ft06_instance = load_benchmark_instance("ft06")
+
+
+@pytest.fixture
+def ft06_instance():
+    return load_benchmark_instance("ft06")
 
 
 # Fixture for a simple job shop instance
