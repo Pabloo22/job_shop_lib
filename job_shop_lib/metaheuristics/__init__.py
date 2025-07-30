@@ -1,5 +1,4 @@
-"""
-Metaheuristic algorithms for solving job shop scheduling problems.
+"""Metaheuristic algorithms for solving job shop scheduling problems.
 
 This module provides implementations of various metaheuristic optimization
 algorithms designed to solve Job Shop Scheduling Problems (JSSP). These
@@ -14,7 +13,7 @@ Metaheuristics are particularly well-suited for JSSP due to their ability to:
 
 Currently implemented algorithms:
 - Simulated Annealing (SA): A probabilistic technique that accepts worse
-  solutions with decreasing probability to escape local optima
+solutions with decreasing probability to escape local optima
 
 The module is designed to be extensible for future implementations of other
 metaheuristic algorithms such as Genetic Algorithms, Particle Swarm
