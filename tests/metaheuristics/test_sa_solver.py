@@ -69,7 +69,7 @@ def test_arrival_times_constraint(simple_instance):
     )
     schedule = solver.solve(simple_instance)
 
-    # Check first operation of each job starts after arrival time
+    # Check first operation of each job starts after release date
     for job_id, job in enumerate(simple_instance.jobs):
         first_op = job[0]
         scheduled_op = next(
@@ -78,7 +78,9 @@ def test_arrival_times_constraint(simple_instance):
             for op in machine_schedule
             if op.operation == first_op
         )
-        assert scheduled_op.start_time >= simple_instance.arrival_times[job_id]
+        assert (
+            scheduled_op.start_time >= first_op.release_date
+        ), f"Job {job_id} first operation starts too early"
 
 
 # Deadlines constraint test
