@@ -25,7 +25,11 @@ Classes:
 """
 
 from job_shop_lib.metaheuristics._job_shop_annealer import JobShopAnnealer
+from job_shop_lib.metaheuristics._simulated_annealing_solver import (
+    SimulatedAnnealingSolver,
+)
 
 __all__ = [
     "JobShopAnnealer",
+    "SimulatedAnnealingSolver",
 ]
