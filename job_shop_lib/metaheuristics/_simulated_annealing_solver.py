@@ -6,6 +6,14 @@ from job_shop_lib.metaheuristics import JobShopAnnealer
 class SimulatedAnnealingSolver(BaseSolver):
     """Simulated Annealing Solver for Job Shop Scheduling.
 
+    SA (Simulated Annealing) is a probabilistic technique (metaheuristic
+    algorithm) for approximating the global optimum of a given function.
+    It seeks to find a good approximation of the optimized makespan by
+    exploring the schedule space and accepting worse schedules with evaluating
+    the metropolis criterion. It represents the JSSP solution by defining
+    the objective function that complies with the constraints of the arrival
+    times and deadlines.
+
     Attributes:
         initial_temperature: Initial temperature for the annealing process.
         steps: Number of steps to perform in the annealing process.
