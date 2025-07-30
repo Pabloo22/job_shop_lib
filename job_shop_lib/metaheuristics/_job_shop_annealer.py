@@ -104,9 +104,9 @@ class JobShopAnnealer(simanneal.Annealer):
                     scheduled_op = self._find_scheduled_operation(
                         schedule, job_id, 0
                     )
-                    if scheduled_op.start_time < arrival_times[job_id]:
-                        penalty += self.penalty_factor * (
-                            arrival_times[job_id] - scheduled_op.start_time
+                    if scheduled_op.start_time < first_op_release_date:
+                        penalty += float(self.penalty_factor) * (
+                            first_op_release_date - scheduled_op.start_time
                         )
 
         return penalty
