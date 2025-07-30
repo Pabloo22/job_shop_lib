@@ -15,12 +15,12 @@ ft06_instance = load_benchmark_instance("ft06")
 def simple_instance():
     jobs = [
         [
-            Operation(machines=0, duration=3),
-            Operation(machines=1, duration=2),
+            Operation(machines=0, duration=3, release_date=2, deadline=10),
+            Operation(machines=1, duration=2, release_date=3, deadline=8),
         ],
         [
-            Operation(machines=0, duration=2),
-            Operation(machines=1, duration=1),
+            Operation(machines=0, duration=2, release_date=1, deadline=8),
+            Operation(machines=1, duration=1, release_date=2, deadline=6),
         ],
     ]
     return JobShopInstance(jobs=jobs)
