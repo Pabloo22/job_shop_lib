@@ -87,9 +87,10 @@ class JobShopAnnealer(simanneal.Annealer):
                 last_op_deadline = deadlines[-1]
                 if (
                     last_op_deadline is not None
+                    and completion_time is not None
                     and completion_time > last_op_deadline
                 ):
-                    penalty += self.penalty_factor * (
+                    penalty += float(self.penalty_factor) * (
                         completion_time - last_op_deadline
                     )
 
