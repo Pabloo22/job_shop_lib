@@ -83,8 +83,6 @@ def test_arrival_times_constraint(simple_instance):
 
 # Deadlines constraint test
 def test_deadlines_constraint(simple_instance):
-    # Set deadlines for jobs
-    simple_instance.deadlines = [10, 8]  # Job0 deadline=10, Job1 deadline=8
 
     solver = SimulatedAnnealingSolver(
         initial_temperature=1000,
