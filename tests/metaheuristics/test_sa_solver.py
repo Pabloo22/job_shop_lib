@@ -104,7 +104,9 @@ def test_deadlines_constraint(simple_instance):
             if op.operation == last_op
         )
         completion_time = scheduled_op.start_time + last_op.duration
-        assert completion_time <= simple_instance.deadlines[job_id]
+        assert (
+            completion_time <= last_op.deadline
+        ), f"Job {job_id} last operation completes after deadline"
 
 
 # Solution quality test of ft06 instance
