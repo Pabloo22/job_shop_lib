@@ -115,11 +115,16 @@ class JobShopAnnealer(simanneal.Annealer):
         self, schedule: Schedule
     ) -> Sequence[int | None]:
         """Returns the completion time of the last operation for each job."""
-        completion_times = [0] * self.instance.num_jobs
+        completion_times = [None] * self.instance.num_jobs
+
         for machine_schedule in schedule.schedule:
             for operation in machine_schedule:
                 job_id = operation.job_id
-                if operation.end_time > completion_times[job_id]:
+                # Check if this the last operation for this job
+                if (
+                    operation.position_in_job
+                    == self.instance.num_operations_per_job[job_id] - 1
+                ):
                     completion_times[job_id] = operation.end_time
 
         return completion_times
