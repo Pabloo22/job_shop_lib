@@ -95,17 +95,19 @@ class JobShopAnnealer(simanneal.Annealer):
                         completion_time - last_op_deadline
                     )
 
-        if hasattr(self.instance, "arrival_times"):
-            arrival_times = self.instance.arrival_times
-            first_ops = [job[0] for job in self.instance.jobs]
-            for job_id, operation in enumerate(first_ops):
-                scheduled_op = self._find_scheduled_operation(
-                    schedule, job_id, 0
-                )
-                if scheduled_op.start_time < arrival_times[job_id]:
-                    penalty += self.penalty_factor * (
-                        arrival_times[job_id] - scheduled_op.start_time
+        if self.instance.has_release_dates:
+            arrival_times = self.instance.release_dates_matrix
+            for job_id in range(self.instance.num_jobs):
+                # Check for the first operation's release date for each job
+                first_op_release_date = arrival_times[job_id][0]
+                if first_op_release_date is not None:
+                    scheduled_op = self._find_scheduled_operation(
+                        schedule, job_id, 0
                     )
+                    if scheduled_op.start_time < arrival_times[job_id]:
+                        penalty += self.penalty_factor * (
+                            arrival_times[job_id] - scheduled_op.start_time
+                        )
 
         return penalty
 
