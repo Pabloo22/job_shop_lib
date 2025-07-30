@@ -2961,14 +2961,9 @@ version = "0.5.0"
 description = "Simulated Annealing in Python"
 optional = false
 python-versions = "*"
-files = []
-develop = false
-
-[package.source]
-type = "git"
-url = "https://github.com/perrygeo/simanneal.git"
-reference = "master"
-resolved_reference = "951e7d89a8b7f19aeb05b64e7cc8b844a734af89"
+files = [
+    {file = "simanneal-0.5.0-py2.py3-none-any.whl", hash = "sha256:f93d90958ff1df68bc4a6e440892a19bbc0569ad9c6442fff659dc011b790b34"},
+]
 
 [[package]]
 name = "six"
@@ -3330,4 +3325,4 @@ pygraphviz = ["pygraphviz"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a7b757d4d1763f9736545592ce2121d5ea4bf3290a5a29d0a01055b78d48f783"
+content-hash = "7d06868bdc9ebc8839b8903bacb40390b95869a427ce6907c8996028bba15edc"
