@@ -19,17 +19,20 @@ class JobShopAnnealer(simanneal.Annealer):
         penalty_factor: Factor to scale the penalty for infeasible solutions.
 
     Args:
-        instance: The job shop instance to solve. It retrieves the jobs and
-        machines from the instance and uses them to create the schedule.
-        initial_state: Initial state of the schedule as a list of lists,
-        where each sublist represents the operations of a job.
-        penalty_factor: Factor to scale the penalty for infeasible solutions.
-        It is used to penalize solutions that violate constraints, such as
-        arrival times and deadlines. A higher value increases the penalty
-        for infeasible solutions, making them less likely to be accepted.
-        It is used to calculate the energy of the solution.
-        It is used to calculate the makespan of the schedule.
-        It is used to calculate the penalties for constraint violations.
+        instance:
+            The job shop instance to solve. It retrieves the jobs and machines
+            from the instance and uses them to create the schedule.
+        initial_state:
+            Initial state of the schedule as a list of lists, where each
+            sublist represents the operations of a job.
+        penalty_factor:
+            Factor to scale the penalty for infeasible solutions. It is used
+            to penalize solutions that violate constraints, such as arrival
+            times and deadlines. A higher value increases the penalty for
+            infeasible solutions, making them less likely to be accepted.
+            It is used to calculate the energy of the solution.
+            It is used to calculate the makespan of the schedule.
+            It is used to calculate the penalties for constraint violations.
     """
 
     def __init__(
