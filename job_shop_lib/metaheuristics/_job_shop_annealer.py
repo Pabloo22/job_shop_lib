@@ -71,8 +71,9 @@ class JobShopAnnealer(simanneal.Annealer):
     def _compute_penalties(self, schedule: Schedule) -> float:
         """Calculates penalties for the constraints of
         deadline and arrival time violations."""
-        if not self.instance.has_deadlines and not hasattr(
-            self.instance, "arrival_times"
+        if (
+            not self.instance.has_deadlines
+            and not self.instance.has_release_dates
         ):
             return 0.0
 
