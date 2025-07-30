@@ -32,7 +32,8 @@ class SimulatedAnnealingSolver(BaseSolver):
             the expensiveness of the algorithm.
         cool:
             Cooling factor for the temperature. It is used to reduce
-            the temperature after each step. A value between 0 and 1 is expected.
+            the temperature after each step. A value between 0 and
+            1 is expected.
         penalty_factor:
             Factor to scale the penalty for infeasible solutions. It is used
             to penalize solutions that violate constraints, such as arrival
