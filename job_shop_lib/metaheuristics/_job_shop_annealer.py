@@ -2,20 +2,14 @@ import random
 import logging
 from typing import Sequence
 
-try:
-    from simanneal import Annealer
-except ImportError:
-    raise ImportError(
-        "simanneal library is required for SimulatedAnnealingSolver. "
-        "Install with: pip install simanneal"
-    )
+import simanneal
 
 from job_shop_lib import JobShopInstance, Schedule
 from job_shop_lib import ScheduledOperation
 from job_shop_lib.exceptions import ValidationError
 
 
-class JobShopAnnealer(Annealer):
+class JobShopAnnealer(simanneal.Annealer):
     """Simulated Annealing implementation from simanneal API
     for Job Shop Scheduling.
 
