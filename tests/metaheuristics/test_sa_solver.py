@@ -26,29 +26,6 @@ def simple_instance():
     return JobShopInstance(jobs=jobs)
 
 
-# Fixture for ft06 instance
-# @pytest.fixture
-# def ft06_instance():
-#     jobs = []
-#     with open("ft06.txt", "r", encoding="utf-8") as f:
-#         lines = f.readlines()[4:]  # Skip header
-#         num_jobs, num_machines = map(int, lines[0].split())
-#         for job_id in range(num_jobs):
-#             operations = []
-#             data = lines[job_id + 1].split()
-#             for op_idx in range(num_machines):
-#                 machine_id = int(data[2 * op_idx])
-#                 duration = int(data[2 * op_idx + 1])
-#                 operations.append(
-#                     Operation(
-#                         machines=machine_id,
-#                         duration=duration,
-#                     )
-#                 )
-#             jobs.append(operations)
-#     return JobShopInstance(jobs=jobs)
-
-
 # Basic Functionality Test
 def test_basic_functionality(simple_instance):
     solver = SimulatedAnnealingSolver(
