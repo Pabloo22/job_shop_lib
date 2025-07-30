@@ -1,10 +1,13 @@
 import pytest
+from job_shop_lib.benchmarking import load_benchmark_instance
 from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.metaheuristics import JobShopAnnealer
 from job_shop_lib.metaheuristics._simulated_annealing_solver import (
     SimulatedAnnealingSolver,
 )
 from job_shop_lib import Schedule
+
+ft06_instance = load_benchmark_instance("ft06")
 
 
 # Fixture for a simple job shop instance
@@ -24,26 +27,26 @@ def simple_instance():
 
 
 # Fixture for ft06 instance
-@pytest.fixture
-def ft06_instance():
-    jobs = []
-    with open("ft06.txt", "r", encoding="utf-8") as f:
-        lines = f.readlines()[4:]  # Skip header
-        num_jobs, num_machines = map(int, lines[0].split())
-        for job_id in range(num_jobs):
-            operations = []
-            data = lines[job_id + 1].split()
-            for op_idx in range(num_machines):
-                machine_id = int(data[2 * op_idx])
-                duration = int(data[2 * op_idx + 1])
-                operations.append(
-                    Operation(
-                        machines=machine_id,
-                        duration=duration,
-                    )
-                )
-            jobs.append(operations)
-    return JobShopInstance(jobs=jobs)
+# @pytest.fixture
+# def ft06_instance():
+#     jobs = []
+#     with open("ft06.txt", "r", encoding="utf-8") as f:
+#         lines = f.readlines()[4:]  # Skip header
+#         num_jobs, num_machines = map(int, lines[0].split())
+#         for job_id in range(num_jobs):
+#             operations = []
+#             data = lines[job_id + 1].split()
+#             for op_idx in range(num_machines):
+#                 machine_id = int(data[2 * op_idx])
+#                 duration = int(data[2 * op_idx + 1])
+#                 operations.append(
+#                     Operation(
+#                         machines=machine_id,
+#                         duration=duration,
+#                     )
+#                 )
+#             jobs.append(operations)
+#     return JobShopInstance(jobs=jobs)
 
 
 # Basic Functionality Test
