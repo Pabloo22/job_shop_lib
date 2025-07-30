@@ -1,15 +1,27 @@
 """
-Contains the implementation of the JobShopAnnealer class,
-which is a simulated annealing algorithm for solving job
-shop scheduling problems.
+Metaheuristic algorithms for solving job shop scheduling problems.
 
-SA (Simulated Annealing) is a probabilistic technique (metaheuristic
-algorithm) for approximating the global optimum of a given function.
-It seeks to find a good approximation of the optimized makespan
-by exploring the schedule space and accepting worse schedules with
-evaluating the metropolis criterion. It represents the JSSP solution by
-defining the objective function that complies with the constraints of the
-arrival times and deadlines.
+This module provides implementations of various metaheuristic optimization
+algorithms designed to solve Job Shop Scheduling Problems (JSSP). These
+algorithms are nature-inspired or probabilistic techniques that can find
+near-optimal solutions for complex combinatorial optimization problems.
+
+Metaheuristics are particularly well-suited for JSSP due to their ability to:
+- Handle large solution spaces efficiently
+- Escape local optima through stochastic mechanisms
+- Balance exploration and exploitation of the search space
+- Provide good quality solutions within reasonable computational time
+
+Currently implemented algorithms:
+- Simulated Annealing (SA): A probabilistic technique that accepts worse
+  solutions with decreasing probability to escape local optima
+
+The module is designed to be extensible for future implementations of other
+metaheuristic algorithms such as Genetic Algorithms, Particle Swarm
+Optimization, Tabu Search, and other nature-inspired optimization techniques.
+
+Classes:
+    JobShopAnnealer: Simulated annealing implementation for JSSP optimization
 """
 
 from job_shop_lib.metaheuristics._job_shop_annealer import JobShopAnnealer
