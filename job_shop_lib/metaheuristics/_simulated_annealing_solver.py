@@ -116,8 +116,8 @@ class SimulatedAnnealingSolver(BaseSolver):
         jobs_by_deadline = sorted(
             range(instance.num_jobs),
             key=lambda j: (
-                float(instance.jobs[j][-1].deadline)
-                if instance.jobs[j][-1].deadline is not None
+                float(deadline)
+                if (deadline := instance.jobs[j][-1].deadline) is not None
                 else float("inf")
             ),
         )
