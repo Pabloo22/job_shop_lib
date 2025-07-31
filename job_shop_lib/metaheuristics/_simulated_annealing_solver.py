@@ -85,11 +85,6 @@ class SimulatedAnnealingSolver(BaseSolver):
             annealer.copy_strategy = "deepcopy"
 
             best_state, _ = annealer.anneal()
-            print(f"Initial state: {initial_state}")
-            print(f"Final state: {best_state}")
-            print(
-                f"Schedule: {Schedule.from_job_sequences(instance, best_state)}"
-            )
             return Schedule.from_job_sequences(instance, best_state)
         finally:
             # Restore the previous random state
@@ -104,7 +99,8 @@ class SimulatedAnnealingSolver(BaseSolver):
         job_progress = [0 for _ in range(instance.num_jobs)]
 
         # Create list of jobs sorted by earliest deadline first
-        # Handle None deadlines by treating them as infinite (very large number)
+        # Handle None deadlines by treating them as infinite
+        # (very large number)
         jobs_by_deadline = sorted(
             range(instance.num_jobs),
             key=lambda j: (
