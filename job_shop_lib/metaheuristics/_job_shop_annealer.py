@@ -1,5 +1,4 @@
 import random
-import logging
 
 import simanneal
 
@@ -62,7 +61,7 @@ class JobShopAnnealer(simanneal.Annealer):
             makespan = schedule.makespan()
             penalty = self._compute_penalties(schedule)
             return makespan + penalty
-        except ValidationError as e:
+        except ValidationError:
             # If the schedule is invalid, return a large penalty
             return float("inf")
 
