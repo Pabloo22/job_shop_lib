@@ -13,6 +13,7 @@ Metaheuristics are particularly well-suited for JSSP due to their ability to:
 - Provide good quality solutions within reasonable computational time
 
 Currently implemented algorithms:
+
 - Simulated Annealing (SA): A probabilistic technique that accepts worse
 solutions with decreasing probability to escape local optima
 
