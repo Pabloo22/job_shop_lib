@@ -69,6 +69,7 @@ def test_arrival_times_constraint(simple_instance):
         steps=5000,
         cool=0.95,
         penalty_factor=1_000_000,
+        seed=42,  # For reproducibility
     )
     schedule = solver.solve(simple_instance)
 
@@ -94,6 +95,7 @@ def test_deadlines_constraint(simple_instance):
         steps=5000,
         cool=0.95,
         penalty_factor=1_000_000,
+        seed=42,  # For reproducibility
     )
     schedule = solver.solve(simple_instance)
 
