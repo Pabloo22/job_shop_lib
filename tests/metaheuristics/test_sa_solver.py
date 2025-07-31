@@ -119,6 +119,7 @@ def test_solution_quality(ft06_instance):
         steps=50_000,
         cool=0.99,
         penalty_factor=1_000_000,
+        seed=42,  # For reproducibility
     )
 
     schedule = solver.solve(ft06_instance)
