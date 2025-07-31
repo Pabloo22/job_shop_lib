@@ -6,6 +6,7 @@ algorithms are nature-inspired or probabilistic techniques that can find
 near-optimal solutions for complex combinatorial optimization problems.
 
 Metaheuristics are particularly well-suited for JSSP due to their ability to:
+
 - Handle large solution spaces efficiently
 - Escape local optima through stochastic mechanisms
 - Balance exploration and exploitation of the search space
