@@ -95,7 +95,7 @@ class SimulatedAnnealingSolver(BaseSolver):
         self, instance: JobShopInstance
     ) -> list[list[int]]:
         """Generates deadline-aware initial sequences for each machine."""
-        state = [[] for _ in range(instance.num_machines)]
+        state: list[list[int]] = [[] for _ in range(instance.num_machines)]
         job_progress = [0 for _ in range(instance.num_jobs)]
 
         # Create list of jobs sorted by earliest deadline first
