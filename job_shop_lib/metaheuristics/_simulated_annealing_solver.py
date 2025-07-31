@@ -19,6 +19,7 @@ class SimulatedAnnealingSolver(BaseSolver):
         steps: Number of steps to perform in the annealing process.
         cool: Cooling factor for the temperature.
         penalty_factor: Factor to scale the penalty for infeasible solutions.
+        seed: Random seed for reproducible results.
 
     Args:
         initial_temperature:
@@ -42,6 +43,9 @@ class SimulatedAnnealingSolver(BaseSolver):
             It is used to calculate the energy of the solution.
             It is used to calculate the makespan of the schedule.
             It is used to calculate the penalties for constraint violations.
+        seed:
+            Random seed for reproducible results. If None, random behavior
+            will be non-deterministic.
 
     """
 
@@ -51,30 +55,41 @@ class SimulatedAnnealingSolver(BaseSolver):
         steps: int = 10000,
         cool: float = 0.95,
         penalty_factor: int = 1_000_000,
+        seed: int | None = None,
     ):
         self.initial_temperature = initial_temperature
         self.steps = steps
         self.cool = cool
         self.penalty_factor = penalty_factor
+        self.seed = seed
 
     def solve(
         self,
         instance: JobShopInstance,
         initial_state: list[list[int]] | None = None,
     ) -> Schedule:
-        if initial_state is None:
-            # Generate a random initial state if not provided
-            initial_state = self._generate_initial_state(instance)
-        annealer = JobShopAnnealer(
-            instance, initial_state, penalty_factor=self.penalty_factor
-        )
-        annealer.Tmax = self.initial_temperature
-        annealer.steps = self.steps
-        annealer.cool = self.cool
-        annealer.copy_strategy = "deepcopy"
+        # Save current random state and set new seed if provided
+        if self.seed is not None:
+            old_state = random.getstate()
+            random.seed(self.seed)
+        try:
+            if initial_state is None:
+                # Generate a random initial state if not provided
+                initial_state = self._generate_initial_state(instance)
+            annealer = JobShopAnnealer(
+                instance, initial_state, penalty_factor=self.penalty_factor
+            )
+            annealer.Tmax = self.initial_temperature
+            annealer.steps = self.steps
+            annealer.cool = self.cool
+            annealer.copy_strategy = "deepcopy"
 
-        best_state, _ = annealer.anneal()
-        return Schedule.from_job_sequences(instance, best_state)
+            best_state, _ = annealer.anneal()
+            return Schedule.from_job_sequences(instance, best_state)
+        finally:
+            # Restore the previous random state
+            if self.seed is not None:
+                random.setstate(old_state)
 
     def _generate_initial_state(
         self, instance: JobShopInstance
