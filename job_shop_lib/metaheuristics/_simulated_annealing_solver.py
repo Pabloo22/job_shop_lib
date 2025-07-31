@@ -76,19 +76,6 @@ class SimulatedAnnealingSolver(BaseSolver):
             if initial_state is None:
                 # Generate a random initial state if not provided
                 initial_state = self._generate_initial_state(instance)
-            # Debug deadline violations
-            schedule_debug = Schedule.from_job_sequences(
-                instance, initial_state
-            )
-            for job_id, job in enumerate(instance.jobs):
-                last_op = job[-1]
-                for machine_schedule in schedule_debug.schedule:
-                    for op in machine_schedule:
-                        if op.operation == last_op:
-                            completion = op.start_time + last_op.duration
-                            print(
-                                f"Job {job_id}: completion={completion}, deadline={last_op.deadline}"
-                            )
             annealer = JobShopAnnealer(
                 instance, initial_state, penalty_factor=self.penalty_factor
             )
