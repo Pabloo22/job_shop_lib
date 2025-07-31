@@ -56,12 +56,14 @@ class SimulatedAnnealingSolver(BaseSolver):
         cool: float = 0.95,
         penalty_factor: int = 1_000_000,
         seed: int | None = None,
+        annealer_params: dict | None = None,
     ):
         self.initial_temperature = initial_temperature
         self.steps = steps
         self.cool = cool
         self.penalty_factor = penalty_factor
         self.seed = seed
+        self.annealer_params = annealer_params
 
     def solve(
         self,
@@ -91,10 +93,23 @@ class SimulatedAnnealingSolver(BaseSolver):
             annealer = JobShopAnnealer(
                 instance, initial_state, penalty_factor=self.penalty_factor
             )
-            annealer.Tmax = self.initial_temperature
-            annealer.steps = self.steps
-            annealer.cool = self.cool
-            annealer.copy_strategy = "deepcopy"
+            # Merge explicit parameters with annealer_params (explicit take precedence)
+            params = {
+                "Tmax": self.initial_temperature,
+                "steps": self.steps,
+                "cool": self.cool,
+                "copy_strategy": "deepcopy",
+            }
+            if self.annealer_params:
+                params.update(self.annealer_params)
+
+            # Dynamically set attributes on the annealer
+            for key, value in params.items():
+                setattr(annealer, key, value)
+            # annealer.Tmax = self.initial_temperature
+            # annealer.steps = self.steps
+            # annealer.cool = self.cool
+            # annealer.copy_strategy = "deepcopy"
 
             best_state, _ = annealer.anneal()
             return Schedule.from_job_sequences(instance, best_state)
