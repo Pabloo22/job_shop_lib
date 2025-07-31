@@ -21,7 +21,8 @@ Optimization, Tabu Search, and other nature-inspired optimization techniques.
 
 .. autosummary::
     JobShopAnnealer: Simulated annealing implementation for JSSP optimization
-    SimulatedAnnealingSolver: Solver interface for simulated annealing algorithm
+    SimulatedAnnealingSolver: Solver interface for simulated annealing
+    algorithm
 """
 
 from job_shop_lib.metaheuristics._job_shop_annealer import JobShopAnnealer
