@@ -80,10 +80,11 @@ class SimulatedAnnealingSolver(BaseSolver):
             Schedule: The best schedule found for the given instance.
 
         Notes:
-            - If a seed is set, the random state is saved and restored to ensure
-            reproducibility.
-            - The annealing process parameters (temperature, steps, cooling rate)
-            are set from the solver's attributes.
+            - If a seed is set, the random state is saved and restored to
+            ensure reproducibility.
+            - The annealing process parameters (temperature, steps,
+            cooling rate) are set from the solver's attributes.
+
         """
         # Save current random state and set new seed if provided
         if self.seed is not None:
