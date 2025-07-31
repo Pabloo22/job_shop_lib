@@ -76,6 +76,19 @@ class SimulatedAnnealingSolver(BaseSolver):
             if initial_state is None:
                 # Generate a random initial state if not provided
                 initial_state = self._generate_initial_state(instance)
+            # Debug deadline violations
+            schedule_debug = Schedule.from_job_sequences(
+                instance, initial_state
+            )
+            for job_id, job in enumerate(instance.jobs):
+                last_op = job[-1]
+                for machine_schedule in schedule_debug.schedule:
+                    for op in machine_schedule:
+                        if op.operation == last_op:
+                            completion = op.start_time + last_op.duration
+                            print(
+                                f"Job {job_id}: completion={completion}, deadline={last_op.deadline}"
+                            )
             annealer = JobShopAnnealer(
                 instance, initial_state, penalty_factor=self.penalty_factor
             )
@@ -85,6 +98,11 @@ class SimulatedAnnealingSolver(BaseSolver):
             annealer.copy_strategy = "deepcopy"
 
             best_state, _ = annealer.anneal()
+            print(f"Initial state: {initial_state}")
+            print(f"Final state: {best_state}")
+            print(
+                f"Schedule: {Schedule.from_job_sequences(instance, best_state)}"
+            )
             return Schedule.from_job_sequences(instance, best_state)
         finally:
             # Restore the previous random state
@@ -94,41 +112,36 @@ class SimulatedAnnealingSolver(BaseSolver):
     def _generate_initial_state(
         self, instance: JobShopInstance
     ) -> list[list[int]]:
-        """Generates valid initial sequences for each machine."""
+        """Generates deadline-aware initial sequences for each machine."""
         state = [[] for _ in range(instance.num_machines)]
-
-        # Track which operation index each job is currently at
         job_progress = [0 for _ in range(instance.num_jobs)]
 
-        # Create a list of all available operations to schedule
-        available_ops = []
-        for job_id in range(instance.num_jobs):
-            if job_progress[job_id] < len(instance.jobs[job_id]):
-                available_ops.append(job_id)
+        # Create list of jobs sorted by earliest deadline first
+        # Handle None deadlines by treating them as infinite (very large number)
+        jobs_by_deadline = sorted(
+            range(instance.num_jobs),
+            key=lambda j: (
+                instance.jobs[j][-1].deadline
+                if instance.jobs[j][-1].deadline is not None
+                else float("inf")
+            ),
+        )
 
         # Schedule operations while respecting job order constraints
-        while available_ops:
-            # Randomly select a job from available operations
-            job_id = random.choice(available_ops)
-            available_ops.remove(job_id)
-
-            # Get the current operation for this job
-            operation = instance.jobs[job_id][job_progress[job_id]]
-
-            # Schedule this operation on one of its possible machines
-            machine_id = (
-                random.choice(operation.machines)
-                if isinstance(operation.machines, list)
-                else operation.machines
-            )
-            state[machine_id].append(job_id)
-
-            # Move to next operation in this job
-            job_progress[job_id] += 1
-
-            # If this job has more operations, add it back to available ops
-            if job_progress[job_id] < len(instance.jobs[job_id]):
-                available_ops.append(job_id)
+        while any(
+            job_progress[j] < len(instance.jobs[j])
+            for j in range(instance.num_jobs)
+        ):
+            for job_id in jobs_by_deadline:
+                # Check if this job has more operations to schedule
+                if job_progress[job_id] < len(instance.jobs[job_id]):
+                    operation = instance.jobs[job_id][job_progress[job_id]]
+                    machine_id = (
+                        operation.machines[0]
+                        if isinstance(operation.machines, list)
+                        else operation.machines
+                    )
+                    state[machine_id].append(job_id)
+                    job_progress[job_id] += 1
 
         return state
-
