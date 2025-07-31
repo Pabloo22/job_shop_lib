@@ -93,7 +93,8 @@ class SimulatedAnnealingSolver(BaseSolver):
             annealer = JobShopAnnealer(
                 instance, initial_state, penalty_factor=self.penalty_factor
             )
-            # Merge explicit parameters with annealer_params (explicit take precedence)
+            # Merge explicit parameters with annealer_params
+            # (explicit take precedence)
             params = {
                 "Tmax": self.initial_temperature,
                 "steps": self.steps,
