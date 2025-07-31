@@ -19,8 +19,9 @@ The module is designed to be extensible for future implementations of other
 metaheuristic algorithms such as Genetic Algorithms, Particle Swarm
 Optimization, Tabu Search, and other nature-inspired optimization techniques.
 
-Classes:
+.. autosummary::
     JobShopAnnealer: Simulated annealing implementation for JSSP optimization
+    SimulatedAnnealingSolver: Solver interface for simulated annealing algorithm
 """
 
 from job_shop_lib.metaheuristics._job_shop_annealer import JobShopAnnealer
