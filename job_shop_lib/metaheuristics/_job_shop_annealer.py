@@ -64,7 +64,6 @@ class JobShopAnnealer(simanneal.Annealer):
             return makespan + penalty
         except ValidationError as e:
             # If the schedule is invalid, return a large penalty
-            logging.warning("Invalid schedule encountered: %s", e)
             return float("inf")
 
     def _compute_penalties(self, schedule: Schedule) -> float:
