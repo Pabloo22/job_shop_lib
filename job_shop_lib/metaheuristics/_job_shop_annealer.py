@@ -48,12 +48,14 @@ class JobShopAnnealer(simanneal.Annealer):
 
     def move(self) -> None:
         """Generates a neighbor state by swapping two operations."""
-        machine_id = random.randint(0, self.instance.num_machines - 1)
+        machine_id = self.random_generator.randint(
+            0, self.instance.num_machines - 1
+        )
         sequence = self.state[machine_id]
         if len(sequence) < 2:
             return
 
-        idx1, idx2 = random.sample(range(len(sequence)), 2)
+        idx1, idx2 = self.random_generator.sample(range(len(sequence)), 2)
         sequence[idx1], sequence[idx2] = sequence[idx2], sequence[idx1]
 
     def energy(self) -> float:
