@@ -6,14 +6,12 @@ algorithms are nature-inspired or probabilistic techniques that can find
 near-optimal solutions for complex combinatorial optimization problems.
 
 Metaheuristics are particularly well-suited for JSSP due to their ability to:
-
 - Handle large solution spaces efficiently
 - Escape local optima through stochastic mechanisms
 - Balance exploration and exploitation of the search space
 - Provide good quality solutions within reasonable computational time
 
 Currently implemented algorithms:
-
 - Simulated Annealing (SA): A probabilistic technique that accepts worse
 solutions with decreasing probability to escape local optima
 
