@@ -83,15 +83,24 @@ class SimulatedAnnealingSolver(BaseSolver):
 
         """
         # Save current random state and set new seed if provided
+        # Create a new random generator if seed is provided
+        local_random = None
+        old_state = None
         if self.seed is not None:
+            local_random = random.Random(self.seed)
             old_state = random.getstate()
-            random.seed(self.seed)
+            random.setstate(local_random.getstate())
         try:
             if initial_state is None:
                 # Generate a random initial state if not provided
                 initial_state = self._generate_initial_state(instance)
+
+            # Annealer class now takes a local random generator
             annealer = JobShopAnnealer(
-                instance, initial_state, penalty_factor=self.penalty_factor
+                instance,
+                initial_state,
+                penalty_factor=self.penalty_factor,
+                random_generator=local_random,
             )
             # Merge explicit parameters with annealer_params
             # (explicit take precedence)
@@ -107,10 +116,6 @@ class SimulatedAnnealingSolver(BaseSolver):
             # Dynamically set attributes on the annealer
             for key, value in params.items():
                 setattr(annealer, key, value)
-            # annealer.Tmax = self.initial_temperature
-            # annealer.steps = self.steps
-            # annealer.cool = self.cool
-            # annealer.copy_strategy = "deepcopy"
 
             best_state, _ = annealer.anneal()
             return Schedule.from_job_sequences(instance, best_state)
