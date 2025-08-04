@@ -38,11 +38,13 @@ class JobShopAnnealer(simanneal.Annealer):
         instance: JobShopInstance,
         initial_state: list[list[int]],
         penalty_factor: int = 1_000_000,
+        random_generator: random.Random | None = None,
     ):
 
         super().__init__(initial_state)
         self.instance = instance
         self.penalty_factor = penalty_factor
+        self.random_generator = random_generator or random
 
     def move(self) -> None:
         """Generates a neighbor state by swapping two operations."""
