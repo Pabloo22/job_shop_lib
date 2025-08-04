@@ -1,4 +1,5 @@
 import random
+from typing import cast, Tuple, Any
 from job_shop_lib import BaseSolver, JobShopInstance, Schedule
 from job_shop_lib.metaheuristics import JobShopAnnealer
 
@@ -89,7 +90,8 @@ class SimulatedAnnealingSolver(BaseSolver):
         if self.seed is not None:
             local_random = random.Random(self.seed)
             old_state = random.getstate()
-            random.setstate(local_random.getstate())
+            state_tuple = cast(Tuple[Any, ...], local_random.getstate())
+            random.setstate(state_tuple)
         try:
             if initial_state is None:
                 # Generate a random initial state if not provided
@@ -121,8 +123,8 @@ class SimulatedAnnealingSolver(BaseSolver):
             return Schedule.from_job_sequences(instance, best_state)
         finally:
             # Restore the previous random state
-            if self.seed is not None:
-                random.setstate(old_state)
+            if self.seed is not None and old_state is not None:
+                random.setstate(cast(Tuple[Any, ...], old_state))
 
     def _generate_initial_state(
         self, instance: JobShopInstance
