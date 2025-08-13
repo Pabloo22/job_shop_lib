@@ -1,70 +1,84 @@
-import random
-from typing import Tuple, Any
 from job_shop_lib import BaseSolver, JobShopInstance, Schedule
 from job_shop_lib.metaheuristics import JobShopAnnealer
+from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 
 
 class SimulatedAnnealingSolver(BaseSolver):
-    """Simulated Annealing Solver for Job Shop Scheduling.
+    """Wraps the :class:`JobShopAnnealer` to follow the
+    :class``~job_shop_lib.BaseSolver`` interface.
 
-    SA (Simulated Annealing) is a probabilistic technique (metaheuristic
-    algorithm) for approximating the global optimum of a given function.
-    It seeks to find a good approximation of the optimized makespan by
-    exploring the schedule space and accepting worse schedules with evaluating
-    the metropolis criterion. It represents the JSSP solution by defining
-    the objective function that complies with the constraints of the arrival
-    times and deadlines.
-
-    Attributes:
-        initial_temperature: Initial temperature for the annealing process.
-        steps: Number of steps to perform in the annealing process.
-        cool: Cooling factor for the temperature.
-        penalty_factor: Factor to scale the penalty for infeasible solutions.
-        seed: Random seed for reproducible results.
+    .. seealso::
+        See the documentation of the :class:`JobShopAnnealer` class for more
+        details on the annealing process.
 
     Args:
         initial_temperature:
             Initial temperature for the annealing process. It controls the
             probability of accepting worse solutions. That sets the metropolis
-            criterion.
+            criterion. Corresponds to the `tmax` parameter in the annealer.
+        ending_temperature:
+            Ending temperature for the annealing process. It controls when to
+            stop accepting worse solutions. Corresponds to the `tmin` parameter
+            in the annealer.
         steps:
-            Number of steps to perform in the annealing process. It is
-            crucial for the convergence of the algorithm. It also specfies
-            how many iterations will be performed. Therefore, user can control
-            the expensiveness of the algorithm.
-        cool:
-            Cooling factor for the temperature. It is used to reduce
-            the temperature after each step. A value between 0 and
-            1 is expected.
-        penalty_factor:
-            Factor to scale the penalty for infeasible solutions. It is used
-            to penalize solutions that violate constraints, such as arrival
-            times and deadlines. A higher value increases the penalty for
-            infeasible solutions, making them less likely to be accepted.
-            It is used to calculate the energy of the solution.
-            It is used to calculate the makespan of the schedule.
-            It is used to calculate the penalties for constraint violations.
+            Number of steps to perform in the annealing process. This is the
+            number of iterations the algorithm will run.
+        updates:
+            The number of progress updates to print during the annealing
+            process. Set to 0 to disable updates.
+        deadline_penalty_factor:
+            Factor to penalize deadline violations. If a deadline is not met,
+            it will add this quantity to the makespan to get the energy
+            of the solution.
+        due_date_penalty_factor:
+            Factor to penalize due date violations. If a due date is not met,
+            it will add this quantity to the makespan to get the energy
+            of the solution.
         seed:
-            Random seed for reproducible results. If None, random behavior
-            will be non-deterministic.
+            Random seed for reproducibility. If ``None``, random behavior will
+            be non-deterministic.
+        time_budget_in_minutes:
+            Optional time budget in minutes for the annealing process. If set,
+            the solver will automatically determine the best parameters based
+            on this budget.
 
+            .. seealso::
+                The :meth:`JobShopAnnealer.auto` method for details on how the
+                parameters are determined based on the time budget.
+
+            .. warning::
+                If this parameter is set, the ``initial_temperature``,
+                ``ending_temperature``, and ``steps`` parameters will be
+                ignored.
+        auto_steps:
+            Number of steps to use when determining the best parameters
+            automatically based on the time budget. This is used by the
+            :meth:`JobShopAnnealer.auto` method to find reasonable parameters
+            for the annealing process. It does not have any effect if
+            ``time_budget_in_minutes`` is not set. Default is 2000.
     """
 
     def __init__(
         self,
-        initial_temperature: float = 10000.0,
-        steps: int = 10000,
-        cool: float = 0.95,
-        penalty_factor: int = 1_000_000,
+        initial_temperature: float = 25000,
+        ending_temperature: float = 2.5,
+        steps: int = 50_000,
+        updates: int = 100,
+        deadline_penalty_factor: int = 1_000_000,
+        due_date_penalty_factor: int = 100,
         seed: int | None = None,
-        annealer_params: dict | None = None,
+        time_budget_in_minutes: float | None = None,
+        auto_steps: int = 2000,
     ):
         self.initial_temperature = initial_temperature
+        self.ending_temperature = ending_temperature
         self.steps = steps
-        self.cool = cool
-        self.penalty_factor = penalty_factor
+        self.updates = updates
+        self.deadline_penalty_factor = deadline_penalty_factor
+        self.due_date_penalty_factor = due_date_penalty_factor
         self.seed = seed
-        self.annealer_params = annealer_params
+        self.time_budget_in_minutes = time_budget_in_minutes
+        self.auto_steps = auto_steps
 
     def solve(
         self,
@@ -75,92 +89,68 @@ class SimulatedAnnealingSolver(BaseSolver):
         simulated annealing.
 
         Args:
-            instance (JobShopInstance): The job shop problem instance to solve.
-            initial_state (list[list[int]], optional): Initial job sequences
-            for each machine. If None, a random initial state is generated.
+            instance:
+                The job shop problem instance to solve.
+            initial_state:
+                Initial job sequences for each machine. A job sequence is a
+                list of job ids. Each list of job ids represents the order of
+                operations on the machine. The machine that the list
+                corresponds to is determined by the index of the list. If
+                ``None``, the solver will generate an initial state using the
+                :class:`DispatchingRuleSolver`.
 
         Returns:
-            Schedule: The best schedule found for the given instance.
+            The best schedule found.
 
         """
-        # Save current random state and set new seed if provided
-        # Create a new random generator if seed is provided
-        local_random = None
-        old_state: Tuple[Any, ...] | None = None
-        if self.seed is not None:
-            # Create a local random generator with the given seed
-            local_random = random.Random(self.seed)
-            # Save the current global state
-            old_state = random.getstate()
-            random.setstate(local_random.getstate())
-        try:
-            if initial_state is None:
-                # Generate a random initial state if not provided
-                initial_state = self._generate_initial_state(instance)
+        if initial_state is None:
+            initial_state = self._generate_initial_state(instance)
 
-            # Annealer class now takes a local random generator
-            annealer = JobShopAnnealer(
-                instance,
-                initial_state,
-                penalty_factor=self.penalty_factor,
-                random_generator=local_random,
-            )
-            # Merge explicit parameters with annealer_params
-            # (explicit take precedence)
-            params = {
-                "Tmax": self.initial_temperature,
-                "steps": self.steps,
-                "cool": self.cool,
-                "copy_strategy": "deepcopy",
-            }
-            if self.annealer_params:
-                params.update(self.annealer_params)
-
-            # Dynamically set attributes on the annealer
-            for key, value in params.items():
-                setattr(annealer, key, value)
-
-            best_state, _ = annealer.anneal()
-            return Schedule.from_job_sequences(instance, best_state)
-        finally:
-            # Restore the previous random state
-            if old_state is not None:
-                random.setstate(old_state)
-
-    def _generate_initial_state(
-        self, instance: JobShopInstance
-    ) -> list[list[int]]:
-        """Generates deadline-aware initial sequences for each machine."""
-        state: list[list[int]] = [[] for _ in range(instance.num_machines)]
-        job_progress = [0 for _ in range(instance.num_jobs)]
-
-        # Create list of jobs sorted by earliest deadline first
-        # Handle None deadlines by treating them as infinite
-        # (very large number)
-        jobs_by_deadline = sorted(
-            range(instance.num_jobs),
-            key=lambda j: (
-                float(deadline)
-                if (deadline := instance.jobs[j][-1].deadline) is not None
-                else float("inf")
-            ),
+        annealer = JobShopAnnealer(
+            instance,
+            initial_state,
+            deadline_penalty_factor=self.deadline_penalty_factor,
+            due_date_penalty_factor=self.due_date_penalty_factor,
+            seed=self.seed,
         )
+        if self.time_budget_in_minutes is not None:
+            best_hparams = annealer.auto(
+                minutes=self.time_budget_in_minutes, steps=self.auto_steps
+            )
+        else:
+            best_hparams = {
+                "tmax": self.initial_temperature,
+                "tmin": self.ending_temperature,
+                "steps": self.steps,
+                "updates": self.updates,
+            }
+        annealer.set_schedule(best_hparams)
 
-        # Schedule operations while respecting job order constraints
-        while any(
-            job_progress[j] < len(instance.jobs[j])
-            for j in range(instance.num_jobs)
-        ):
-            for job_id in jobs_by_deadline:
-                # Check if this job has more operations to schedule
-                if job_progress[job_id] < len(instance.jobs[job_id]):
-                    operation = instance.jobs[job_id][job_progress[job_id]]
-                    machine_id = (
-                        operation.machines[0]
-                        if isinstance(operation.machines, list)
-                        else operation.machines
-                    )
-                    state[machine_id].append(job_id)
-                    job_progress[job_id] += 1
+        try:
+            best_state, _ = annealer.anneal()
+        except InterruptedError:
+            # If the annealing process is interrupted, we return the best state
+            # found so far.
+            best_state = annealer.best_state
+        return Schedule.from_job_sequences(instance, best_state)
 
-        return state
+    @staticmethod
+    def _generate_initial_state(instance: JobShopInstance) -> list[list[int]]:
+        """Uses the
+        :class:`~job_shop_lib.dispatching.rules.DispatchingRuleSolver` to
+        generate an initial state for the annealer.
+
+        .. note::
+            The first solution might be unfeasible if the job shop instance
+            has deadlines.
+
+        Args:
+            instance (JobShopInstance): The job shop problem instance.
+
+        Returns:
+            list[list[int]]: Initial state as a list of lists, where each
+            sublist represents the operations of a job.
+        """
+        solver = DispatchingRuleSolver()
+        schedule = solver.solve(instance)
+        return schedule.job_sequences()
