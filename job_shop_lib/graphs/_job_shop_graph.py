@@ -7,7 +7,7 @@ from typing import DefaultDict
 
 from job_shop_lib import JobShopInstance
 from job_shop_lib.exceptions import ValidationError
-from job_shop_lib.graphs import Node, NodeType
+from job_shop_lib.graphs import Node, NodeType, EdgeType
 
 
 NODE_ATTR = "node"
@@ -49,12 +49,36 @@ class JobShopGraph:
             "List of lists mapping machine ids to operation nodes."
         ),
         "_nodes_by_job": "List of lists mapping job ids to operation nodes.",
-        "_next_node_id": (
-            "Dictionary mapping node types to their next available local id."
-        ),
         "removed_nodes": (
-            "Dictionary mapping node types to a list of boolean values "
-            "indicating whether a node has been removed from the graph."
+            "Dictionary mapping instance ids to a boolean indicating whether a node has been removed."
+            "The keys are node types, and the values are dictionaries mapping "
+            "instance ids to booleans. This allows for quick access to removed nodes by their instance ids."
+        ),
+        "instance_id_map": (
+            "Dictionary mapping instance ids to nodes for quick access."
+            "The keys are node types, and the values are dictionaries mapping "
+            "instace ids to nodes. This allows for quick access to nodes by their "
+            "operation, machine, or job ids."
+        ),
+        "adjacency_in": (
+            "Stores graph adjacency information of incoming edges,"
+            "mapping nodes to their neighbors based on edge types. The "
+            "keys are either edge types or tuples of (source_node_type, "
+            "'to', destination_node_type), and the values are lists of "
+            "nodes that are connected to the key node type or tuple."
+        ),
+        "adjacency_out": (
+            "Stores graph adjacency information of outgoing edges,"
+            "mapping nodes to their neighbors based on edge types. The "
+            "keys are either edge types or tuples of (source_node_type, "
+            "'to', destination_node_type), and the values are lists of "
+            "nodes that are connected to the key node type or tuple."
+        ),
+        "edge_types": (
+            "A set of all edge types present in the graph."
+            "Only includes tuples of (source_node_type, 'to', destination_node_type),"
+            "processing conjunctive and disjunctive edges, not including them in the set"
+            "but inferring them from the nodes forming the edges of said types."
         ),
     }
 
@@ -74,20 +98,30 @@ class JobShopGraph:
         self._nodes_by_job: list[list[Node]] = [
             [] for _ in range(instance.num_jobs)
         ]
-        # Changed: _next_node_id is now a dictionary
-        self._next_node_id = collections.defaultdict(int)
+        # Changed: _next_node_id is now removed
+        # self._next_node_id = collections.defaultdict(int)
         # Changed: removed_nodes is now a dictionary of lists
         self.removed_nodes: dict[str, list[bool]] = collections.defaultdict(
             list
         )
+        self.instance_id_map: dict[str, dict[int, Node]] = (
+            collections.defaultdict(dict)
+        )
+        self.adjacency_in: dict[
+            Node, dict[tuple[str, str, str] | EdgeType, list[Node]]
+        ] = {}
+        self.adjacency_out: dict[
+            Node, dict[tuple[str, str, str] | EdgeType, list[Node]]
+        ] = {}
+
         if add_operation_nodes:
             self.add_operation_nodes()
 
-        self.removed_nodes[NodeType.OPERATION.name.lower()] = [
+        self.removed_nodes[NodeType.OPERATION.name] = [
             False
         ] * instance.num_operations
 
-        self.edge_types = set[tuple[str, str, str]]()
+        self.edge_types = set()
 
     @property
     def graph(self) -> nx.DiGraph:
@@ -192,49 +226,36 @@ class JobShopGraph:
         """
         # Changed: Node ID generation logic
         node_type_name = node_for_adding.node_type.name
-        local_id = self._next_node_id[node_type_name]
+        local_id = len(self._nodes_by_type[node_for_adding.node_type])
         new_id = (node_type_name, local_id)
 
         node_for_adding.node_id = new_id
-        self.graph.add_node(new_id, **{NODE_ATTR: node_for_adding})
-        # Changed: Node ID generation logic
-        node_type_name = node_for_adding.node_type.name
-        local_id = self._next_node_id[node_type_name]
-        new_id = (node_type_name, local_id)
-
-        node_for_adding.node_id = new_id
-        self.graph.add_node(new_id, **{NODE_ATTR: node_for_adding})
         self._nodes_by_type[node_for_adding.node_type].append(node_for_adding)
         self._nodes.append(node_for_adding)
         self._nodes_map[new_id] = node_for_adding
-        self._next_node_id[node_type_name] += 1
-        self.removed_nodes[node_type_name].append(False)
-        self._nodes_map[new_id] = node_for_adding
-        self._next_node_id[node_type_name] += 1
-        self.removed_nodes[node_type_name].append(False)
 
         if node_for_adding.node_type == NodeType.OPERATION:
             operation = node_for_adding.operation
             self._nodes_by_job[operation.job_id].append(node_for_adding)
             for machine_id in operation.machines:
                 self._nodes_by_machine[machine_id].append(node_for_adding)
-            self.instance_id_map[NodeType.OPERATION.name.lower()][
+            self.instance_id_map[NodeType.OPERATION.name][
                 operation.operation_id
             ] = node_for_adding
         elif node_for_adding.node_type == NodeType.MACHINE:
-            self.instance_id_map[NodeType.MACHINE.name.lower()][
+            self.instance_id_map[NodeType.MACHINE.name][
                 node_for_adding.machine_id
             ] = node_for_adding
-            if NodeType.MACHINE.name.lower() not in self.removed_nodes:
-                self.removed_nodes[NodeType.MACHINE.name.lower()] = [
+            if NodeType.MACHINE.name not in self.removed_nodes:
+                self.removed_nodes[NodeType.MACHINE.name] = [
                     False
                 ] * self.instance.num_machines
         elif node_for_adding.node_type == NodeType.JOB:
-            self.instance_id_map[NodeType.JOB.name.lower()][
+            self.instance_id_map[NodeType.JOB.name][
                 node_for_adding.job_id
             ] = node_for_adding
-            if NodeType.JOB.name.lower() not in self.removed_nodes:
-                self.removed_nodes[NodeType.JOB.name.lower()] = [
+            if NodeType.JOB.name not in self.removed_nodes:
+                self.removed_nodes[NodeType.JOB.name] = [
                     False
                 ] * self.instance.num_jobs
         else:
@@ -245,11 +266,13 @@ class JobShopGraph:
         # Initialize adjacency lists for the new node
         self.adjacency_in[node_for_adding] = collections.defaultdict(list)
         self.adjacency_out[node_for_adding] = collections.defaultdict(list)
+        self.adjacency_in[node_for_adding] = collections.defaultdict(list)
+        self.adjacency_out[node_for_adding] = collections.defaultdict(list)
 
     def add_edge(
         self,
-        u_of_edge: Node | tuple[str, int],
-        v_of_edge: Node | tuple[str, int],
+        u_of_edge: Node,
+        v_of_edge: Node,
         **attr,
     ) -> None:
         r"""Adds an edge to the graph.
@@ -263,10 +286,7 @@ class JobShopGraph:
 
         Args:
             u_of_edge:
-                The source node of the edge. Can be a :class:`Node` or
-                its tuple id.
-                The source node of the edge. Can be a :class:`Node` or
-                its tuple id.
+                The source node of the edge. Can be a :class:`Node`
             v_of_edge:
                 The destination node of the edge. Can be a :class:`Node` or
                 its tuple id.
@@ -280,70 +300,207 @@ class JobShopGraph:
 
         # Ensure both nodes are in the graph
         if u_of_edge not in self._nodes or v_of_edge not in self._nodes:
+
+        # Ensure both nodes are in the graph
+        if u_of_edge not in self._nodes or v_of_edge not in self._nodes:
             raise ValidationError(
+                "`u_of_edge` and `v_of_edge` must be in the graph."
                 "`u_of_edge` and `v_of_edge` must be in the graph."
             )
         edge_type = attr.pop("type", None)
         self.edge_types.add((u_of_edge.node_id[0], "to", v_of_edge.node_id[0]))
+        self.edge_types.add((u_of_edge.node_id[0], "to", v_of_edge.node_id[0]))
         if edge_type is None:
-            # Changed: Use _nodes_map for efficient lookup
-            u_node = self._nodes_map[u_of_edge]
-            v_node = self._nodes_map[v_of_edge]
-            # Changed: Use _nodes_map for efficient lookup
-            u_node = self._nodes_map[u_of_edge]
-            v_node = self._nodes_map[v_of_edge]
-            edge_type = (
-                u_node.node_type.name.lower(),
-                "to",
-                v_node.node_type.name.lower(),
-            )
-        self.graph.add_edge(u_of_edge, v_of_edge, type=edge_type, **attr)
+            edge_type = (u_of_edge.node_id[0], "to", v_of_edge.node_id[0])
+
+        self.adjacency_in[v_of_edge][edge_type].append(u_of_edge)
+        self.adjacency_out[u_of_edge][edge_type].append(v_of_edge)
 
     def remove_node(self, node_id: tuple[str, int]) -> None:
-        """Removes a node from the graph.
+        """
+        Removes a node and its edges from the graph, then renumbers the
+        local IDs of subsequent nodes of the same type to maintain a
+        contiguous sequence.
+
+        This is a complex operation that involves modifying node IDs in-place
+        and ensuring all graph data structures remain consistent.
+        """
+        node_type_name, local_id = node_id
+
+        # 1. Verify the node exists before proceeding.
+        if node_id not in self._nodes_map:
+            return
+
+        node_to_remove = self._nodes_map[node_id]
+
+        if node_to_remove.node_type == NodeType.OPERATION:
+            operation = node_to_remove.operation
+            self.removed_nodes[NodeType.OPERATION.name][
+                operation.operation_id
+            ] = True
+        elif node_to_remove.node_type == NodeType.MACHINE:
+            self.removed_nodes[NodeType.MACHINE.name][
+                node_to_remove.machine_id
+            ] = True
+        elif node_to_remove.node_type == NodeType.JOB:
+            self.removed_nodes[NodeType.JOB.name][node_to_remove.job_id] = True
+        else:
+            # For other node types, we can use a default id of 0
+            self.removed_nodes[node_type_name][0] = True
+
+        # 2. Remove all edges connected to the node from the adjacency lists.
+        # Update neighbors that have incoming edges from the node to be removed.
+        if node_to_remove in self.adjacency_out:
+            for edge_type, neighbors in self.adjacency_out[
+                node_to_remove
+            ].items():
+                for neighbor in list(neighbors):
+                    if (
+                        neighbor in self.adjacency_in
+                        and edge_type in self.adjacency_in[neighbor]
+                    ):
+                        self.adjacency_in[neighbor][edge_type].remove(
+                            node_to_remove
+                        )
+
+        # Update neighbors that have outgoing edges to the node to be removed.
+        if node_to_remove in self.adjacency_in:
+            for edge_type, neighbors in self.adjacency_in[
+                node_to_remove
+            ].items():
+                for neighbor in list(neighbors):
+                    if (
+                        neighbor in self.adjacency_out
+                        and edge_type in self.adjacency_out[neighbor]
+                    ):
+                        self.adjacency_out[neighbor][edge_type].remove(
+                            node_to_remove
+                        )
+
+        # Remove the node itself from the adjacency lists.
+        self.adjacency_out.pop(node_to_remove, None)
+        self.adjacency_in.pop(node_to_remove, None)
+
+        # 3. Physically remove the node from all tracking lists and maps.
+        self._nodes.remove(node_to_remove)
+        self._nodes_by_type[node_to_remove.node_type].remove(node_to_remove)
+        del self._nodes_map[node_id]
+
+        if node_to_remove.node_type == NodeType.OPERATION:
+            operation = node_to_remove.operation
+            self._nodes_by_job[operation.job_id].remove(node_to_remove)
+            for machine_id in operation.machines:
+                self._nodes_by_machine[machine_id].remove(node_to_remove)
+
+        # 4. Identify and renumber all subsequent nodes of the same type.
+        # Collect nodes that need re-numbering.
+        nodes_to_renumber = [
+            node
+            for node in self._nodes_by_type[node_to_remove.node_type]
+            if node.node_id[1] > local_id
+        ]
+        # Sort them by their current ID to process in the correct order.
+        nodes_to_renumber.sort(key=lambda n: n.node_id[1])
+
+        for node_to_update in nodes_to_renumber:
+            old_node_id = node_to_update.node_id
+            new_node_id = (old_node_id[0], old_node_id[1] - 1)
+
+            # CRITICAL: To safely change the ID of a node used as a dictionary key,
+            # we must pop its entries and re-insert them after the change.
+            in_edges = self.adjacency_in.pop(node_to_update, None)
+            out_edges = self.adjacency_out.pop(node_to_update, None)
+
+            # Mutate the node's ID.
+            node_to_update.node_id = new_node_id
+
+            # Re-insert adjacency data with the updated node object as the key.
+            if in_edges:
+                self.adjacency_in[node_to_update] = in_edges
+            if out_edges:
+                self.adjacency_out[node_to_update] = out_edges
+
+            # Update the main node map to reflect the new ID.
+            del self._nodes_map[old_node_id]
+            self._nodes_map[new_node_id] = node_to_update
+
+    def remove_edge(
+        self,
+        u_of_edge: Node,
+        v_of_edge: Node,
+        **attr,
+    ) -> None:
+        """Removes an edge from the graph.
+
+        This method removes the edge between two nodes, updating the adjacency
+        lists accordingly. It also checks if the nodes are in the graph before
+        attempting to remove the edge.
 
         Args:
-            node_id:
-                The tuple id of the node to remove.
-                The tuple id of the node to remove.
+            u_of_edge:
+                The source node of the edge. Can be a :class:`Node`.
+            v_of_edge:
+                The destination node of the edge. Can be a :class:`Node`.
+            **attr:
+                Additional attributes to identify the edge type.
         """
-        self.graph.remove_node(node_id)
-        # Changed: Update removed_nodes dictionary
-        node_type_name, local_id = node_id
-        if local_id < len(self.removed_nodes[node_type_name]):
-            self.removed_nodes[node_type_name][local_id] = True
+        edge_type = attr.pop("type", None)
+        if edge_type is None:
+            edge_type = (u_of_edge.node_id[0], "to", v_of_edge.node_id[0])
+
+        # Remove from adjacency lists
+        if u_of_edge in self.adjacency_out:
+            self.adjacency_out[u_of_edge][edge_type].remove(v_of_edge)
+        if v_of_edge in self.adjacency_in:
+            self.adjacency_in[v_of_edge][edge_type].remove(u_of_edge)
 
     def remove_isolated_nodes(self) -> None:
         """Removes isolated nodes from the graph."""
-        isolated_nodes = list(nx.isolates(self.graph))
-        for isolated_node_id in isolated_nodes:
-            # Changed: Update removed_nodes dictionary for each isolated node
-            node_type_name, local_id = isolated_node_id
-            if local_id < len(self.removed_nodes[node_type_name]):
-                self.removed_nodes[node_type_name][local_id] = True
 
-        self.graph.remove_nodes_from(isolated_nodes)
+        # get isolated nodes, meaning nodes with no incoming or outgoing edges, for all edge types, meaning only empty lists
+        isolated_nodes = list()
+        for node in self._nodes:
+            cond1 = False
+            cond2 = False
+            if node in self.adjacency_in:
+                cond1 = all(
+                    not neighbors
+                    for neighbors in self.adjacency_in[node].values()
+                )
+            if node in self.adjacency_out:
+                cond2 = all(
+                    not neighbors
+                    for neighbors in self.adjacency_out[node].values()
+                )
+            if cond1 and cond2:
+                isolated_nodes.append(node)
 
-    def is_removed(self, node: tuple[str, int] | Node) -> bool:
+        # Remove isolated nodes
+        for node in isolated_nodes:
+            self.remove_node(node.node_id)
+
+    def is_removed(self, node: Node) -> bool:
         """Returns whether the node is removed from the graph.
 
         Args:
             node:
-                The node to check. Can be a :class:`Node` or its tuple id.
+                The node to check. Can be a :class:`Node`.
         """
-        if isinstance(node, Node):
-            node_id = node.node_id
-        else:
-            node_id = node
 
-        # Changed: Check removed_nodes dictionary
-        node_type_name, local_id = node_id
-        type_removed_list = self.removed_nodes[node_type_name]
-
-        if local_id >= len(type_removed_list):
-            return False  # Node was never added or list is out of sync
-
-        return type_removed_list[local_id]
+        if node.node_type.name == NodeType.OPERATION.name:
+            return self.removed_nodes[NodeType.OPERATION.name][
+                node.operation.operation_id
+            ]
+        if node.node_type.name == NodeType.MACHINE.name:
+            return self.removed_nodes[NodeType.MACHINE.name][node.machine_id]
+        if node.node_type.name == NodeType.JOB.name:
+            return self.removed_nodes[NodeType.JOB.name][node.job_id]
+        # Default case for other node types
+        return (
+            self.removed_nodes[node.node_type.name][0]
+            if node.node_type.name in self.removed_nodes
+            else False
+        )
 
     def non_removed_nodes(self) -> list[Node]:
         """Returns the nodes that are not removed from the graph."""
@@ -404,7 +561,7 @@ class JobShopGraph:
             The node with the given id.
         """
 
-        nodes = self.instance_id_map[node_type.name.lower()]
+        nodes = self.instance_id_map[node_type.name]
         if node_id in nodes:
             return nodes[node_id]
 

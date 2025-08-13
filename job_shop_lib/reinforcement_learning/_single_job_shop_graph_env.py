@@ -1,6 +1,7 @@
 """Home of the `SingleJobShopGraphEnv` class."""
 
 from copy import deepcopy
+from collections import defaultdict
 from collections.abc import Callable, Sequence
 from typing import Any
 import warnings
@@ -190,6 +191,7 @@ class SingleJobShopGraphEnv(gym.Env):
         self.action_space = gym.spaces.MultiDiscrete(
             [self.instance.num_jobs, self.instance.num_machines], start=[0, -1]
         )
+        self.use_padding = use_padding
         self.observation_space: gym.spaces.Dict = self._get_observation_space()
         self.render_mode = render_mode
         if render_config is None:
