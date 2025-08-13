@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Sequence
 import functools
 from typing import Any
+import warnings
 
 import numpy as np
 from numpy.typing import NDArray
@@ -13,7 +15,7 @@ from job_shop_lib import Operation
 
 
 class JobShopInstance:
-    """Data structure to store a Job Shop Scheduling Problem instance.
+    r"""Data structure to store a Job Shop Scheduling Problem instance.
 
     Additional attributes such as ``num_machines`` or ``durations_matrix`` can
     be computed from the instance and are cached for performance since they
@@ -40,6 +42,9 @@ class JobShopInstance:
         is_flexible
         durations_matrix
         machines_matrix
+        release_dates_matrix
+        deadlines_matrix
+        due_dates_matrix
         durations_matrix_array
         machines_matrix_array
         operations_by_machine
@@ -75,7 +80,7 @@ class JobShopInstance:
             attributes of the operations are set when the instance is created.
             See :meth:`set_operation_attributes` for more information. Defaults
             to True.
-        **metadata:
+        \**metadata:
             Additional information about the instance.
     """
 
@@ -91,6 +96,24 @@ class JobShopInstance:
             self.set_operation_attributes()
         self.name: str = name
         self.metadata: dict[str, Any] = metadata
+
+        deprecated_keys = {
+            "release_dates_matrix",
+            "deadlines_matrix",
+            "due_dates_matrix",
+        }
+        if any(key in self.metadata for key in deprecated_keys):
+            warnings.warn(
+                "The use of 'release_dates_matrix', 'deadlines_matrix', or "
+                "'due_dates_matrix' in metadata is deprecated."
+                "Please add these attributes "
+                "directly to the Operation class. Not doing so may cause bugs "
+                "when using the dispatching module.You can use the "
+                "`JobShopInstance.from_matrices` method to create an "
+                "instance from 2D sequences. ",
+                DeprecationWarning,
+                stacklevel=2,
+            )
 
     def set_operation_attributes(self):
         """Sets the ``job_id``, ``position_in_job``, and ``operation_id``
@@ -131,7 +154,7 @@ class JobShopInstance:
         name: str | None = None,
         **metadata: Any,
     ) -> JobShopInstance:
-        """Creates a JobShopInstance from a file following Taillard's format.
+        r"""Creates a JobShopInstance from a file following Taillard's format.
 
         Args:
             file_path:
@@ -144,7 +167,7 @@ class JobShopInstance:
             name:
                 A string with the name of the instance. If not provided, the
                 name of the instance is set to the name of the file.
-            **metadata:
+            \**metadata:
                 Additional information about the instance.
 
         Returns:
@@ -196,14 +219,25 @@ class JobShopInstance:
                     "duration_matrix": self.durations_matrix,
                     "machines_matrix": self.machines_matrix,
                     "metadata": self.metadata,
+                    # Optionally (if the instance has them):
+                    "release_dates_matrix": self.release_dates_matrix,
+                    "deadlines_matrix": self.deadlines_matrix,
+                    "due_dates_matrix": self.due_dates_matrix,
                 }
         """
-        return {
+        data = {
             "name": self.name,
             "duration_matrix": self.durations_matrix,
             "machines_matrix": self.machines_matrix,
             "metadata": self.metadata,
         }
+        if self.has_release_dates:
+            data["release_dates_matrix"] = self.release_dates_matrix
+        if self.has_deadlines:
+            data["deadlines_matrix"] = self.deadlines_matrix
+        if self.has_due_dates:
+            data["due_dates_matrix"] = self.due_dates_matrix
+        return data
 
     @classmethod
     def from_matrices(
@@ -212,6 +246,9 @@ class JobShopInstance:
         machines_matrix: list[list[list[int]]] | list[list[int]],
         name: str = "JobShopInstance",
         metadata: dict[str, Any] | None = None,
+        release_dates_matrix: list[list[int]] | None = None,
+        deadlines_matrix: list[list[int | None]] | None = None,
+        due_dates_matrix: list[list[int | None]] | None = None,
     ) -> JobShopInstance:
         """Creates a :class:`JobShopInstance` from duration and machines
         matrices.
@@ -219,16 +256,26 @@ class JobShopInstance:
         Args:
             duration_matrix:
                 A list of lists of integers. The i-th list contains the
-                durations of the operations of the job with id i.
+                durations of the operations of the job with id ``i``.
             machines_matrix:
-            A list of lists of lists of integers if the
+                A list of lists of lists of integers if the
                 instance is flexible, or a list of lists of integers if the
                 instance is not flexible. The i-th list contains the machines
-                in which the operations of the job with id i can be processed.
+                in which the operations of the job with id ``i`` can be
+                processed.
             name:
                 A string with the name of the instance.
             metadata:
                 A dictionary with additional information about the instance.
+            release_dates_matrix:
+                A list of lists of integers. The i-th list contains the
+                release dates of the operations of the job with id ``i``.
+            deadlines_matrix:
+                A list of lists of optional integers. The i-th list contains
+                the deadlines of the operations of the job with id ``i``.
+            due_dates_matrix:
+                A list of lists of optional integers. The i-th list contains
+                the due dates of the operations of the job with id ``i``.
 
         Returns:
             A :class:`JobShopInstance` object.
@@ -241,8 +288,29 @@ class JobShopInstance:
             for position_in_job in range(num_operations):
                 duration = duration_matrix[job_id][position_in_job]
                 machines = machines_matrix[job_id][position_in_job]
+                release_date = (
+                    release_dates_matrix[job_id][position_in_job]
+                    if release_dates_matrix
+                    else 0
+                )
+                deadline = (
+                    deadlines_matrix[job_id][position_in_job]
+                    if deadlines_matrix
+                    else None
+                )
+                due_date = (
+                    due_dates_matrix[job_id][position_in_job]
+                    if due_dates_matrix
+                    else None
+                )
                 jobs[job_id].append(
-                    Operation(duration=duration, machines=machines)
+                    Operation(
+                        duration=duration,
+                        machines=machines,
+                        release_date=release_date,
+                        deadline=deadline,
+                        due_date=due_date,
+                    )
                 )
 
         metadata = {} if metadata is None else metadata
@@ -290,6 +358,21 @@ class JobShopInstance:
         )
 
     @functools.cached_property
+    def has_release_dates(self) -> bool:
+        """Returns ``True`` if any operation has a release date > 0."""
+        return any(op.release_date > 0 for job in self.jobs for op in job)
+
+    @functools.cached_property
+    def has_deadlines(self) -> bool:
+        """Returns ``True`` if any operation has a deadline."""
+        return any(op.deadline is not None for job in self.jobs for op in job)
+
+    @functools.cached_property
+    def has_due_dates(self) -> bool:
+        """Returns ``True`` if any operation has a due date."""
+        return any(op.due_date is not None for job in self.jobs for op in job)
+
+    @functools.cached_property
     def durations_matrix(self) -> list[list[int]]:
         """Returns the duration matrix of the instance.
 
@@ -331,22 +414,74 @@ class JobShopInstance:
         ]
 
     @functools.cached_property
+    def release_dates_matrix(self) -> list[list[int]]:
+        """Returns the release dates matrix of the instance.
+
+        The release date of the operation with ``job_id`` i and
+        ``position_in_job`` j is stored in the i-th position of the j-th list
+        of the returned matrix.
+        """
+        return [
+            [operation.release_date for operation in job] for job in self.jobs
+        ]
+
+    @functools.cached_property
+    def deadlines_matrix(self) -> list[list[int | None]]:
+        """Returns the deadlines matrix of the instance.
+
+        The deadline of the operation with ``job_id`` i and
+        ``position_in_job`` j is stored in the i-th position of the j-th list
+        of the returned matrix.
+        """
+        return [[operation.deadline for operation in job] for job in self.jobs]
+
+    @functools.cached_property
+    def due_dates_matrix(self) -> list[list[int | None]]:
+        """Returns the due dates matrix of the instance.
+
+        The due date of the operation with ``job_id`` i and
+        ``position_in_job`` j is stored in the i-th position of the j-th list
+        of the returned matrix.
+        """
+        return [[operation.due_date for operation in job] for job in self.jobs]
+
+    @functools.cached_property
     def durations_matrix_array(self) -> NDArray[np.float32]:
         """Returns the duration matrix of the instance as a numpy array.
 
-        The returned array has shape (``num_jobs``,
-        ``max_num_operations_per_job``).
-        Non-existing operations are filled with ``np.nan``.
-
-        Example:
-            >>> jobs = [[Operation(0, 2), Operation(1, 3)], [Operation(0, 4)]]
-            >>> instance = JobShopInstance(jobs)
-            >>> instance.durations_matrix_array
-            array([[ 2.,  3.],
-                   [ 4., nan]], dtype=float32)
+        If the jobs have different number of operations, the matrix is
+        padded with ``np.nan`` to make it rectangular.
         """
-        duration_matrix = self.durations_matrix
-        return self._fill_matrix_with_nans_2d(duration_matrix)
+        return self._fill_matrix_with_nans_2d(self.durations_matrix)
+
+    @functools.cached_property
+    def release_dates_matrix_array(self) -> NDArray[np.float32]:
+        """Returns the release dates matrix of the instance as a numpy array.
+
+        If the jobs have different number of operations, the matrix is
+        padded with ``np.nan`` to make it rectangular.
+        """
+        return self._fill_matrix_with_nans_2d(self.release_dates_matrix)
+
+    @functools.cached_property
+    def deadlines_matrix_array(self) -> NDArray[np.float32]:
+        """Returns the deadlines matrix of the instance as a numpy array.
+
+        If the jobs have different number of operations, the matrix is
+        padded with ``np.nan`` to make it rectangular. None values are also
+        converted to ``np.nan``.
+        """
+        return self._fill_matrix_with_nans_2d(self.deadlines_matrix)
+
+    @functools.cached_property
+    def due_dates_matrix_array(self) -> NDArray[np.float32]:
+        """Returns the due dates matrix of the instance as a numpy array.
+
+        If the jobs have different number of operations, the matrix is
+        padded with ``np.nan`` to make it rectangular. None values are also
+        converted to ``np.nan``.
+        """
+        return self._fill_matrix_with_nans_2d(self.due_dates_matrix)
 
     @functools.cached_property
     def machines_matrix_array(self) -> NDArray[np.float32]:
@@ -474,13 +609,13 @@ class JobShopInstance:
 
     @staticmethod
     def _fill_matrix_with_nans_2d(
-        matrix: list[list[int]],
+        matrix: Sequence[Sequence[int | None]],
     ) -> NDArray[np.float32]:
-        """Fills a matrix with ``np.nan`` values.
+        """Creates a 2D numpy array padded with ``np.nan`` values.
 
         Args:
             matrix:
-                A list of lists of integers.
+                A list of lists of integers or Nones.
 
         Returns:
             A numpy array with the same shape as the input matrix, filled with
@@ -491,14 +626,17 @@ class JobShopInstance:
             (len(matrix), max_length), np.nan, dtype=np.float32
         )
         for i, row in enumerate(matrix):
-            squared_matrix[i, : len(row)] = row
+            processed_row = [
+                item if item is not None else np.nan for item in row
+            ]
+            squared_matrix[i, : len(processed_row)] = processed_row
         return squared_matrix
 
     @staticmethod
     def _fill_matrix_with_nans_3d(
         matrix: list[list[list[int]]],
     ) -> NDArray[np.float32]:
-        """Fills a 3D matrix with ``np.nan`` values.
+        """Creates a 3D numpy array padded with ``np.nan`` values.
 
         Args:
             matrix:
@@ -522,9 +660,3 @@ class JobShopInstance:
             for j, inner_row in enumerate(row):
                 squared_matrix[i, j, : len(inner_row)] = inner_row
         return squared_matrix
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()

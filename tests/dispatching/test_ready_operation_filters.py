@@ -118,7 +118,8 @@ def test_dominated_operation_filter(
 
     A smaller example to illustrate the point:
 
-    ```python
+    .. code-block:: python
+
     instance_dict = {
         "name": "classic_generated_instance_375",
         "duration_matrix": [[3, 5, 9],
@@ -133,7 +134,6 @@ def test_dominated_operation_filter(
             "dispatching_rule": "most_work_remaining",
         },
     }
-    ```
 
     You can see the plots of the schedules in the `examples` folder.
     """
@@ -155,6 +155,61 @@ def test_dominated_operation_filter(
         f"Instance: {instance.name}, "
         f"Dispatching rule: {dispatching_rule}"
     )
+
+
+def test_filter_non_immediate_operations_with_release_date():
+    """
+    Tests that `filter_non_immediate_operations` correctly filters out
+    operations that are not yet released.
+    """
+    # Operation 0_0 has no release date.
+    # Operation 1_0 has a release date of 10.
+    jobs = [
+        [Operation(machines=0, duration=5)],
+        [Operation(machines=0, duration=5, release_date=10)],
+    ]
+    instance = JobShopInstance(jobs, "test_instance")
+
+    dispatcher = Dispatcher(
+        instance, ready_operations_filter=filter_non_immediate_operations
+    )
+
+    # At time 0, only operation 0_0 is available and immediate.
+    # Operation 1_0 is available but not immediate due to its release date.
+    available_ops = dispatcher.available_operations()
+    assert len(available_ops) == 1
+    assert available_ops[0].operation_id == 0
+
+    # Schedule operation 0_0. It runs from t=0 to t=5.
+    dispatcher.dispatch(available_ops[0], machine_id=0)
+
+    # At time 5, machine 0 is free. Operation 1_0 is still not released.
+    # The dispatcher's current_time should advance to the release date of
+    # the next operation.
+    # The only available operation is 1_0, which can start at t=10.
+    # So, available_operations will return operation 1_0.
+    available_ops = dispatcher.available_operations()
+    assert len(available_ops) == 1
+    assert available_ops[0].operation_id == 1
+
+    # The filter should identify that it can start at t=10, which is the
+    # min_start_time, so it is considered immediate.
+    assert dispatcher.current_time() == 10
+
+    # Dispatch operation 1_0
+    dispatcher.dispatch(available_ops[0], machine_id=0)
+
+    # Schedule should be complete
+    assert dispatcher.schedule.is_complete()
+
+    # Verify schedule
+    scheduled_op_0_0 = dispatcher.schedule.schedule[0][0]
+    assert scheduled_op_0_0.start_time == 0
+    assert scheduled_op_0_0.end_time == 5
+
+    scheduled_op_1_0 = dispatcher.schedule.schedule[0][1]
+    assert scheduled_op_1_0.start_time == 10
+    assert scheduled_op_1_0.end_time == 15
 
 
 if __name__ == "__main__":

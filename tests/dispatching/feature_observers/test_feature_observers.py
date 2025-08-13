@@ -1,3 +1,5 @@
+import numpy as np
+
 from job_shop_lib import JobShopInstance
 from job_shop_lib.generation import GeneralInstanceGenerator
 from job_shop_lib.dispatching.feature_observers import (
@@ -135,7 +137,7 @@ operations:
 4      0.0                1.0       5.0          1.0            0.0          0.0
 5      1.0                6.0       1.0          0.0            0.0          0.0
 6      0.0                7.0       1.0          0.0            1.0          0.0
-7      0.0               -1.0       0.0          1.0            0.0          1.0
+7      0.0               -1.0       1.0          1.0            0.0          1.0
 8      1.0                0.0       3.0          0.0            0.0          0.0
 9      0.0                6.0       2.0          0.0            1.0          0.0
 machines:
@@ -160,7 +162,7 @@ operations:
 4      0.0                1.0       5.0          1.0            0.0          0.0
 5      1.0                8.0       1.0          0.0            0.0          0.0
 6      0.0                9.0       1.0          0.0            1.0          0.0
-7      0.0               -1.0       0.0          1.0            0.0          1.0
+7      0.0               -1.0       1.0          1.0            0.0          1.0
 8      1.0                0.0       3.0          0.0            0.0          0.0
 9      0.0                6.0       2.0          0.0            1.0          0.0
 machines:
@@ -180,13 +182,13 @@ operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0               -7.0       1.0          1.0            0.0          1.0
 1      0.0               -6.0       1.0          1.0            0.0          1.0
-2      0.0               -5.0       7.0          1.0            0.0          0.0
+2      0.0               -5.0       2.0          1.0            0.0          0.0
 3      1.0                2.0       2.0          0.0            0.0          0.0
 4      0.0               -5.0       5.0          1.0            0.0          1.0
 5      1.0                2.0       1.0          0.0            0.0          0.0
 6      0.0                3.0       1.0          0.0            1.0          0.0
-7      0.0               -7.0       0.0          1.0            0.0          1.0
-8      0.0               -6.0      -3.0          1.0            0.0          1.0
+7      0.0               -7.0       1.0          1.0            0.0          1.0
+8      0.0               -6.0       3.0          1.0            0.0          1.0
 9      1.0                0.0       2.0          0.0            0.0          0.0
 machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
@@ -205,13 +207,13 @@ operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0               -7.0       1.0          1.0            0.0          1.0
 1      0.0               -6.0       1.0          1.0            0.0          1.0
-2      0.0               -5.0       7.0          1.0            0.0          0.0
+2      0.0               -5.0       2.0          1.0            0.0          0.0
 3      0.0                2.0       2.0          1.0            0.0          0.0
 4      0.0               -5.0       5.0          1.0            0.0          1.0
 5      1.0                2.0       1.0          0.0            0.0          0.0
 6      0.0                4.0       1.0          0.0            1.0          0.0
-7      0.0               -7.0       0.0          1.0            0.0          1.0
-8      0.0               -6.0      -3.0          1.0            0.0          1.0
+7      0.0               -7.0       1.0          1.0            0.0          1.0
+8      0.0               -6.0       3.0          1.0            0.0          1.0
 9      1.0                0.0       2.0          0.0            0.0          0.0
 machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
@@ -230,13 +232,13 @@ operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0               -7.0       1.0          1.0            0.0          1.0
 1      0.0               -6.0       1.0          1.0            0.0          1.0
-2      0.0               -5.0       7.0          1.0            0.0          0.0
+2      0.0               -5.0       2.0          1.0            0.0          0.0
 3      0.0                2.0       2.0          1.0            0.0          0.0
 4      0.0               -5.0       5.0          1.0            0.0          1.0
 5      0.0                2.0       1.0          1.0            0.0          0.0
 6      1.0                4.0       1.0          0.0            0.0          0.0
-7      0.0               -7.0       0.0          1.0            0.0          1.0
-8      0.0               -6.0      -3.0          1.0            0.0          1.0
+7      0.0               -7.0       1.0          1.0            0.0          1.0
+8      0.0               -6.0       3.0          1.0            0.0          1.0
 9      1.0                0.0       2.0          0.0            0.0          0.0
 machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
@@ -255,14 +257,14 @@ operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0              -11.0       1.0          1.0            0.0          1.0
 1      0.0              -10.0       1.0          1.0            0.0          1.0
-2      0.0               -9.0       7.0          1.0            0.0          1.0
+2      0.0               -9.0       2.0          1.0            0.0          1.0
 3      0.0               -2.0       2.0          1.0            0.0          1.0
 4      0.0               -9.0       5.0          1.0            0.0          1.0
 5      0.0               -2.0       1.0          1.0            0.0          1.0
 6      1.0                0.0       1.0          0.0            0.0          0.0
-7      0.0              -11.0       0.0          1.0            0.0          1.0
-8      0.0              -10.0      -3.0          1.0            0.0          1.0
-9      0.0               -4.0      -2.0          1.0            0.0          1.0
+7      0.0              -11.0       1.0          1.0            0.0          1.0
+8      0.0              -10.0       3.0          1.0            0.0          1.0
+9      0.0               -4.0       2.0          1.0            0.0          1.0
 machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      1.0                0.0       1.0          0.0                  1.0          0.0
@@ -280,14 +282,14 @@ operations:
    IsReady  EarliestStartTime  Duration  IsScheduled  PositionInJob  IsCompleted
 0      0.0              -12.0       1.0          1.0            0.0          1.0
 1      0.0              -11.0       1.0          1.0            0.0          1.0
-2      0.0              -10.0       7.0          1.0            0.0          1.0
+2      0.0              -10.0       2.0          1.0            0.0          1.0
 3      0.0               -3.0       2.0          1.0            0.0          1.0
 4      0.0              -10.0       5.0          1.0            0.0          1.0
 5      0.0               -3.0       1.0          1.0            0.0          1.0
-6      0.0               -1.0       0.0          1.0            0.0          1.0
-7      0.0              -12.0       0.0          1.0            0.0          1.0
-8      0.0              -11.0      -3.0          1.0            0.0          1.0
-9      0.0               -5.0      -2.0          1.0            0.0          1.0
+6      0.0               -1.0       1.0          1.0            0.0          1.0
+7      0.0              -12.0       1.0          1.0            0.0          1.0
+8      0.0              -11.0       3.0          1.0            0.0          1.0
+9      0.0               -5.0       2.0          1.0            0.0          1.0
 machines:
    IsReady  EarliestStartTime  Duration  IsScheduled  RemainingOperations  IsCompleted
 0      0.0              -12.0       0.0          0.0                  0.0          1.0
@@ -522,6 +524,75 @@ def test_is_completed_observer_with_random_instances():
     )
     for instance in generator:
         test_is_completed_observer(instance)
+
+
+def test_earliest_start_time_observer_with_recirculation(
+    instance_with_recirculation: JobShopInstance,
+):
+    dispatcher = Dispatcher(instance_with_recirculation)
+    feature_observer_factory(
+        FeatureObserverType.EARLIEST_START_TIME, dispatcher=dispatcher
+    )
+
+
+def test_earliest_start_time_observer_without_cache(
+    irregular_job_shop_instance: JobShopInstance,
+):
+    pruning_function = ready_operations_filter_factory(
+        ReadyOperationsFilterType.DOMINATED_OPERATIONS
+    )
+    dispatcher = Dispatcher(
+        irregular_job_shop_instance,
+        ready_operations_filter=pruning_function,
+    )
+    feature_observers_types: list[
+        FeatureObserverType | type[FeatureObserver]
+    ] = [
+        FeatureObserverType.IS_READY,
+        EarliestStartTimeObserver,  # For checking the factory
+        DurationObserver,
+        FeatureObserverType.IS_SCHEDULED,
+        FeatureObserverType.POSITION_IN_JOB,
+        FeatureObserverType.REMAINING_OPERATIONS,
+        FeatureObserverType.IS_COMPLETED,
+    ]
+    feature_observers = [
+        feature_observer_factory(
+            feature_observer_type,
+            dispatcher=dispatcher,
+        )
+        for feature_observer_type in feature_observers_types
+    ]
+    # REMOVE CACHE
+    earliest_start_time_observer = dispatcher.create_or_get_observer(
+        EarliestStartTimeObserver
+    )
+    # pylint: disable=protected-access
+    earliest_start_time_observer._is_regular_instance = False
+    earliest_start_time_observer._job_ids = np.array([])
+    earliest_start_time_observer._positions = np.array([])
+
+    composite = CompositeFeatureObserver(
+        dispatcher, feature_observers=feature_observers
+    )
+    assert str(composite) == STEP_0
+    solver = DispatchingRuleSolver("most_work_remaining")
+
+    steps = [
+        STEP_1,
+        STEP_2,
+        STEP_3,
+        STEP_4,
+        STEP_5,
+        STEP_6,
+        STEP_7,
+        STEP_8,
+        STEP_9,
+        STEP_10,
+    ]
+    for step in steps:
+        solver.step(dispatcher)
+        assert str(composite) == step, f"index: {steps.index(step)}"
 
 
 if __name__ == "__main__":

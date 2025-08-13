@@ -25,14 +25,16 @@ def no_setup_time_calculator(
 ) -> int:
     """Default start time calculator that implements the standard behavior.
 
-    The start time is the maximum of the next available time for the
-    machine and the next available time for the job to which the
-    operation belongs.
+    The start time is the maximum of the machine's next available time, the
+    job's next available time, and the operation's release date.
 
     Args:
-        dispatcher: The dispatcher instance.
-        operation: The operation to be scheduled.
-        machine_id: The id of the machine on which the operation is to be
+        dispatcher:
+            The dispatcher instance.
+        operation:
+            The operation to be scheduled.
+        machine_id:
+            The id of the machine on which the operation is to be
             scheduled.
 
     Returns:
@@ -41,6 +43,7 @@ def no_setup_time_calculator(
     return max(
         dispatcher.machine_next_available_time[machine_id],
         dispatcher.job_next_available_time[operation.job_id],
+        operation.release_date,
     )
 
 
@@ -329,8 +332,10 @@ class Dispatcher:
                 :attr:`~job_shop_lib.Operation.machine_id` attribute is used.
 
         Raises:
-            ValidationError: If the operation is not ready to be scheduled.
-            UninitializedAttributeError: If the operation has multiple
+            ValidationError:
+                If the operation is not ready to be scheduled.
+            UninitializedAttributeError:
+                If the operation has multiple
                 machines in its list and no ``machine_id`` is provided.
         """
 
@@ -408,7 +413,7 @@ class Dispatcher:
         condition: Callable[[DispatcherObserver], bool] = lambda _: True,
         **kwargs,
     ) -> ObserverType:
-        """Creates a new observer of the specified type or returns an existing
+        r"""Creates a new observer of the specified type or returns an existing
         observer of the same type if it already exists in the dispatcher's list
         of observers.
 
@@ -419,7 +424,7 @@ class Dispatcher:
                 A function that takes an observer and returns True if it is
                 the observer to be retrieved. By default, it returns True for
                 all observers.
-            **kwargs:
+            \**kwargs:
                 Additional keyword arguments to be passed to the observer's
                 constructor.
         """
@@ -547,7 +552,9 @@ class Dispatcher:
             for machine_id in operation.machines
         )
         job_start_time = self._job_next_available_time[operation.job_id]
-        return max(machine_earliest_start_time, job_start_time)
+        return max(
+            machine_earliest_start_time, job_start_time, operation.release_date
+        )
 
     def remaining_duration(
         self, scheduled_operation: ScheduledOperation
@@ -627,7 +634,11 @@ class Dispatcher:
     def is_ongoing(self, scheduled_operation: ScheduledOperation) -> bool:
         """Checks if the given operation is currently being processed."""
         current_time = self.current_time()
-        return scheduled_operation.start_time <= current_time
+        return (
+            scheduled_operation.start_time
+            <= current_time
+            < scheduled_operation.end_time
+        )
 
     def next_operation(self, job_id: int) -> Operation:
         """Returns the next operation to be scheduled for the given job.

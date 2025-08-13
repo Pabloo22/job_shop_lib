@@ -268,7 +268,7 @@ class JobShopGraph:
         v_of_edge: Node,
         **attr,
     ) -> None:
-        """Adds an edge to the graph.
+        r"""Adds an edge to the graph.
 
         It automatically determines the edge type based on the source and
         destination nodes unless explicitly provided in the ``attr`` argument
@@ -279,9 +279,10 @@ class JobShopGraph:
             u_of_edge:
                 The source node of the edge. Can be a :class:`Node`
             v_of_edge:
-                The destination node of the edge. Can be a :class:`Node` or
-                its tuple id.
-            **attr:
+                The destination node of the edge. If it is a :class:`Node`,
+                its ``node_id`` is used as the destination. Otherwise, it
+                is assumed to be the ``node_id`` of the destination.
+            \**attr:
                 Additional attributes to be added to the edge.
 
         Raises:

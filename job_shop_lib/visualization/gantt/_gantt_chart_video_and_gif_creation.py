@@ -70,14 +70,16 @@ def get_partial_gantt_chart_plotter(
     show_available_operations: bool = False,
     **kwargs: Any,
 ) -> PartialGanttChartPlotter:
-    """Returns a function that plots a Gantt chart for an unfinished schedule.
+    r"""Returns a function that plots a Gantt chart for an unfinished schedule.
 
     Args:
-        title: The title of the Gantt chart.
-        cmap: The name of the colormap to use.
+        title:
+            The title of the Gantt chart.
+        cmap:
+            The name of the colormap to use.
         show_available_operations:
             Whether to show the available operations in the Gantt chart.
-        **kwargs: Additional keyword arguments to pass to the
+        \*\*kwargs: Additional keyword arguments to pass to the
             :func:`plot_gantt_chart` function.
 
     Returns:

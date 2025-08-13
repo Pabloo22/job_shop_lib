@@ -129,16 +129,18 @@ class GeneralInstanceGenerator(InstanceGenerator):
         num_machines: int | None = None,
     ) -> JobShopInstance:
         if num_jobs is None:
-            num_jobs = self.rng.integers(
-                self.num_jobs_range[0], self.num_jobs_range[1] + 1
+            num_jobs = int(
+                self.rng.integers(
+                    self.num_jobs_range[0], self.num_jobs_range[1] + 1
+                )
             )
 
         if num_machines is None:
             min_num_machines, max_num_machines = self.num_machines_range
             if not self.allow_less_jobs_than_machines:
                 min_num_machines = min(num_jobs, max_num_machines)
-            num_machines = self.rng.integers(
-                min_num_machines, max_num_machines + 1
+            num_machines = int(
+                self.rng.integers(min_num_machines, max_num_machines + 1)
             )
         elif (
             not self.allow_less_jobs_than_machines and num_jobs < num_machines

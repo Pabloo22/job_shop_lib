@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Sequence
 import time
 
 from ortools.sat.python import cp_model
@@ -64,14 +64,28 @@ class ORToolsSolver(BaseSolver):
         self.solver = cp_model.CpSolver()
         self._operations_start: dict[Operation, tuple[IntVar, IntVar]] = {}
 
-    def __call__(self, instance: JobShopInstance) -> Schedule:
+    def __call__(
+        self,
+        instance: JobShopInstance,
+        arrival_times: Sequence[Sequence[int]] | None = None,
+        deadlines: Sequence[Sequence[int]] | None = None,
+    ) -> Schedule:
         """Equivalent to calling the :meth:`~ORToolsSolver.solve` method.
 
         This method is necessary because, in JobShopLib, solvers are defined
         as callables that receive an instance and return a schedule.
 
         Args:
-            instance: The job shop instance to be solved.
+            instance:
+                The job shop instance to be solved.
+            arrival_times:
+                Optional arrival times for each operation.
+                If provided, the solver will ensure that operations do not
+                start before their respective arrival times.
+            deadlines:
+                Optional deadlines for each operation.
+                If provided, the solver will ensure that operations are
+                completed before their respective deadlines.
 
         Returns:
             The best schedule found by the solver.
@@ -84,14 +98,26 @@ class ORToolsSolver(BaseSolver):
         """
         # Re-defined here since we already add metadata to the schedule in
         # the solve method.
-        return self.solve(instance)
+        return self.solve(
+            instance, arrival_times=arrival_times, deadlines=deadlines
+        )
 
-    def solve(self, instance: JobShopInstance) -> Schedule:
+    def solve(
+        self,
+        instance: JobShopInstance,
+        arrival_times: Sequence[Sequence[int]] | None = None,
+        deadlines: Sequence[Sequence[int]] | None = None,
+    ) -> Schedule:
         """Creates the variables, constraints and objective, and solves the
         problem.
 
         Args:
             instance: The job shop instance to be solved.
+
+            .. note::
+                If provided, `arrival_times` and `deadlines` will override the
+                `release_date` and `deadline` attributes of the operations,
+                respectively.
 
         Returns:
             The best schedule found by the solver.
@@ -107,7 +133,9 @@ class ORToolsSolver(BaseSolver):
                 If no solution could be found for the given problem within the
                 time limit.
         """
-        self._initialize_model(instance)
+        self._initialize_model(
+            instance, arrival_times=arrival_times, deadlines=deadlines
+        )
 
         start_time = time.perf_counter()
         status = self.solver.Solve(self.model)
@@ -128,7 +156,12 @@ class ORToolsSolver(BaseSolver):
         }
         return self._create_schedule(instance, metadata)
 
-    def _initialize_model(self, instance: JobShopInstance):
+    def _initialize_model(
+        self,
+        instance: JobShopInstance,
+        arrival_times: Sequence[Sequence[int]] | None = None,
+        deadlines: Sequence[Sequence[int]] | None = None,
+    ):
         """Initializes the model with variables, constraints and objective.
 
         The model is initialized with two variables for each operation: start
@@ -147,7 +180,9 @@ class ORToolsSolver(BaseSolver):
             self.solver.parameters.max_time_in_seconds = (
                 self.max_time_in_seconds
             )
-        self._create_variables(instance)
+        self._create_variables(
+            instance, arrival_times=arrival_times, deadlines=deadlines
+        )
         self._add_constraints(instance)
         self._set_objective(instance)
 
@@ -177,15 +212,38 @@ class ORToolsSolver(BaseSolver):
             instance=instance, schedule=sorted_schedule, **metadata
         )
 
-    def _create_variables(self, instance: JobShopInstance):
+    def _create_variables(
+        self,
+        instance: JobShopInstance,
+        arrival_times: Sequence[Sequence[int]] | None = None,
+        deadlines: Sequence[Sequence[int]] | None = None,
+    ):
         """Creates two variables for each operation: start and end time."""
         for job in instance.jobs:
             for operation in job:
+                lower_bound = operation.release_date
+                upper_bound = (
+                    instance.total_duration
+                    if operation.deadline is None
+                    else operation.deadline
+                )
+
+                if arrival_times is not None:
+                    lower_bound = arrival_times[operation.job_id][
+                        operation.position_in_job
+                    ]
+
+                if deadlines is not None:
+                    op_deadline = deadlines[operation.job_id][
+                        operation.position_in_job
+                    ]
+                    upper_bound = op_deadline
+
                 start_var = self.model.NewIntVar(
-                    0, instance.total_duration, f"start_{operation}"
+                    lower_bound, upper_bound, f"start_{operation}"
                 )
                 end_var = self.model.NewIntVar(
-                    0, instance.total_duration, f"end_{operation}"
+                    lower_bound, upper_bound, f"end_{operation}"
                 )
                 self._operations_start[operation] = (start_var, end_var)
                 self.model.Add(end_var == start_var + operation.duration)

@@ -247,9 +247,11 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
     def _get_start_from_zero_mappings(
         original_indices_dict: dict[str, NDArray[np.int32]],
     ) -> dict[str, dict[int, int]]:
-        mappings = {}
+        mappings: dict[str, dict[int, int]] = {}
         for key, indices in original_indices_dict.items():
-            mappings[key] = {idx: i for i, idx in enumerate(indices)}
+            mappings[key] = {
+                idx: i for i, idx in enumerate(indices)  # type: ignore[misc]
+            }  # idx is an integer (false positive)
         return mappings
 
     def _create_node_features_dict(
@@ -318,7 +320,7 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
                 ~removed_nodes_of_this_type
             ]
             original_ids_dict[node_type] = np.where(
-                ~removed_nodes_of_this_type
+                ~removed_nodes_of_this_type  # type: ignore[assignment]
             )[0]
 
         return removed_nodes_dict, original_ids_dict

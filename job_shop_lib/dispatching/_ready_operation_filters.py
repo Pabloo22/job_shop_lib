@@ -88,6 +88,8 @@ def filter_non_immediate_operations(
     min_start_time = dispatcher.min_start_time(operations)
     immediate_operations: list[Operation] = []
     for operation in operations:
+        if operation.release_date > min_start_time:
+            continue
         start_time = dispatcher.earliest_start_time(operation)
         if start_time == min_start_time:
             immediate_operations.append(operation)

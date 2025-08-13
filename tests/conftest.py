@@ -3,13 +3,14 @@ from job_shop_lib import (
     JobShopInstance,
     Operation,
     Schedule,
+    ScheduledOperation,
 )
 from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
     MultiJobShopGraphEnv,
 )
-from job_shop_lib.dispatching import DispatcherObserverConfig
+from job_shop_lib.dispatching import DispatcherObserverConfig, Dispatcher
 from job_shop_lib.dispatching.feature_observers import (
     FeatureObserverType,
     FeatureType,
@@ -24,13 +25,29 @@ from job_shop_lib.graphs import (
 from job_shop_lib.benchmarking import load_benchmark_instance
 
 
-@pytest.fixture
-def job_shop_instance():
+@pytest.fixture(name="job_shop_instance")
+def job_shop_instance_fixture():
     jobs = [
         [Operation(0, 10), Operation(1, 20)],
         [Operation(1, 15), Operation(2, 10)],
     ]
     instance = JobShopInstance(jobs, "TestInstance")
+    return instance
+
+
+@pytest.fixture(name="job_shop_instance_with_extras")
+def job_shop_instance_with_extras_fixture():
+    jobs = [
+        [
+            Operation(0, 10, release_date=0, deadline=100, due_date=80),
+            Operation(1, 20, release_date=10, deadline=110, due_date=90),
+        ],
+        [
+            Operation(1, 15, release_date=5, deadline=105, due_date=85),
+            Operation(2, 10, release_date=15, deadline=115, due_date=95),
+        ],
+    ]
+    instance = JobShopInstance(jobs, "TestInstanceWithExtras")
     return instance
 
 
@@ -52,6 +69,22 @@ def example_job_shop_instance():
         lower_bound=7,
     )
     return instance
+
+
+@pytest.fixture
+def dispatcher(  # pylint: disable=redefined-outer-name
+    example_job_shop_instance: JobShopInstance,
+) -> Dispatcher:
+    """Provides a Dispatcher instance for the example_job_shop_instance."""
+    return Dispatcher(example_job_shop_instance)
+
+
+@pytest.fixture
+def dispatcher_with_extras(
+    job_shop_instance_with_extras: JobShopInstance,
+) -> Dispatcher:
+    """Provides a Dispatcher for an instance with release/due dates."""
+    return Dispatcher(job_shop_instance_with_extras)
 
 
 @pytest.fixture
@@ -220,4 +253,56 @@ def example_schedule(  # W0621 = redefined-outer-name
     instance = example_job_shop_instance
     solver = DispatchingRuleSolver()
     schedule = solver.solve(instance)
+    return schedule
+
+
+@pytest.fixture
+def instance_with_recirculation() -> JobShopInstance:
+    """Create a job shop instance with recirculation."""
+    m0 = 0
+    m1 = 1
+    m2 = 2
+
+    job_0 = [Operation(m0, 1), Operation(m1, 1), Operation(m0, 7)]
+    job_1 = [Operation(m1, 5), Operation(m2, 1), Operation(m1, 1)]
+    job_2 = [Operation(m2, 1), Operation(m0, 3), Operation(m1, 2)]
+
+    jobs = [job_0, job_1, job_2]
+
+    instance = JobShopInstance(
+        jobs,
+        name="Recirculation",
+    )
+    return instance
+
+
+@pytest.fixture
+def minimal_infeasible_instance():
+    """Creates a minimal instance that's infeasible with tight constraints."""
+    jobs = [
+        [Operation(0, 10)],  # Operation takes 10 time units
+        [Operation(0, 10)],  # Another operation on same machine
+    ]
+    return JobShopInstance(jobs, name="MinimalInfeasible")
+
+
+@pytest.fixture(name="complete_schedule")
+def complete_schedule_fixture(job_shop_instance):
+    schedule = Schedule(instance=job_shop_instance, check=True)
+    operations = [
+        ScheduledOperation(
+            job_shop_instance.jobs[0][0], start_time=0, machine_id=0
+        ),
+        ScheduledOperation(
+            job_shop_instance.jobs[0][1], start_time=0, machine_id=1
+        ),
+        ScheduledOperation(
+            job_shop_instance.jobs[1][0], start_time=100, machine_id=1
+        ),
+        ScheduledOperation(
+            job_shop_instance.jobs[1][1], start_time=100, machine_id=2
+        ),
+    ]
+    for op in operations:
+        schedule.add(op)
     return schedule
