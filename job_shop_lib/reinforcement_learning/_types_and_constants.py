@@ -36,8 +36,8 @@ class ObservationSpaceKey(str, Enum):
 class _ObservationDictRequired(TypedDict):
     """Required fields for the observation dictionary."""
 
-    removed_nodes: NDArray[np.bool_]
-    edge_index: NDArray[np.int32]
+    removed_nodes: dict[str, NDArray[bool]]
+    edge_index: dict[tuple[str, str, str], NDArray[np.int32]]
 
 
 class _ObservationDictOptional(TypedDict, total=False):

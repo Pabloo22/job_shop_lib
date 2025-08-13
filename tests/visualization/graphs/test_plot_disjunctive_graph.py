@@ -2,7 +2,12 @@ import pytest
 import matplotlib
 
 from job_shop_lib import JobShopInstance
-from job_shop_lib.graphs import build_disjunctive_graph, NodeType, Node
+from job_shop_lib.graphs import (
+    build_disjunctive_graph,
+    NodeType,
+    Node,
+    EdgeType,
+)
 from job_shop_lib.visualization.graphs import plot_disjunctive_graph
 from job_shop_lib.exceptions import ValidationError
 
@@ -67,22 +72,63 @@ def test_plot_disjunctive_graph_removed_nodes(
     also using machine_colors and single_edge for disjunctive edges.
     """
     graph = build_disjunctive_graph(example_job_shop_instance)
-
+    print(graph.adjacency_out[list(graph.adjacency_out.keys())[-2]])
+    print()
     op_nodes = [
         node for node in graph.nodes if node.node_type == NodeType.OPERATION
     ]
+    print(f"Operation nodes before removal: {len(op_nodes)}")
+    print()
 
     # Remove 1st, 3rd, 4th operation nodes if they exist
+    """
     nodes_to_remove_indices = [0, 2, 3]
     removed_count = 0
     for index_to_remove in nodes_to_remove_indices:
         actual_index = index_to_remove - removed_count
         if actual_index < len(op_nodes):
             node_to_remove = op_nodes.pop(actual_index)
-            if not graph.is_removed(node_to_remove.node_id):
+            if not graph.is_removed(node_to_remove):
+                print(f"Removing node: {node_to_remove.node_id}")
                 graph.remove_node(node_to_remove.node_id)
                 removed_count += 1
-
+        print(graph._nodes_map)
+        print(graph.adjacency_out[list(graph.adjacency_out.keys())[-2]])
+        print()
+    """
+    to_remove = [op_nodes[i] for i in [0, 2, 3] if i < len(op_nodes)]
+    source_node = graph._nodes_map[("SOURCE", 0)]
+    print(f"Nodes to remove: {[node for node in to_remove]}")
+    print("Intial adjacency_in:")
+    print()
+    print(to_remove[0])
+    print(graph.adjacency_in[to_remove[0]][EdgeType.CONJUNCTIVE])
+    print()
+    print(to_remove[1])
+    print(graph.adjacency_in[to_remove[1]][EdgeType.CONJUNCTIVE])
+    print()
+    print(to_remove[2])
+    print(graph.adjacency_in[to_remove[2]][EdgeType.CONJUNCTIVE])
+    print()
+    for node in to_remove:
+        print("--" * 20)
+        print(f"Removing node: {node}")
+        print(f"incoming edges: {graph.adjacency_in[node]}")
+        graph.remove_node(node.node_id)
+        print(f"SOURCE NODE ADJACENCY OUT")
+        print(graph.adjacency_out[source_node])
+        print()
+        print(f"Trying to access adjacency_in for removed node {node}:")
+        try:
+            print(graph.adjacency_in[node])
+        except KeyError:
+            print("Node not found in adjacency_in")
+        print()
+        print("Nodes map after removal:")
+        print(graph._nodes_map)
+        print()
+    print(f"SOURCE NODE ADJACENCY OUT")
+    print(graph.adjacency_out[source_node])
     num_machines = example_job_shop_instance.num_machines
     cmap = matplotlib.colormaps.get_cmap("plasma")
     machine_colors = {
@@ -127,7 +173,7 @@ def test_plot_disjunctive_graph_removed_nodes_default_machine_colors(
         actual_index = index_to_remove - removed_count
         if actual_index < len(op_nodes):
             node_to_remove = op_nodes.pop(actual_index)
-            if not graph.is_removed(node_to_remove.node_id):
+            if not graph.is_removed(node_to_remove):
                 graph.remove_node(node_to_remove.node_id)
                 removed_count += 1
 

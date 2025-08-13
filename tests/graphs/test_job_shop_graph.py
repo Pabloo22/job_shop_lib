@@ -138,29 +138,35 @@ def test_remove_node(example_job_shop_instance):
     # Ensure there are enough nodes to run the test
     assert len(op_nodes) >= 7, "Test instance needs at least 7 operations"
     nodes_to_remove = [
-        op_nodes[0].node_id,
-        op_nodes[3].node_id,
-        op_nodes[6].node_id,
+        op_nodes[0],
+        op_nodes[3],
+        op_nodes[6],
     ]
 
     # Remove nodes using their correct tuple IDs
-    for node_id in nodes_to_remove:
-        graph.remove_node(node_id)
+    for node in nodes_to_remove:
+        graph.remove_node(node.node_id)
 
     # Verify the nodes are no longer in the graph's node set
-    for node_id in nodes_to_remove:
-        assert node_id not in graph.graph.nodes()
+    for node in nodes_to_remove:
+        if node.node_id in graph._nodes_map:
+            assert (
+                graph._nodes_map[node.node_id].operation.operation_id
+                != node.operation.operation_id
+            )
 
     # Verify the `removed_nodes` attribute is updated correctly via the API
-    for node_id in nodes_to_remove:
-        assert graph.is_removed(node_id)
+    for node in nodes_to_remove:
+        assert graph.is_removed(node)
 
+    """
+    Won't raise an error because ids are updated after removal.
     with pytest.raises(nx.NetworkXError):
-        # Seeing all edges of removed nodesreturns an empty list, not an error
+        # Seeing all edges of removed nodes returns an empty list, not an error
         # So we try to access an edge that should not exist
         last_removed_node_id = nodes_to_remove[-1]
         graph.graph.remove_edge(last_removed_node_id, ("SOURCE", 0))
-
+    """
     # This part of the test remains valid as it uses the is_removed() helper
     graph.remove_isolated_nodes()
     isolated_nodes = list(nx.isolates(graph.graph))

@@ -244,7 +244,7 @@ def plot_disjunctive_graph(
         cmap_func = matplotlib.colormaps.get_cmap(color_map)
         remaining_machines = job_shop_graph.instance.num_machines
         for operation_node in operation_nodes:
-            if job_shop_graph.is_removed(operation_node.node_id):
+            if job_shop_graph.is_removed(operation_node):
                 continue
             machine_id = operation_node.operation.machine_id
             if machine_id not in machine_colors:
@@ -258,12 +258,12 @@ def plot_disjunctive_graph(
         node_colors: list[Any] = [
             _get_node_color(node)
             for node in job_shop_graph.nodes
-            if not job_shop_graph.is_removed(node.node_id)
+            if not job_shop_graph.is_removed(node)
         ]
     else:
         node_colors = []
         for node in job_shop_graph.nodes:
-            if job_shop_graph.is_removed(node.node_id):
+            if job_shop_graph.is_removed(node):
                 continue
             if node.node_type == NodeType.OPERATION:
                 machine_id = node.operation.machine_id
@@ -331,15 +331,15 @@ def plot_disjunctive_graph(
     labels = {}
     if job_shop_graph.nodes_by_type[NodeType.SOURCE]:
         source_node = job_shop_graph.nodes_by_type[NodeType.SOURCE][0]
-        if not job_shop_graph.is_removed(source_node.node_id):
+        if not job_shop_graph.is_removed(source_node):
             labels[source_node] = start_node_label
     if job_shop_graph.nodes_by_type[NodeType.SINK]:
         sink_node = job_shop_graph.nodes_by_type[NodeType.SINK][0]
         # check if the sink node is removed
-        if not job_shop_graph.is_removed(sink_node.node_id):
+        if not job_shop_graph.is_removed(sink_node):
             labels[sink_node] = end_node_label
     for operation_node in operation_nodes:
-        if job_shop_graph.is_removed(operation_node.node_id):
+        if job_shop_graph.is_removed(operation_node):
             continue
         labels[operation_node] = operation_node_labeler(operation_node)
 
