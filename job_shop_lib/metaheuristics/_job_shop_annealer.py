@@ -2,19 +2,67 @@ import random
 
 import simanneal
 
-from job_shop_lib import JobShopInstance, Schedule, ScheduledOperation
+from job_shop_lib import JobShopInstance, Schedule
 from job_shop_lib.exceptions import ValidationError
 
 
 class JobShopAnnealer(simanneal.Annealer):
-    """Simulated Annealing implementation from simanneal API
-    for Job Shop Scheduling.
+    """Helper class for the :class:`SimulatedAnnealingSolver`.
+
+    It uses `simanneal <https://github.com/perrygeo/simanneal>`_ as the
+    backend.
+
+    In the context of the job shop scheduling problem, simulated annealing is
+    particularly useful for improving previous solutions.
+
+    The process involves iteratively exploring the solution space:
+
+    1. A random move is made to alter the current state. This is done by
+       swapping two operations in the sequence of a machine.
+    2. The "energy" of the new state is evaluated using an objective function.
+       In this case, the energy is calculated as the makespan of the schedule
+       plus penalties for any constraint violations (such as deadlines and
+       due dates).
+    3. The new state is accepted if it has lower energy (a better solution).
+       If it has higher energy, it might still be accepted with a certain
+       probability, which depends on the current "temperature". The
+       temperature decreases over time, reducing the chance of accepting
+       worse solutions as the algorithm progresses. This helps to avoid
+       getting stuck in local optima.
+
+    This is repeated until the solution converges or a maximum number of
+    steps is reached.
+
+    Tuning the annealer is crucial for performance. The base
+    ``simanneal.Annealer`` class provides parameters that can be adjusted:
+
+    - ``Tmax``: Maximum (starting) temperature (default: 25000.0).
+    - ``Tmin``: Minimum (ending) temperature (default: 2.5).
+    - ``steps``: Number of iterations (default: 50000).
+    - ``updates``: Number of progress updates (default: 100).
+
+    A good starting point is to set ``Tmax`` to a value that accepts about 98%
+    of moves and ``Tmin`` to a value where the solution no longer improves.
+    The number of ``steps`` should be large enough to explore the search space
+    thoroughly.
+
+    These parameters can be set on the annealer instance. For example:
+    ``annealer.Tmax = 12000.0``
+
+    Alternatively, this class provides an ``auto`` method to find reasonable
+    parameters based on a desired runtime:
+    ``auto_schedule = annealer.auto(minutes=1)``
+    ``annealer.set_schedule(auto_schedule)``
 
     Attributes:
-        instance: The job shop instance to solve.
-        initial_state: Initial state of the schedule as a list of lists,
-        where each sublist represents the operations of a job.
-        penalty_factor: Factor to scale the penalty for infeasible solutions.
+        instance:
+            The job shop instance to solve.
+        deadline_penalty_factor:
+            Factor to penalize deadline violations.
+        due_date_penalty_factor:
+            Factor to penalize due date violations.
+        random_generator:
+            Random generator for reproducibility.
 
     Args:
         instance:
@@ -23,35 +71,46 @@ class JobShopAnnealer(simanneal.Annealer):
         initial_state:
             Initial state of the schedule as a list of lists, where each
             sublist represents the operations of a job.
-        penalty_factor:
-            Factor to scale the penalty for infeasible solutions. It is used
-            to penalize solutions that violate constraints, such as arrival
-            times and deadlines. A higher value increases the penalty for
-            infeasible solutions, making them less likely to be accepted.
-            It is used to calculate the energy of the solution.
-            It is used to calculate the makespan of the schedule.
-            It is used to calculate the penalties for constraint violations.
+        deadline_penalty_factor:
+            Factor to penalize deadline violations. If a deadline is not met,
+            it will add this quantity to the makespan to get the energy
+            of the solution.
+        due_date_penalty_factor:
+            Factor to penalize due date violations. If a due date is not met,
+            it will add this quantity to the makespan to get the energy
+            of the solution.
+        seed:
+            Random seed for reproducibility. If ``None``, random behavior will
+            be non-deterministic.
     """
 
     def __init__(
         self,
         instance: JobShopInstance,
         initial_state: list[list[int]],
-        penalty_factor: int = 1_000_000,
-        random_generator: random.Random | None = None,
+        deadline_penalty_factor: int = 1_000_000,
+        due_date_penalty_factor: int = 100,
+        seed: int | None = None,
     ):
-
         super().__init__(initial_state)
         self.instance = instance
-        self.penalty_factor = penalty_factor
-        self.random_generator = random_generator or random
+        self.deadline_penalty_factor = deadline_penalty_factor
+        self.due_date_penalty_factor = due_date_penalty_factor
+        self.random_generator = random.Random(seed)
+
+    def _get_state(self) -> list[list[int]]:
+        """Returns the current state of the annealer.
+
+        This method facilitates type checking.
+        """
+        return self.state
 
     def move(self) -> None:
         """Generates a neighbor state by swapping two operations."""
         machine_id = self.random_generator.randint(
             0, self.instance.num_machines - 1
         )
-        sequence = self.state[machine_id]
+        sequence = self._get_state()[machine_id]
         if len(sequence) < 2:
             return
 
@@ -72,77 +131,42 @@ class JobShopAnnealer(simanneal.Annealer):
     def _compute_penalties(self, schedule: Schedule) -> float:
         """Calculates penalties for the constraints of
         deadline and arrival time violations."""
-        if (
-            not self.instance.has_deadlines
-            and not self.instance.has_release_dates
-        ):
+        if not self.instance.has_deadlines and not self.instance.has_due_dates:
             return 0.0
 
-        job_completion_times = self._get_job_completion_times(schedule)
-        penalty = 0.0
-
-        if self.instance.has_deadlines:
-            # Use the deadlines_matrix property to get deadlines
-            for job_id, completion_time in enumerate(job_completion_times):
-                deadlines = self.instance.deadlines_matrix[job_id]
-                # Check the last operation's deadline for each job
-                last_op_deadline = deadlines[-1]
-                if (
-                    last_op_deadline is not None
-                    and completion_time is not None
-                    and completion_time > last_op_deadline
-                ):
-                    penalty += float(self.penalty_factor) * (
-                        completion_time - last_op_deadline
-                    )
-
-        if self.instance.has_release_dates:
-            arrival_times = self.instance.release_dates_matrix
-            for job_id in range(self.instance.num_jobs):
-                # Check for the first operation's release date for each job
-                first_op_release_date = arrival_times[job_id][0]
-                if first_op_release_date is not None:
-                    scheduled_op = self._find_scheduled_operation(
-                        schedule, job_id, 0
-                    )
-                    if scheduled_op.start_time < first_op_release_date:
-                        penalty += float(self.penalty_factor) * (
-                            first_op_release_date - scheduled_op.start_time
-                        )
-
-        return penalty
-
-    def _get_job_completion_times(
-        self, schedule: Schedule
-    ) -> list[int | None]:
-        """Returns the completion time of the last operation for each job."""
-        completion_times: list[int | None] = [None] * self.instance.num_jobs
-
+        total_penalty = 0.0
         for machine_schedule in schedule.schedule:
-            for operation in machine_schedule:
-                job_id = operation.job_id
-                # Check if this the last operation for this job
-                if (
-                    operation.position_in_job
-                    == self.instance.num_operations - 1
-                ):
-                    completion_times[job_id] = operation.end_time
+            for scheduled_op in machine_schedule:
+                violates_deadline = (
+                    (scheduled_op.end_time > scheduled_op.operation.deadline)
+                    if scheduled_op.operation.deadline is not None
+                    else False
+                )
+                violates_due_date = (
+                    (scheduled_op.end_time > scheduled_op.operation.due_date)
+                    if scheduled_op.operation.due_date is not None
+                    else False
+                )
+                total_penalty += (
+                    violates_deadline * self.deadline_penalty_factor
+                    + violates_due_date * self.due_date_penalty_factor
+                )
+        return total_penalty
 
-        return completion_times
+    def auto(self, minutes: float, steps: int = 2000) -> dict[str, float]:
+        """Explores the search space to determine decent starting temperature
+        values for a given time budget.
 
-    def _find_scheduled_operation(
-        self, schedule: Schedule, job_id: int, operation_index: int
-    ) -> ScheduledOperation:
-        """Finds the scheduled operation for a given
-        job and operation index."""
-        for machine_schedule in schedule.schedule:
-            for operation in machine_schedule:
-                if (
-                    operation.job_id == job_id
-                    and operation.position_in_job == operation_index
-                ):
-                    return operation
-        raise ValueError(
-            f"Scheduled operation not found for job {job_id} and "
-            f"operation index {operation_index}"
-        )
+        Args:
+            minutes:
+                How long you're willing to wait for results.
+            steps:
+                The number of steps to take in the exploration process.
+
+        Returns:
+            A dictionary suitable for the
+            :meth:``simmaneal.Annealer.set_schedule`` method. The dictionary
+            contains the following keys: "tmax", "tmin", "steps", "updates".
+        """
+        assert minutes > 0, "Minutes must be greater than 0"
+        return super().auto(minutes, steps)
