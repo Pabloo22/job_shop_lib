@@ -106,15 +106,9 @@ class Schedule:
                 - **"metadata"**: A dictionary with additional information
                   about the schedule.
         """
-        job_sequences: list[list[int]] = []
-        for machine_schedule in self.schedule:
-            job_sequences.append(
-                [operation.job_id for operation in machine_schedule]
-            )
-
         return {
             "instance": self.instance.to_dict(),
-            "job_sequences": job_sequences,
+            "job_sequences": self.job_sequences(),
             "metadata": self.metadata,
         }
 
@@ -210,6 +204,19 @@ class Schedule:
                     "Invalid job sequences. No valid operation to schedule."
                 )
         return dispatcher.schedule
+
+    def job_sequences(self) -> list[list[int]]:
+        """Returns the sequence of jobs for each machine in the schedule.
+
+        This method returns a list of lists, where each sublist contains the
+        job ids of the operations scheduled on that machine.
+        """
+        job_sequences: list[list[int]] = []
+        for machine_schedule in self.schedule:
+            job_sequences.append(
+                [operation.job_id for operation in machine_schedule]
+            )
+        return job_sequences
 
     def reset(self):
         """Resets the schedule to an empty state."""
