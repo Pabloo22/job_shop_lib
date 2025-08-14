@@ -38,16 +38,21 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install --upgrade pip
-          pip install poetry==1.7
-          if [[ "${{ runner.os }}" == "macOS" ]]; then
-          # On macOS, we need to explicitly tell the compiler where to find the brew-installed graphviz headers and libraries.
-          # We set these environment variables only for the poetry install command.
+        pip install --upgrade pip
+        pip install poetry==1.7
+
+        if [[ "${{ runner.os }}" == "macOS" ]]; then
+          # On macOS, tell the compiler where to find the brew-installed graphviz
           CFLAGS="-I$(brew --prefix graphviz)/include" LDFLAGS="-L$(brew --prefix graphviz)/lib" poetry install --with test --extras "pygraphviz"
-          else
-          # For Linux and Windows, the standard command works
+        
+        elif [[ "${{ runner.os }}" == "Windows" ]]; then
+          # On Windows, tell the compiler where to find the choco-installed graphviz
+          # Note: The shell is bash, but we use Windows-style paths for the variables.
+          INCLUDE="C:\Program Files\Graphviz\include" LIB="C:\Program Files\Graphviz\lib" poetry install --with test --extras "pygraphviz"
+        
+        else # This covers Linux ("ubuntu-latest")
           poetry install --with test --extras "pygraphviz"
-          fi
+        fi
       shell: bash
 
     - name: Run tests and generate coverage report
