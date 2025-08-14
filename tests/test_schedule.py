@@ -1,5 +1,10 @@
 import pytest
-from job_shop_lib import Schedule, ScheduledOperation, JobShopInstance
+from job_shop_lib import (
+    Schedule,
+    ScheduledOperation,
+    JobShopInstance,
+    Operation,
+)
 from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.rules import (
@@ -225,6 +230,53 @@ def test_repr(complete_schedule: Schedule):
 
 def test_eq(complete_schedule: Schedule):
     assert complete_schedule != []
+
+
+def test_critical_path():
+    # Check that the length of the critical path is the same as the makespan
+    for instance in INSTANCES_TO_TEST:
+        solver = DispatchingRuleSolver()
+        schedule = solver.solve(instance)
+        critical_path = schedule.critical_path()
+        assert (
+            sum(op.operation.duration for op in critical_path)
+            == schedule.makespan()
+        ), f"Critical path length does not match makespan for {instance.name}"
+
+
+def test_critical_path_empty_schedule():
+    empty_schedule = Schedule(instance=JobShopInstance([]))
+    critical_path = empty_schedule.critical_path()
+    assert (
+        len(critical_path) == 0
+    ), "Critical path should be empty for an empty schedule"
+
+
+def test_last_operation_empty_schedule():
+    empty_schedule = Schedule(instance=JobShopInstance([]))
+    with pytest.raises(ValidationError):
+        empty_schedule.last_operation()
+
+
+def test_associated_scheduled_operation(complete_schedule: Schedule):
+    # Check that the associated scheduled operation is correct
+    for machine_schedule in complete_schedule.schedule:
+        for scheduled_op in machine_schedule:
+            assert (
+                scheduled_op
+                is complete_schedule.get_associated_scheduled_operation(
+                    scheduled_op.operation
+                )
+            ), "Associated scheduled operation does not match"
+
+    operation_not_in_schedule = Operation(0, 1)
+    with pytest.raises(
+        ValidationError,
+        match=r"not found in the schedule.",
+    ):
+        complete_schedule.get_associated_scheduled_operation(
+            operation_not_in_schedule
+        )
 
 
 if __name__ == "__main__":

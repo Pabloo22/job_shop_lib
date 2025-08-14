@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 from collections import deque
 
-from job_shop_lib import ScheduledOperation, JobShopInstance
+from job_shop_lib import ScheduledOperation, JobShopInstance, Operation
 from job_shop_lib.exceptions import ValidationError
 
 if TYPE_CHECKING:
@@ -227,11 +227,10 @@ class Schedule:
 
         The makespan is the time at which all operations are completed.
         """
-        max_end_time = 0
-        for machine_schedule in self.schedule:
-            if machine_schedule:
-                max_end_time = max(max_end_time, machine_schedule[-1].end_time)
-        return max_end_time
+        if self.num_scheduled_operations == 0:
+            return 0
+        last_operation = self.last_operation()
+        return last_operation.end_time
 
     def is_complete(self) -> bool:
         """Returns ``True`` if all operations have been scheduled."""
@@ -340,3 +339,120 @@ class Schedule:
             [machine_schedule.copy() for machine_schedule in self.schedule],
             **self.metadata,
         )
+
+    def get_associated_scheduled_operation(
+        self, operation: Operation
+    ) -> ScheduledOperation:
+        """Returns the :class:`ScheduledOperation` that contains the given
+        :class:`Operation`.
+
+        Args:
+            operation:
+                The :class:`Operation` to find the associated
+                :class:`ScheduledOperation` for.
+
+        Returns:
+            The :class:`ScheduledOperation` associated with the given
+            :class:`Operation`.
+
+        Raises:
+            ValidationError:
+                If the operation is not found in the schedule.
+        """
+        for machine_id in operation.machines:
+            for scheduled_op in self.schedule[machine_id]:
+                if scheduled_op.operation == operation:
+                    return scheduled_op
+        raise ValidationError(
+            f"Operation {operation} not found in the schedule."
+        )
+
+    def last_operation(self) -> ScheduledOperation:
+        """Returns the :class:`ScheduledOperation` with the latest end time.
+
+        If there is a tie, it returns the first one found.
+
+        Raises:
+            ValidationError: If the schedule is empty.
+        """
+        if self.num_scheduled_operations == 0:
+            raise ValidationError(
+                "Cannot get last operation from an empty schedule."
+            )
+        return max(
+            (
+                machine_schedule[-1]
+                for machine_schedule in self.schedule
+                if machine_schedule
+            ),
+            key=lambda op: op.end_time,
+        )
+
+    def critical_path(self) -> list[ScheduledOperation]:
+        """Returns the critical path of the schedule.
+
+        The critical path is the longest path of dependent operations through
+        the schedule, which determines the makespan. This implementation
+        correctly identifies the path even in non-compact schedules where
+        idle time may exist.
+
+        It works by starting from an operation that determines the makespan
+        and tracing backwards, at each step choosing the predecessor (either
+        from the same job or the same machine) that finished latest.
+        """
+        if self.num_scheduled_operations == 0:
+            return []
+
+        # 1. Start from the operation that determines the makespan
+        last_scheduled_op = self.last_operation()
+
+        critical_path = deque([last_scheduled_op])
+        current_scheduled_op = last_scheduled_op
+
+        # 2. Trace backwards from the last operation
+        while True:
+            job_pred = None
+            machine_pred = None
+
+            # Find job predecessor (the previous operation in the same job)
+            op_idx_in_job = current_scheduled_op.operation.position_in_job
+            if op_idx_in_job > 0:
+                prev_op_in_job = self.instance.jobs[
+                    current_scheduled_op.job_id
+                ][op_idx_in_job - 1]
+                job_pred = self.get_associated_scheduled_operation(
+                    prev_op_in_job
+                )
+
+            # Find machine predecessor (the previous operation on the same
+            # machine)
+            machine_schedule = self.schedule[current_scheduled_op.machine_id]
+            op_idx_on_machine = machine_schedule.index(current_scheduled_op)
+            if op_idx_on_machine > 0:
+                machine_pred = machine_schedule[op_idx_on_machine - 1]
+
+            # 3. Determine the critical predecessor
+            # The critical predecessor is the one that finished latest, as it
+            # determined the start time of the current operation.
+
+            if job_pred is None and machine_pred is None:
+                # Reached the beginning of the schedule, no more predecessors
+                break
+
+            job_pred_end_time = (
+                job_pred.end_time if job_pred is not None else -1
+            )
+            machine_pred_end_time = (
+                machine_pred.end_time if machine_pred is not None else -1
+            )
+            critical_pred = (
+                job_pred
+                if job_pred_end_time >= machine_pred_end_time
+                else machine_pred
+            )
+            assert critical_pred is not None
+            # Prepend the critical predecessor to the path and continue tracing
+            critical_path.appendleft(critical_pred)
+            current_scheduled_op = critical_pred
+
+        return list(critical_path)
