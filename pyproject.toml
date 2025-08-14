@@ -86,3 +86,4 @@ filterwarnings = [
     "ignore::DeprecationWarning:importlib._bootstrap:488"
 ]
 mpl-baseline-path = "tests/visualization/baseline"
+addopts = "--cov=job_shop_lib --cov-report lcov:lcov.info --mpl"
