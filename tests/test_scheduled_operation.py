@@ -37,3 +37,16 @@ def test_end_time_calculation():
         operation, start_time=10, machine_id=1
     )
     assert scheduled_operation.end_time == 15
+
+
+def test_equality():
+    operation = Operation(machines=[1, 2], duration=5)
+    scheduled_op1 = ScheduledOperation(
+        operation, start_time=10, machine_id=1
+    )
+    scheduled_op2 = ScheduledOperation(
+        operation, start_time=10, machine_id=1
+    )
+    assert scheduled_op1 == scheduled_op2
+
+    assert scheduled_op1 != 0
