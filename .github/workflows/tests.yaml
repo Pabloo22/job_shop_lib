@@ -40,7 +40,7 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install poetry==1.7
-        poetry install --with test
+        poetry install --with test --extras "pygraphviz"
 
     - name: Run tests and generate coverage report
       run: poetry run pytest -v --cov=job_shop_lib --cov-report=xml
