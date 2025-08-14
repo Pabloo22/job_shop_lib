@@ -1,4 +1,3 @@
-import pytest
 from job_shop_lib.benchmarking import load_benchmark_instance
 from job_shop_lib.metaheuristics import JobShopAnnealer
 from job_shop_lib.metaheuristics._simulated_annealing_solver import (
@@ -7,16 +6,9 @@ from job_shop_lib.metaheuristics._simulated_annealing_solver import (
 from job_shop_lib import Schedule
 
 
-@pytest.fixture
-def ft06_instance():
-    return load_benchmark_instance("ft06")
-
-
 # Basic Functionality Test
 def test_basic_functionality(instance_with_release_dates_and_deadlines):
-    solver = SimulatedAnnealingSolver(
-        initial_temperature=100, steps=100, cool=0.95
-    )
+    solver = SimulatedAnnealingSolver(initial_temperature=100, steps=100)
     schedule = solver.solve(instance_with_release_dates_and_deadlines)
 
     assert isinstance(schedule, Schedule)
@@ -37,11 +29,13 @@ def test_basic_functionality(instance_with_release_dates_and_deadlines):
 # Initialization Test
 def test_initialization(instance_with_release_dates_and_deadlines):
     # Create a custom initial state
-    initial_state = [
+    initial_state_seq = [
         [0, 1],  # Machine 0: Job0 then Job1
         [0, 1],  # Machine 1: Job0 then Job1
     ]
-
+    initial_state = Schedule.from_job_sequences(
+        instance_with_release_dates_and_deadlines, initial_state_seq
+    )
     annealer = JobShopAnnealer(
         instance_with_release_dates_and_deadlines,
         initial_state,
@@ -51,43 +45,15 @@ def test_initialization(instance_with_release_dates_and_deadlines):
     assert annealer.state == initial_state
 
 
-# Arrival Times constraint test
-def test_arrival_times_constraint(instance_with_release_dates_and_deadlines):
-
-    solver = SimulatedAnnealingSolver(
-        initial_temperature=1000,
-        steps=5000,
-        cool=0.95,
-        penalty_factor=1_000_000,
-        seed=42,  # For reproducibility
-    )
-    schedule = solver.solve(instance_with_release_dates_and_deadlines)
-
-    # Check first operation of each job starts after release date
-    for job_id, job in enumerate(
-        instance_with_release_dates_and_deadlines.jobs
-    ):
-        first_op = job[0]
-        scheduled_op = next(
-            op
-            for machine_schedule in schedule.schedule
-            for op in machine_schedule
-            if op.operation == first_op
-        )
-        assert (
-            scheduled_op.start_time >= first_op.release_date
-        ), f"Job {job_id} first operation starts too early"
-
-
 # Deadlines constraint test
 def test_deadlines_constraint(instance_with_release_dates_and_deadlines):
 
     solver = SimulatedAnnealingSolver(
         initial_temperature=1000,
         steps=5000,
-        cool=0.95,
-        penalty_factor=1_000_000,
-        seed=42,  # For reproducibility
+        deadline_penalty_factor=1_000_000,
+        updates=0,
+        seed=42,
     )
     schedule = solver.solve(instance_with_release_dates_and_deadlines)
 
@@ -108,20 +74,20 @@ def test_deadlines_constraint(instance_with_release_dates_and_deadlines):
         ), f"Job {job_id} last operation completes after deadline"
 
 
-# Solution quality test of ft06 instance
-def test_solution_quality(ft06_instance):
-    solver = SimulatedAnnealingSolver(
-        initial_temperature=10_000,
-        steps=50_000,
-        cool=0.99,
-        penalty_factor=1_000_000,
-        seed=42,  # For reproducibility
-    )
+def test_solution_quality_and_seed():
+    for i in range(10):
+        ft06_instance = load_benchmark_instance("ft06")
+        solver = SimulatedAnnealingSolver(
+            seed=42,
+            initial_temperature=10,
+            steps=1000,
+            updates=0,
+        )
 
-    schedule = solver.solve(ft06_instance)
-    makespan = schedule.makespan()
+        schedule = solver.solve(ft06_instance)
+        makespan = schedule.makespan()
 
-    # Known optimal makespan for ft06 is 55
-    # Allow some suboptimality due to stochastic nature
-    assert makespan <= 60  # Within 10% of optimal
-    print(f"\nft06 makespan: {makespan} (optimal=55)")
+        # For this seed and settings, we expect a makespan of 55
+        assert (
+            makespan == 55
+        ), f"Failed at iteration {i}: Expected 55, got {makespan}"

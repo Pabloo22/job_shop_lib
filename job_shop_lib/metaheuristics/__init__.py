@@ -25,8 +25,17 @@ contribute!
 
     JobShopAnnealer
     SimulatedAnnealingSolver
+    NeighborGenerator
+    swap_adjacent_operations
+    generate_critical_path_neighbor
+
 """
 
+from job_shop_lib.metaheuristics._neighbor_generators import (
+    NeighborGenerator,
+    swap_adjacent_operations,
+    swap_in_critical_path,
+)
 from job_shop_lib.metaheuristics._job_shop_annealer import JobShopAnnealer
 from job_shop_lib.metaheuristics._simulated_annealing_solver import (
     SimulatedAnnealingSolver,
@@ -35,4 +44,7 @@ from job_shop_lib.metaheuristics._simulated_annealing_solver import (
 __all__ = [
     "JobShopAnnealer",
     "SimulatedAnnealingSolver",
+    "NeighborGenerator",
+    "swap_adjacent_operations",
+    "swap_in_critical_path",
 ]
