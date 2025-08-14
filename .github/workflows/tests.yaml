@@ -24,15 +24,18 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Graphviz
+    - name: Install Graphviz and add to PATH
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          # Add libgraphviz-dev for headers needed to build pygraphviz
+          # apt-get installs to standard paths, no PATH modification needed
           sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          # brew handles PATH automatically
           brew install graphviz
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
           choco install graphviz
+          # Add the Graphviz bin directory to the system PATH for subsequent steps
+          echo "C:\Program Files\Graphviz\bin" >> $GITHUB_PATH
         fi
       shell: bash
 
