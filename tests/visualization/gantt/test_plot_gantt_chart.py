@@ -6,8 +6,7 @@ from job_shop_lib.visualization.gantt import plot_gantt_chart
 
 
 @pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
 )
 def test_plot_gantt_chart_default(example_schedule: Schedule):
     fig, ax = plot_gantt_chart(example_schedule)
@@ -17,8 +16,7 @@ def test_plot_gantt_chart_default(example_schedule: Schedule):
 
 
 @pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
 )
 def test_plot_gantt_chart_custom_title(example_schedule: Schedule):
     fig, ax = plot_gantt_chart(example_schedule, title="Custom Title")
@@ -29,8 +27,7 @@ def test_plot_gantt_chart_custom_title(example_schedule: Schedule):
 
 
 @pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
 )
 def test_plot_gantt_chart_no_title(example_schedule: Schedule):
     fig, ax = plot_gantt_chart(example_schedule, title="")
@@ -41,8 +38,7 @@ def test_plot_gantt_chart_no_title(example_schedule: Schedule):
 
 
 @pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
 )
 def test_plot_gantt_chart_custom_labels(example_schedule: Schedule):
     job_labels = ["Job A", "Job B", "Job C"]
@@ -61,13 +57,14 @@ def test_plot_gantt_chart_custom_labels(example_schedule: Schedule):
     assert ax.get_ylabel() == "Custom Y Label"
     assert ax.get_legend().get_title().get_text() == "Custom Legend"
     assert [tick.get_text() for tick in ax.get_yticklabels()] == machine_labels
-    assert [text.get_text() for text in ax.get_legend().get_texts()] == job_labels
+    assert [
+        text.get_text() for text in ax.get_legend().get_texts()
+    ] == job_labels
     return fig
 
 
 @pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
 )
 def test_plot_gantt_chart_custom_xlim_and_ticks(example_schedule: Schedule):
     custom_xlim = 20
@@ -84,8 +81,7 @@ def test_plot_gantt_chart_custom_xlim_and_ticks(example_schedule: Schedule):
 
 
 @pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
 )
 def test_plot_gantt_chart_different_cmap(example_schedule: Schedule):
     fig, ax = plot_gantt_chart(example_schedule, cmap_name="plasma")

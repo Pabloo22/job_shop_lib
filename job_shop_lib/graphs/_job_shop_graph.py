@@ -2,6 +2,8 @@
 
 import collections
 import networkx as nx
+import numpy as np
+from collections import defaultdict
 
 from job_shop_lib import JobShopInstance
 from job_shop_lib.exceptions import ValidationError
@@ -49,15 +51,17 @@ class JobShopGraph:
         ),
         "_nodes_by_job": "List of lists mapping job ids to operation nodes.",
         "removed_nodes": (
-            "Dictionary mapping instance ids to a boolean indicating whether a node has been removed."
+            "Dictionary mapping instance ids to a boolean indicating whether "
+            "a node has been removed."
             "The keys are node types, and the values are dictionaries mapping "
-            "instance ids to booleans. This allows for quick access to removed nodes by their instance ids."
+            "instance ids to booleans. This allows for quick access "
+            "to removed nodes by their instance ids."
         ),
         "instance_id_map": (
             "Dictionary mapping instance ids to nodes for quick access."
             "The keys are node types, and the values are dictionaries mapping "
-            "instace ids to nodes. This allows for quick access to nodes by their "
-            "operation, machine, or job ids."
+            "instance ids to nodes. This allows for quick access to "
+            "nodes by their operation, machine, or job ids."
         ),
         "adjacency_in": (
             "Stores graph adjacency information of incoming edges,"
@@ -75,9 +79,12 @@ class JobShopGraph:
         ),
         "edge_types": (
             "A set of all edge types present in the graph."
-            "Only includes tuples of (source_node_type, 'to', destination_node_type),"
-            "processing conjunctive and disjunctive edges, not including them in the set"
-            "but inferring them from the nodes forming the edges of said types."
+            "Only includes tuples of "
+            "(source_node_type, 'to', destination_node_type),"
+            "processing conjunctive and disjunctive edges, "
+            "not including them in the set"
+            "but inferring them from the nodes forming "
+            "the edges of said types."
         ),
     }
 
@@ -299,7 +306,10 @@ class JobShopGraph:
         self.edge_types.add((u_of_edge.node_id[0], "to", v_of_edge.node_id[0]))
         if edge_type is None:
             edge_type = (u_of_edge.node_id[0], "to", v_of_edge.node_id[0])
-
+            self.edge_types.add(edge_type)
+        else:
+            new_edge_type = (u_of_edge.node_id[0], edge_type.name, v_of_edge.node_id[0])
+            self.edge_types.add(new_edge_type)
         self.adjacency_in[v_of_edge][edge_type].append(u_of_edge)
         self.adjacency_out[u_of_edge][edge_type].append(v_of_edge)
 
@@ -336,7 +346,7 @@ class JobShopGraph:
             self.removed_nodes[node_type_name][0] = True
 
         # 2. Remove all edges connected to the node from the adjacency lists.
-        # Update neighbors that have incoming edges from the node to be removed.
+        # Update neighbors that have incoming edges from the node.
         if node_to_remove in self.adjacency_out:
             for edge_type, neighbors in self.adjacency_out[
                 node_to_remove
@@ -393,8 +403,7 @@ class JobShopGraph:
             old_node_id = node_to_update.node_id
             new_node_id = (old_node_id[0], old_node_id[1] - 1)
 
-            # CRITICAL: To safely change the ID of a node used as a dictionary key,
-            # we must pop its entries and re-insert them after the change.
+            # Remove the node from the adjacency lists.
             in_edges = self.adjacency_in.pop(node_to_update, None)
             out_edges = self.adjacency_out.pop(node_to_update, None)
 
@@ -444,7 +453,8 @@ class JobShopGraph:
     def remove_isolated_nodes(self) -> None:
         """Removes isolated nodes from the graph."""
 
-        # get isolated nodes, meaning nodes with no incoming or outgoing edges, for all edge types, meaning only empty lists
+        # get isolated nodes, meaning nodes with no incoming or outgoing edges,
+        # for all edge types, meaning only empty lists
         isolated_nodes = list()
         for node in self._nodes:
             cond1 = False
@@ -553,3 +563,13 @@ class JobShopGraph:
             return nodes[node_id]
 
         raise ValidationError(f"No node found with node.{id_attr}={node_id}")
+
+    @property
+    def edge_index_dict(self):
+        edge_index = defaultdict(lambda: np.empty((2, 0), dtype=np.int32))
+        for node, edges in self.adjacency_out.items():
+            src = node.node_id[1]
+            for edge_type, neighbors in edges.items():
+                dst = np.array([[src, neighbor.node_id[1]] for neighbor in neighbors]).T
+                edge_index[edge_type] = np.hstack((edge_index[edge_type], dst))
+        return edge_index

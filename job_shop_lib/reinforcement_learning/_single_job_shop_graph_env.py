@@ -248,7 +248,8 @@ class SingleJobShopGraphEnv(gym.Env):
             ObservationSpaceKey.REMOVED_NODES.value: gym.spaces.Dict(
                 {
                     node_type: gym.spaces.MultiBinary(len(bool_list))
-                    for node_type, bool_list in self.initial_job_shop_graph.removed_nodes.items()
+                    for node_type, bool_list in
+                    self.initial_job_shop_graph.removed_nodes.items()
                 }
             ),
             ObservationSpaceKey.EDGE_INDEX.value: gym.spaces.Dict(
@@ -407,16 +408,20 @@ class SingleJobShopGraphEnv(gym.Env):
         final_edge_index = {}
         if self.use_padding:
             num_edges = self.initial_job_shop_graph.num_edges
-            
+
             # Get the list of keys the observation space *always* expects.
-            expected_keys = self.observation_space[ObservationSpaceKey.EDGE_INDEX.value].spaces.keys()
+            expected_keys = self.observation_space[
+                ObservationSpaceKey.EDGE_INDEX.value
+            ].spaces.keys()
 
             # Iterate over the EXPECTED keys, not the keys we found this step.
             for key in expected_keys:
-                # Get the edges for this key, or an empty array if the key is missing.
-                edges_found = edge_index.get(key, np.empty((2, 0), dtype=np.int32))
-                
-                # Pad the result (even if it's empty) and add it to the final dict.
+                # Get the edges for this key.
+                edges_found = edge_index.get(
+                    key, np.empty((2, 0), dtype=np.int32)
+                )
+
+                # Pad the result and add it to the final dict.
                 final_edge_index[key] = add_padding(
                     edges_found, output_shape=(2, num_edges)
                 )
