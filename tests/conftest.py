@@ -1,4 +1,6 @@
 import pytest
+import random
+
 from job_shop_lib import (
     JobShopInstance,
     Operation,
@@ -321,3 +323,14 @@ def instance_with_release_dates_and_deadlines():
         ],
     ]
     return JobShopInstance(jobs=jobs)
+
+
+@pytest.fixture
+def ft06_instance():
+    """Load the ft06 benchmark instance."""
+    return load_benchmark_instance("ft06")
+
+
+@pytest.fixture
+def seeded_rng() -> random.Random:
+    return random.Random(42)

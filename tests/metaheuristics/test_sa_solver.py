@@ -1,9 +1,14 @@
+import pytest
+
 from job_shop_lib.benchmarking import load_benchmark_instance
-from job_shop_lib.metaheuristics import JobShopAnnealer
-from job_shop_lib.metaheuristics._simulated_annealing_solver import (
+from job_shop_lib.metaheuristics import (
+    JobShopAnnealer,
     SimulatedAnnealingSolver,
+    swap_adjacent_operations,
+    swap_random_operations,
 )
 from job_shop_lib import Schedule
+from job_shop_lib.exceptions import ValidationError
 
 
 # Basic Functionality Test
@@ -91,3 +96,56 @@ def test_solution_quality_and_seed():
         assert (
             makespan == 55
         ), f"Failed at iteration {i}: Expected 55, got {makespan}"
+
+
+def test_min_temperature_is_not_zero():
+    """Ensure that the minimum temperature is not set to zero."""
+    solver = SimulatedAnnealingSolver(
+        initial_temperature=1000,
+        ending_temperature=0,  # This should raise an error
+        steps=1000,
+    )
+    with pytest.raises(
+        ValidationError,
+        match="Exponential cooling requires a minimum temperature greater "
+        "than zero.",
+    ):
+        solver.solve(load_benchmark_instance("ft06"))
+
+
+def test_with_adjacent_swap(ft06_instance):
+    """Test the simulated annealing solver with adjacent job swaps."""
+    for i in range(10):
+        solver = SimulatedAnnealingSolver(
+            seed=42,
+            initial_temperature=10,
+            steps=100,
+            updates=0,
+            neighbor_generator=swap_adjacent_operations,
+        )
+        schedule = solver.solve(ft06_instance)
+        makespan = schedule.makespan()
+
+        # For this seed and settings, we expect a makespan of 61
+        assert (
+            makespan == 61
+        ), f"Failed at iteration {i}: Expected 61, got {makespan}"
+
+
+def test_with_random_swap(ft06_instance):
+    """Test the simulated annealing solver with random job swaps."""
+    for i in range(10):
+        solver = SimulatedAnnealingSolver(
+            seed=42,
+            initial_temperature=10,
+            steps=10,
+            updates=0,
+            neighbor_generator=swap_random_operations,
+        )
+        schedule = solver.solve(ft06_instance)
+        makespan = schedule.makespan()
+
+        # For this seed and settings, we expect a makespan of 61
+        assert (
+            makespan == 61
+        ), f"Failed at iteration {i}: Expected 61, got {makespan}"
