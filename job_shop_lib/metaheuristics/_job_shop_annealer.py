@@ -219,14 +219,10 @@ class JobShopAnnealer(simanneal.Annealer):
 
     def energy(self) -> float:
         """Computes the makespan with penalties for constraint violations."""
-        try:
-            schedule = self._get_state()
-            makespan = schedule.makespan()
-            penalty = self._compute_penalties(schedule)
-            return makespan + penalty
-        except ValidationError:
-            # If the schedule is invalid, return a large penalty
-            return float("inf")
+        schedule = self._get_state()
+        makespan = schedule.makespan()
+        penalty = self._compute_penalties(schedule)
+        return makespan + penalty
 
     def _compute_penalties(self, schedule: Schedule) -> float:
         """Calculates penalties for the constraints of
