@@ -53,6 +53,19 @@ class Schedule:
             "schedule. It can be used to store information about the "
             "algorithm that generated the schedule, for example."
         ),
+        "operation_to_scheduled_operation": (
+            "A dictionary that maps an :class:`Operation` to its "
+            ":class:`ScheduledOperation` in the schedule. This is used to "
+            "quickly find the scheduled operation associated with a given "
+            "operation."
+        ),
+        "num_scheduled_operations": (
+            "The number of operations that have been scheduled so far."
+        ),
+        "operation_with_latest_end_time": (
+            "The :class:`ScheduledOperation` with the latest end time. "
+            "This is used to quickly find the last operation in the schedule."
+        ),
     }
 
     def __init__(
@@ -69,6 +82,25 @@ class Schedule:
         self.instance: JobShopInstance = instance
         self._schedule = schedule
         self.metadata: dict[str, Any] = metadata
+        self.operation_to_scheduled_operation: dict[
+            Operation, ScheduledOperation
+        ] = {
+            scheduled_op.operation: scheduled_op
+            for machine_schedule in schedule
+            for scheduled_op in machine_schedule
+        }
+        self.num_scheduled_operations = sum(
+            len(machine_schedule) for machine_schedule in schedule
+        )
+        self.operation_with_latest_end_time: ScheduledOperation | None = max(
+            (
+                scheduled_op
+                for machine_schedule in schedule
+                for scheduled_op in machine_schedule
+            ),
+            key=lambda op: op.end_time,  # type: ignore[union-attr]
+            default=None,
+        )
 
     def __repr__(self) -> str:
         return str(self.schedule)
@@ -83,11 +115,6 @@ class Schedule:
     def schedule(self, new_schedule: list[list[ScheduledOperation]]):
         Schedule.check_schedule(new_schedule)
         self._schedule = new_schedule
-
-    @property
-    def num_scheduled_operations(self) -> int:
-        """The number of operations that have been scheduled so far."""
-        return sum(len(machine_schedule) for machine_schedule in self.schedule)
 
     def to_dict(self) -> dict:
         """Returns a dictionary representation of the schedule.
@@ -221,15 +248,17 @@ class Schedule:
     def reset(self):
         """Resets the schedule to an empty state."""
         self.schedule = [[] for _ in range(self.instance.num_machines)]
+        self.operation_to_scheduled_operation = {}
+        self.num_scheduled_operations = 0
 
     def makespan(self) -> int:
         """Returns the makespan of the schedule.
 
         The makespan is the time at which all operations are completed.
         """
-        if self.num_scheduled_operations == 0:
+        last_operation = self.operation_with_latest_end_time
+        if last_operation is None:
             return 0
-        last_operation = self.last_operation()
         return last_operation.end_time
 
     def is_complete(self) -> bool:
@@ -251,9 +280,24 @@ class Schedule:
                 constraints.
         """
         self._check_start_time_of_new_operation(scheduled_operation)
+
+        # Update attributes:
         self.schedule[scheduled_operation.machine_id].append(
             scheduled_operation
         )
+
+        self.operation_to_scheduled_operation[
+            scheduled_operation.operation
+        ] = scheduled_operation
+
+        self.num_scheduled_operations += 1
+
+        if self.operation_to_scheduled_operation is None or (
+            self.operation_with_latest_end_time is None
+            or scheduled_operation.end_time
+            > self.operation_with_latest_end_time.end_time
+        ):
+            self.operation_with_latest_end_time = scheduled_operation
 
     def _check_start_time_of_new_operation(
         self,
@@ -340,54 +384,6 @@ class Schedule:
             **self.metadata,
         )
 
-    def get_associated_scheduled_operation(
-        self, operation: Operation
-    ) -> ScheduledOperation:
-        """Returns the :class:`ScheduledOperation` that contains the given
-        :class:`Operation`.
-
-        Args:
-            operation:
-                The :class:`Operation` to find the associated
-                :class:`ScheduledOperation` for.
-
-        Returns:
-            The :class:`ScheduledOperation` associated with the given
-            :class:`Operation`.
-
-        Raises:
-            ValidationError:
-                If the operation is not found in the schedule.
-        """
-        for machine_id in operation.machines:
-            for scheduled_op in self.schedule[machine_id]:
-                if scheduled_op.operation == operation:
-                    return scheduled_op
-        raise ValidationError(
-            f"Operation {operation} not found in the schedule."
-        )
-
-    def last_operation(self) -> ScheduledOperation:
-        """Returns the :class:`ScheduledOperation` with the latest end time.
-
-        If there is a tie, it returns the first one found.
-
-        Raises:
-            ValidationError: If the schedule is empty.
-        """
-        if self.num_scheduled_operations == 0:
-            raise ValidationError(
-                "Cannot get last operation from an empty schedule."
-            )
-        return max(
-            (
-                machine_schedule[-1]
-                for machine_schedule in self.schedule
-                if machine_schedule
-            ),
-            key=lambda op: op.end_time,
-        )
-
     def critical_path(self) -> list[ScheduledOperation]:
         """Returns the critical path of the schedule.
 
@@ -400,11 +396,10 @@ class Schedule:
         and tracing backwards, at each step choosing the predecessor (either
         from the same job or the same machine) that finished latest.
         """
-        if self.num_scheduled_operations == 0:
-            return []
-
         # 1. Start from the operation that determines the makespan
-        last_scheduled_op = self.last_operation()
+        last_scheduled_op = self.operation_with_latest_end_time
+        if last_scheduled_op is None:
+            return []
 
         critical_path = deque([last_scheduled_op])
         current_scheduled_op = last_scheduled_op
@@ -420,9 +415,9 @@ class Schedule:
                 prev_op_in_job = self.instance.jobs[
                     current_scheduled_op.job_id
                 ][op_idx_in_job - 1]
-                job_pred = self.get_associated_scheduled_operation(
+                job_pred = self.operation_to_scheduled_operation[
                     prev_op_in_job
-                )
+                ]
 
             # Find machine predecessor (the previous operation on the same
             # machine)
