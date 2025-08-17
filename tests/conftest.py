@@ -1,4 +1,6 @@
 import pytest
+import random
+
 from job_shop_lib import (
     JobShopInstance,
     Operation,
@@ -314,3 +316,29 @@ def complete_schedule_fixture(job_shop_instance):
     for op in operations:
         schedule.add(op)
     return schedule
+
+
+@pytest.fixture
+def instance_with_release_dates_and_deadlines():
+    jobs = [
+        [
+            Operation(machines=0, duration=3, release_date=2, deadline=10),
+            Operation(machines=1, duration=2, release_date=3, deadline=8),
+        ],
+        [
+            Operation(machines=0, duration=2, release_date=1, deadline=8),
+            Operation(machines=1, duration=1, release_date=2, deadline=6),
+        ],
+    ]
+    return JobShopInstance(jobs=jobs)
+
+
+@pytest.fixture
+def ft06_instance():
+    """Load the ft06 benchmark instance."""
+    return load_benchmark_instance("ft06")
+
+
+@pytest.fixture
+def seeded_rng() -> random.Random:
+    return random.Random(42)
