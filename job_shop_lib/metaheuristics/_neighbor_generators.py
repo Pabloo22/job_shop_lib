@@ -36,7 +36,6 @@ def _swap_with_index_picker(
             and returns two indices to swap.
 
     Returns:
-
         A valid neighbor schedule if a feasible swap is found, otherwise the
         original schedule.
     """
@@ -134,9 +133,9 @@ def swap_in_critical_path(
     - The makespan is the length of the critical path; operations not on it
       typically have slack, so reordering them often does not improve the
       objective. By contrast, modifying machine order on the critical path
-      can shorten the longest path or unlock constraints that reduce blocking
-      and idle times.
-    - Swapping cosecutive critical operations on the same machine always
+      can shorten the longest path or unlock constraints that reduce
+      blocking and idle times.
+    - Swapping consecutive critical operations on the same machine always
       results in a feasible schedule.
 
     Behavior:

@@ -8,7 +8,9 @@ from job_shop_lib import JobShopInstance, Schedule
 from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.metaheuristics import (
     NeighborGenerator,
+    ObjectiveFunction,
     swap_in_critical_path,
+    get_makespan_with_penalties_objective,
 )
 
 
@@ -31,9 +33,13 @@ class JobShopAnnealer(simanneal.Annealer):
     1. A random move is made to alter the current state. This is done by
        swapping two operations in the sequence of a machine.
     2. The "energy" of the new state is evaluated using an objective function.
-       In this case, the energy is calculated as the makespan of the schedule
-       plus penalties for any constraint violations (such as deadlines and
-       due dates).
+       With the default objective function, the energy is calculated as the
+       makespan of the schedule plus penalties for any constraint violations
+       (such as deadlines and due dates). See
+       :func:`get_makespan_with_penalties_objective` for details. You can
+       create custom objective functions by implementing the
+       :class:`ObjectiveFunction` interface, which takes a schedule and returns
+       a float representing the energy of that schedule.
     3. The new state is accepted if it has lower energy (a better solution).
        If it has higher energy, it might still be accepted with a certain
        probability, which depends on the current "temperature". The
@@ -68,15 +74,16 @@ class JobShopAnnealer(simanneal.Annealer):
     Attributes:
         instance:
             The job shop instance to solve.
-        deadline_penalty_factor:
-            Factor to penalize deadline violations.
-        due_date_penalty_factor:
-            Factor to penalize due date violations.
         random_generator:
             Random generator for reproducibility.
         neighbor_generator:
             Function used to generate neighbors from the current schedule.
             Defaults to :func:`swap_in_critical_path`.
+        objective_function:
+            Function that computes the energy of the schedule. If ``None``,
+            it defaults to :func:`get_makespan_with_penalties_objective`.
+            This function receives a schedule and returns the energy that will
+            be minimized by the annealer.
 
     Args:
         instance:
@@ -85,14 +92,6 @@ class JobShopAnnealer(simanneal.Annealer):
         initial_state:
             Initial state of the schedule as a list of lists, where each
             sublist represents the operations of a job.
-        deadline_penalty_factor:
-            Factor to penalize deadline violations. If a deadline is not met,
-            it will add this quantity to the makespan to get the energy of
-            the solution.
-        due_date_penalty_factor:
-            Factor to penalize due date violations. If a due date is not met,
-            it will add this quantity to the makespan to get the energy of
-            the solution.
         seed:
             Random seed for reproducibility. If ``None``, random behavior
             will be non-deterministic.
@@ -101,6 +100,11 @@ class JobShopAnnealer(simanneal.Annealer):
             and returns a new schedule to explore. Defaults to
             :func:`swap_in_critical_path`. Use this to plug in custom
             neighborhoods (e.g., adjacent swaps).
+        objective_function:
+            Function that computes the energy of the schedule. If ``None``,
+            it defaults to :func:`get_makespan_with_penalties_objective`.
+            This callable receives a :class:`~job_shop_lib.Schedule` and
+            returns a float that will be minimized by the annealer.
     """
 
     copy_strategy = "method"
@@ -110,15 +114,14 @@ class JobShopAnnealer(simanneal.Annealer):
         instance: JobShopInstance,
         initial_state: Schedule,
         *,
-        deadline_penalty_factor: int = 1_000_000,
-        due_date_penalty_factor: int = 100,
         seed: int | None = None,
         neighbor_generator: NeighborGenerator = swap_in_critical_path,
+        objective_function: ObjectiveFunction | None = None,
     ):
         super().__init__(initial_state)
         self.instance = instance
-        self.deadline_penalty_factor = deadline_penalty_factor
-        self.due_date_penalty_factor = due_date_penalty_factor
+        if objective_function is None:
+            self.objective_function = get_makespan_with_penalties_objective()
         self.random_generator = random.Random(seed)
         self.neighbor_generator = neighbor_generator
 
@@ -218,33 +221,7 @@ class JobShopAnnealer(simanneal.Annealer):
         return self.best_state, self.best_energy
 
     def energy(self) -> float:
-        """Computes the makespan with penalties for constraint violations."""
+        """Computes the energy of the current schedule using the objective
+        function provided."""
         schedule = self._get_state()
-        makespan = schedule.makespan()
-        penalty = self._compute_penalties(schedule)
-        return makespan + penalty
-
-    def _compute_penalties(self, schedule: Schedule) -> float:
-        """Calculates penalties for the constraints of
-        deadline and arrival time violations."""
-        if not self.instance.has_deadlines and not self.instance.has_due_dates:
-            return 0.0
-
-        total_penalty = 0.0
-        for machine_schedule in schedule.schedule:
-            for scheduled_op in machine_schedule:
-                violates_deadline = (
-                    (scheduled_op.end_time > scheduled_op.operation.deadline)
-                    if scheduled_op.operation.deadline is not None
-                    else False
-                )
-                violates_due_date = (
-                    (scheduled_op.end_time > scheduled_op.operation.due_date)
-                    if scheduled_op.operation.due_date is not None
-                    else False
-                )
-                total_penalty += (
-                    violates_deadline * self.deadline_penalty_factor
-                    + violates_due_date * self.due_date_penalty_factor
-                )
-        return total_penalty
+        return self.objective_function(schedule)

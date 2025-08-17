@@ -4,6 +4,7 @@ from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 from job_shop_lib.metaheuristics import (
     NeighborGenerator,
     swap_in_critical_path,
+    ObjectiveFunction,
 )
 
 
@@ -30,14 +31,6 @@ class SimulatedAnnealingSolver(BaseSolver):
         updates:
             The number of progress updates to print during the annealing
             process. Set to 0 to disable updates.
-        deadline_penalty_factor:
-            Factor to penalize deadline violations. If a deadline is not met,
-            it will add this quantity to the makespan to get the energy
-            of the solution.
-        due_date_penalty_factor:
-            Factor to penalize due date violations. If a due date is not met,
-            it will add this quantity to the makespan to get the energy
-            of the solution.
         seed:
             Random seed for reproducibility. If ``None``, random behavior will
             be non-deterministic.
@@ -57,14 +50,6 @@ class SimulatedAnnealingSolver(BaseSolver):
         updates:
             The number of progress updates to print during the annealing
             process. Set to 0 to disable updates.
-        deadline_penalty_factor:
-            Factor to penalize deadline violations. If a deadline is not met,
-            it will add this quantity to the makespan to get the energy
-            of the solution.
-        due_date_penalty_factor:
-            Factor to penalize due date violations. If a due date is not met,
-            it will add this quantity to the makespan to get the energy
-            of the solution.
         seed:
             Random seed for reproducibility. If ``None``, random behavior will
             be non-deterministic.
@@ -77,8 +62,7 @@ class SimulatedAnnealingSolver(BaseSolver):
         ending_temperature: float = 2.5,
         steps: int = 50_000,
         updates: int = 100,
-        deadline_penalty_factor: int = 1_000_000,
-        due_date_penalty_factor: int = 100,
+        objective_function: ObjectiveFunction | None = None,
         seed: int | None = None,
         neighbor_generator: NeighborGenerator = swap_in_critical_path,
     ):
@@ -86,8 +70,7 @@ class SimulatedAnnealingSolver(BaseSolver):
         self.ending_temperature = ending_temperature
         self.steps = steps
         self.updates = updates
-        self.deadline_penalty_factor = deadline_penalty_factor
-        self.due_date_penalty_factor = due_date_penalty_factor
+        self.objective_function = objective_function
         self.seed = seed
         self.neighbor_generator = neighbor_generator
         self.annealer_: JobShopAnnealer | None = None
@@ -110,8 +93,7 @@ class SimulatedAnnealingSolver(BaseSolver):
         annealer = JobShopAnnealer(
             instance,
             initial_state,
-            deadline_penalty_factor=self.deadline_penalty_factor,
-            due_date_penalty_factor=self.due_date_penalty_factor,
+            objective_function=self.objective_function,
             seed=self.seed,
             neighbor_generator=self.neighbor_generator,
         )

@@ -29,9 +29,15 @@ contribute!
     swap_adjacent_operations
     swap_in_critical_path
     swap_random_operations
+    ObjectiveFunction
+    get_makespan_with_penalties_objective
 
 """
 
+from job_shop_lib.metaheuristics._objective_functions import (
+    ObjectiveFunction,
+    get_makespan_with_penalties_objective,
+)
 from job_shop_lib.metaheuristics._neighbor_generators import (
     NeighborGenerator,
     swap_adjacent_operations,
@@ -50,4 +56,6 @@ __all__ = [
     "swap_adjacent_operations",
     "swap_in_critical_path",
     "swap_random_operations",
+    "ObjectiveFunction",
+    "get_makespan_with_penalties_objective",
 ]
