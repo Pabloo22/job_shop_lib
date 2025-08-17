@@ -44,7 +44,6 @@ def test_initialization(instance_with_release_dates_and_deadlines):
     annealer = JobShopAnnealer(
         instance_with_release_dates_and_deadlines,
         initial_state,
-        deadline_penalty_factor=1_000_000,
     )
 
     assert annealer.state == initial_state
@@ -56,7 +55,6 @@ def test_deadlines_constraint(instance_with_release_dates_and_deadlines):
     solver = SimulatedAnnealingSolver(
         initial_temperature=1000,
         steps=5000,
-        deadline_penalty_factor=1_000_000,
         updates=0,
         seed=42,
     )
