@@ -122,6 +122,8 @@ class JobShopAnnealer(simanneal.Annealer):
         self.instance = instance
         if objective_function is None:
             self.objective_function = get_makespan_with_penalties_objective()
+        else:
+            self.objective_function = objective_function
         self.random_generator = random.Random(seed)
         self.neighbor_generator = neighbor_generator
 
