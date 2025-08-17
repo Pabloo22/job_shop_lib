@@ -10,7 +10,7 @@ from job_shop_lib.metaheuristics import (
 
 class SimulatedAnnealingSolver(BaseSolver):
     """Wraps the :class:`JobShopAnnealer` to follow the
-    :class``~job_shop_lib.BaseSolver`` interface.
+    :class`~job_shop_lib.BaseSolver` interface.
 
     .. seealso::
         See the documentation of the :class:`JobShopAnnealer` class for more
