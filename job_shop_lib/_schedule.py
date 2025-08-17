@@ -250,6 +250,7 @@ class Schedule:
         self.schedule = [[] for _ in range(self.instance.num_machines)]
         self.operation_to_scheduled_operation = {}
         self.num_scheduled_operations = 0
+        self.operation_with_latest_end_time = None
 
     def makespan(self) -> int:
         """Returns the makespan of the schedule.
