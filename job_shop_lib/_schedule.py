@@ -293,7 +293,7 @@ class Schedule:
 
         self.num_scheduled_operations += 1
 
-        if self.operation_to_scheduled_operation is None or (
+        if (
             self.operation_with_latest_end_time is None
             or scheduled_operation.end_time
             > self.operation_with_latest_end_time.end_time
