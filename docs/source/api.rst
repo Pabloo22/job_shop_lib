@@ -18,5 +18,6 @@ API
    job_shop_lib.exceptions
    job_shop_lib.generation
    job_shop_lib.graphs
+   job_shop_lib.metaheuristics
    job_shop_lib.reinforcement_learning
    job_shop_lib.visualization
