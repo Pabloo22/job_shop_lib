@@ -24,15 +24,18 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Graphviz
+    - name: Install Graphviz and add to PATH
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          # Add libgraphviz-dev for headers needed to build pygraphviz
+          # apt-get installs to standard paths, no PATH modification needed
           sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          # brew handles PATH automatically
           brew install graphviz
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
           choco install graphviz
+          # Add the Graphviz bin directory to the system PATH for subsequent steps
+          echo "C:\Program Files\Graphviz\bin" >> $GITHUB_PATH
         fi
       shell: bash
 
@@ -40,7 +43,20 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install poetry==1.7
-        poetry install --with test
+
+        if [[ "${{ runner.os }}" == "macOS" ]]; then
+          # On macOS, tell the compiler where to find the brew-installed graphviz
+          CFLAGS="-I$(brew --prefix graphviz)/include" LDFLAGS="-L$(brew --prefix graphviz)/lib" poetry install --with test --extras "pygraphviz"
+        
+        elif [[ "${{ runner.os }}" == "Windows" ]]; then
+          # On Windows, tell the compiler where to find the choco-installed graphviz
+          # Note: The shell is bash, but we use Windows-style paths for the variables.
+          INCLUDE="C:\Program Files\Graphviz\include" LIB="C:\Program Files\Graphviz\lib" poetry install --with test --extras "pygraphviz"
+        
+        else # This covers Linux ("ubuntu-latest")
+          poetry install --with test --extras "pygraphviz"
+        fi
+      shell: bash
 
     - name: Run tests and generate coverage report
       run: poetry run pytest -v --cov=job_shop_lib --cov-report=xml

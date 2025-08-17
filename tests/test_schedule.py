@@ -1,5 +1,10 @@
 import pytest
-from job_shop_lib import Schedule, ScheduledOperation, JobShopInstance
+from job_shop_lib import (
+    Schedule,
+    ScheduledOperation,
+    JobShopInstance,
+    Operation,
+)
 from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.dispatching.rules import (
@@ -225,6 +230,70 @@ def test_repr(complete_schedule: Schedule):
 
 def test_eq(complete_schedule: Schedule):
     assert complete_schedule != []
+
+
+def test_critical_path():
+    # Check that the length of the critical path is the same as the makespan
+    for instance in INSTANCES_TO_TEST:
+        solver = DispatchingRuleSolver()
+        schedule = solver.solve(instance)
+        critical_path = schedule.critical_path()
+        assert critical_path, (
+            "Critical path should not be empty for these " "instances."
+        )
+        assert (
+            critical_path[-1].end_time == schedule.makespan()
+        ), f"Critical path end time does not match makespan for {instance.name}"
+        for i in range(len(critical_path) - 1):
+            op1 = critical_path[i]
+            op2 = critical_path[i + 1]
+            assert (
+                op1.end_time <= op2.start_time
+            ), f"Invalid critical path sequence for {instance.name}"
+
+        # Since schedules are compact, we can also check that the
+        # sum of durations matches the makespan
+        total_duration = sum(op.operation.duration for op in critical_path)
+        assert total_duration == schedule.makespan(), (
+            "Total duration of critical path does not match makespan for "
+            f"{instance.name}"
+        )
+
+
+def test_critical_path_empty_schedule():
+    empty_schedule = Schedule(instance=JobShopInstance([]))
+    critical_path = empty_schedule.critical_path()
+    assert (
+        len(critical_path) == 0
+    ), "Critical path should be empty for an empty schedule"
+
+
+def test_last_operation_empty_schedule():
+    empty_schedule = Schedule(instance=JobShopInstance([]))
+    assert empty_schedule.operation_with_latest_end_time is None, (
+        "Last operation should be None for an empty schedule"
+    )
+
+
+def test_operation_to_scheduled_operation(complete_schedule: Schedule):
+    # Check that the associated scheduled operation is correct
+    for machine_schedule in complete_schedule.schedule:
+        for scheduled_op in machine_schedule:
+            assert (
+                scheduled_op
+                is complete_schedule.operation_to_scheduled_operation.get(
+                    scheduled_op.operation
+                )
+            ), "Associated scheduled operation does not match"
+
+    operation_not_in_schedule = Operation(0, 1)
+
+    assert (
+        complete_schedule.operation_to_scheduled_operation.get(
+            operation_not_in_schedule
+        )
+        is None
+    )
 
 
 if __name__ == "__main__":

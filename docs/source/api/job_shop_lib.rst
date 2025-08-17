@@ -16,5 +16,6 @@
    exceptions
    generation
    graphs
+   metaheuristics
    reinforcement_learning
    visualization

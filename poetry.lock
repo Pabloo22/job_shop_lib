@@ -2956,6 +2956,16 @@ files = [
 ]
 
 [[package]]
+name = "simanneal"
+version = "0.5.0"
+description = "Simulated Annealing in Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "simanneal-0.5.0-py2.py3-none-any.whl", hash = "sha256:f93d90958ff1df68bc4a6e440892a19bbc0569ad9c6442fff659dc011b790b34"},
+]
+
+[[package]]
 name = "six"
 version = "1.17.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -3315,4 +3325,4 @@ pygraphviz = ["pygraphviz"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "26a552aadea31537b31f7df9577162d43edb57223aaaa6b044e478f8357fb321"
+content-hash = "7d06868bdc9ebc8839b8903bacb40390b95869a427ce6907c8996028bba15edc"
