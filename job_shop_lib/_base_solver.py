@@ -15,13 +15,13 @@ Solver = Callable[[JobShopInstance], Schedule]
 class BaseSolver(abc.ABC):
     """Base class for all solvers implemented as classes.
 
-    A `Solver` is any `Callable` that takes a `JobShopInstance` and returns a
-    `Schedule`. Therefore, solvers can be implemented as functions or as
-    classes. This class is provided as a base class for solvers implemented as
-    classes. It provides a default implementation of the `__call__` method that
-    measures the time taken to solve the instance and stores it in the
-    schedule's metadata under the key "elapsed_time" if it is not already
-    present.
+    A ``Solver`` is any ``Callable`` that takes a :class:`JobShopInstance` and
+    returns a :class:`Schedule`. Therefore, solvers can be implemented as
+    functions or as classes. This class is provided as a base class for solvers
+    implemented as classes. It provides a default implementation of the
+    ``__call__`` method that measures the time taken to solve the instance
+    and stores it in the schedule's metadata under the key "elapsed_time" if
+    it is not alreadypresent.
     """
 
     @abc.abstractmethod
