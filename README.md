@@ -17,49 +17,34 @@ JobShopLib is a Python package for creating, solving, and visualizing job shop s
 
 It follows a modular design, allowing users to easily extend the library with new solvers, dispatching rules, visualization functions, etc.
 
-There is a [documentation page](https://job-shop-lib.readthedocs.io/en/stable/) for versions 1.0.0a3 and onward. See the [latest pull requests](https://github.com/Pabloo22/job_shop_lib/pulls?q=is%3Apr+is%3Aclosed) for the latest changes.
+We support multiple solvers, including:
+- **Constraint Programming**: Based on OR-Tools' CP-SAT solver. It supports **release dates, deadlines, and due dates.** See the ["Solving the Problem" tutorial](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/02-Solving-the-Problem.ipynb) for an example.
+- **Dispatching Rules**: A set of predefined rules and the ability to create custom ones. They support arbitrary **setup times, machine breakdowns, release dates, deadlines, and due dates**. See the [following example](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/03-Dispatching-Rules.ipynb). You can also create videos or GIFs of the scheduling process. For creating GIFs or videos, see the [Save Gif example](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/04-Save-Gif.ipynb).
+- **Metaheuristics**: Currently, we have a **simulated annealing** implementation that supports **release dates, deadlines, and due dates**. We also support arbitrary neighborhood search strategies, including swapping operations in the critical path as described in the paper "Job Shop Scheduling by Simulated Annealing" by van Laarhoven et al. (1992); and energy functions. See our [simulated annealing tutorial](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/03-Simulated-Annealing.ipynb).
+- **Reinforcement Learning**: Two Gymnasium environments for solving the problem with **graph neural networks** (GNNs) or any other method. The environments support **setup times, release dates, deadlines, and due dates.** We're currently building a tutorial on how to use them.
 
-See [`gnn_scheduler`](https://github.com/Pabloo22/gnn_scheduler/blob/main/gnn_scheduler/) for an example implementation of a graph neural network-based dispatcher trained with [PyTorch Geometric](https://pyg.org/).
-
-See [this](https://colab.research.google.com/drive/1XV_Rvq1F2ns6DFG8uNj66q_rcowwTZ4H?usp=sharing) Google Colab notebook for a quick start guide! More advanced examples can be found [here](https://job-shop-lib.readthedocs.io/en/stable/examples.html).
+We also provide useful utilities, data structures, and visualization functions:
+- **Intuitive Data Structures**: Easily create, manage, and manipulate job shop instances and solutions with user-friendly data structures. See [Getting Started](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/00-Getting-Started.ipynb) and [How Solutions are Represented](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/01-How-Solutions-are-Represented.ipynb).
+- **Benchmark Instances**: Load well-known benchmark instances directly from the library without manual downloading.
+- **Random Instance Generation**: Create random instances with customizable sizes and properties.
+- **Gantt Charts**: Visualize final schedules and how they are created iteratively by dispatching rule solvers or sequences of scheduling decisions with GIFs or videos.
+- **Graph Representations**: Represent and visualize instances as disjunctive graphs or agent-task graphs (introduced in the ScheduleNet paper). Build your own custom graphs with the `JobShopGraph` class.
 
 ## Installation :package:
 
 <!-- start installation -->
 
-JobShopLib is distributed on [PyPI](https://pypi.org/project/job-shop-lib/). You can install the latest stable version using `pip`:
-
 ```bash
 pip install job-shop-lib
 ```
 
+or 
+
+```bash
+poetry add job-shop-lib
+```
+
 <!-- end installation -->
-
-<!-- key features -->
-
-## Key Features :star:
-
-- **Data Structures**: Easily create, manage, and manipulate job shop instances and solutions with user-friendly data structures. See [Getting Started](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/00-Getting-Started.ipynb) and [How Solutions are Represented](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/01-How-Solutions-are-Represented.ipynb).
-
-- **Benchmark Instances**: Load well-known benchmark instances directly from the library without manual downloading. See [Load Benchmark Instances](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/05-Load-Benchmark-Instances.ipynb).
-
-- **Random Instance Generation**: Create random instances with customizable sizes and properties. See [`generation`](job_shop_lib/generation) package.
-
-- **Multiple Solvers**:
-  - **Constraint Programming Solver**: OR-Tools' CP-SAT solver. See [Solving the Problem](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/02-Solving-the-Problem.ipynb).
-
-  - **Dispatching Rule Solvers**: Use any of the available dispatching rules or create custom ones. See [Dispatching Rules](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/03-Dispatching-Rules.ipynb).
-
-- **Gantt Charts**: Visualize final schedules and how are they created iteratively by dispatching rule solvers or sequences of scheduling decisions with GIFs or videos. See [Save Gif](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/06-Save-Gif.ipynb).
-
-- **Graph Representations**:
-  - **Disjunctive Graphs**: Represent and visualize instances as disjunctive graphs. See [Disjunctive Graph](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/04-Disjunctive-Graph.ipynb).
-  - **Agent-Task Graphs**: Encode instances as agent-task graphs (introduced in [ScheduleNet paper](https://arxiv.org/abs/2106.03051)). See [Agent-Task Graph](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/07-Agent-Task-Graph.ipynb).
-  - Build your own custom graphs with the `JobShopGraph` class.
-
-- **Gymnasium Environments**: Two environments for solving the problem with graph neural networks (GNNs) or any other method, and reinforcement learning (RL). See [SingleJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/09-SingleJobShopGraphEnv.ipynb) and [MultiJobShopGraphEnv](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/10-MultiJobShopGraphEnv.ipynb).
-
-<!-- end key features -->
 
 ## Publication :scroll:
 
@@ -194,6 +179,7 @@ A dispatching rule is a heuristic guideline used to prioritize and sequence jobs
 ```python
 class DispatchingRule(str, Enum):
     SHORTEST_PROCESSING_TIME = "shortest_processing_time"
+    LARGEST_PROCESSING_TIME = "largest_processing_time"
     FIRST_COME_FIRST_SERVED = "first_come_first_served"
     MOST_WORK_REMAINING = "most_work_remaining"
     MOST_OPERATION_REMAINING = "most_operation_remaining"
@@ -406,6 +392,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 
 ## References :books:
+
+ - Peter J. M. van Laarhoven, Emile H. L. Aarts, Jan Karel Lenstra, (1992) Job Shop Scheduling by Simulated Annealing. Operations Research 40(1):113-125.
 
  - J. Adams, E. Balas, and D. Zawack, "The shifting bottleneck procedure
      for job shop scheduling," Management Science, vol. 34, no. 3,
