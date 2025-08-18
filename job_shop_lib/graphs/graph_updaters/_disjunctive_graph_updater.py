@@ -64,9 +64,9 @@ class DisjunctiveGraphUpdater(ResidualGraphUpdater):
 
         # Remove the disjunctive arcs between the scheduled operation and the
         # previous operation
-        scheduled_operation_node = self.job_shop_graph.nodes[
+        scheduled_operation_node = self.job_shop_graph.get_operation_node(
             scheduled_operation.operation.operation_id
-        ]
+        )
         if (
             scheduled_operation_node.operation
             is not scheduled_operation.operation
@@ -77,14 +77,15 @@ class DisjunctiveGraphUpdater(ResidualGraphUpdater):
                 "added to the graph. This method assumes that the operation id"
                 " and node id are the same."
             )
-        scheduled_id = scheduled_operation_node.node_id
-        assert scheduled_id == scheduled_operation.operation.operation_id
+        scheduled_operation_node_op_id = scheduled_operation_node.operation.operation_id
+        assert scheduled_operation_node_op_id == scheduled_operation.operation.operation_id
         previous_id = previous_scheduled_operation.operation.operation_id
+        previous_node = self.job_shop_graph.get_operation_node(previous_id)
         if self.job_shop_graph.is_removed(
-            previous_id
-        ) or self.job_shop_graph.is_removed(scheduled_id):
+            previous_node
+        ) or self.job_shop_graph.is_removed(scheduled_operation_node):
             return
-        self.job_shop_graph.graph.remove_edge(scheduled_id, previous_id)
+        self.job_shop_graph.remove_edge(scheduled_operation_node, previous_node)
 
         # Now, remove all the disjunctive edges between the previous scheduled
         # operation and the other operations in the machine schedule
@@ -100,9 +101,12 @@ class DisjunctiveGraphUpdater(ResidualGraphUpdater):
         for operation in operations_with_same_machine:
             if operation.operation_id in already_scheduled_operations:
                 continue
-            self.job_shop_graph.graph.remove_edge(
-                previous_id, operation.operation_id
+            operation_node = self.job_shop_graph.get_operation_node(
+                operation.operation_id
             )
-            self.job_shop_graph.graph.remove_edge(
-                operation.operation_id, previous_id
+            self.job_shop_graph.remove_edge(
+                previous_node, operation_node
+            )
+            self.job_shop_graph.remove_edge(
+                operation_node, previous_node
             )

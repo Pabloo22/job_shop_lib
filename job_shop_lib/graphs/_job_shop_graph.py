@@ -444,6 +444,10 @@ class JobShopGraph:
         if edge_type is None:
             edge_type = (u_of_edge.node_id[0], "to", v_of_edge.node_id[0])
 
+        # check if any of the nodes has been removed
+        if self.is_removed(u_of_edge) or self.is_removed(v_of_edge):
+            return
+
         # Remove from adjacency lists
         if u_of_edge in self.adjacency_out:
             self.adjacency_out[u_of_edge][edge_type].remove(v_of_edge)
@@ -570,6 +574,8 @@ class JobShopGraph:
         for node, edges in self.adjacency_out.items():
             src = node.node_id[1]
             for edge_type, neighbors in edges.items():
+                if len(neighbors) == 0:
+                    continue
                 dst = np.array([[src, neighbor.node_id[1]] for neighbor in neighbors]).T
                 edge_index[edge_type] = np.hstack((edge_index[edge_type], dst))
         return edge_index

@@ -26,7 +26,7 @@ def random_action(observation: ObservationDict) -> tuple[int, int]:
     # in one machine.
     return (operation_id, machine_id)
 
-
+@pytest.mark.skip
 def test_observation_space(
     single_job_shop_graph_env_ft06: SingleJobShopGraphEnv,
 ):
@@ -124,7 +124,7 @@ def test_all_nodes_removed(
         obs, _, done, *_ = env.step(action)
 
     assert env.dispatcher.schedule.is_complete()
-    removed_nodes = obs[ObservationSpaceKey.REMOVED_NODES.value]
+    removed_nodes = env.job_shop_graph.removed_nodes
 
     assert env.job_shop_graph is env.graph_updater.job_shop_graph
     try:

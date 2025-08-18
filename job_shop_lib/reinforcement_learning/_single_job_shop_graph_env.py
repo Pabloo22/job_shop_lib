@@ -245,13 +245,6 @@ class SingleJobShopGraphEnv(gym.Env):
         num_edges = self.initial_job_shop_graph.num_edges
         num_nodes = len(self.initial_job_shop_graph.nodes)
         dict_space: dict[str, gym.Space] = {
-            ObservationSpaceKey.REMOVED_NODES.value: gym.spaces.Dict(
-                {
-                    node_type: gym.spaces.MultiBinary(len(bool_list))
-                    for node_type, bool_list in
-                    self.initial_job_shop_graph.removed_nodes.items()
-                }
-            ),
             ObservationSpaceKey.EDGE_INDEX.value: gym.spaces.Dict(
                 {
                     key: gym.spaces.Box(
@@ -353,81 +346,20 @@ class SingleJobShopGraphEnv(gym.Env):
     def get_observation(self) -> ObservationDict:
         """Returns the current observation of the environment."""
         observation: ObservationDict = {
-            ObservationSpaceKey.REMOVED_NODES.value: {
-                k: np.array(v, dtype=bool)  # or dtype=bool
-                for k, v in self.job_shop_graph.removed_nodes.items()
-            },
-            ObservationSpaceKey.EDGE_INDEX.value: self._get_edge_index(),
+            ObservationSpaceKey.EDGE_INDEX.value: self.job_shop_graph.edge_index_dict
         }
+        removed_nodes = self.job_shop_graph.removed_nodes
         for feature_type, matrix in self.composite_observer.features.items():
+            node_type = feature_type.value.upper()[:-1]
+            removed_mask = removed_nodes.get(node_type, None)
+            if removed_mask is not None:
+                removed_mask = np.array(removed_mask, dtype=bool)
+                removed_mask = ~removed_mask
+                matrix = matrix[removed_mask]
             observation[feature_type.value] = matrix
         return observation
 
-    def _get_edge_index(self) -> dict[str, NDArray[np.int32]]:
-        """Returns the edge index of the job shop graph in COO format.
-        The edge index is a dictionary where the keys are edge types and the
-        values are 2D arrays with shape (2, num_edges), where the first row
-        contains the source node IDs and the second row contains the target
-        node IDs.
-        """
-        edge_index = defaultdict(lambda: np.empty((2, 0), dtype=np.int32))
 
-        for (
-            source_node,
-            edges_dict,
-        ) in self.job_shop_graph.adjacency_out.items():
-            for edge_type, edge_list in edges_dict.items():
-                if isinstance(edge_type, tuple):
-                    edges = [
-                        [source_node.node_id[1], tgt_node.node_id[1]]
-                        for tgt_node in edge_list
-                    ]
-                    edges = np.array(edges, dtype=np.int32).T
-                    # if edges is an empty array, it will not be added
-                    if edges.size > 0:
-                        edge_index[edge_type] = np.hstack(
-                            (edge_index[edge_type], edges)
-                        )
-                else:
-                    for tgt_node in edge_list:
-                        aux_type = (
-                            source_node.node_id[0],
-                            "to",
-                            tgt_node.node_id[0],
-                        )
-                        edges = np.array(
-                            [[source_node.node_id[1], tgt_node.node_id[1]]],
-                            dtype=np.int32,
-                        ).T
-                        # if edges is and empty array, it will not be added
-                        if edges.size > 0:
-                            edge_index[aux_type] = np.hstack(
-                                (edge_index[aux_type], edges)
-                            )
-        # Add padding if required
-        final_edge_index = {}
-        if self.use_padding:
-            num_edges = self.initial_job_shop_graph.num_edges
-
-            # Get the list of keys the observation space *always* expects.
-            expected_keys = self.observation_space[
-                ObservationSpaceKey.EDGE_INDEX.value
-            ].spaces.keys()
-
-            # Iterate over the EXPECTED keys, not the keys we found this step.
-            for key in expected_keys:
-                # Get the edges for this key.
-                edges_found = edge_index.get(
-                    key, np.empty((2, 0), dtype=np.int32)
-                )
-
-                # Pad the result and add it to the final dict.
-                final_edge_index[key] = add_padding(
-                    edges_found, output_shape=(2, num_edges)
-                )
-            return final_edge_index
-
-        return dict(edge_index)
 
     def render(self):
         """Renders the environment.

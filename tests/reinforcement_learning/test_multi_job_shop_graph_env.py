@@ -119,7 +119,7 @@ def test_all_nodes_are_removed(
             action = _random_action(obs)
             obs, _, done, *_ = env.step(action)
 
-    removed_nodes = obs[ObservationSpaceKey.REMOVED_NODES.value]
+    removed_nodes = multi_job_shop_graph_env.job_shop_graph.removed_nodes
     try:
         assert np.all(removed_nodes)
     except AssertionError:
