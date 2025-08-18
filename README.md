@@ -25,10 +25,10 @@ We support multiple solvers, including:
 
 We also provide useful utilities, data structures, and visualization functions:
 - **Intuitive Data Structures**: Easily create, manage, and manipulate job shop instances and solutions with user-friendly data structures. See [Getting Started](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/00-Getting-Started.ipynb) and [How Solutions are Represented](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/01-How-Solutions-are-Represented.ipynb).
-- **Benchmark Instances**: Load well-known benchmark instances directly from the library without manual downloading.
-- **Random Instance Generation**: Create random instances with customizable sizes and properties.
+- **Benchmark Instances**: Load well-known benchmark instances directly from the library without manual downloading. See [Load Benchmark Instances](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/05-Load-Benchmark-Instances.ipynb).
+- **Random Instance Generation**: Create random instances with customizable sizes and properties. See [`generation`](https://job-shop-lib.readthedocs.io/en/stable/api/job_shop_lib.generation.html#module-job_shop_lib.generation) module.
 - **Gantt Charts**: Visualize final schedules and how they are created iteratively by dispatching rule solvers or sequences of scheduling decisions with GIFs or videos.
-- **Graph Representations**: Represent and visualize instances as disjunctive graphs or agent-task graphs (introduced in the ScheduleNet paper). Build your own custom graphs with the `JobShopGraph` class.
+- **Graph Representations**: Represent and visualize instances as disjunctive graphs or agent-task graphs (introduced in the ScheduleNet paper). Build your own custom graphs with the `JobShopGraph` class. See the [Disjunctive Graphs](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/04-Disjunctive-Graphs.ipynb) and [Resource Task Graphs](https://job-shop-lib.readthedocs.io/en/stable/examples/07-Resource-Task-Graph.html) examples.
 
 ## Installation :package:
 
