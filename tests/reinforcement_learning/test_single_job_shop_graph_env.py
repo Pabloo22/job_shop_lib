@@ -137,7 +137,7 @@ def test_all_nodes_removed(
         print(env.instance.to_dict())
         print(env.instance)
         print(env.job_shop_graph.nodes)
-        raise
+        raise 
 
 
 if __name__ == "__main__":

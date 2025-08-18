@@ -222,7 +222,7 @@ def plot_disjunctive_graph(
         [
             (u, v)
             for u, v, d in job_shop_graph.graph.edges(data=True)
-            if d["type"] == EdgeType.DISJUNCTIVE
+            if d["type"][1] == EdgeType.DISJUNCTIVE.name
         ]
     )
 
@@ -285,12 +285,12 @@ def plot_disjunctive_graph(
     conjunctive_edges = [
         (u, v)
         for u, v, d in job_shop_graph.graph.edges(data=True)
-        if d["type"] == EdgeType.CONJUNCTIVE
+        if d["type"][1] == EdgeType.CONJUNCTIVE.name
     ]
     disjunctive_edges: Iterable[tuple[int, int]] = [
         (u, v)
         for u, v, d in job_shop_graph.graph.edges(data=True)
-        if d["type"] == EdgeType.DISJUNCTIVE
+        if d["type"][1] == EdgeType.DISJUNCTIVE.name
     ]
     if conjunctive_edges_additional_params is None:
         conjunctive_edges_additional_params = {}
