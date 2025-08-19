@@ -407,7 +407,8 @@ class Schedule:
 
         machine_op_index = {}
         for machine_id, schedule_list in enumerate(self.schedule):
-            machine_op_index[machine_id] = {op: idx for idx, op in enumerate(schedule_list)}
+            machine_op_index[machine_id] = {op: idx for idx, op in
+                                            enumerate(schedule_list)}
 
         # 2. Trace backwards from the last operation
         while True:
@@ -427,7 +428,9 @@ class Schedule:
             # Find machine predecessor (the previous operation on the same
             # machine)
             machine_schedule = self.schedule[current_scheduled_op.machine_id]
-            op_idx_on_machine = machine_op_index[current_scheduled_op.machine_id][current_scheduled_op]
+            op_idx_on_machine = (
+                machine_op_index
+                [current_scheduled_op.machine_id][current_scheduled_op])
             if op_idx_on_machine > 0:
                 machine_pred = machine_schedule[op_idx_on_machine - 1]
 
