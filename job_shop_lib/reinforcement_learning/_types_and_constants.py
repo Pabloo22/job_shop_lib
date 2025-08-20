@@ -26,8 +26,7 @@ class RenderConfig(TypedDict, total=False):
 class ObservationSpaceKey(str, Enum):
     """Enumeration of the keys for the observation space dictionary."""
 
-    REMOVED_NODES = "removed_nodes"
-    EDGE_INDEX = "edge_index"
+    EDGE_INDEX = "edge_index_dict"
     OPERATIONS = FeatureType.OPERATIONS.value
     JOBS = FeatureType.JOBS.value
     MACHINES = FeatureType.MACHINES.value
@@ -36,7 +35,7 @@ class ObservationSpaceKey(str, Enum):
 class _ObservationDictRequired(TypedDict):
     """Required fields for the observation dictionary."""
 
-    edge_index: dict[tuple[str, str, str], NDArray[np.int32]]
+    edge_index_dict: dict[tuple[str, str, str], NDArray[np.int32]]
 
 
 class _ObservationDictOptional(TypedDict, total=False):

@@ -309,6 +309,7 @@ class JobShopGraph:
             self.edge_types.add(edge_type)
         else:
             new_edge_type = (u_of_edge.node_id[0], edge_type.name, v_of_edge.node_id[0])
+            edge_type = new_edge_type
             self.edge_types.add(new_edge_type)
         self.adjacency_in[v_of_edge][edge_type].append(u_of_edge)
         self.adjacency_out[u_of_edge][edge_type].append(v_of_edge)

@@ -160,7 +160,7 @@ class SingleJobShopGraphEnv(gym.Env):
         ) = filter_dominated_operations,
         render_mode: str | None = None,
         render_config: RenderConfig | None = None,
-        use_padding: bool = True,
+        use_padding: bool = False,
     ) -> None:
         super().__init__()
         # Used for resetting the environment

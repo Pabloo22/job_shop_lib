@@ -298,8 +298,9 @@ class MultiJobShopGraphEnv(gym.Env):
         obs, info = self.single_job_shop_graph_env.reset(
             seed=seed, options=options
         )
-        if self.use_padding:
-            obs = self._add_padding_to_observation(obs)
+        # Padding will not be added because of new observation structure
+        # if self.use_padding:
+        #    obs = self._add_padding_to_observation(obs)
 
         return obs, info
 
@@ -331,8 +332,9 @@ class MultiJobShopGraphEnv(gym.Env):
         obs, reward, done, truncated, info = (
             self.single_job_shop_graph_env.step(action)
         )
-        if self.use_padding:
-            obs = self._add_padding_to_observation(obs)
+        # Padding will not be added because of new observation structure
+        # if self.use_padding:
+        #     obs = self._add_padding_to_observation(obs)
 
         return obs, reward, done, truncated, info
 
