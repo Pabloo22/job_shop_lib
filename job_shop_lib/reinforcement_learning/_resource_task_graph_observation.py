@@ -186,8 +186,8 @@ class ResourceTaskGraphObservation(ObservationWrapper, Generic[EnvType]):
             type_nodes = self.unwrapped.job_shop_graph.nodes_by_type[node_type]
             if not type_nodes:
                 continue
-            start = min(node.node_id for node in type_nodes)
-            end = max(node.node_id for node in type_nodes) + 1
+            start = min(node.node_id[1] for node in type_nodes)
+            end = max(node.node_id[1] for node in type_nodes) + 1
             type_ranges[node_type.name.lower()] = (start, end)
 
         return type_ranges

@@ -81,7 +81,9 @@ def build_solved_disjunctive_graph(schedule: Schedule) -> JobShopGraph:
                 break
             next_scheduled_operation = machine_schedule[i + 1]
             graph.add_edge(
-                graph.get_operation_node(scheduled_operation.operation.operation_id),
+                graph.get_operation_node(
+                    scheduled_operation.operation.operation_id
+                ),
                 graph.get_operation_node(
                     next_scheduled_operation.operation.operation_id
                 ),

@@ -14,6 +14,7 @@ from job_shop_lib.dispatching import Dispatcher, DispatcherObserver
 from job_shop_lib.dispatching.feature_observers import (
     CompositeFeatureObserver,
     IsCompletedObserver,
+    FeatureType,
 )
 from job_shop_lib.graphs.graph_updaters import ResidualGraphUpdater
 
@@ -21,7 +22,7 @@ from job_shop_lib.graphs.graph_updaters import ResidualGraphUpdater
 def _random_action(observation: ObservationDict) -> tuple[int, int]:
     ready_operations = []
     for operation_id, is_ready in enumerate(
-        observation[ObservationSpaceKey.JOBS.value].ravel()
+        observation[ObservationSpaceKey.NODE_FEATURES.value][FeatureType.JOBS.value].ravel()
     ):
         if is_ready == 1.0:
             ready_operations.append(operation_id)
@@ -44,6 +45,7 @@ def test_consistent_observation_space(
     for _ in range(100):
         _ = env.reset()
         assert observation_space == env.observation_space
+
 
 @pytest.mark.skip
 def test_observation_space(

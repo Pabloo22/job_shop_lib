@@ -11,11 +11,13 @@ def test_disjunctive_edges_addition(example_job_shop_instance):
         for node1, node2 in itertools.combinations(machine_operations, 2):
             assert (
                 graph.graph.has_edge(node1, node2)
-                and graph.graph[node1][node2]["type"][1] == EdgeType.DISJUNCTIVE.name
+                and graph.graph[node1][node2]["type"][1]
+                == EdgeType.DISJUNCTIVE.name
             )
             assert (
                 graph.graph.has_edge(node2, node1)
-                and graph.graph[node2][node1]["type"][1] == EdgeType.DISJUNCTIVE.name
+                and graph.graph[node2][node1]["type"][1]
+                == EdgeType.DISJUNCTIVE.name
             )
 
 

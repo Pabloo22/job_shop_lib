@@ -112,6 +112,7 @@ def test_type_ranges(
     assert env.type_ranges["machine"] == (36, 42)
     assert len(env.type_ranges) == 2
 
+
 @pytest.mark.skip
 def test_info(
     single_env_ft06_resource_task_graph_with_all_features: (

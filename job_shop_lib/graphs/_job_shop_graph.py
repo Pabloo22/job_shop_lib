@@ -308,7 +308,11 @@ class JobShopGraph:
             edge_type = (u_of_edge.node_id[0], "to", v_of_edge.node_id[0])
             self.edge_types.add(edge_type)
         else:
-            new_edge_type = (u_of_edge.node_id[0], edge_type.name, v_of_edge.node_id[0])
+            new_edge_type = (
+                u_of_edge.node_id[0],
+                edge_type.name,
+                v_of_edge.node_id[0],
+            )
             edge_type = new_edge_type
             self.edge_types.add(new_edge_type)
         self.adjacency_in[v_of_edge][edge_type].append(u_of_edge)
@@ -577,6 +581,8 @@ class JobShopGraph:
             for edge_type, neighbors in edges.items():
                 if len(neighbors) == 0:
                     continue
-                dst = np.array([[src, neighbor.node_id[1]] for neighbor in neighbors]).T
+                dst = np.array(
+                    [[src, neighbor.node_id[1]] for neighbor in neighbors]
+                ).T
                 edge_index[edge_type] = np.hstack((edge_index[edge_type], dst))
         return edge_index

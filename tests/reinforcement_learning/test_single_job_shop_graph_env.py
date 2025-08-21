@@ -6,6 +6,8 @@ import gymnasium as gym
 
 import numpy as np
 
+from job_shop_lib.dispatching.feature_observers import FeatureType
+
 from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
     ObservationSpaceKey,
@@ -16,7 +18,7 @@ from job_shop_lib.reinforcement_learning import (
 def random_action(observation: ObservationDict) -> tuple[int, int]:
     ready_operations = []
     for operation_id, is_ready in enumerate(
-        observation[ObservationSpaceKey.JOBS.value].ravel()
+        observation[ObservationSpaceKey.NODE_FEATURES.value][FeatureType.JOBS.value].ravel()
     ):
         if is_ready == 1.0:
             ready_operations.append(operation_id)
@@ -25,6 +27,7 @@ def random_action(observation: ObservationDict) -> tuple[int, int]:
     machine_id = -1  # We can use -1 if each operation can only be scheduled
     # in one machine.
     return (operation_id, machine_id)
+
 
 @pytest.mark.skip
 def test_observation_space(
@@ -122,6 +125,23 @@ def test_all_nodes_removed(
     while not done:
         action = random_action(obs)
         obs, _, done, *_ = env.step(action)
+        # print(f"Action: {action}")
+        # obs, _, done, _, info = env.step(action)  # type: ignore[call-arg]
+        # from job_shop_lib.graphs import NodeType
+        # print("Current operation nodes:")
+        # for node in env.job_shop_graph.nodes_by_type[NodeType.OPERATION]:
+        #     print(f'node id: {node.node_id}, operation {node.operation}, operation id: {node.operation.operation_id}, corresponding job id: {node.operation.job_id}')
+        # print('Available operations:')
+        # print(env.dispatcher.available_operations())
+        # print("Observation after step:")
+        # print(obs)
+        # print("Info:")
+        # print(info)
+        # print()
+        # print()
+    # print the schedule
+    # print(env.dispatcher.schedule)
+    # assert 0 == 1
 
     assert env.dispatcher.schedule.is_complete()
     removed_nodes = env.job_shop_graph.removed_nodes
@@ -137,7 +157,7 @@ def test_all_nodes_removed(
         print(env.instance.to_dict())
         print(env.instance)
         print(env.job_shop_graph.nodes)
-        raise 
+        raise
 
 
 if __name__ == "__main__":
