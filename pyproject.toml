@@ -10,10 +10,7 @@ include = ["job_shop_lib/benchmarking/benchmark_instances.json", "job_shop_lib/p
 
 [tool.poetry.dependencies]
 python = "^3.10"
-ortools = [
-    { version = "^9.9", markers = "sys_platform != 'darwin'" },
-    { version = ">=9.9,<9.13", markers = "sys_platform == 'darwin'" }
-]
+ortools = ">=9.9,<9.13"
 matplotlib = "^3"
 pyarrow = ">=15,<21"  # An optional pandas' dependency that will be required in the future
 networkx = "^3"
