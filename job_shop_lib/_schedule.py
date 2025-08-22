@@ -412,8 +412,8 @@ class Schedule:
 
         # 2. Trace backwards from the last operation
         while True:
-            job_pred = None
-            machine_pred = None
+            job_pred: ScheduledOperation | None = None
+            machine_pred: ScheduledOperation | None = None
 
             # Find job predecessor (the previous operation in the same job)
             op_idx_in_job = current_scheduled_op.operation.position_in_job
@@ -432,7 +432,9 @@ class Schedule:
                 machine_op_index
                 [current_scheduled_op.machine_id][current_scheduled_op])
             if op_idx_on_machine > 0:
-                machine_pred = machine_schedule[op_idx_on_machine - 1]
+                machine_pred = machine_schedule[
+                    op_idx_on_machine - 1
+                ]
 
             # 3. Determine the critical predecessor
             # The critical predecessor is the one that finished latest, as it
