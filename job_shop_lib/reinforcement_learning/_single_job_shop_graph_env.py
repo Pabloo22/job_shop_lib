@@ -1,6 +1,7 @@
 """Home of the `SingleJobShopGraphEnv` class."""
 
 from copy import deepcopy
+from collections import defaultdict
 from collections.abc import Callable, Sequence
 from typing import Any
 import warnings
@@ -12,7 +13,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from job_shop_lib import JobShopInstance, Operation
-from job_shop_lib.graphs import JobShopGraph
+from job_shop_lib.graphs import JobShopGraph, NodeType
 from job_shop_lib.graphs.graph_updaters import (
     GraphUpdater,
     ResidualGraphUpdater,
@@ -28,6 +29,7 @@ from job_shop_lib.dispatching.feature_observers import (
     CompositeFeatureObserver,
     FeatureObserver,
     FeatureObserverType,
+    FeatureType,
 )
 from job_shop_lib.visualization.gantt import GanttChartCreator
 from job_shop_lib.reinforcement_learning import (
@@ -38,6 +40,17 @@ from job_shop_lib.reinforcement_learning import (
     ObservationSpaceKey,
     ObservationDict,
 )
+
+_NODE_TYPE_TO_FEATURE_TYPE = {
+    NodeType.OPERATION: FeatureType.OPERATIONS,
+    NodeType.MACHINE: FeatureType.MACHINES,
+    NodeType.JOB: FeatureType.JOBS,
+}
+_FEATURE_TYPE_STR_TO_NODE_TYPE = {
+    FeatureType.OPERATIONS.value: NodeType.OPERATION,
+    FeatureType.MACHINES.value: NodeType.MACHINE,
+    FeatureType.JOBS.value: NodeType.JOB,
+}
 
 
 class SingleJobShopGraphEnv(gym.Env):
@@ -92,8 +105,9 @@ class SingleJobShopGraphEnv(gym.Env):
             Defines the observation space. The observation is a dictionary
             with the following keys:
 
-            - "removed_nodes": Binary vector indicating removed graph nodes.
-            - "edge_list": Matrix of graph edges in COO format.
+            - "removed_nodes": Dictionary of binary vectors by node type
+                indicating removed nodes.
+            - "edge_list": Dictionary of edge lists in COO format by edge type.
             - Feature matrices: Keys corresponding to the composite observer
                 features (e.g., "operations", "jobs", "machines").
 
@@ -158,7 +172,7 @@ class SingleJobShopGraphEnv(gym.Env):
         ) = filter_dominated_operations,
         render_mode: str | None = None,
         render_config: RenderConfig | None = None,
-        use_padding: bool = True,
+        use_padding: bool = False,
     ) -> None:
         super().__init__()
         # Used for resetting the environment
@@ -186,6 +200,7 @@ class SingleJobShopGraphEnv(gym.Env):
         self.action_space = gym.spaces.MultiDiscrete(
             [self.instance.num_jobs, self.instance.num_machines], start=[0, -1]
         )
+        self.use_padding = use_padding
         self.observation_space: gym.spaces.Dict = self._get_observation_space()
         self.render_mode = render_mode
         if render_config is None:
@@ -193,7 +208,6 @@ class SingleJobShopGraphEnv(gym.Env):
         self.gantt_chart_creator = GanttChartCreator(
             dispatcher=self.dispatcher, **render_config
         )
-        self.use_padding = use_padding
 
     @property
     def instance(self) -> JobShopInstance:
@@ -240,29 +254,33 @@ class SingleJobShopGraphEnv(gym.Env):
 
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
-        num_edges = self.job_shop_graph.num_edges
-        dict_space: dict[str, gym.Space] = {
-            ObservationSpaceKey.REMOVED_NODES.value: gym.spaces.MultiBinary(
-                len(self.job_shop_graph.nodes)
-            ),
-            ObservationSpaceKey.EDGE_INDEX.value: gym.spaces.MultiDiscrete(
-                np.full(
-                    (2, num_edges),
-                    fill_value=len(self.job_shop_graph.nodes) + 1,
+        num_edges = self.initial_job_shop_graph.num_edges
+        num_nodes = len(self.initial_job_shop_graph.nodes)
+        edge_index_space = gym.spaces.Dict(
+            {
+                key: gym.spaces.Box(
+                    low=-1,
+                    high=num_nodes - 1,
+                    shape=(2, num_edges),
                     dtype=np.int32,
-                ),
-                start=np.full(
-                    (2, num_edges),
-                    fill_value=-1,  # -1 is used for padding
-                    dtype=np.int32,
-                ),
-            ),
-        }
-        for feature_type, matrix in self.composite_observer.features.items():
-            dict_space[feature_type.value] = gym.spaces.Box(
-                low=-np.inf, high=np.inf, shape=matrix.shape
-            )
-        return gym.spaces.Dict(dict_space)
+                )
+                for key in self.initial_job_shop_graph.edge_types
+            }
+        )
+        node_features_space = gym.spaces.Dict(
+            {
+                feature_type.value: gym.spaces.Box(
+                    low=-np.inf, high=np.inf, shape=matrix.shape
+                )
+                for feature_type, matrix in self.composite_observer.features.items()
+            }
+        )
+        return gym.spaces.Dict(
+            {
+                ObservationSpaceKey.EDGE_INDEX: edge_index_space,
+                ObservationSpaceKey.NODE_FEATURES: node_features_space,
+            }
+        )
 
     def reset(
         self,
@@ -346,31 +364,28 @@ class SingleJobShopGraphEnv(gym.Env):
 
     def get_observation(self) -> ObservationDict:
         """Returns the current observation of the environment."""
-        observation: ObservationDict = {
-            ObservationSpaceKey.REMOVED_NODES.value: np.array(
-                self.job_shop_graph.removed_nodes, dtype=bool
-            ),
-            ObservationSpaceKey.EDGE_INDEX.value: self._get_edge_index(),
-        }
+        node_features_dict: dict[str, NDArray[np.float32]] = {}
+        removed_nodes = self.job_shop_graph.removed_nodes
+
         for feature_type, matrix in self.composite_observer.features.items():
-            observation[feature_type.value] = matrix
+            # Use the provided mapping for robust conversion
+            node_type = _FEATURE_TYPE_STR_TO_NODE_TYPE[feature_type.value]
+            removed_mask = removed_nodes.get(node_type)
+
+            current_matrix = matrix
+            if removed_mask is not None:
+                # The mask is True for removed nodes; invert to get active ones
+                active_mask = ~np.array(removed_mask, dtype=bool)
+                current_matrix = matrix[active_mask]
+            
+            node_features_dict[feature_type.value] = current_matrix
+
+        # Construct the final observation dictionary with the nested structure
+        observation: ObservationDict = {
+            ObservationSpaceKey.EDGE_INDEX: self.job_shop_graph.edge_index_dict,
+            ObservationSpaceKey.NODE_FEATURES: node_features_dict,
+        }
         return observation
-
-    def _get_edge_index(self) -> NDArray[np.int32]:
-        """Returns the edge index matrix."""
-        edge_index = np.array(
-            self.job_shop_graph.graph.edges(), dtype=np.int32
-        ).T
-
-        if self.use_padding:
-            output_shape = self.observation_space[
-                ObservationSpaceKey.EDGE_INDEX.value
-            ].shape
-            assert output_shape is not None  # For the type checker
-            edge_index = add_padding(
-                edge_index, output_shape=output_shape, dtype=np.int32
-            )
-        return edge_index
 
     def render(self):
         """Renders the environment.

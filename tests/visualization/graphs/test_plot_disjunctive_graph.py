@@ -4,7 +4,12 @@ import pytest
 import matplotlib
 
 from job_shop_lib import JobShopInstance
-from job_shop_lib.graphs import build_disjunctive_graph, NodeType, Node
+from job_shop_lib.graphs import (
+    build_disjunctive_graph,
+    NodeType,
+    Node,
+    EdgeType,
+)
 from job_shop_lib.visualization.graphs import plot_disjunctive_graph
 from job_shop_lib.exceptions import ValidationError
 
@@ -69,10 +74,13 @@ def test_plot_disjunctive_graph_removed_nodes(
     also using machine_colors and single_edge for disjunctive edges.
     """
     graph = build_disjunctive_graph(example_job_shop_instance)
-
+    print(graph.adjacency_out[list(graph.adjacency_out.keys())[-2]])
+    print()
     op_nodes = [
         node for node in graph.nodes if node.node_type == NodeType.OPERATION
     ]
+    print(f"Operation nodes before removal: {len(op_nodes)}")
+    print()
 
     # Remove 1st, 3rd, 4th operation nodes if they exist
     nodes_to_remove_indices = [0, 2, 3]
@@ -81,7 +89,7 @@ def test_plot_disjunctive_graph_removed_nodes(
         actual_index = index_to_remove - removed_count
         if actual_index < len(op_nodes):
             node_to_remove = op_nodes.pop(actual_index)
-            if not graph.is_removed(node_to_remove.node_id):
+            if not graph.is_removed(node_to_remove):
                 graph.remove_node(node_to_remove.node_id)
                 removed_count += 1
 
@@ -129,7 +137,7 @@ def test_plot_disjunctive_graph_removed_nodes_default_machine_colors(
         actual_index = index_to_remove - removed_count
         if actual_index < len(op_nodes):
             node_to_remove = op_nodes.pop(actual_index)
-            if not graph.is_removed(node_to_remove.node_id):
+            if not graph.is_removed(node_to_remove):
                 graph.remove_node(node_to_remove.node_id)
                 removed_count += 1
 

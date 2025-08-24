@@ -314,10 +314,10 @@ def test_eq():
 def test_repr(job_shop_instance: JobShopInstance):
     """Test the string representation of JobShopInstance."""
     expected_repr = (
-        "JobShopInstance(name=TestInstance, num_jobs=2, "
-        "num_machines=3)"
+        "JobShopInstance(name=TestInstance, num_jobs=2, " "num_machines=3)"
     )
     assert repr(job_shop_instance) == expected_repr
+
 
 if __name__ == "__main__":
     pytest.main(["-vv", __file__])
