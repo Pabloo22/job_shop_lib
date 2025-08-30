@@ -412,11 +412,14 @@ class SingleJobShopGraphEnv(gym.Env):
         available_operations = self.dispatcher.available_operations()
         available_operations_with_ids = []
         for operation in available_operations:
+            # For now only local operation ids are obtained from the graph, still to discuss how to handle
+            # jobs or machine ids in case of them not being present in the graph
+            local_node_operation_id = self.job_shop_graph.instance_id_map['OPERATION'][operation.operation_id]
             job_id = operation.job_id
             operation_id = operation.operation_id
             for machine_id in operation.machines:
                 available_operations_with_ids.append(
-                    (operation_id, machine_id, job_id)
+                    (local_node_operation_id, machine_id, job_id)
                 )
         return available_operations_with_ids
 
