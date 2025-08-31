@@ -19,7 +19,7 @@ def remove_completed_operations(
             The dispatcher instance.
     """
     for operation in completed_operations:
-        if job_shop_graph.removed_nodes["OPERATION"][operation.operation_id]:
+        if job_shop_graph.removed_nodes["operation"][operation.operation_id]:
             continue
         node_id = job_shop_graph.get_operation_node(
             operation.operation_id

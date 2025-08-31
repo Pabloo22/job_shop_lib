@@ -28,7 +28,7 @@ class JobShopGraph:
     to analyze and solve scheduling problems.
 
     The class now generates and manages node identifiers as tuples of the
-    form `(node_type_name, local_id)`, e.g., `("OPERATION", 42)`.
+    form `(node_type_name, local_id)`, e.g., `("operation", 42)`.
 
     Args:
         instance:
@@ -114,16 +114,16 @@ class JobShopGraph:
             collections.defaultdict(dict)
         )
         self.adjacency_in: dict[
-            Node, dict[tuple[str, str, str] | EdgeType, list[Node]]
+            Node, dict[tuple[str, str, str] | tuple[str, EdgeType, str], list[Node]]
         ] = {}
         self.adjacency_out: dict[
-            Node, dict[tuple[str, str, str] | EdgeType, list[Node]]
+            Node, dict[tuple[str, str, str] | tuple[str, EdgeType, str], list[Node]]
         ] = {}
 
         if add_operation_nodes:
             self.add_operation_nodes()
 
-        self.removed_nodes[NodeType.OPERATION.name] = [
+        self.removed_nodes[NodeType.OPERATION.name.lower()] = [
             False
         ] * instance.num_operations
 
@@ -227,7 +227,7 @@ class JobShopGraph:
             inconsistencies.
         """
         # Changed: Node ID generation logic
-        node_type_name = node_for_adding.node_type.name
+        node_type_name = node_for_adding.node_type.name.lower()
         local_id = len(self._nodes_by_type[node_for_adding.node_type])
         new_id = (node_type_name, local_id)
 
@@ -241,23 +241,23 @@ class JobShopGraph:
             self._nodes_by_job[operation.job_id].append(node_for_adding)
             for machine_id in operation.machines:
                 self._nodes_by_machine[machine_id].append(node_for_adding)
-            self.instance_id_map[NodeType.OPERATION.name][
+            self.instance_id_map[NodeType.OPERATION.name.lower()][
                 operation.operation_id
             ] = node_for_adding
         elif node_for_adding.node_type == NodeType.MACHINE:
-            self.instance_id_map[NodeType.MACHINE.name][
+            self.instance_id_map[NodeType.MACHINE.name.lower()][
                 node_for_adding.machine_id
             ] = node_for_adding
-            if NodeType.MACHINE.name not in self.removed_nodes:
-                self.removed_nodes[NodeType.MACHINE.name] = [
+            if NodeType.MACHINE.name.lower() not in self.removed_nodes:
+                self.removed_nodes[NodeType.MACHINE.name.lower()] = [
                     False
                 ] * self.instance.num_machines
         elif node_for_adding.node_type == NodeType.JOB:
-            self.instance_id_map[NodeType.JOB.name][
+            self.instance_id_map[NodeType.JOB.name.lower()][
                 node_for_adding.job_id
             ] = node_for_adding
-            if NodeType.JOB.name not in self.removed_nodes:
-                self.removed_nodes[NodeType.JOB.name] = [
+            if NodeType.JOB.name.lower() not in self.removed_nodes:
+                self.removed_nodes[NodeType.JOB.name.lower()] = [
                     False
                 ] * self.instance.num_jobs
         else:
@@ -337,15 +337,17 @@ class JobShopGraph:
 
         if node_to_remove.node_type == NodeType.OPERATION:
             operation = node_to_remove.operation
-            self.removed_nodes[NodeType.OPERATION.name][
+            self.removed_nodes[NodeType.OPERATION.name.lower()][
                 operation.operation_id
             ] = True
         elif node_to_remove.node_type == NodeType.MACHINE:
-            self.removed_nodes[NodeType.MACHINE.name][
+            self.removed_nodes[NodeType.MACHINE.name.lower()][
                 node_to_remove.machine_id
             ] = True
         elif node_to_remove.node_type == NodeType.JOB:
-            self.removed_nodes[NodeType.JOB.name][node_to_remove.job_id] = True
+            self.removed_nodes[NodeType.JOB.name.lower()][
+                node_to_remove.job_id
+            ] = True
         else:
             # For other node types, we can use a default id of 0
             self.removed_nodes[node_type_name][0] = True
@@ -494,17 +496,19 @@ class JobShopGraph:
         """
 
         if node.node_type.name == NodeType.OPERATION.name:
-            return self.removed_nodes[NodeType.OPERATION.name][
+            return self.removed_nodes[NodeType.OPERATION.name.lower()][
                 node.operation.operation_id
             ]
         if node.node_type.name == NodeType.MACHINE.name:
-            return self.removed_nodes[NodeType.MACHINE.name][node.machine_id]
+            return self.removed_nodes[NodeType.MACHINE.name.lower()][
+                node.machine_id
+            ]
         if node.node_type.name == NodeType.JOB.name:
-            return self.removed_nodes[NodeType.JOB.name][node.job_id]
+            return self.removed_nodes[NodeType.JOB.name.lower()][node.job_id]
         # Default case for other node types
         return (
-            self.removed_nodes[node.node_type.name][0]
-            if node.node_type.name in self.removed_nodes
+            self.removed_nodes[node.node_type.name.lower()][0]
+            if node.node_type.name.lower() in self.removed_nodes
             else False
         )
 
@@ -567,7 +571,7 @@ class JobShopGraph:
             The node with the given id.
         """
 
-        nodes = self.instance_id_map[node_type.name]
+        nodes = self.instance_id_map[node_type.name.lower()]
         if node_id in nodes:
             return nodes[node_id]
 

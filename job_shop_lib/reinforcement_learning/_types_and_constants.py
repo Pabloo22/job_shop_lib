@@ -27,6 +27,8 @@ class ObservationSpaceKey(str, Enum):
 
     EDGE_INDEX = "edge_index_dict"
     NODE_FEATURES = "node_features_dict"
+    ACTION_MASK = "available_operations_with_ids"
+
 
 # NEW: TypedDict for the nested node features dictionary.
 class NodeFeaturesDict(TypedDict, total=False):
@@ -40,10 +42,12 @@ class NodeFeaturesDict(TypedDict, total=False):
     jobs: NDArray[np.float32]
     machines: NDArray[np.float32]
 
+
 class _ObservationDictRequired(TypedDict):
     """Required fields for the observation dictionary."""
 
     edge_index_dict: dict[tuple[str, str, str], NDArray[np.int32]]
+    available_operations_with_ids: list[tuple[int, int, int]]
 
 
 # UPDATED: Now contains the nested dictionary for node features.
@@ -63,7 +67,10 @@ class ObservationDict(_ObservationDictRequired, _ObservationDictOptional):
         edge_index_dict: A dictionary mapping edge types
             (source_type, relation, destination_type) to their respective
             edge index tensors in COO format.
-
+        available_operations_with_ids: A list of tuples representing the
+            available operations and their IDs, where each tuple is of the
+            form (local_operation_node_id, local_machine_node_id, local_job_node_id)
+            if nodes of each type are present, else -1.
     Optional fields:
         node_features_dict: A dictionary mapping node type names (from
             FeatureType) to their corresponding feature matrices.

@@ -16,16 +16,8 @@ from job_shop_lib.reinforcement_learning import (
 
 
 def random_action(observation: ObservationDict) -> tuple[int, int]:
-    ready_operations = []
-    for operation_id, is_ready in enumerate(
-        observation[ObservationSpaceKey.NODE_FEATURES.value][FeatureType.JOBS.value].ravel()
-    ):
-        if is_ready == 1.0:
-            ready_operations.append(operation_id)
-
-    operation_id = random.choice(ready_operations)
-    machine_id = -1  # We can use -1 if each operation can only be scheduled
-    # in one machine.
+    available_operations_with_ids = observation[ObservationSpaceKey.ACTION_MASK.value]
+    operation_id, machine_id, _ = random.choice(available_operations_with_ids)
     return (operation_id, machine_id)
 
 
@@ -122,26 +114,33 @@ def test_all_nodes_removed(
     env = single_job_shop_graph_env_ft06_resource_task
     obs, _ = env.reset()
     done = False
+    print("Initial observation:")
+    print(obs)
+
     while not done:
         action = random_action(obs)
-        obs, _, done, *_ = env.step(action)
-        # print(f"Action: {action}")
-        # obs, _, done, _, info = env.step(action)  # type: ignore[call-arg]
-        # from job_shop_lib.graphs import NodeType
-        # print("Current operation nodes:")
-        # for node in env.job_shop_graph.nodes_by_type[NodeType.OPERATION]:
-        #     print(f'node id: {node.node_id}, operation {node.operation}, operation id: {node.operation.operation_id}, corresponding job id: {node.operation.job_id}')
-        # print('Available operations:')
-        # print(env.dispatcher.available_operations())
-        # print("Observation after step:")
-        # print(obs)
-        # print("Info:")
-        # print(info)
-        # print()
-        # print()
-    # print the schedule
-    # print(env.dispatcher.schedule)
-    # assert 0 == 1
+        print(f"Action to be done: {action}")
+        obs, _, done, _, info = env.step(action)  # type: ignore[call-arg]
+        from job_shop_lib.graphs import NodeType
+
+        print("Current operation nodes:")
+        for node in env.job_shop_graph.nodes_by_type[NodeType.OPERATION]:
+            print(
+                f"node id: {node.node_id}, operation {node.operation}, operation id: {node.operation.operation_id}, corresponding job id: {node.operation.job_id}"
+            )
+        print("Current machine nodes:")
+        for node in env.job_shop_graph.nodes_by_type[NodeType.MACHINE]:
+            print(f"node id: {node.node_id}, machine id: {node.machine_id}")
+        print("Available operations:")
+        print(env.dispatcher.available_operations())
+        print("Observation after step:")
+        print(obs)
+        print("Info:")
+        print(info)
+        print()
+        print()
+
+    #assert 0 == 1
 
     assert env.dispatcher.schedule.is_complete()
     removed_nodes = env.job_shop_graph.removed_nodes

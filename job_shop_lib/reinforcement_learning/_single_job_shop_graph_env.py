@@ -41,11 +41,7 @@ from job_shop_lib.reinforcement_learning import (
     ObservationDict,
 )
 
-_NODE_TYPE_TO_FEATURE_TYPE = {
-    NodeType.OPERATION: FeatureType.OPERATIONS,
-    NodeType.MACHINE: FeatureType.MACHINES,
-    NodeType.JOB: FeatureType.JOBS,
-}
+
 _FEATURE_TYPE_STR_TO_NODE_TYPE = {
     FeatureType.OPERATIONS.value: NodeType.OPERATION,
     FeatureType.MACHINES.value: NodeType.MACHINE,
@@ -312,10 +308,7 @@ class SingleJobShopGraphEnv(gym.Env):
         self.dispatcher.reset()
         obs = self.get_observation()
         return obs, {
-            "feature_names": self.composite_observer.column_names,
-            "available_operations_with_ids": (
-                self.get_available_actions_with_ids()
-            ),
+            "feature_names": self.composite_observer.column_names
         }
 
     def step(
@@ -326,8 +319,8 @@ class SingleJobShopGraphEnv(gym.Env):
         Args:
             action:
                 The action to take. The action is a tuple of two integers
-                (job_id, machine_id):
-                the job ID and the machine ID in which to schedule the
+                (operation_id, machine_id):
+                the operation ID and the machine ID in which to schedule the
                 operation.
 
         Returns:
@@ -339,14 +332,16 @@ class SingleJobShopGraphEnv(gym.Env):
             - Whether the episode was truncated (always False).
             - A dictionary with additional information. The dictionary
               contains the following keys: "feature_names", the names of the
-              features in the observation; and "available_operations_with_ids",
-              a list of available actions in the form of (operation_id,
-              machine_id, job_id).
+              features in the observation.
         """
-        job_id, machine_id = action
-        operation = self.dispatcher.next_operation(job_id)
-        if machine_id == -1:
+        node_operation_id, node_machine_id = action
+        operation = self.job_shop_graph._nodes_map[('operation', node_operation_id)].operation
+        print(operation, operation.operation_id)
+        if node_machine_id == -1:
             machine_id = operation.machine_id
+        else:
+            machine_id = self.job_shop_graph._nodes_map[('machine', node_machine_id)].machine_id
+        print(machine_id)
 
         self.dispatcher.dispatch(operation, machine_id)
 
@@ -355,10 +350,7 @@ class SingleJobShopGraphEnv(gym.Env):
         done = self.dispatcher.schedule.is_complete()
         truncated = False
         info: dict[str, Any] = {
-            "feature_names": self.composite_observer.column_names,
-            "available_operations_with_ids": (
-                self.get_available_actions_with_ids()
-            ),
+            "feature_names": self.composite_observer.column_names
         }
         return obs, reward, done, truncated, info
 
@@ -377,13 +369,14 @@ class SingleJobShopGraphEnv(gym.Env):
                 # The mask is True for removed nodes; invert to get active ones
                 active_mask = ~np.array(removed_mask, dtype=bool)
                 current_matrix = matrix[active_mask]
-            
+
             node_features_dict[feature_type.value] = current_matrix
 
         # Construct the final observation dictionary with the nested structure
         observation: ObservationDict = {
             ObservationSpaceKey.EDGE_INDEX: self.job_shop_graph.edge_index_dict,
             ObservationSpaceKey.NODE_FEATURES: node_features_dict,
+            ObservationSpaceKey.ACTION_MASK: self.get_available_actions_with_ids(),
         }
         return observation
 
@@ -412,42 +405,56 @@ class SingleJobShopGraphEnv(gym.Env):
         available_operations = self.dispatcher.available_operations()
         available_operations_with_ids = []
         for operation in available_operations:
-            # For now only local operation ids are obtained from the graph, still to discuss how to handle
-            # jobs or machine ids in case of them not being present in the graph
-            local_node_operation_id = self.job_shop_graph.instance_id_map['OPERATION'][operation.operation_id]
-            job_id = operation.job_id
-            operation_id = operation.operation_id
-            for machine_id in operation.machines:
+            # For now only local operation ids are obtained from the graph
+            # jobs or machine ids will not be included if not present in the graph
+            operation_id = self.job_shop_graph.get_operation_node(
+                operation.operation_id
+            ).node_id[1]
+            if len(self.job_shop_graph.nodes_by_type[NodeType.JOB]) > 0:
+                job_id = self.job_shop_graph.get_job_node(
+                    operation.job_id
+                ).node_id[1]
+            else:
+                job_id = -1  # Use -1 to indicate job_id is not in the graph
+            if len(self.job_shop_graph.nodes_by_type[NodeType.MACHINE]) > 0:
+                for machine_id in operation.machines:
+                    machine_id = self.job_shop_graph.get_machine_node(
+                        machine_id
+                    ).node_id[1]
+                    available_operations_with_ids.append(
+                        (operation_id, machine_id, job_id)
+                    )
+            else:
                 available_operations_with_ids.append(
-                    (local_node_operation_id, machine_id, job_id)
+                    (operation_id, -1, job_id)
                 )
         return available_operations_with_ids
 
-    def validate_action(self, action: tuple[int, int]) -> None:
-        """Validates that the action is legal in the current state.
+    # def validate_action(self, action: tuple[int, int]) -> None:
+    #     """Validates that the action is legal in the current state.
 
-        Args:
-            action:
-                The action to validate. The action is a tuple of two integers
-                (job_id, machine_id).
+    #     Args:
+    #         action:
+    #             The action to validate. The action is a tuple of two integers
+    #             (job_id, machine_id).
 
-        Raises:
-            ValidationError: If the action is invalid.
-        """
-        job_id, machine_id = action
-        if not 0 <= job_id < self.instance.num_jobs:
-            raise ValidationError(f"Invalid job_id {job_id}")
+    #     Raises:
+    #         ValidationError: If the action is invalid.
+    #     """
+    #     job_id, machine_id = action
+    #     if not 0 <= job_id < self.instance.num_jobs:
+    #         raise ValidationError(f"Invalid job_id {job_id}")
 
-        if not -1 <= machine_id < self.instance.num_machines:
-            raise ValidationError(f"Invalid machine_id {machine_id}")
+    #     if not -1 <= machine_id < self.instance.num_machines:
+    #         raise ValidationError(f"Invalid machine_id {machine_id}")
 
-        # Check if job has operations left
-        job = self.instance.jobs[job_id]
-        if self.dispatcher.job_next_operation_index[job_id] >= len(job):
-            raise ValidationError(f"Job {job_id} has no operations left")
+    #     # Check if job has operations left
+    #     job = self.instance.jobs[job_id]
+    #     if self.dispatcher.job_next_operation_index[job_id] >= len(job):
+    #         raise ValidationError(f"Job {job_id} has no operations left")
 
-        next_operation = self.dispatcher.next_operation(job_id)
-        if machine_id == -1 and len(next_operation.machines) > 1:
-            raise ValidationError(
-                f"Operation {next_operation} requires a machine_id"
-            )
+    #     next_operation = self.dispatcher.next_operation(job_id)
+    #     if machine_id == -1 and len(next_operation.machines) > 1:
+    #         raise ValidationError(
+    #             f"Operation {next_operation} requires a machine_id"
+    #         )

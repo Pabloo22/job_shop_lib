@@ -20,16 +20,8 @@ from job_shop_lib.graphs.graph_updaters import ResidualGraphUpdater
 
 
 def _random_action(observation: ObservationDict) -> tuple[int, int]:
-    ready_operations = []
-    for operation_id, is_ready in enumerate(
-        observation[ObservationSpaceKey.NODE_FEATURES.value][FeatureType.JOBS.value].ravel()
-    ):
-        if is_ready == 1.0:
-            ready_operations.append(operation_id)
-
-    operation_id = random.choice(ready_operations)
-    machine_id = -1  # We can use -1 if each operation can only be scheduled
-    # in one machine.
+    available_operations_with_ids = observation[ObservationSpaceKey.ACTION_MASK.value]
+    operation_id, machine_id, _ = random.choice(available_operations_with_ids)
     return (operation_id, machine_id)
 
 

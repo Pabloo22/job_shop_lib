@@ -49,7 +49,7 @@ def test_node_ids(example_job_shop_instance):
         assert isinstance(node_id[1], int)
 
         # Assert the node type in the ID matches the node's actual type
-        assert node_id[0] == node.node_type.name
+        assert node_id[0] == node.node_type.name.lower()
 
         # Assert that we can retrieve the exact same node using its ID
         # This tests the `_nodes_map` functionality.
