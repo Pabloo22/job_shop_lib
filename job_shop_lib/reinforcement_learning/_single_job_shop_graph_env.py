@@ -60,13 +60,13 @@ class SingleJobShopGraphEnv(gym.Env):
     Observation Space:
         A dictionary with the following keys:
 
-        - "removed_nodes": Binary vector indicating removed graph nodes.
-        - "edge_list": Matrix of graph edges in COO format.
-        - Feature matrices: Keys corresponding to the composite observer
-          features (e.g., "operations", "jobs", "machines").
+        - "edge_index_dict": Dictionary mapping edge types to their COO format indices.
+        - "available_operations_with_ids": List of available actions
+          represented as (operation_id, machine_id, job_id) tuples.
+        - "node_features_dict": (optional) Dictionary mapping node types to their feature matrices.
 
     Action Space:
-        MultiDiscrete space representing (job_id, machine_id) pairs.
+        MultiDiscrete space representing (operation_id, machine_id) pairs.
 
     Render Modes:
 
@@ -94,18 +94,16 @@ class SingleJobShopGraphEnv(gym.Env):
 
         action_space:
             Defines the action space. The action is a tuple of two integers
-            (job_id, machine_id). The machine_id can be -1 if the selected
+            (operation_id, machine_id). The machine_id can be -1 if the selected
             operation can only be scheduled in one machine.
 
         observation_space:
             Defines the observation space. The observation is a dictionary
             with the following keys:
 
-            - "removed_nodes": Dictionary of binary vectors by node type
-                indicating removed nodes.
-            - "edge_list": Dictionary of edge lists in COO format by edge type.
-            - Feature matrices: Keys corresponding to the composite observer
-                features (e.g., "operations", "jobs", "machines").
+            - "edge_index_dict": Dictionary mapping edge types to their COO format indices.
+            - "available_operations_with_ids": List of available actions represented as (operation_id, machine_id, job_id) tuples.
+            - "node_features_dict": (optional) Dictionary mapping node types to their feature matrices.
 
         render_mode:
             The mode for rendering the environment ("human", "save_video",
@@ -307,9 +305,7 @@ class SingleJobShopGraphEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self.dispatcher.reset()
         obs = self.get_observation()
-        return obs, {
-            "feature_names": self.composite_observer.column_names
-        }
+        return obs, {"feature_names": self.composite_observer.column_names}
 
     def step(
         self, action: tuple[int, int]
@@ -335,12 +331,16 @@ class SingleJobShopGraphEnv(gym.Env):
               features in the observation.
         """
         node_operation_id, node_machine_id = action
-        operation = self.job_shop_graph._nodes_map[('operation', node_operation_id)].operation
+        operation = self.job_shop_graph._nodes_map[
+            ("operation", node_operation_id)
+        ].operation
         print(operation, operation.operation_id)
         if node_machine_id == -1:
             machine_id = operation.machine_id
         else:
-            machine_id = self.job_shop_graph._nodes_map[('machine', node_machine_id)].machine_id
+            machine_id = self.job_shop_graph._nodes_map[
+                ("machine", node_machine_id)
+            ].machine_id
         print(machine_id)
 
         self.dispatcher.dispatch(operation, machine_id)

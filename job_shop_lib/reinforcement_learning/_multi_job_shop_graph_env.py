@@ -172,7 +172,7 @@ class MultiJobShopGraphEnv(gym.Env):
         ] = DispatcherObserverConfig(class_type=MakespanReward),
         render_mode: str | None = None,
         render_config: RenderConfig | None = None,
-        use_padding: bool = True,
+        use_padding: bool = False,
     ) -> None:
         super().__init__()
 

@@ -18,7 +18,8 @@ class JobShopGraph:
     """Represents a :class:`JobShopInstance` as a heterogeneous directed graph.
 
     Provides a comprehensive graph-based representation of a job shop
-    scheduling problem, utilizing the ``networkx`` library to model the complex
+    scheduling problem, utilizing outgoing and incoming edges adjacency lists
+     with multiple edge types to model the complex
     relationships between jobs, operations, and machines. This class transforms
     the abstract scheduling problem into a directed graph, where various
     entities (jobs, machines, and operations) are nodes, and the dependencies
@@ -27,7 +28,7 @@ class JobShopGraph:
     This transformation allows for the application of graph algorithms
     to analyze and solve scheduling problems.
 
-    The class now generates and manages node identifiers as tuples of the
+    The class generates and manages node identifiers as tuples of the
     form `(node_type_name, local_id)`, e.g., `("operation", 42)`.
 
     Args:
@@ -53,7 +54,7 @@ class JobShopGraph:
         "removed_nodes": (
             "Dictionary mapping instance ids to a boolean indicating whether "
             "a node has been removed."
-            "The keys are node types, and the values are dictionaries mapping "
+            "The keys are node types, and the values are lists mapping "
             "instance ids to booleans. This allows for quick access "
             "to removed nodes by their instance ids."
         ),
@@ -69,6 +70,8 @@ class JobShopGraph:
             "keys are either edge types or tuples of (source_node_type, "
             "'to', destination_node_type), and the values are lists of "
             "nodes that are connected to the key node type or tuple."
+            "In case of conjunctive or disjunctive edges, these edge types"
+            "will replace the 'to' component of the type tuple"
         ),
         "adjacency_out": (
             "Stores graph adjacency information of outgoing edges,"
@@ -76,15 +79,16 @@ class JobShopGraph:
             "keys are either edge types or tuples of (source_node_type, "
             "'to', destination_node_type), and the values are lists of "
             "nodes that are connected to the key node type or tuple."
+            "In case of conjunctive or disjunctive edges, these edge types"
+            "will replace the 'to' component of the type tuple"
         ),
         "edge_types": (
             "A set of all edge types present in the graph."
             "Only includes tuples of "
             "(source_node_type, 'to', destination_node_type),"
             "processing conjunctive and disjunctive edges, "
-            "not including them in the set"
-            "but inferring them from the nodes forming "
-            "the edges of said types."
+            "replacing the 'to' component of the type tuple"
+            "with the appropriate edge type"
         ),
     }
 
@@ -114,10 +118,12 @@ class JobShopGraph:
             collections.defaultdict(dict)
         )
         self.adjacency_in: dict[
-            Node, dict[tuple[str, str, str] | tuple[str, EdgeType, str], list[Node]]
+            Node,
+            dict[tuple[str, str, str] | tuple[str, EdgeType, str], list[Node]],
         ] = {}
         self.adjacency_out: dict[
-            Node, dict[tuple[str, str, str] | tuple[str, EdgeType, str], list[Node]]
+            Node,
+            dict[tuple[str, str, str] | tuple[str, EdgeType, str], list[Node]],
         ] = {}
 
         if add_operation_nodes:
@@ -280,7 +286,9 @@ class JobShopGraph:
         It automatically determines the edge type based on the source and
         destination nodes unless explicitly provided in the ``attr`` argument
         via the ``type`` key. The edge type is a tuple of strings:
-        ``(source_node_type, "to", destination_node_type)``.
+        ``(source_node_type, "to", destination_node_type)``. If edges of
+        type "conjunctive" or "disjunctive" are being added, the "to"
+        component of the edge type will be replaced accordingly.
 
         Args:
             u_of_edge:

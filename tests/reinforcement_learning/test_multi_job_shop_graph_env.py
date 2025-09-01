@@ -20,7 +20,9 @@ from job_shop_lib.graphs.graph_updaters import ResidualGraphUpdater
 
 
 def _random_action(observation: ObservationDict) -> tuple[int, int]:
-    available_operations_with_ids = observation[ObservationSpaceKey.ACTION_MASK.value]
+    available_operations_with_ids = observation[
+        ObservationSpaceKey.ACTION_MASK.value
+    ]
     operation_id, machine_id, _ = random.choice(available_operations_with_ids)
     return (operation_id, machine_id)
 

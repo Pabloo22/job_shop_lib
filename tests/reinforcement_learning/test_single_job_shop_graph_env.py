@@ -16,7 +16,9 @@ from job_shop_lib.reinforcement_learning import (
 
 
 def random_action(observation: ObservationDict) -> tuple[int, int]:
-    available_operations_with_ids = observation[ObservationSpaceKey.ACTION_MASK.value]
+    available_operations_with_ids = observation[
+        ObservationSpaceKey.ACTION_MASK.value
+    ]
     operation_id, machine_id, _ = random.choice(available_operations_with_ids)
     return (operation_id, machine_id)
 
@@ -119,28 +121,7 @@ def test_all_nodes_removed(
 
     while not done:
         action = random_action(obs)
-        print(f"Action to be done: {action}")
         obs, _, done, _, info = env.step(action)  # type: ignore[call-arg]
-        from job_shop_lib.graphs import NodeType
-
-        print("Current operation nodes:")
-        for node in env.job_shop_graph.nodes_by_type[NodeType.OPERATION]:
-            print(
-                f"node id: {node.node_id}, operation {node.operation}, operation id: {node.operation.operation_id}, corresponding job id: {node.operation.job_id}"
-            )
-        print("Current machine nodes:")
-        for node in env.job_shop_graph.nodes_by_type[NodeType.MACHINE]:
-            print(f"node id: {node.node_id}, machine id: {node.machine_id}")
-        print("Available operations:")
-        print(env.dispatcher.available_operations())
-        print("Observation after step:")
-        print(obs)
-        print("Info:")
-        print(info)
-        print()
-        print()
-
-    #assert 0 == 1
 
     assert env.dispatcher.schedule.is_complete()
     removed_nodes = env.job_shop_graph.removed_nodes
