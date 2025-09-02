@@ -191,7 +191,6 @@ class MultiJobShopGraphEnv(gym.Env):
             ready_operations_filter=ready_operations_filter,
             render_mode=render_mode,
             render_config=render_config,
-            use_padding=use_padding,
         )
         self.instance_generator = instance_generator
         self.graph_initializer = graph_initializer
@@ -293,7 +292,6 @@ class MultiJobShopGraphEnv(gym.Env):
             ready_operations_filter=self.ready_operations_filter,
             render_mode=self.render_mode,
             render_config=self.render_config,
-            use_padding=self.single_job_shop_graph_env.use_padding,
         )
         obs, info = self.single_job_shop_graph_env.reset(
             seed=seed, options=options

@@ -123,7 +123,7 @@ class JobShopGraph:
         ] = {}
         self.adjacency_out: dict[
             Node,
-            dict[tuple[str, str, str] | tuple[str, EdgeType, str], list[Node]],
+            dict[tuple[str, str, str], list[Node]],
         ] = {}
 
         if add_operation_nodes:
@@ -133,7 +133,7 @@ class JobShopGraph:
             False
         ] * instance.num_operations
 
-        self.edge_types = set()
+        self.edge_types = set[tuple[str, str, str]]()
 
     @property
     def graph(self) -> nx.DiGraph:

@@ -6,12 +6,12 @@ import gymnasium as gym
 
 import numpy as np
 
-from job_shop_lib.dispatching.feature_observers import FeatureType
 
 from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
     ObservationSpaceKey,
     ObservationDict,
+    add_padding
 )
 
 
@@ -23,37 +23,41 @@ def random_action(observation: ObservationDict) -> tuple[int, int]:
     return (operation_id, machine_id)
 
 
-@pytest.mark.skip
 def test_observation_space(
     single_job_shop_graph_env_ft06: SingleJobShopGraphEnv,
 ):
     env = single_job_shop_graph_env_ft06
     observation_space = single_job_shop_graph_env_ft06.observation_space
-    num_edges = env.job_shop_graph.num_edges
+    num_edges = env.initial_job_shop_graph.num_edges
     edge_index_shape = [2, 0]
 
-    if env.use_padding:
-        i = 0
-        for _, space in list(
-            observation_space[ObservationSpaceKey.EDGE_INDEX].spaces.items()
-        ):
-            edge_index_shape[1] += space.shape[1]
-            i += 1
-        assert tuple(edge_index_shape) == (2, num_edges * i)
-    else:
-        for _, space in list(
-            observation_space[ObservationSpaceKey.EDGE_INDEX].spaces.items()
-        ):
-            edge_index_shape[1] += space.shape[1]
-        assert tuple(edge_index_shape) == (2, env.job_shop_graph.num_edges)
+    print(f"Init num edges: {num_edges}")
+    print(f"Observation_space_num_edges_per_type: {list(observation_space[ObservationSpaceKey.EDGE_INDEX].spaces.items())[0][1].shape[1]}")
+    print(f"num_nodes {len(env.initial_job_shop_graph._nodes)}")
+    for _, space in list(
+        observation_space[ObservationSpaceKey.EDGE_INDEX].spaces.items()
+    ):
+        edge_index_shape[1] += space.shape[1]
+    assert tuple(edge_index_shape) == (2, num_edges * len(env.job_shop_graph.edge_types))
 
     done = False
     obs, _ = env.reset()
-    assert observation_space.contains(obs)
+    new_edge_index = {edge_type: add_padding(edges, (2, num_edges), dtype=np.int32) for edge_type, edges in obs[ObservationSpaceKey.EDGE_INDEX.value].items()}
+    new_obs = obs.copy()
+    del new_obs[ObservationSpaceKey.ACTION_MASK.value]
+    new_obs[ObservationSpaceKey.EDGE_INDEX.value] = new_edge_index
+    print(new_obs)
+    for edge_type, edges in new_obs[ObservationSpaceKey.EDGE_INDEX.value].items():
+        print(f"Edge type: {edge_type}, Edges: {edges.shape}")
+    assert observation_space.contains(new_obs)
     while not done:
         action = random_action(obs)
         obs, _, done, *_ = env.step(action)
-        assert observation_space.contains(obs)
+        new_edge_index = {edge_type: add_padding(edges, (2, num_edges), dtype=np.int32) for edge_type, edges in obs[ObservationSpaceKey.EDGE_INDEX.value].items()}
+        new_obs = obs.copy()
+        del new_obs[ObservationSpaceKey.ACTION_MASK.value]
+        new_obs[ObservationSpaceKey.EDGE_INDEX.value] = new_edge_index
+        assert observation_space.contains(new_obs)
 
     env.use_padding = False
     done = False
@@ -73,8 +77,8 @@ def test_observation_space(
     assert edge_index_has_changed
 
 
-@pytest.mark.skip
-def test_edge_index_padding(
+
+def test_observation(
     single_job_shop_graph_env_ft06: SingleJobShopGraphEnv,
 ):
     env = single_job_shop_graph_env_ft06
@@ -86,27 +90,26 @@ def test_edge_index_padding(
         obs, _, done, *_ = env.step(action)
 
         edge_index = obs[ObservationSpaceKey.EDGE_INDEX.value]
-        edges = env.observation_space[  # type: ignore[index]
-            ObservationSpaceKey.EDGE_INDEX.value
-        ].shape[1]
-        assert edge_index.shape == (2, edges)
-
-        padding_mask = edge_index == -1
-        if np.any(padding_mask):
-            # Ensure all padding is at the end
-            for row in padding_mask:
-                padding_start = np.argmax(row)
-                if padding_start > 0:
-                    assert np.all(row[padding_start:])
+        
+        for edge_type, edges in edge_index.items():
+            assert edge_type in env.job_shop_graph.edge_types
+            assert edges.ndim == 2 and edges.shape[0] == 2, \
+                f"Edge index shape mismatch for {edge_type}: {edges.shape}"
+            src_nodes_type, _, dst_nodes_type = edge_type
+            src_nodes, dst_nodes = edges
+            src_type_removed_nodes = env.job_shop_graph.removed_nodes[src_nodes_type]
+            dst_type_removed_nodes = env.job_shop_graph.removed_nodes[dst_nodes_type]
+            max_src_id = len(src_type_removed_nodes) - sum(src_type_removed_nodes) - 1
+            max_dst_id = len(dst_type_removed_nodes) - sum(dst_type_removed_nodes) - 1
+            assert np.all(src_nodes <= max_src_id), f"Source nodes {src_nodes} exceed max id {max_src_id}"
+            assert np.all(dst_nodes <= max_dst_id), f"Destination nodes {dst_nodes} exceed max id {max_dst_id}"
 
     assert env.dispatcher.schedule.is_complete()
     try:
-        assert np.all(obs[ObservationSpaceKey.REMOVED_NODES.value])
+        assert len(obs[ObservationSpaceKey.ACTION_MASK.value]) == 0
     except AssertionError:
-        print(obs[ObservationSpaceKey.REMOVED_NODES.value])
-        print(env.instance.to_dict())
-        print(env.instance)
-        print(env.job_shop_graph.nodes)
+        print("Action mask is not empty but schedule is complete:")
+        print(obs[ObservationSpaceKey.ACTION_MASK.value])
         raise
 
 

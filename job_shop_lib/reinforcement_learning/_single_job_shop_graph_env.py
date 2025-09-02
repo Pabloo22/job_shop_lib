@@ -1,7 +1,6 @@
 """Home of the `SingleJobShopGraphEnv` class."""
 
 from copy import deepcopy
-from collections import defaultdict
 from collections.abc import Callable, Sequence
 from typing import Any
 import warnings
@@ -18,7 +17,6 @@ from job_shop_lib.graphs.graph_updaters import (
     GraphUpdater,
     ResidualGraphUpdater,
 )
-from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import (
     Dispatcher,
     filter_dominated_operations,
@@ -35,7 +33,6 @@ from job_shop_lib.visualization.gantt import GanttChartCreator
 from job_shop_lib.reinforcement_learning import (
     RewardObserver,
     MakespanReward,
-    add_padding,
     RenderConfig,
     ObservationSpaceKey,
     ObservationDict,
@@ -60,10 +57,12 @@ class SingleJobShopGraphEnv(gym.Env):
     Observation Space:
         A dictionary with the following keys:
 
-        - "edge_index_dict": Dictionary mapping edge types to their COO format indices.
+        - "edge_index_dict": Dictionary mapping edge types to
+          their COO format indices.
         - "available_operations_with_ids": List of available actions
           represented as (operation_id, machine_id, job_id) tuples.
-        - "node_features_dict": (optional) Dictionary mapping node types to their feature matrices.
+        - "node_features_dict": (optional) Dictionary mapping node types to
+          their feature matrices.
 
     Action Space:
         MultiDiscrete space representing (operation_id, machine_id) pairs.
@@ -94,16 +93,20 @@ class SingleJobShopGraphEnv(gym.Env):
 
         action_space:
             Defines the action space. The action is a tuple of two integers
-            (operation_id, machine_id). The machine_id can be -1 if the selected
-            operation can only be scheduled in one machine.
+            (operation_id, machine_id). The machine_id can be -1 if the
+            selected operation can only be scheduled in one machine.
 
         observation_space:
             Defines the observation space. The observation is a dictionary
             with the following keys:
 
-            - "edge_index_dict": Dictionary mapping edge types to their COO format indices.
-            - "available_operations_with_ids": List of available actions represented as (operation_id, machine_id, job_id) tuples.
-            - "node_features_dict": (optional) Dictionary mapping node types to their feature matrices.
+            - "edge_index_dict": Dictionary mapping edge types to
+              their COO format indices.
+            - "available_operations_with_ids": List of available
+              actions represented as
+              (operation_id, machine_id, job_id) tuples.
+            - "node_features_dict": (optional) Dictionary mapping
+              node types to their feature matrices.
 
         render_mode:
             The mode for rendering the environment ("human", "save_video",
@@ -112,10 +115,6 @@ class SingleJobShopGraphEnv(gym.Env):
         gantt_chart_creator:
             Creates Gantt chart visualizations. See
             :class:`~job_shop_lib.visualization.GanttChartCreator`.
-
-        use_padding:
-            Whether to use padding in observations. Padding maintains the
-            observation space shape when the number of nodes changes.
 
     Args:
         job_shop_graph:
@@ -135,9 +134,6 @@ class SingleJobShopGraphEnv(gym.Env):
         render_config:
             Configuration for rendering (e.g., paths for saving videos
             or GIFs). See :class:`~job_shop_lib.visualization.RenderConfig`.
-        use_padding:
-            Whether to use padding in observations. Padding maintains the
-            observation space shape when the number of nodes changes.
     """
 
     metadata = {"render_modes": ["human", "save_video", "save_gif"]}
@@ -166,7 +162,6 @@ class SingleJobShopGraphEnv(gym.Env):
         ) = filter_dominated_operations,
         render_mode: str | None = None,
         render_config: RenderConfig | None = None,
-        use_padding: bool = False,
     ) -> None:
         super().__init__()
         # Used for resetting the environment
@@ -194,7 +189,6 @@ class SingleJobShopGraphEnv(gym.Env):
         self.action_space = gym.spaces.MultiDiscrete(
             [self.instance.num_jobs, self.instance.num_machines], start=[0, -1]
         )
-        self.use_padding = use_padding
         self.observation_space: gym.spaces.Dict = self._get_observation_space()
         self.render_mode = render_mode
         if render_config is None:
@@ -272,8 +266,7 @@ class SingleJobShopGraphEnv(gym.Env):
         return gym.spaces.Dict(
             {
                 ObservationSpaceKey.EDGE_INDEX: edge_index_space,
-                ObservationSpaceKey.NODE_FEATURES: node_features_space,
-            }
+                ObservationSpaceKey.NODE_FEATURES: node_features_space,            }
         )
 
     def reset(
@@ -405,8 +398,10 @@ class SingleJobShopGraphEnv(gym.Env):
         available_operations = self.dispatcher.available_operations()
         available_operations_with_ids = []
         for operation in available_operations:
-            # For now only local operation ids are obtained from the graph
-            # jobs or machine ids will not be included if not present in the graph
+            # For now only local operation ids are obtained
+            # from the graph
+            # jobs or machine ids will not be included
+            # if not present in the graph
             operation_id = self.job_shop_graph.get_operation_node(
                 operation.operation_id
             ).node_id[1]

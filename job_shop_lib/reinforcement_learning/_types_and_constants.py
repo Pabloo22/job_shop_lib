@@ -69,7 +69,10 @@ class ObservationDict(_ObservationDictRequired, _ObservationDictOptional):
             edge index tensors in COO format.
         available_operations_with_ids: A list of tuples representing the
             available operations and their IDs, where each tuple is of the
-            form (local_operation_node_id, local_machine_node_id, local_job_node_id)
+            form
+            (local_operation_node_id,
+            local_machine_node_id,
+            local_job_node_id)
             if nodes of each type are present, else -1.
     Optional fields:
         node_features_dict: A dictionary mapping node type names (from
