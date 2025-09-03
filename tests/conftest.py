@@ -163,6 +163,10 @@ def single_job_shop_graph_env_ft06() -> SingleJobShopGraphEnv:
         DispatcherObserverConfig(
             FeatureObserverType.IS_READY,
             kwargs={"feature_types": [FeatureType.JOBS]},
+        ),
+        DispatcherObserverConfig(
+            FeatureObserverType.IS_COMPLETED,
+            kwargs={"feature_types": [FeatureType.OPERATIONS]},
         )
     ]
 

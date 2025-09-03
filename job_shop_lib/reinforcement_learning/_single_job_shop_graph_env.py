@@ -355,7 +355,7 @@ class SingleJobShopGraphEnv(gym.Env):
         for feature_type, matrix in self.composite_observer.features.items():
             # Use the provided mapping for robust conversion
             node_type = _FEATURE_TYPE_STR_TO_NODE_TYPE[feature_type.value]
-            removed_mask = removed_nodes.get(node_type)
+            removed_mask = removed_nodes.get(node_type.name.lower())
 
             current_matrix = matrix
             if removed_mask is not None:
