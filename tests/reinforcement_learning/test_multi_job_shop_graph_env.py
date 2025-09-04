@@ -16,6 +16,7 @@ from job_shop_lib.dispatching.feature_observers import (
     IsCompletedObserver,
     FeatureType,
 )
+from job_shop_lib.graphs import NodeType
 from job_shop_lib.graphs.graph_updaters import ResidualGraphUpdater
 
 
@@ -76,33 +77,71 @@ def test_observation_space(
     assert edge_index_has_changed
 
 
-@pytest.mark.skip
-def test_edge_index_padding(
+def test_observation(
     multi_job_shop_graph_env: MultiJobShopGraphEnv,
 ):
-    random.seed(100)
+    """
+    Tests the integrity of the observation space throughout a full episode.
+
+    This test verifies that:
+    1.  Edge indices in the observation correctly map to active nodes in the graph.
+    2.  Node features for completed operations are properly zeroed out.
+    3.  The number of node features matches the current number of nodes in the graph.
+    4.  The episode concludes with a complete schedule and no available actions.
+    """
     env = multi_job_shop_graph_env
+    obs, _ = env.reset()
+    done = False
 
-    for _ in range(1):
-        done = False
-        obs, _ = env.reset()
-        while not done:
-            action = _random_action(obs)
-            obs, _, done, *_ = env.step(action)
+    while not done:
+        action = _random_action(obs)
+        obs, _, done, *_ = env.step(action)
 
-            edge_index = obs[ObservationSpaceKey.EDGE_INDEX.value]
-            num_edges = env.observation_space[  # type: ignore[index]
-                ObservationSpaceKey.EDGE_INDEX.value
-            ].shape[1]
-            assert edge_index.shape == (2, num_edges)
+        # 1. Verify edge indices
+        edge_index_dict = obs[ObservationSpaceKey.EDGE_INDEX.value]
+        for edge_type, edges in edge_index_dict.items():
+            assert edge_type in env.job_shop_graph.edge_types
+            assert edges.ndim == 2 and edges.shape[0] == 2, (
+                f"Edge index shape mismatch for {edge_type}: {edges.shape}"
+            )
+            # Ensure all node indices in edges are valid and point to active nodes
+            src_nodes_type, _, dst_nodes_type = edge_type
+            src_nodes, dst_nodes = edges
 
-            padding_mask = edge_index == -1
-            if np.any(padding_mask):
-                # Ensure all padding is at the end
-                for row in padding_mask:
-                    padding_start = np.argmax(row)
-                    if padding_start > 0:
-                        assert np.all(row[padding_start:])
+            # Calculate the maximum valid ID for source and destination node types
+            src_type_removed_nodes = env.job_shop_graph.removed_nodes[src_nodes_type]
+            dst_type_removed_nodes = env.job_shop_graph.removed_nodes[dst_nodes_type]
+            max_src_id = len(src_type_removed_nodes) - sum(src_type_removed_nodes) - 1
+            max_dst_id = len(dst_type_removed_nodes) - sum(dst_type_removed_nodes) - 1
+            
+            if edges.size > 0: # Only check if there are edges of this type
+                assert np.all(src_nodes <= max_src_id), (
+                    f"Source nodes {src_nodes} exceed max id {max_src_id} for type {src_nodes_type.name}"
+                )
+                assert np.all(dst_nodes <= max_dst_id), (
+                    f"Destination nodes {dst_nodes} exceed max id {max_dst_id} for type {dst_nodes_type.name}"
+                )
+
+        # 2. Verify that features of completed operations are removed (sum to zero)
+        op_features = obs[ObservationSpaceKey.NODE_FEATURES.value][FeatureType.OPERATIONS.value]
+        op_completed_feats_sum = np.sum(op_features)
+        assert op_completed_feats_sum == 0, (
+            "Operation features are not correctly zeroed out for completed nodes. "
+            f"Sum should be 0 but got {op_completed_feats_sum}"
+        )
+
+        # 3. Verify that the number of node features matches the number of active nodes
+        assert op_features.shape[0] == len(env.job_shop_graph.nodes_by_type[NodeType.OPERATION]), (
+            f"Operation features shape mismatch: {op_features.shape[0]} != "
+            f"{len(env.job_shop_graph.nodes_by_type[NodeType.OPERATION])}"
+        )
+
+    # 4. Verify terminal state
+    assert env.dispatcher.schedule.is_complete()
+    assert len(obs[ObservationSpaceKey.ACTION_MASK.value]) == 0, (
+        "Action mask should be empty at the end of the episode but is not. "
+        f"Mask: {obs[ObservationSpaceKey.ACTION_MASK.value]}"
+    )
 
 
 def test_all_nodes_are_removed(

@@ -235,7 +235,11 @@ def multi_job_shop_graph_env() -> MultiJobShopGraphEnv:
         DispatcherObserverConfig(
             FeatureObserverType.IS_READY,
             kwargs={"feature_types": [FeatureType.JOBS]},
-        )
+        ),
+        DispatcherObserverConfig(
+            FeatureObserverType.IS_COMPLETED,
+            kwargs={"feature_types": [FeatureType.OPERATIONS]},
+        ),
     ]
 
     env = MultiJobShopGraphEnv(
