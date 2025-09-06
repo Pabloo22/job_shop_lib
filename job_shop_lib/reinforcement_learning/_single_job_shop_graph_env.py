@@ -242,32 +242,47 @@ class SingleJobShopGraphEnv(gym.Env):
 
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
-        num_edges = self.initial_job_shop_graph.num_edges
-        num_nodes = len(self.initial_job_shop_graph.nodes)
+
+        obs_space = gym.spaces.Dict()
+        initial_edge_index_dict = self.initial_job_shop_graph.edge_index_dict
         edge_index_space = gym.spaces.Dict(
             {
                 key: gym.spaces.Box(
-                    low=-1,
-                    high=num_nodes - 1,
-                    shape=(2, num_edges),
+                    low=0,
+                    high=np.iinfo(np.int32).max,
+                    shape=edges.shape,
                     dtype=np.int32,
                 )
-                for key in self.initial_job_shop_graph.edge_types
+                for key, edges in initial_edge_index_dict.items()
             }
         )
+        obs_space[ObservationSpaceKey.EDGE_INDEX] = edge_index_space
+
+        single_tuple_space = gym.spaces.Box(
+            low=np.array([-1, -1, -1], dtype=np.int32),
+            high=np.array([
+                len(self.job_shop_graph.nodes_by_type[NodeType.OPERATION]) - 1,
+                len(self.job_shop_graph.nodes_by_type[NodeType.MACHINE]) - 1,
+                len(self.job_shop_graph.nodes_by_type[NodeType.JOB]) - 1,
+            ], dtype=np.int32),
+            shape=(3,),
+            dtype=np.int32
+        )
+        available_actions_with_ids_space = gym.spaces.Sequence(single_tuple_space)
+        obs_space[ObservationSpaceKey.ACTION_MASK] = available_actions_with_ids_space
+        if not self.composite_observer.features:
+            return obs_space
         node_features_space = gym.spaces.Dict(
             {
                 feature_type.value: gym.spaces.Box(
-                    low=-np.inf, high=np.inf, shape=matrix.shape
+                    low=-np.inf, high=np.inf, shape=matrix.shape, dtype=np.float32
                 )
                 for feature_type, matrix in self.composite_observer.features.items()
             }
         )
-        return gym.spaces.Dict(
-            {
-                ObservationSpaceKey.EDGE_INDEX: edge_index_space,
-                ObservationSpaceKey.NODE_FEATURES: node_features_space,            }
-        )
+        obs_space[ObservationSpaceKey.NODE_FEATURES] = node_features_space
+
+        return obs_space
 
     def reset(
         self,
@@ -417,11 +432,11 @@ class SingleJobShopGraphEnv(gym.Env):
                         machine_id
                     ).node_id[1]
                     available_operations_with_ids.append(
-                        (operation_id, machine_id, job_id)
+                        np.array([operation_id, machine_id, job_id], dtype=np.int32)
                     )
             else:
                 available_operations_with_ids.append(
-                    (operation_id, -1, job_id)
+                    np.array([operation_id, -1, job_id], dtype=np.int32)
                 )
         return available_operations_with_ids
 

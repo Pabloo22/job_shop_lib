@@ -594,7 +594,8 @@ class JobShopGraph:
                 if len(neighbors) == 0:
                     continue
                 dst = np.array(
-                    [[src, neighbor.node_id[1]] for neighbor in neighbors]
+                    [[src, neighbor.node_id[1]] for neighbor in neighbors],
+                    dtype=np.int32
                 ).T
                 edge_index[edge_type] = np.hstack((edge_index[edge_type], dst))
-        return edge_index
+        return dict(edge_index)

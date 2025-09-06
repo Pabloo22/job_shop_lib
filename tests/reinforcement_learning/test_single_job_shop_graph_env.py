@@ -28,7 +28,86 @@ def random_action(observation: ObservationDict) -> tuple[int, int]:
     operation_id, machine_id, _ = random.choice(available_operations_with_ids)
     return (operation_id, machine_id)
 
-@pytest.mark.skip
+def debug_observation(obs, space):
+    """Prints a detailed comparison of an observation and its space."""
+    print("--- STARTING OBSERVATION DEBUG ---")
+
+    # 1. Top-Level Key Check
+    obs_keys = set(obs.keys())
+    space_keys = set(space.keys())
+    if obs_keys != space_keys:
+        print(f"❌ MISMATCH: Top-level keys do not match!")
+        print(f"   Obs Keys:   {sorted(list(obs_keys))}")
+        print(f"   Space Keys: {sorted(list(space_keys))}")
+        # Find differences
+        print(f"   Missing in Obs:   {space_keys - obs_keys}")
+        print(f"   Extra in Obs:     {obs_keys - space_keys}")
+        return
+
+    print("✅ Top-level keys match.")
+
+    # 2. Check Each Component
+    for key, obs_value in obs.items():
+        sub_space = space[key]
+        print(f"\n--- Checking Component: '{key}' ---")
+
+        # Handle Dict spaces (like NODE_FEATURES and EDGE_INDEX)
+        if isinstance(sub_space, gym.spaces.Dict):
+            obs_sub_keys = set(obs_value.keys())
+            space_sub_keys = set(sub_space.keys())
+            if obs_sub_keys != space_sub_keys:
+                print(f"❌ MISMATCH: Keys inside '{key}' do not match!")
+                print(f"   Obs Keys:   {sorted(list(obs_sub_keys))}")
+                print(f"   Space Keys: {sorted(list(space_sub_keys))}")
+                continue
+
+            print(f"✅ Keys inside '{key}' match.")
+            # Check each array in the Dict
+            for sub_key, array in obs_value.items():
+                array_space = sub_space[sub_key]
+                if not array_space.contains(array):
+                    print(f"❌ MISMATCH: Array '{key}':'{sub_key}' is invalid!")
+                    print(f"   Obs Shape: {array.shape}, Space Shape: {array_space.shape}")
+                    print(f"   Obs Dtype: {array.dtype}, Space Dtype: {array_space.dtype}")
+                    if array.shape != array_space.shape:
+                        print("   Reason: SHAPE MISMATCH")
+                    elif array.dtype != array_space.dtype:
+                        print("   Reason: DTYPE MISMATCH")
+                    else:
+                        print("   Reason: VALUE OUT OF BOUNDS")
+                else:
+                    print(f"✅ Array '{key}':'{sub_key}' is valid.")
+
+        # Handle Sequence spaces (like ACTION_MASK)
+        elif isinstance(sub_space, gym.spaces.Sequence):
+            if not isinstance(obs_value, (list, tuple)):
+                print(f"❌ MISMATCH: '{key}' should be a list or tuple, but got {type(obs_value)}")
+                continue
+
+            print(f"✅ Component '{key}' is a list/tuple.")
+            if len(obs_value) > 0:
+                # Check the type of the first element
+                first_elem = obs_value[0]
+                if not isinstance(first_elem, np.ndarray):
+                     print(f"❌ MISMATCH: Elements in '{key}' should be np.ndarray, but found {type(first_elem)}")
+                     continue
+                print(f"✅ Elements in '{key}' are of type np.ndarray.")
+
+                # Check each element in the sequence
+                for i, elem in enumerate(obs_value):
+                    if not sub_space.feature_space.contains(elem):
+                        print(f"❌ MISMATCH: Element {i} in '{key}' is invalid!")
+                        elem_space = sub_space.feature_space
+                        print(f"   Obs Shape: {elem.shape}, Space Shape: {elem_space.shape}")
+                        print(f"   Obs Dtype: {elem.dtype}, Space Dtype: {elem_space.dtype}")
+                        print(f"   Obs Value: {elem}")
+                        break
+                else:
+                    print(f"✅ All elements in '{key}' are valid.")
+            else:
+                print("✅ Component '{key}' is an empty list, which is valid.")
+    print("\n--- DEBUGGING COMPLETE ---")
+
 def test_observation_space(
     single_job_shop_graph_env_ft06: SingleJobShopGraphEnv,
 ):
@@ -36,22 +115,16 @@ def test_observation_space(
     observation_space = single_job_shop_graph_env_ft06.observation_space
     num_edges = env.initial_job_shop_graph.num_edges
     edge_index_shape = [2, 0]
-
-    print(f"Init num edges: {num_edges}")
-    print(f"Observation_space_num_edges_per_type: {list(observation_space[ObservationSpaceKey.EDGE_INDEX].spaces.items())[0][1].shape[1]}")
-    print(f"num_nodes {len(env.initial_job_shop_graph._nodes)}")
     for _, space in list(
         observation_space[ObservationSpaceKey.EDGE_INDEX].spaces.items()
     ):
         edge_index_shape[1] += space.shape[1]
-    assert tuple(edge_index_shape) == (2, num_edges * len(env.initial_job_shop_graph.edge_types))
+    assert tuple(edge_index_shape) == (2, num_edges)
 
     done = False
     obs, _ = env.reset()
-    print(obs)
-    new_obs = obs.copy()
-    del new_obs[ObservationSpaceKey.ACTION_MASK.value]
-    assert observation_space.contains(new_obs)
+    debug_observation(obs, observation_space)
+    assert observation_space.contains(obs), obs
     while not done:
         action = random_action(obs)
         obs, _, done, *_ = env.step(action)
