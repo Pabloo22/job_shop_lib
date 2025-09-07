@@ -4,9 +4,9 @@ from numpy.typing import NDArray
 
 from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.reinforcement_learning import (
-    add_padding,
     create_edge_type_dict,
     map_values,
+    add_padding,
 )
 
 

@@ -11,7 +11,6 @@ from job_shop_lib.reinforcement_learning import (
     SingleJobShopGraphEnv,
     ObservationSpaceKey,
     ObservationDict,
-    add_padding,
 )
 
 from job_shop_lib.dispatching.feature_observers import (

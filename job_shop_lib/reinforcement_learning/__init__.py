@@ -47,19 +47,12 @@ from job_shop_lib.reinforcement_learning._single_job_shop_graph_env import (
 from job_shop_lib.reinforcement_learning._multi_job_shop_graph_env import (
     MultiJobShopGraphEnv,
 )
-from ._resource_task_graph_observation import (
-    ResourceTaskGraphObservation,
-    ResourceTaskGraphObservationDict,
-)
-
 
 __all__ = [
     "SingleJobShopGraphEnv",
     "MultiJobShopGraphEnv",
     "ObservationDict",
     "ObservationSpaceKey",
-    "ResourceTaskGraphObservation",
-    "ResourceTaskGraphObservationDict",
     "RewardObserver",
     "MakespanReward",
     "IdleTimeReward",
