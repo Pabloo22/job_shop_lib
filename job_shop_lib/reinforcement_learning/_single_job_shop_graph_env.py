@@ -4,6 +4,7 @@ from copy import deepcopy
 from collections.abc import Callable, Sequence
 from typing import Any
 import warnings
+from exceptions import ValidationError
 
 import matplotlib.pyplot as plt
 import gymnasium as gym
@@ -392,13 +393,13 @@ class SingleJobShopGraphEnv(gym.Env):
             node_features_dict[feature_type.value] = current_matrix
 
         # Construct the final observation dictionary with the nested structure
-        observation: ObservationDict = {  # type: ignore
-            ObservationSpaceKey.EDGE_INDEX:
-                self.job_shop_graph.edge_index_dict,
-            ObservationSpaceKey.ACTION_MASK:
-                self.get_available_actions_with_ids(),
-            ObservationSpaceKey.NODE_FEATURES:
-                node_features_dict,
+        observation: ObservationDict = {
+            ObservationSpaceKey.EDGE_INDEX:  # type: ignore
+            self.job_shop_graph.edge_index_dict,
+            ObservationSpaceKey.ACTION_MASK:  # type: ignore
+            self.get_available_actions_with_ids(),
+            ObservationSpaceKey.NODE_FEATURES:  # type: ignore
+            node_features_dict,
         }
         return observation
 
