@@ -247,7 +247,7 @@ class SingleJobShopGraphEnv(gym.Env):
         initial_edge_index_dict = self.initial_job_shop_graph.edge_index_dict
         edge_index_space = gym.spaces.Dict(
             {
-                key: gym.spaces.Box(
+                key: gym.spaces.Box(  # type: ignore
                     low=0,
                     high=np.iinfo(np.int32).max,
                     shape=edges.shape,
@@ -258,26 +258,39 @@ class SingleJobShopGraphEnv(gym.Env):
         )
         obs_space[ObservationSpaceKey.EDGE_INDEX] = edge_index_space
 
-        single_tuple_space = gym.spaces.Box(
-            low=np.array([-1, -1, -1], dtype=np.int32),
-            high=np.array([
-                len(self.job_shop_graph.nodes_by_type[NodeType.OPERATION]) - 1,
-                len(self.job_shop_graph.nodes_by_type[NodeType.MACHINE]) - 1,
-                len(self.job_shop_graph.nodes_by_type[NodeType.JOB]) - 1,
-            ], dtype=np.int32),
-            shape=(3,),
-            dtype=np.int32
+        num_available_actions = len(self.get_available_actions_with_ids())
+        available_actions_with_ids_space = gym.spaces.Box(
+            low=np.full((num_available_actions, 3), -1, dtype=np.int32),
+            high=np.array(
+                [
+                    len(self.job_shop_graph.nodes_by_type[NodeType.OPERATION])
+                    - 1,
+                    len(self.job_shop_graph.nodes_by_type[NodeType.MACHINE])
+                    - 1,
+                    len(self.job_shop_graph.nodes_by_type[NodeType.JOB]) - 1,
+                ],
+                dtype=np.int32,
+            )
+            .reshape(1, 3)
+            .repeat(num_available_actions, axis=0),
+            shape=(num_available_actions, 3),
+            dtype=np.int32,
         )
-        available_actions_with_ids_space = gym.spaces.Sequence(single_tuple_space)
-        obs_space[ObservationSpaceKey.ACTION_MASK] = available_actions_with_ids_space
+        obs_space[ObservationSpaceKey.ACTION_MASK] = (
+            available_actions_with_ids_space
+        )
         if not self.composite_observer.features:
             return obs_space
         node_features_space = gym.spaces.Dict(
             {
                 feature_type.value: gym.spaces.Box(
-                    low=-np.inf, high=np.inf, shape=matrix.shape, dtype=np.float32
+                    low=-np.inf,
+                    high=np.inf,
+                    shape=matrix.shape,
+                    dtype=np.float32,
                 )
-                for feature_type, matrix in self.composite_observer.features.items()
+                for feature_type, matrix in
+                self.composite_observer.features.items()
             }
         )
         obs_space[ObservationSpaceKey.NODE_FEATURES] = node_features_space
@@ -342,14 +355,12 @@ class SingleJobShopGraphEnv(gym.Env):
         operation = self.job_shop_graph._nodes_map[
             ("operation", node_operation_id)
         ].operation
-        print(operation, operation.operation_id)
         if node_machine_id == -1:
             machine_id = operation.machine_id
         else:
             machine_id = self.job_shop_graph._nodes_map[
                 ("machine", node_machine_id)
             ].machine_id
-        print(machine_id)
 
         self.dispatcher.dispatch(operation, machine_id)
 
@@ -381,10 +392,13 @@ class SingleJobShopGraphEnv(gym.Env):
             node_features_dict[feature_type.value] = current_matrix
 
         # Construct the final observation dictionary with the nested structure
-        observation: ObservationDict = {
-            ObservationSpaceKey.EDGE_INDEX: self.job_shop_graph.edge_index_dict,
-            ObservationSpaceKey.NODE_FEATURES: node_features_dict,
-            ObservationSpaceKey.ACTION_MASK: self.get_available_actions_with_ids(),
+        observation: ObservationDict = {  # type: ignore
+            ObservationSpaceKey.EDGE_INDEX:
+                self.job_shop_graph.edge_index_dict,
+            ObservationSpaceKey.ACTION_MASK:
+                self.get_available_actions_with_ids(),
+            ObservationSpaceKey.NODE_FEATURES:
+                node_features_dict,
         }
         return observation
 
@@ -407,7 +421,7 @@ class SingleJobShopGraphEnv(gym.Env):
         elif self.render_mode == "save_gif":
             self.gantt_chart_creator.create_gif()
 
-    def get_available_actions_with_ids(self) -> list[tuple[int, int, int]]:
+    def get_available_actions_with_ids(self) -> NDArray[np.int32]:
         """Returns a list of available actions in the form of
         (operation_id, machine_id, job_id)."""
         available_operations = self.dispatcher.available_operations()
@@ -432,39 +446,39 @@ class SingleJobShopGraphEnv(gym.Env):
                         machine_id
                     ).node_id[1]
                     available_operations_with_ids.append(
-                        np.array([operation_id, machine_id, job_id], dtype=np.int32)
+                        [operation_id, machine_id, job_id]
                     )
             else:
                 available_operations_with_ids.append(
-                    np.array([operation_id, -1, job_id], dtype=np.int32)
+                    [operation_id, -1, job_id]
                 )
-        return available_operations_with_ids
+        return np.array(available_operations_with_ids, dtype=np.int32)
 
-    # def validate_action(self, action: tuple[int, int]) -> None:
-    #     """Validates that the action is legal in the current state.
+    def validate_action(self, action: tuple[int, int]) -> None:
+        """Validates that the action is legal in the current state.
 
-    #     Args:
-    #         action:
-    #             The action to validate. The action is a tuple of two integers
-    #             (job_id, machine_id).
+        Args:
+            action:
+                The action to validate. The action is a tuple of two integers
+                (job_id, machine_id).
 
-    #     Raises:
-    #         ValidationError: If the action is invalid.
-    #     """
-    #     job_id, machine_id = action
-    #     if not 0 <= job_id < self.instance.num_jobs:
-    #         raise ValidationError(f"Invalid job_id {job_id}")
+        Raises:
+            ValidationError: If the action is invalid.
+        """
+        job_id, machine_id = action
+        if not 0 <= job_id < self.instance.num_jobs:
+            raise ValidationError(f"Invalid job_id {job_id}")
 
-    #     if not -1 <= machine_id < self.instance.num_machines:
-    #         raise ValidationError(f"Invalid machine_id {machine_id}")
+        if not -1 <= machine_id < self.instance.num_machines:
+            raise ValidationError(f"Invalid machine_id {machine_id}")
 
-    #     # Check if job has operations left
-    #     job = self.instance.jobs[job_id]
-    #     if self.dispatcher.job_next_operation_index[job_id] >= len(job):
-    #         raise ValidationError(f"Job {job_id} has no operations left")
+        # Check if job has operations left
+        job = self.instance.jobs[job_id]
+        if self.dispatcher.job_next_operation_index[job_id] >= len(job):
+            raise ValidationError(f"Job {job_id} has no operations left")
 
-    #     next_operation = self.dispatcher.next_operation(job_id)
-    #     if machine_id == -1 and len(next_operation.machines) > 1:
-    #         raise ValidationError(
-    #             f"Operation {next_operation} requires a machine_id"
-    #         )
+        next_operation = self.dispatcher.next_operation(job_id)
+        if machine_id == -1 and len(next_operation.machines) > 1:
+            raise ValidationError(
+                f"Operation {next_operation} requires a machine_id"
+            )

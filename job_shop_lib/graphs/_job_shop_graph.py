@@ -3,11 +3,11 @@
 import collections
 import networkx as nx
 import numpy as np
-from collections import defaultdict
+from typing import DefaultDict
 
 from job_shop_lib import JobShopInstance
 from job_shop_lib.exceptions import ValidationError
-from job_shop_lib.graphs import Node, NodeType, EdgeType
+from job_shop_lib.graphs import Node, NodeType
 
 
 NODE_ATTR = "node"
@@ -119,7 +119,7 @@ class JobShopGraph:
         )
         self.adjacency_in: dict[
             Node,
-            dict[tuple[str, str, str] | tuple[str, EdgeType, str], list[Node]],
+            dict[tuple[str, str, str], list[Node]],
         ] = {}
         self.adjacency_out: dict[
             Node,
@@ -586,8 +586,13 @@ class JobShopGraph:
         raise ValidationError(f"No node found with node.{id_attr}={node_id}")
 
     @property
-    def edge_index_dict(self):
-        edge_index = defaultdict(lambda: np.empty((2, 0), dtype=np.int32))
+    def edge_index_dict(self) -> dict[tuple[str, str, str], np.ndarray]:
+        """Returns the edge index as a dictionary of numpy arrays.
+        The keys are edge types, and the values are numpy arrays of shape
+        (2, num_edges) representing the edges of that type.
+        """
+        edge_index: DefaultDict[tuple[str, str, str], np.ndarray] = \
+            collections.defaultdict(lambda: np.empty((2, 0), np.int32))
         for node, edges in self.adjacency_out.items():
             src = node.node_id[1]
             for edge_type, neighbors in edges.items():
@@ -595,7 +600,7 @@ class JobShopGraph:
                     continue
                 dst = np.array(
                     [[src, neighbor.node_id[1]] for neighbor in neighbors],
-                    dtype=np.int32
+                    dtype=np.int32,
                 ).T
                 edge_index[edge_type] = np.hstack((edge_index[edge_type], dst))
         return dict(edge_index)
