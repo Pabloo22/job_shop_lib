@@ -58,7 +58,7 @@ class DurationObserver(FeatureObserver):
             mapping[feature_type](scheduled_operation)
 
     def _initialize_operation_durations(self):
-        duration_matrix = self.dispatcher.instance.durations_matrix_array
+        duration_matrix = self.dispatcher.instance.duration_matrix_array
         operation_durations = np.array(duration_matrix).reshape(-1, 1)
         # Drop the NaN values
         operation_durations = operation_durations[

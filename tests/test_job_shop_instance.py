@@ -85,6 +85,10 @@ def test_durations_matrix(job_shop_instance: JobShopInstance):
     ]
     assert job_shop_instance.duration_matrix == expected_matrix
 
+    # check that "durations_matrix" is deprecated
+    with pytest.warns(DeprecationWarning):
+        assert job_shop_instance.durations_matrix == expected_matrix
+
 
 def test_machines_matrix(job_shop_instance: JobShopInstance):
     expected_matrix = [
@@ -197,10 +201,15 @@ def test_duration_matrix_array():
         [Operation(machines=1, duration=3)],
     ]
     instance = JobShopInstance(jobs=jobs)
-    assert str(instance.durations_matrix_array) == str(
+    assert str(instance.duration_matrix_array) == str(
         np.array([[1.0, 2.0], [3.0, np.nan]], dtype=np.float32)
     )
 
+    # check that "durations_matrix_array" is deprecated
+    with pytest.warns(DeprecationWarning):
+        assert str(instance.durations_matrix_array) == str(
+            np.array([[1.0, 2.0], [3.0, np.nan]], dtype=np.float32)
+        )
 
 def test_release_dates_matrix_array():
     jobs = [

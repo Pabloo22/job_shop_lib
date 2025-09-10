@@ -80,7 +80,7 @@ class EarliestStartTimeObserver(FeatureObserver):
 
         # Earliest start times initialization
         # -------------------------------
-        squared_duration_matrix = dispatcher.instance.durations_matrix_array
+        squared_duration_matrix = dispatcher.instance.duration_matrix_array
         self.earliest_start_times: NDArray[np.float32] = np.hstack(
             (
                 np.zeros((squared_duration_matrix.shape[0], 1), dtype=float),
