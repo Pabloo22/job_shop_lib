@@ -1,5 +1,5 @@
 [flake8]
-extend-ignore = E203
+extend-ignore = E203, RST303
 # Tell flake8-rst-docstrings about Sphinx directives/roles
 rst-directives = autosummary,seealso,deprecated,doctest
 rst-roles = class,meth,func,attr
