@@ -86,3 +86,29 @@ def load_benchmark_json() -> dict[str, dict[str, Any]]:
 
     with benchmark_file.open("r", encoding="utf-8") as f:
         return json.load(f)
+
+
+@functools.cache
+def load_benchmark_group(group_prefix: str) -> list[JobShopInstance]:
+    """Loads a group of benchmark instances whose names start with the given
+    prefix.
+
+    Args:
+        group_prefix:
+            The prefix of the benchmark instances to load. For example,
+            if the prefix is "la", all instances whose names start with "la"
+            (e.g., "la01-40", "la02-40", etc.) will be loaded.
+
+    Returns:
+        A dictionary containing the names of the benchmark instances as keys
+        and the corresponding :class:`JobShopInstance` objects as values.
+
+    .. versionadded:: 1.7.0
+
+    """
+    all_instances = load_all_benchmark_instances()
+    return [
+        instance
+        for name, instance in all_instances.items()
+        if name.startswith(group_prefix)
+    ]
