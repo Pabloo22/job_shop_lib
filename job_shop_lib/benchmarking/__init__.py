@@ -6,6 +6,7 @@
     load_all_benchmark_instances
     load_benchmark_instance
     load_benchmark_json
+    load_benchmark_group
 
 You can load a benchmark instance from the library:
 
@@ -93,10 +94,12 @@ from job_shop_lib.benchmarking._load_benchmark import (
     load_all_benchmark_instances,
     load_benchmark_instance,
     load_benchmark_json,
+    load_benchmark_group,
 )
 
 __all__ = [
     "load_all_benchmark_instances",
     "load_benchmark_instance",
     "load_benchmark_json",
+    "load_benchmark_group",
 ]
