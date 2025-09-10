@@ -32,7 +32,7 @@ def test_set_operation_attributes():
 
 
 def test_from_matrices(job_shop_instance_with_extras: JobShopInstance):
-    duration_matrix = job_shop_instance_with_extras.durations_matrix
+    duration_matrix = job_shop_instance_with_extras.duration_matrix
     machines_matrix = job_shop_instance_with_extras.machines_matrix
     release_dates_matrix = job_shop_instance_with_extras.release_dates_matrix
     deadlines_matrix = job_shop_instance_with_extras.deadlines_matrix
@@ -50,7 +50,7 @@ def test_from_matrices(job_shop_instance_with_extras: JobShopInstance):
         metadata=metadata,
     )
 
-    assert new_instance.durations_matrix == duration_matrix
+    assert new_instance.duration_matrix == duration_matrix
     assert new_instance.machines_matrix == machines_matrix
     assert new_instance.release_dates_matrix == release_dates_matrix
     assert new_instance.deadlines_matrix == deadlines_matrix
@@ -83,7 +83,7 @@ def test_durations_matrix(job_shop_instance: JobShopInstance):
         [10, 20],
         [15, 10],
     ]
-    assert job_shop_instance.durations_matrix == expected_matrix
+    assert job_shop_instance.duration_matrix == expected_matrix
 
 
 def test_machines_matrix(job_shop_instance: JobShopInstance):
