@@ -13,13 +13,13 @@ class InstanceGenerator(ABC):
     """Common interface for all generators.
 
     The class supports both single instance generation and iteration over
-    multiple instances, controlled by the `iteration_limit` parameter. It
-    implements the iterator protocol, allowing it to be used in a `for` loop.
+    multiple instances, controlled by the ``iteration_limit`` parameter. It
+    implements the iterator protocol, allowing it to be used in a ``for`` loop.
 
     Note:
         When used as an iterator, the generator will produce instances until it
-        reaches the specified `iteration_limit`. If `iteration_limit` is None,
-        it will continue indefinitely.
+        reaches the specified ``iteration_limit``. If ``iteration_limit`` is
+        ``None``, it will continue indefinitely.
 
     Attributes:
         num_jobs_range:
@@ -84,9 +84,11 @@ class InstanceGenerator(ABC):
         """Generates a single job shop instance
 
         Args:
-            num_jobs: The number of jobs to generate. If None, a random value
+            num_jobs:
+                The number of jobs to generate. If None, a random value
                 within the specified range will be used.
-            num_machines: The number of machines to generate. If None, a random
+            num_machines:
+                The number of machines to generate. If None, a random
                 value within the specified range will be used.
         """
 
