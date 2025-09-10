@@ -40,12 +40,12 @@ class JobShopInstance:
         num_machines
         num_operations
         is_flexible
-        durations_matrix
+        duration_matrix
         machines_matrix
         release_dates_matrix
         deadlines_matrix
         due_dates_matrix
-        durations_matrix_array
+        duration_matrix_array
         machines_matrix_array
         operations_by_machine
         max_duration
@@ -216,7 +216,7 @@ class JobShopInstance:
 
                 {
                     "name": self.name,
-                    "duration_matrix": self.durations_matrix,
+                    "duration_matrix": self.duration_matrix,
                     "machines_matrix": self.machines_matrix,
                     "metadata": self.metadata,
                     # Optionally (if the instance has them):
@@ -227,7 +227,7 @@ class JobShopInstance:
         """
         data = {
             "name": self.name,
-            "duration_matrix": self.durations_matrix,
+            "duration_matrix": self.duration_matrix,
             "machines_matrix": self.machines_matrix,
             "metadata": self.metadata,
         }
@@ -374,6 +374,22 @@ class JobShopInstance:
 
     @functools.cached_property
     def durations_matrix(self) -> list[list[int]]:
+        """Another name for `duration_matrix` attribute, kept for
+        backward compatibility.
+
+        It may be removed in future versions.
+        """
+        warnings.warn(
+            "`duration_matrix` attribute is deprecated and will be "
+            "removed in future versions. Please use `duration_matrix` "
+            "property instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.duration_matrix
+
+    @property
+    def duration_matrix(self) -> list[list[int]]:
         """Returns the duration matrix of the instance.
 
         The duration of the operation with ``job_id`` i and ``position_in_job``
@@ -452,7 +468,23 @@ class JobShopInstance:
         If the jobs have different number of operations, the matrix is
         padded with ``np.nan`` to make it rectangular.
         """
-        return self._fill_matrix_with_nans_2d(self.durations_matrix)
+        warnings.warn(
+            "`durations_matrix_array` attribute is deprecated and will be "
+            "removed in future versions. Please use `duration_matrix_array` "
+            "property instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.duration_matrix_array
+
+    @property
+    def duration_matrix_array(self) -> NDArray[np.float32]:
+        """Returns the duration matrix of the instance as a numpy array.
+
+        If the jobs have different number of operations, the matrix is
+        padded with ``np.nan`` to make it rectangular.
+        """
+        return self._fill_matrix_with_nans_2d(self.duration_matrix)
 
     @functools.cached_property
     def release_dates_matrix_array(self) -> NDArray[np.float32]:
