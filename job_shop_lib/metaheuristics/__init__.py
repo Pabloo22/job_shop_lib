@@ -31,12 +31,16 @@ contribute!
     swap_random_operations
     ObjectiveFunction
     get_makespan_with_penalties_objective
+    compute_penalty_for_deadlines
+    compute_penalty_for_due_dates
 
 """
 
 from job_shop_lib.metaheuristics._objective_functions import (
     ObjectiveFunction,
     get_makespan_with_penalties_objective,
+    compute_penalty_for_deadlines,
+    compute_penalty_for_due_dates,
 )
 from job_shop_lib.metaheuristics._neighbor_generators import (
     NeighborGenerator,
@@ -58,4 +62,6 @@ __all__ = [
     "swap_random_operations",
     "ObjectiveFunction",
     "get_makespan_with_penalties_objective",
+    "compute_penalty_for_deadlines",
+    "compute_penalty_for_due_dates",
 ]

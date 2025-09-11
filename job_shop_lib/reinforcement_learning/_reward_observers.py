@@ -1,6 +1,9 @@
 """Rewards functions are defined as `DispatcherObervers` and are used to
 calculate the reward for a given state."""
 
+from collections.abc import Callable
+
+from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import DispatcherObserver, Dispatcher
 from job_shop_lib import ScheduledOperation
 
@@ -83,3 +86,75 @@ class IdleTimeReward(RewardObserver):
 
         reward = -idle_time
         self.rewards.append(reward)
+
+
+class RewardWithPenalties(RewardObserver):
+    """Reward function that adds penalties to another reward function.
+
+    The reward is calculated as the sum of the reward from another reward
+    function and a penalty for each constraint violation (due dates and
+    deadlines).
+
+    Attributes:
+        base_reward_observer:
+            The base reward observer to use for calculating the reward.
+        penalty_per_violation:
+            The penalty to apply for each constraint violation.
+
+    Args:
+        dispatcher:
+            The dispatcher to observe.
+        base_reward_observer:
+            The base reward observer to use for calculating the reward. It
+            must use the same dispatcher as this reward observer. If it is
+            subscribed to the dispatcher, it will be unsubscribed.
+        penalty_function:
+            A function that takes a scheduled operation and the
+            dispatcher as input and returns the penalty for that operation.
+        subscribe:
+            Whether to subscribe to the dispatcher upon initialization.
+
+    Raises:
+        ValidationError:
+            If the base reward observer does not use the same dispatcher as
+            this reward observer.
+
+    .. versionadded:: 1.7.0
+
+    .. seealso::
+        The following functions (along with ``functools.partial``) can be
+        used to create penalty functions:
+
+        - :class:`job_shop_lib.metaheuristics.penalty_for_deadlines`
+        - :class:`job_shop_lib.metaheuristics.penalty_for_due_dates`
+
+    """
+
+    def __init__(
+        self,
+        dispatcher: Dispatcher,
+        *,
+        base_reward_observer: RewardObserver,
+        penalty_function: Callable[[ScheduledOperation, Dispatcher], float],
+        subscribe: bool = True,
+    ) -> None:
+        super().__init__(dispatcher, subscribe=subscribe)
+        self.base_reward_observer = base_reward_observer
+        self.penalty_function = penalty_function
+        if base_reward_observer.dispatcher is not dispatcher:
+            raise ValidationError(
+                "The base reward observer must use the same "
+                "dispatcher as this reward observer."
+            )
+        if base_reward_observer in dispatcher.subscribers:
+            dispatcher.unsubscribe(base_reward_observer)
+
+    def reset(self) -> None:
+        super().reset()
+        self.base_reward_observer.reset()
+
+    def update(self, scheduled_operation: ScheduledOperation):
+        self.base_reward_observer.update(scheduled_operation)
+        base_reward = self.base_reward_observer.last_reward
+        penalty = self.penalty_function(scheduled_operation, self.dispatcher)
+        self.rewards.append(base_reward - penalty)

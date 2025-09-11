@@ -14,11 +14,14 @@
     RewardObserver
     MakespanReward
     IdleTimeReward
+    RewardWithPenalties
     RenderConfig
     add_padding
     create_edge_type_dict
     map_values
     get_optimal_actions
+    get_deadline_violation_penalty
+    get_due_date_violation_penalty
 
 """
 
@@ -32,6 +35,7 @@ from job_shop_lib.reinforcement_learning._reward_observers import (
     RewardObserver,
     MakespanReward,
     IdleTimeReward,
+    RewardWithPenalties,
 )
 
 from job_shop_lib.reinforcement_learning._utils import (
@@ -39,6 +43,8 @@ from job_shop_lib.reinforcement_learning._utils import (
     create_edge_type_dict,
     map_values,
     get_optimal_actions,
+    get_deadline_violation_penalty,
+    get_due_date_violation_penalty,
 )
 
 from job_shop_lib.reinforcement_learning._single_job_shop_graph_env import (
@@ -63,9 +69,12 @@ __all__ = [
     "RewardObserver",
     "MakespanReward",
     "IdleTimeReward",
+    "RewardWithPenalties",
     "RenderConfig",
     "add_padding",
     "create_edge_type_dict",
     "map_values",
     "get_optimal_actions",
+    "get_deadline_violation_penalty",
+    "get_due_date_violation_penalty",
 ]
