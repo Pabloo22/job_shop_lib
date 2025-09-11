@@ -70,8 +70,8 @@ def generate_machine_matrix_with_recirculation(
         rng: A numpy random number generator.
 
     Returns:
-        A machine matrix with recirculation with shape (num_machines,
-        num_jobs).
+        A machine matrix with recirculation with shape (num_jobs,
+        num_machines).
     """
     rng = rng or np.random.default_rng()
     if num_jobs <= 0:
