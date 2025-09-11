@@ -45,29 +45,70 @@ def get_makespan_with_penalties_objective(
 
     def objective(schedule: Schedule) -> float:
         makespan = schedule.makespan()
-        instance = schedule.instance
-
-        # Fast path: no constraint attributes present in the instance
-        if not instance.has_deadlines and not instance.has_due_dates:
-            return makespan
-
-        penalty = 0.0
-        for machine_schedule in schedule.schedule:
-            for scheduled_op in machine_schedule:
-                op = scheduled_op.operation
-                # Deadline (hard) penalty
-                if (
-                    op.deadline is not None
-                    and scheduled_op.end_time > op.deadline
-                ):
-                    penalty += deadline_penalty_factor
-                # Due date (soft) penalty
-                if (
-                    op.due_date is not None
-                    and scheduled_op.end_time > op.due_date
-                ):
-                    penalty += due_date_penalty_factor
+        penalty_for_deadlines = compute_penalty_for_deadlines(
+            schedule, deadline_penalty_factor
+        )
+        penalty_for_due_dates = compute_penalty_for_due_dates(
+            schedule, due_date_penalty_factor
+        )
+        penalty = penalty_for_deadlines + penalty_for_due_dates
 
         return makespan + penalty
 
     return objective
+
+
+def compute_penalty_for_deadlines(
+    schedule: Schedule, penalty_per_violation: float
+) -> float:
+    """Compute the total penalty for deadline violations in a schedule.
+
+    Args:
+        schedule:
+            The schedule to evaluate.
+        penalty_per_violation:
+            The penalty to apply for each operation that
+            finishes after its deadline.
+
+    Returns:
+        The total penalty for deadline violations.
+    """
+    if not schedule.instance.has_deadlines or penalty_per_violation == 0:
+        return 0.0
+
+    penalty = 0.0
+    for machine_schedule in schedule.schedule:
+        for scheduled_op in machine_schedule:
+            op = scheduled_op.operation
+            if op.deadline is not None and scheduled_op.end_time > op.deadline:
+                penalty += penalty_per_violation
+
+    return penalty
+
+
+def compute_penalty_for_due_dates(
+    schedule: Schedule, penalty_per_violation: float
+) -> float:
+    """Compute the total penalty for due date violations in a schedule.
+
+    Args:
+        schedule:
+            The schedule to evaluate.
+        penalty_per_violation:
+            The penalty to apply for each operation that
+            finishes after its due date.
+
+    Returns:
+        The total penalty for due date violations.
+    """
+    if not schedule.instance.has_due_dates or penalty_per_violation == 0:
+        return 0.0
+
+    penalty = 0.0
+    for machine_schedule in schedule.schedule:
+        for scheduled_op in machine_schedule:
+            op = scheduled_op.operation
+            if op.due_date is not None and scheduled_op.end_time > op.due_date:
+                penalty += penalty_per_violation
+
+    return penalty

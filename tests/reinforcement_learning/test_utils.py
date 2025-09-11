@@ -3,10 +3,14 @@ import numpy as np
 from numpy.typing import NDArray
 
 from job_shop_lib.exceptions import ValidationError
+from job_shop_lib import Operation, JobShopInstance, ScheduledOperation
+from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.reinforcement_learning import (
     create_edge_type_dict,
     map_values,
     add_padding,
+    get_deadline_violation_penalty,
+    get_due_date_violation_penalty,
 )
 
 
@@ -295,6 +299,106 @@ def test_invalid_global_id():
     mapping = {0: 0, 1: 1}  # Missing mapping for 2
     with pytest.raises(ValidationError):
         map_values(edge_index, mapping)
+
+
+def _make_scheduled_operation(
+    *,
+    duration: int,
+    start_time: int,
+    machine: int = 0,
+    deadline=None,
+    due_date=None,
+):
+    """Helper to build a minimal scheduled operation and dispatcher."""
+    jobs = [
+        [
+            Operation(
+                machine,
+                duration=duration,
+                deadline=deadline,
+                due_date=due_date,
+            )
+        ]
+    ]
+    instance = JobShopInstance(jobs, name="PenaltyTestInstance")
+    dispatcher = Dispatcher(instance)
+    op = instance.jobs[0][0]
+    scheduled_op = ScheduledOperation(
+        op, start_time=start_time, machine_id=machine
+    )
+    return scheduled_op, dispatcher
+
+
+# ---------------- Deadline penalty tests ---------------- #
+
+
+def test_deadline_penalty_violation():
+    scheduled_op, dispatcher = _make_scheduled_operation(
+        duration=10, start_time=0, deadline=5
+    )  # end_time = 10 > 5
+    assert get_deadline_violation_penalty(scheduled_op, dispatcher) == 10_000
+
+
+def test_deadline_penalty_no_violation_equal_boundary():
+    scheduled_op, dispatcher = _make_scheduled_operation(
+        duration=5, start_time=0, deadline=5
+    )  # end_time = 5 == 5
+    assert get_deadline_violation_penalty(scheduled_op, dispatcher) == 0.0
+
+
+def test_deadline_penalty_none_deadline():
+    scheduled_op, dispatcher = _make_scheduled_operation(
+        duration=4, start_time=0, deadline=None
+    )
+    assert get_deadline_violation_penalty(scheduled_op, dispatcher) == 0.0
+
+
+def test_deadline_penalty_custom_factor():
+    scheduled_op, dispatcher = _make_scheduled_operation(
+        duration=3, start_time=0, deadline=2
+    )  # end_time = 3 > 2
+    assert (
+        get_deadline_violation_penalty(
+            scheduled_op, dispatcher, deadline_penalty_factor=123.45
+        )
+        == 123.45
+    )
+
+
+# ---------------- Due date penalty tests ---------------- #
+
+
+def test_due_date_penalty_violation():
+    scheduled_op, dispatcher = _make_scheduled_operation(
+        duration=7, start_time=0, due_date=6
+    )  # end_time = 7 > 6
+    assert get_due_date_violation_penalty(scheduled_op, dispatcher) == 100
+
+
+def test_due_date_penalty_no_violation_equal_boundary():
+    scheduled_op, dispatcher = _make_scheduled_operation(
+        duration=5, start_time=0, due_date=5
+    )  # end_time = 5 == 5
+    assert get_due_date_violation_penalty(scheduled_op, dispatcher) == 0.0
+
+
+def test_due_date_penalty_none_due_date():
+    scheduled_op, dispatcher = _make_scheduled_operation(
+        duration=4, start_time=0, due_date=None
+    )
+    assert get_due_date_violation_penalty(scheduled_op, dispatcher) == 0.0
+
+
+def test_due_date_penalty_custom_factor():
+    scheduled_op, dispatcher = _make_scheduled_operation(
+        duration=9, start_time=0, due_date=1
+    )  # end_time = 9 > 1
+    assert (
+        get_due_date_violation_penalty(
+            scheduled_op, dispatcher, due_date_penalty_factor=7.5
+        )
+        == 7.5
+    )
 
 
 if __name__ == "__main__":
