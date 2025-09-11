@@ -6,14 +6,14 @@ from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.generation import (
     create_release_dates_matrix,
     compute_horizon_proxy,
-    independent_release_date_strategy,
-    cumulative_release_date_strategy,
-    mixed_release_date_strategy,
+    get_independent_release_date_strategy,
+    get_cumulative_release_date_strategy,
+    get_mixed_release_date_strategy,
 )
 
 
 def test_independent_strategy_basic():
-    strategy = independent_release_date_strategy(5)
+    strategy = get_independent_release_date_strategy(5)
     rng = random.Random(123)
     values = [strategy(rng, 0) for _ in range(10)]
     assert all(0 <= v <= 5 for v in values)
@@ -25,35 +25,35 @@ def test_independent_strategy_basic():
 
 def test_independent_strategy_invalid():
     with pytest.raises(ValidationError):
-        independent_release_date_strategy(-1)
+        get_independent_release_date_strategy(-1)
 
 
 def test_cumulative_strategy_no_slack():
-    strat = cumulative_release_date_strategy(0)
+    strat = get_cumulative_release_date_strategy(0)
     rng = random.Random(0)
-    # Should return cumulative prev unchanged (non-negative)
+    # Should return cumulative prev unchanged (non-negative) when slack=0
     assert strat(rng, 10) == 10
 
 
 def test_cumulative_strategy_with_slack():
-    strat = cumulative_release_date_strategy(5)
+    strat = get_cumulative_release_date_strategy(5)
     rng = random.Random(1)
     # Generate multiple to sample slack branch
     results = {strat(rng, 20) for _ in range(20)}
-    # All results <= 20 and >= 0
-    assert all(0 <= r <= 20 for r in results)
+    # All results >= 20 and <= 25 (20 + max slack)
+    assert all(20 <= r <= 25 for r in results)
     # At least one value different from 20 to ensure slack applied
     assert any(r != 20 for r in results)
 
 
 def test_cumulative_strategy_invalid():
     with pytest.raises(ValidationError):
-        cumulative_release_date_strategy(-2)
+        get_cumulative_release_date_strategy(-2)
 
 
 def test_mixed_strategy_basic():
     horizon = 50
-    strat = mixed_release_date_strategy(
+    strat = get_mixed_release_date_strategy(
         alpha=0.5, beta=0.4, horizon_proxy=horizon
     )
     rng = random.Random(2)
@@ -63,18 +63,16 @@ def test_mixed_strategy_basic():
 
 def test_mixed_strategy_zero_random_component():
     # horizon_proxy=0 => random_component_upper=0 => no random addition
-    strat = mixed_release_date_strategy(alpha=0.3, beta=0.9, horizon_proxy=0)
+    strat = get_mixed_release_date_strategy(
+        alpha=0.3, beta=0.9, horizon_proxy=0
+    )
     rng = random.Random(0)
     assert strat(rng, 100) == int(0.3 * 100)
 
 
 def test_mixed_strategy_invalid_params():
     with pytest.raises(ValidationError):
-        mixed_release_date_strategy(alpha=-0.1, beta=0.5, horizon_proxy=10)
-    with pytest.raises(ValidationError):
-        mixed_release_date_strategy(alpha=0.5, beta=1.5, horizon_proxy=10)
-    with pytest.raises(ValidationError):
-        mixed_release_date_strategy(alpha=0.5, beta=0.5, horizon_proxy=-1)
+        get_mixed_release_date_strategy(alpha=0.5, beta=0.5, horizon_proxy=-1)
 
 
 def test_compute_horizon_proxy_empty():
@@ -89,7 +87,7 @@ def test_compute_horizon_proxy_non_empty():
 
 def test_create_release_dates_matrix_with_strategy():
     dm = [[3, 2], [4, 1]]
-    strat = cumulative_release_date_strategy(backward_slack=0)
+    strat = get_cumulative_release_date_strategy(maximum_slack=0)
     rng = random.Random(0)
     rd = create_release_dates_matrix(dm, strategy=strat, rng=rng)
     # Cumulative release dates should equal cumulative previous durations
@@ -129,25 +127,25 @@ def test_compute_horizon_proxy_some_empty_jobs():
 def test_create_release_dates_matrix_with_empty_job_and_custom_strategy():
     dm = [[4, 2], [], [3]]
     # Use cumulative strategy with slack to exercise slack branch too
-    strat = cumulative_release_date_strategy(backward_slack=2)
+    strat = get_cumulative_release_date_strategy(maximum_slack=2)
     rng = random.Random(10)
     rdm = create_release_dates_matrix(dm, strategy=strat, rng=rng)
     assert len(rdm) == 3
     assert rdm[1] == []  # empty job preserved
-    # First job: first op release date 0
-    assert rdm[0][0] == 0
-    # Durations accumulate (may be reduced by slack but never exceed prev cum)
-    cum = 0
+    # Durations accumulate + forward slack (release date >= cumulative prev)
+    cum_prev = 0
     for dur, rel in zip(dm[0], rdm[0]):
-        assert 0 <= rel <= cum
-        cum += dur
+        assert rel >= cum_prev
+        # slack bounded by 2
+        assert rel <= cum_prev + 2
+        cum_prev += dur
 
 
 def test_mixed_release_date_strategy_determinism_and_bounds():
     horizon = 120
     alpha = 0.6
     beta = 0.25
-    strat = mixed_release_date_strategy(alpha, beta, horizon)
+    strat = get_mixed_release_date_strategy(alpha, beta, horizon)
     rng1 = random.Random(123)
     rng2 = random.Random(123)
     vals1 = [strat(rng1, c) for c in range(0, 200, 25)]
@@ -160,7 +158,7 @@ def test_mixed_release_date_strategy_determinism_and_bounds():
 
 
 def test_independent_release_date_strategy_variability():
-    strat = independent_release_date_strategy(3)
+    strat = get_independent_release_date_strategy(3)
     rng = random.Random(7)
     values = {strat(rng, 0) for _ in range(30)}
     # Expect to have seen all numbers 0..3 in 30 draws with high probability

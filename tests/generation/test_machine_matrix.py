@@ -18,8 +18,8 @@ def test_machine_matrix_with_recirculation_shape_and_coverage():
     mat = generate_machine_matrix_with_recirculation(
         num_jobs, num_machines, rng
     )
-    # Shape (num_machines, num_jobs)
-    assert mat.shape == (num_machines, num_jobs)
+    # Shape (num_jobs, num_machines)
+    assert mat.shape == (num_jobs, num_machines)
     # All machines used at least once
     assert set(mat.flatten()) == set(range(num_machines))
 
@@ -29,6 +29,13 @@ def test_machine_matrix_with_recirculation_validation_errors():
         generate_machine_matrix_with_recirculation(0, 3)
     with pytest.raises(ValidationError):
         generate_machine_matrix_with_recirculation(3, 0)
+
+
+def test_machine_matrix_without_recirculation_validation_errors():
+    with pytest.raises(ValidationError):
+        generate_machine_matrix_without_recirculation(0, 3)
+    with pytest.raises(ValidationError):
+        generate_machine_matrix_without_recirculation(3, 0)
 
 
 def test_machine_matrix_with_recirculation_determinism():
@@ -73,9 +80,9 @@ def test_get_default_machine_matrix_creator_with_recirculation():
     seed = 2024
     out1 = creator(random.Random(seed))
     out2 = creator(random.Random(seed))
-    # With recirculation underlying shape is (num_machines, num_jobs) => (3,5)
-    assert len(out1) == 3
-    assert all(len(row) == 5 for row in out1)
+    # With recirculation underlying shape is (num_jobs, num_machines) => (5,3)
+    assert len(out1) == 5
+    assert all(len(row) == 3 for row in out1)
     assert out1 == out2  # deterministic with same seed
     # Coverage check
     assert {m for row in out1 for m in row} == {0, 1, 2}
@@ -96,3 +103,7 @@ def test_get_default_machine_matrix_creator_without_recirculation():
     for row in out1:
         assert set(row) == {0, 1}
         assert len(row) == 2
+
+
+if __name__ == "__main__":
+    pytest.main()
