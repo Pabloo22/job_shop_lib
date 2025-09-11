@@ -82,6 +82,7 @@ def modular_instance_generator(
          [ 5.  7. 10.]
          [ 9.  9.  5.]]
 
+    .. versionadded:: 1.7.0
     """
     rng = random.Random(seed)
     i = 0

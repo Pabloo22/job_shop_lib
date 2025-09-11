@@ -15,9 +15,9 @@
     get_default_duration_matrix_creator
     ReleaseDateStrategy
     create_release_dates_matrix
-    independent_release_date_strategy
-    cumulative_release_date_strategy
-    mixed_release_date_strategy
+    get_independent_release_date_strategy
+    get_cumulative_release_date_strategy
+    get_mixed_release_date_strategy
     compute_horizon_proxy
 
 """
@@ -38,9 +38,9 @@ from job_shop_lib.generation._duration_matrix import (
 from job_shop_lib.generation._release_date_matrix import (
     ReleaseDateStrategy,
     create_release_dates_matrix,
-    independent_release_date_strategy,
-    cumulative_release_date_strategy,
-    mixed_release_date_strategy,
+    get_independent_release_date_strategy,
+    get_cumulative_release_date_strategy,
+    get_mixed_release_date_strategy,
     compute_horizon_proxy,
 )
 from job_shop_lib.generation._modular_instance_generator import (
@@ -64,8 +64,8 @@ __all__ = [
     "get_default_duration_matrix_creator",
     "ReleaseDateStrategy",
     "create_release_dates_matrix",
-    "independent_release_date_strategy",
-    "cumulative_release_date_strategy",
-    "mixed_release_date_strategy",
+    "get_independent_release_date_strategy",
+    "get_cumulative_release_date_strategy",
+    "get_mixed_release_date_strategy",
     "compute_horizon_proxy",
 ]
