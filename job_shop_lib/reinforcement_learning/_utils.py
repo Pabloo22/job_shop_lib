@@ -5,8 +5,9 @@ from typing import TypeVar, Any
 import numpy as np
 from numpy.typing import NDArray
 
+from job_shop_lib import ScheduledOperation
 from job_shop_lib.exceptions import ValidationError
-from job_shop_lib.dispatching import OptimalOperationsObserver
+from job_shop_lib.dispatching import OptimalOperationsObserver, Dispatcher
 
 T = TypeVar("T", bound=np.number)
 
@@ -193,7 +194,65 @@ def get_optimal_actions(
     return optimal_actions
 
 
-if __name__ == "__main__":
-    import doctest
+def get_deadline_violation_penalty(
+    scheduled_operation: ScheduledOperation,
+    unused_dispatcher: Dispatcher,
+    deadline_penalty_factor: float = 10_000,
+) -> float:
+    """Compute the penalty for a scheduled operation that violates its
+    deadline.
 
-    doctest.testmod()
+    Args:
+        scheduled_operation:
+            The scheduled operation to evaluate.
+        unused_dispatcher:
+            This argument is unused but included for compatibility with the
+            penalty function signature.
+        deadline_penalty_factor:
+            Cost added for each operation that
+            finishes after its deadline. Defaults to 10_000.
+    Returns:
+        The penalty for the scheduled operation if it violates its deadline,
+        otherwise 0.
+
+    .. versionadded:: 1.7.0
+    """
+    if (
+        scheduled_operation.operation.deadline is not None
+        and scheduled_operation.end_time
+        > scheduled_operation.operation.deadline
+    ):
+        return deadline_penalty_factor
+    return 0.0
+
+
+def get_due_date_violation_penalty(
+    scheduled_operation: ScheduledOperation,
+    unused_dispatcher: Dispatcher,
+    due_date_penalty_factor: float = 100,
+) -> float:
+    """Compute the penalty for a scheduled operation that violates its
+    due date.
+
+    Args:
+        scheduled_operation:
+            The scheduled operation to evaluate.
+        unused_dispatcher:
+            This argument is unused but included for compatibility with the
+            penalty function signature.
+        due_date_penalty_factor:
+            Cost added for each operation that
+            finishes after its due date. Defaults to 100.
+    Returns:
+        The penalty for the scheduled operation if it violates its due date,
+        otherwise 0.
+
+    .. versionadded:: 1.7.0
+    """
+    if (
+        scheduled_operation.operation.due_date is not None
+        and scheduled_operation.end_time
+        > scheduled_operation.operation.due_date
+    ):
+        return due_date_penalty_factor
+    return 0.0
