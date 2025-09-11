@@ -388,7 +388,7 @@ class JobShopInstance:
         )
         return self.duration_matrix
 
-    @property
+    @functools.cached_property
     def duration_matrix(self) -> list[list[int]]:
         """Returns the duration matrix of the instance.
 

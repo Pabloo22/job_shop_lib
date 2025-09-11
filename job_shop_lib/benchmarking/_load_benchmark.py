@@ -100,11 +100,10 @@ def load_benchmark_group(group_prefix: str) -> list[JobShopInstance]:
             (e.g., "la01-40", "la02-40", etc.) will be loaded.
 
     Returns:
-        A dictionary containing the names of the benchmark instances as keys
-        and the corresponding :class:`JobShopInstance` objects as values.
+        A list of :class:`JobShopInstance` objects whose names start with
+        the given prefix.
 
     .. versionadded:: 1.7.0
-
     """
     all_instances = load_all_benchmark_instances()
     return [
