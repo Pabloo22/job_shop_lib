@@ -81,7 +81,7 @@ def generate_machine_matrix_with_recirculation(
     num_machines_is_correct = False
     while not num_machines_is_correct:
         machine_matrix: np.ndarray = rng.integers(
-            0, num_machines, size=(num_machines, num_jobs), dtype=np.int32
+            0, num_machines, size=(num_jobs, num_machines), dtype=np.int32
         )
         num_machines_is_correct = (
             len(np.unique(machine_matrix)) == num_machines
@@ -104,6 +104,10 @@ def generate_machine_matrix_without_recirculation(
         A machine matrix without recirculation.
     """
     rng = rng or np.random.default_rng()
+    if num_jobs <= 0:
+        raise ValidationError("The number of jobs must be greater than 0.")
+    if num_machines <= 0:
+        raise ValidationError("The number of machines must be greater than 0.")
     # Start with an arange repeated:
     # m1: [0, 1, 2]
     # m2: [0, 1, 2]
