@@ -125,10 +125,10 @@ class RewardWithPenalties(RewardObserver):
         The following functions (along with ``functools.partial``) can be
         used to create penalty functions:
 
-        - :class:`job_shop_lib.metaheuristics.penalty_for_deadlines`
-        - :class:`job_shop_lib.metaheuristics.penalty_for_due_dates`
+        - :class:`~job_shop_lib.reinforcement_learning.get_deadline_violation_penalty`
+        - :class:`~job_shop_lib.reinforcement_learning.get_due_date_violation_penalty`
 
-    """
+    """  # noqa: E501
 
     def __init__(
         self,

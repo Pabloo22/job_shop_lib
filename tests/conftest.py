@@ -334,3 +334,17 @@ def ft06_instance():
 @pytest.fixture
 def seeded_rng() -> random.Random:
     return random.Random(42)
+
+
+@pytest.fixture
+def single_machine_instance() -> JobShopInstance:
+    # Two single-op jobs on same machine
+    jobs = [[Operation(0, 2)], [Operation(0, 3)]]
+    return JobShopInstance(jobs, name="SingleMachine")
+
+
+@pytest.fixture
+def two_machines_instance() -> JobShopInstance:
+    # Two jobs, each with one operation on different machines
+    jobs = [[Operation(0, 5)], [Operation(1, 3)]]
+    return JobShopInstance(jobs, name="TwoMachines")
