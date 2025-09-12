@@ -6,12 +6,15 @@ from job_shop_lib.exceptions import ValidationError
 from job_shop_lib import Operation, JobShopInstance, ScheduledOperation
 from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.reinforcement_learning import (
+    add_padding,
     create_edge_type_dict,
     map_values,
-    add_padding,
+    get_optimal_actions,
     get_deadline_violation_penalty,
     get_due_date_violation_penalty,
 )
+from job_shop_lib.dispatching import OptimalOperationsObserver
+from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 
 
 def test_add_padding_int_array():
@@ -399,6 +402,82 @@ def test_due_date_penalty_custom_factor():
         )
         == 7.5
     )
+
+
+# ---------------- get_optimal_actions tests ---------------- #
+
+
+def test_get_optimal_actions_initial_and_after_step(
+    example_job_shop_instance: JobShopInstance,
+):
+    # Build a reference schedule using a simple heuristic solver
+    solver = DispatchingRuleSolver()
+    reference_schedule = solver.solve(example_job_shop_instance)
+
+    # Fresh dispatcher and observer on same instance
+    dispatcher = Dispatcher(example_job_shop_instance)
+    optimal_obs = OptimalOperationsObserver(dispatcher, reference_schedule)
+
+    # Build available actions tuples (operation_id, machine_id, job_id)
+    available_ops = dispatcher.available_operations()
+    actions = [
+        (op.operation_id, op.machine_id, op.job_id) for op in available_ops
+    ]
+
+    # Compute mapping and expected optimal ids
+    mapping = get_optimal_actions(optimal_obs, actions)
+    expected_ones = {
+        (op.operation_id, op.machine_id, op.job_id)
+        for op in optimal_obs.optimal_available
+    }
+
+    # Check 1 for optimal, 0 otherwise
+    for a in actions:
+        assert mapping[a] == int(a in expected_ones)
+
+    # Dispatch one optimal operation and validate mapping updates
+    op_to_dispatch = next(iter(optimal_obs.optimal_available))
+    dispatcher.dispatch(op_to_dispatch)
+
+    available_ops = dispatcher.available_operations()
+    actions = [
+        (op.operation_id, op.machine_id, op.job_id) for op in available_ops
+    ]
+    mapping = get_optimal_actions(optimal_obs, actions)
+    expected_ones = {
+        (op.operation_id, op.machine_id, op.job_id)
+        for op in optimal_obs.optimal_available
+    }
+    for a in actions:
+        assert mapping[a] == int(a in expected_ones)
+
+
+def test_get_optimal_actions_marks_non_optimal_zero(
+    example_job_shop_instance: JobShopInstance,
+):
+    solver = DispatchingRuleSolver()
+    reference_schedule = solver.solve(example_job_shop_instance)
+    dispatcher = Dispatcher(example_job_shop_instance)
+    optimal_obs = OptimalOperationsObserver(dispatcher, reference_schedule)
+
+    # Valid available actions
+    available_ops = dispatcher.available_operations()
+    actions = [
+        (op.operation_id, op.machine_id, op.job_id) for op in available_ops
+    ]
+
+    # Add an artificial non-optimal action tuple (invalid machine id)
+    if actions:
+        fake_action = (actions[0][0], actions[0][1] + 99, actions[0][2])
+        actions_with_fake = actions + [fake_action]
+    else:
+        actions_with_fake = []
+
+    mapping = get_optimal_actions(optimal_obs, actions_with_fake)
+
+    # Fake action should be marked as non-optimal (0)
+    if actions_with_fake:
+        assert mapping[fake_action] == 0
 
 
 if __name__ == "__main__":
