@@ -98,8 +98,9 @@ class RewardWithPenalties(RewardObserver):
     Attributes:
         base_reward_observer:
             The base reward observer to use for calculating the reward.
-        penalty_per_violation:
-            The penalty to apply for each constraint violation.
+        penalty_function:
+            A function that takes a scheduled operation and the dispatcher as
+            input and returns the penalty for that operation.
 
     Args:
         dispatcher:
@@ -125,8 +126,8 @@ class RewardWithPenalties(RewardObserver):
         The following functions (along with ``functools.partial``) can be
         used to create penalty functions:
 
-        - :class:`~job_shop_lib.reinforcement_learning.get_deadline_violation_penalty`
-        - :class:`~job_shop_lib.reinforcement_learning.get_due_date_violation_penalty`
+        - :func:`~job_shop_lib.reinforcement_learning.get_deadline_violation_penalty`
+        - :func:`~job_shop_lib.reinforcement_learning.get_due_date_violation_penalty`
 
     """  # noqa: E501
 
