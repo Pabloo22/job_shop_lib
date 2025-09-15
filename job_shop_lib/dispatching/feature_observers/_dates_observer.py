@@ -135,8 +135,7 @@ class DatesObserver(FeatureObserver):
         elapsed_time = current_time - self._previous_current_time
         self._previous_current_time = current_time
         cols = [
-            self._attribute_map[attr]
-            for attr in self.attributes_to_observe
+            self._attribute_map[attr] for attr in self.attributes_to_observe
         ]
         self.features[FeatureType.OPERATIONS][:, cols] -= elapsed_time
 

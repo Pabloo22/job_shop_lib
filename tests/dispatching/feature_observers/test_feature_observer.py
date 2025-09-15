@@ -331,7 +331,7 @@ class TestFeatureObserver:
     def test_class_attributes(self):
         """Test class attributes have correct default values."""
         # pylint: disable=protected-access
-        assert FeatureObserver._is_singleton is False  
+        assert FeatureObserver._is_singleton is False
         assert FeatureObserver._feature_sizes == 1
         assert FeatureObserver._supported_feature_types == list(FeatureType)
 

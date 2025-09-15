@@ -1,9 +1,9 @@
 """Home of the `GraphEnvironment` class."""
 
-from collections import defaultdict
 from collections.abc import Callable, Sequence
 from typing import Any
 from copy import deepcopy
+from numpy.typing import NDArray
 
 import gymnasium as gym
 import numpy as np
@@ -27,8 +27,6 @@ from job_shop_lib.reinforcement_learning import (
     RenderConfig,
     MakespanReward,
     ObservationDict,
-    ObservationSpaceKey,
-    add_padding,
 )
 
 
@@ -145,13 +143,6 @@ class MultiJobShopGraphEnv(gym.Env):
         render_config:
             Configuration for rendering. See
             :class:`~job_shop_lib.RenderConfig`.
-
-        use_padding:
-            Whether to use padding in observations. If True, all matrices
-            are padded to fixed sizes based on the maximum instance size.
-            Values are padded with -1, except for the "removed_nodes" key,
-            which is padded with ``True``, indicating that the node is
-            removed.
     """
 
     def __init__(
@@ -172,7 +163,6 @@ class MultiJobShopGraphEnv(gym.Env):
         ] = DispatcherObserverConfig(class_type=MakespanReward),
         render_mode: str | None = None,
         render_config: RenderConfig | None = None,
-        use_padding: bool = True,
     ) -> None:
         super().__init__()
 
@@ -191,7 +181,6 @@ class MultiJobShopGraphEnv(gym.Env):
             ready_operations_filter=ready_operations_filter,
             render_mode=render_mode,
             render_config=render_config,
-            use_padding=use_padding,
         )
         self.instance_generator = instance_generator
         self.graph_initializer = graph_initializer
@@ -245,16 +234,6 @@ class MultiJobShopGraphEnv(gym.Env):
         )
 
     @property
-    def use_padding(self) -> bool:
-        """Returns whether the padding is used."""
-        return self.single_job_shop_graph_env.use_padding
-
-    @use_padding.setter
-    def use_padding(self, use_padding: bool) -> None:
-        """Sets whether the padding is used."""
-        self.single_job_shop_graph_env.use_padding = use_padding
-
-    @property
     def job_shop_graph(self) -> JobShopGraph:
         """Returns the current job shop graph."""
         return self.single_job_shop_graph_env.job_shop_graph
@@ -293,13 +272,13 @@ class MultiJobShopGraphEnv(gym.Env):
             ready_operations_filter=self.ready_operations_filter,
             render_mode=self.render_mode,
             render_config=self.render_config,
-            use_padding=self.single_job_shop_graph_env.use_padding,
         )
         obs, info = self.single_job_shop_graph_env.reset(
             seed=seed, options=options
         )
-        if self.use_padding:
-            obs = self._add_padding_to_observation(obs)
+        self.observation_space = deepcopy(
+            self.single_job_shop_graph_env.observation_space
+        )
 
         return obs, info
 
@@ -331,55 +310,33 @@ class MultiJobShopGraphEnv(gym.Env):
         obs, reward, done, truncated, info = (
             self.single_job_shop_graph_env.step(action)
         )
-        if self.use_padding:
-            obs = self._add_padding_to_observation(obs)
 
         return obs, reward, done, truncated, info
 
-    def _add_padding_to_observation(
-        self, observation: ObservationDict
-    ) -> ObservationDict:
-        """Adds padding to the observation.
-
-        "removed_nodes":
-            input_shape: (num_nodes,)
-            output_shape: (max_num_nodes,) (padded with True)
-        "edge_index":
-            input_shape: (2, num_edges)
-            output_shape: (2, max_num_edges) (padded with -1)
-        "operations":
-            input_shape: (num_operations, num_features)
-            output_shape: (max_num_operations, num_features) (padded with -1)
-        "jobs":
-            input_shape: (num_jobs, num_features)
-            output_shape: (max_num_jobs, num_features) (padded with -1)
-        "machines":
-            input_shape: (num_machines, num_features)
-            output_shape: (max_num_machines, num_features) (padded with -1)
-        """
-        padding_value: dict[str, float | bool] = defaultdict(lambda: -1)
-        padding_value[ObservationSpaceKey.REMOVED_NODES.value] = True
-        for key, value in observation.items():
-            if not isinstance(value, np.ndarray):  # Make mypy happy
-                continue
-            expected_shape = self._get_output_shape(key)
-            observation[key] = add_padding(  # type: ignore[literal-required]
-                value,
-                expected_shape,
-                padding_value=padding_value[key],
-            )
-        return observation
-
-    def _get_output_shape(self, key: str) -> tuple[int, ...]:
+    def _get_output_shape(
+        self, key: str
+    ) -> tuple[int, ...] | dict[str, tuple[int, ...]]:
         """Returns the output shape of the observation space key."""
-        output_shape = self.observation_space[key].shape
-        assert output_shape is not None  # Make mypy happy
-        return output_shape
+        space = self.observation_space[key]
+
+        if isinstance(space, gym.spaces.Box):
+            assert space.shape is not None  # mypy
+            return space.shape
+        elif isinstance(space, gym.spaces.Dict):
+            shapes: dict[str, tuple[int, ...]] = {}
+            for k, v in space.spaces.items():
+                assert v.shape is not None  # mypy knows shape is tuple now
+                shapes[k] = v.shape
+            return shapes
+        else:
+            raise ValueError(
+                f"Unsupported space type for key {key}: {type(space)}"
+            )
 
     def render(self) -> None:
         self.single_job_shop_graph_env.render()
 
-    def get_available_actions_with_ids(self) -> list[tuple[int, int, int]]:
+    def get_available_actions_with_ids(self) -> NDArray[np.int32]:
         """Returns a list of available actions in the form of
         (operation_id, machine_id, job_id)."""
         return self.single_job_shop_graph_env.get_available_actions_with_ids()
