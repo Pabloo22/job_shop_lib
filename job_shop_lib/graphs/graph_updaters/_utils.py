@@ -3,7 +3,7 @@
 from collections.abc import Iterable
 
 from job_shop_lib import Operation
-from job_shop_lib.graphs import JobShopGraph
+from job_shop_lib.graphs import JobShopGraph, NodeType
 
 
 def remove_completed_operations(
@@ -19,7 +19,9 @@ def remove_completed_operations(
             The dispatcher instance.
     """
     for operation in completed_operations:
-        if job_shop_graph.removed_nodes["OPERATION"][operation.operation_id]:
+        if job_shop_graph.removed_nodes[NodeType.OPERATION.name.lower()][
+            operation.operation_id
+        ]:
             continue
         node_id = job_shop_graph.get_operation_node(
             operation.operation_id

@@ -9,7 +9,6 @@ from job_shop_lib.reinforcement_learning import (
     create_edge_type_dict,
     add_padding,
     map_values,
-    add_padding,
     get_optimal_actions,
     get_deadline_violation_penalty,
     get_due_date_violation_penalty,

@@ -1,11 +1,9 @@
 """Home of the `SingleJobShopGraphEnv` class."""
 
 from copy import deepcopy
-from collections import defaultdict
 from collections.abc import Callable, Sequence
 from typing import Any
 import warnings
-from exceptions import ValidationError
 
 import matplotlib.pyplot as plt
 import gymnasium as gym
@@ -39,6 +37,7 @@ from job_shop_lib.reinforcement_learning import (
     ObservationSpaceKey,
     ObservationDict,
 )
+from job_shop_lib.exceptions import ValidationError
 
 
 _FEATURE_TYPE_STR_TO_NODE_TYPE = {
@@ -191,7 +190,7 @@ class SingleJobShopGraphEnv(gym.Env):
         self.action_space = gym.spaces.MultiDiscrete(
             [self.instance.num_jobs, self.instance.num_machines], start=[0, -1]
         )
-        self.use_padding = use_padding
+
         self.observation_space: gym.spaces.Dict = self._get_observation_space()
         self.render_mode = render_mode
         if render_config is None:
@@ -355,13 +354,13 @@ class SingleJobShopGraphEnv(gym.Env):
               features in the observation.
         """
         node_operation_id, node_machine_id = action
-        operation = self.job_shop_graph._nodes_map[
+        operation = self.job_shop_graph.nodes_map[
             ("operation", node_operation_id)
         ].operation
         if node_machine_id == -1:
             machine_id = operation.machine_id
         else:
-            machine_id = self.job_shop_graph._nodes_map[
+            machine_id = self.job_shop_graph.nodes_map[
                 ("machine", node_machine_id)
             ].machine_id
 
