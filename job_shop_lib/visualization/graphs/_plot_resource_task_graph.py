@@ -94,7 +94,7 @@ def plot_resource_task_graph(
     fig.suptitle(title)
 
     # Create the networkx graph
-    graph = job_shop_graph.graph
+    graph = job_shop_graph.get_networkx_graph()
     nodes = job_shop_graph.non_removed_nodes()
 
     # Create the layout if it was not provided

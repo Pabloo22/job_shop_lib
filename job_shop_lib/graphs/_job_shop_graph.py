@@ -17,13 +17,13 @@ NODE_ATTR = "node"
 class JobShopGraph:
     """Represents a :class:`JobShopInstance` as a heterogeneous directed graph.
 
-    Provides a comprehensive graph-based representation of a job shop
-    scheduling problem, utilizing outgoing and incoming edges adjacency lists
-    with multiple edge types to model the complex
-    relationships between jobs, operations, and machines. This class transforms
-    the abstract scheduling problem into a directed graph, where various
-    entities (jobs, machines, and operations) are nodes, and the dependencies
-    (such as operation order within a job or machine assignment) are edges.
+    Internally, the graph is represented using adjacency lists
+    (``adjaceny_in`` and ``adjacency_out``) for efficient
+    addition and removal of nodes and edges.
+
+    The graph can be converted to a
+    :class:`networkx.DiGraph` on-demand via the
+    :meth:`~JobShopGraph.get_networkx_graph` method.
 
     This transformation allows for the application of graph algorithms
     to analyze and solve scheduling problems.
@@ -135,12 +135,11 @@ class JobShopGraph:
 
         self.edge_types = set[tuple[str, str, str]]()
 
-    @property
-    def graph(self) -> nx.DiGraph:
-        """Constructs and returns a networkx.DiGraph object on-demand.
+    def get_networkx_graph(self) -> nx.DiGraph:
+        """Constructs and returns a ``networkx.DiGraph`` object on-demand.
 
-        The generated graph respects all node removals, containing only the
-        active nodes and the edges between them.
+        Each node is represented by their node ID, and all edges have a "type"
+        property in their data.
         """
         g = nx.DiGraph()
         # Add only the nodes that have not been removed

@@ -24,7 +24,7 @@ def test_nodes(example_job_shop_instance):
     graph = JobShopGraph(example_job_shop_instance)
     add_source_sink_nodes(graph)
     assert graph.nodes == [
-        data["node"] for _, data in graph.graph.nodes(data=True)
+        data["node"] for _, data in graph.get_networkx_graph().nodes(data=True)
     ]
 
 
@@ -163,18 +163,20 @@ def test_remove_node(example_job_shop_instance):
         # Seeing all edges of removed nodes just returns an empty list, not an error
         # So we try to access an edge that should not exist
         last_removed_node_id = nodes_to_remove[-1]
-        graph.graph.remove_edge(last_removed_node_id, ("SOURCE", 0))
+        graph.get_networkx_graph().remove_edge(
+            last_removed_node_id, ("SOURCE", 0)
+        )
 
     # This part of the test remains valid as it uses the is_removed() helper
     graph.remove_isolated_nodes()
-    isolated_nodes = list(nx.isolates(graph.graph))
+    isolated_nodes = list(nx.isolates(graph.get_networkx_graph()))
     assert not isolated_nodes
 
     # Verify the integrity of the remaining graph structure
     remaining_node_ids = {
         node.node_id for node in graph.nodes if not graph.is_removed(node)
     }
-    for u, v in graph.graph.edges():
+    for u, v in graph.get_networkx_graph().edges():
         assert u in remaining_node_ids
         assert v in remaining_node_ids
 
