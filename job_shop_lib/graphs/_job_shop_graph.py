@@ -128,11 +128,6 @@ class JobShopGraph:
 
         if add_operation_nodes:
             self.add_operation_nodes()
-
-        self.removed_nodes[NodeType.OPERATION.name.lower()] = [
-            False
-        ] * instance.num_operations
-
         self.edge_types = set[tuple[str, str, str]]()
 
     def get_networkx_graph(self) -> nx.DiGraph:
@@ -242,6 +237,10 @@ class JobShopGraph:
             self.instance_id_map[NodeType.OPERATION.name.lower()][
                 operation.operation_id
             ] = node_for_adding
+            if NodeType.OPERATION.name.lower() not in self.removed_nodes:
+                self.removed_nodes[NodeType.OPERATION.name.lower()] = [
+                    False
+                ] * self.instance.num_operations
         elif node_for_adding.node_type == NodeType.MACHINE:
             self.instance_id_map[NodeType.MACHINE.name.lower()][
                 node_for_adding.machine_id
