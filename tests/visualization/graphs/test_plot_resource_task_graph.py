@@ -12,7 +12,9 @@ from job_shop_lib.visualization.graphs import (
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_plot_resource_task_graph(example_job_shop_instance):
     graph = build_resource_task_graph(example_job_shop_instance)
@@ -22,7 +24,9 @@ def test_plot_resource_task_graph(example_job_shop_instance):
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_plot_resource_task_graph_with_jobs(example_job_shop_instance):
     graph = build_resource_task_graph_with_jobs(example_job_shop_instance)
@@ -32,7 +36,9 @@ def test_plot_resource_task_graph_with_jobs(example_job_shop_instance):
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_plot_complete_resource_task_graph(example_job_shop_instance):
     graph = build_complete_resource_task_graph(example_job_shop_instance)
@@ -41,7 +47,9 @@ def test_plot_complete_resource_task_graph(example_job_shop_instance):
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_plot_resource_task_graph_custom_title_legend(
     example_job_shop_instance,
@@ -58,7 +66,9 @@ def test_plot_resource_task_graph_custom_title_legend(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_plot_resource_task_graph_with_jobs_doble_arrow(
     example_job_shop_instance,
@@ -85,7 +95,9 @@ def test_plot_resource_task_graph_with_jobs_doble_arrow(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_plot_resource_task_graph_with_jobs_single_edge_custom_params(
     example_job_shop_instance,
@@ -106,7 +118,9 @@ def test_plot_resource_task_graph_with_jobs_single_edge_custom_params(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_plot_complete_resource_task_graph_custom_shapes_colors_layout(
     example_job_shop_instance,

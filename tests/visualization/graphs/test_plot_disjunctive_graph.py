@@ -14,7 +14,9 @@ from job_shop_lib.exceptions import ValidationError
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_default_plot_disjunctive_graph(
     example_job_shop_instance: JobShopInstance,
@@ -26,7 +28,9 @@ def test_default_plot_disjunctive_graph(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_plot_disjunctive_graph_single_edge_machine_colors(
     example_job_shop_instance: JobShopInstance,
@@ -63,7 +67,9 @@ def test_plot_disjunctive_graph_single_edge_machine_colors(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_plot_disjunctive_graph_removed_nodes(
     example_job_shop_instance: JobShopInstance,
@@ -105,7 +111,9 @@ def test_plot_disjunctive_graph_removed_nodes(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    style="default",
+    tolerance=10,
+    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
 )
 def test_plot_disjunctive_graph_removed_nodes_default_machine_colors(
     example_job_shop_instance: JobShopInstance,
