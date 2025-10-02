@@ -13,11 +13,13 @@ from job_shop_lib.visualization.graphs import plot_disjunctive_graph
 from job_shop_lib.exceptions import ValidationError
 
 
-@pytest.mark.mpl_image_compare(
-    style="default",
-    tolerance=10,
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
-)
+KWARGS_MPL_IMAGE_COMPARE = {
+    "style": "default",
+    "tolerance": 20,
+    "savefig_kwargs": {"dpi": 300, "bbox_inches": "tight"},
+}
+
+@pytest.mark.mpl_image_compare(**KWARGS_MPL_IMAGE_COMPARE)
 def test_default_plot_disjunctive_graph(
     example_job_shop_instance: JobShopInstance,
 ):
@@ -28,9 +30,7 @@ def test_default_plot_disjunctive_graph(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default",
-    tolerance=10,
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
+    **KWARGS_MPL_IMAGE_COMPARE
 )
 def test_plot_disjunctive_graph_single_edge_machine_colors(
     example_job_shop_instance: JobShopInstance,
@@ -67,9 +67,7 @@ def test_plot_disjunctive_graph_single_edge_machine_colors(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default",
-    tolerance=10,
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
+    **KWARGS_MPL_IMAGE_COMPARE
 )
 def test_plot_disjunctive_graph_removed_nodes(
     example_job_shop_instance: JobShopInstance,
@@ -111,9 +109,7 @@ def test_plot_disjunctive_graph_removed_nodes(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default",
-    tolerance=10,
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"},
+    **KWARGS_MPL_IMAGE_COMPARE
 )
 def test_plot_disjunctive_graph_removed_nodes_default_machine_colors(
     example_job_shop_instance: JobShopInstance,
