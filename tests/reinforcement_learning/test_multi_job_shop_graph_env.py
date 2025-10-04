@@ -155,7 +155,7 @@ def test_all_nodes_are_removed(
 
     removed_nodes = multi_job_shop_graph_env.job_shop_graph.removed_nodes
     try:
-        assert np.all(removed_nodes)
+        assert all(np.all(lst) for lst in removed_nodes.values())
     except AssertionError:
         print(removed_nodes)
         print(env.instance.to_dict())
