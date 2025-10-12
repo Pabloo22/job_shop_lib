@@ -13,7 +13,9 @@ class Node:
 
     A node is hashable by its id. The id is assigned when the node is added to
     the graph. The id must be unique for each node in the graph, and should be
-    used to identify the node in the networkx graph.
+    used to identify the node in the networkx graph. The id is a tuple
+    containing the node type's name as a string and a local integer id,
+    e.g., ``("MACHINE", 42)``.
 
     Depending on the type of the node, it can have different attributes. The
     following table shows the attributes of each type of node:
@@ -29,7 +31,7 @@ class Node:
     +----------------+---------------------+
 
     In terms of equality, two nodes are equal if they have the same id.
-    Additionally, one node is equal to an integer if the integer is equal to
+    Additionally, a node is equal to a tuple if the tuple is equal to
     its id. It is also hashable by its id.
 
     This allows for using the node as a key in a dictionary, at the same time
@@ -38,10 +40,10 @@ class Node:
     .. code-block:: python
 
         node = Node(NodeType.SOURCE)
-        node.node_id = 1
+        node.node_id = ("SOURCE", 0)
         graph = {node: "some value"}
         print(graph[node])  # "some value"
-        print(graph[1])  # "some value"
+        print(graph[("SOURCE", 0)])  # "some value"
 
     Args:
         node_type:
@@ -67,7 +69,7 @@ class Node:
 
     __slots__ = {
         "node_type": "The type of the node.",
-        "_node_id": "Unique identifier for the node.",
+        "_node_id": "Unique identifier for the node (tuple[str, int]).",
         "_operation": ("The operation associated with the node."),
         "_machine_id": ("The machine ID associated with the node."),
         "_job_id": "The job ID associated with the node.",
@@ -90,14 +92,14 @@ class Node:
             raise ValidationError("Job node must have a job_id.")
 
         self.node_type: NodeType = node_type
-        self._node_id: int | None = None
+        self._node_id: tuple[str, int] | None = None
 
         self._operation = operation
         self._machine_id = machine_id
         self._job_id = job_id
 
     @property
-    def node_id(self) -> int:
+    def node_id(self) -> tuple[str, int]:
         """Returns a unique identifier for the node."""
         if self._node_id is None:
             raise UninitializedAttributeError(
@@ -106,7 +108,7 @@ class Node:
         return self._node_id
 
     @node_id.setter
-    def node_id(self, value: int) -> None:
+    def node_id(self, value: tuple[str, int]) -> None:
         self._node_id = value
 
     @property
@@ -150,27 +152,33 @@ class Node:
         return self._job_id
 
     def __hash__(self) -> int:
-        return self.node_id
+        return hash(self.node_id)
 
     def __eq__(self, __value: object) -> bool:
         if isinstance(__value, Node):
-            __value = __value.node_id
+            return self.node_id == __value.node_id
         return self.node_id == __value
 
     def __repr__(self) -> str:
+        # Use self.node_id to trigger UninitializedAttributeError if not set
+        try:
+            node_id_repr = f"id={self.node_id}"
+        except UninitializedAttributeError:
+            node_id_repr = "id=None"
+
         if self.node_type == NodeType.OPERATION:
             return (
-                f"Node(node_type={self.node_type.name}, id={self._node_id}, "
+                f"Node(node_type={self.node_type.name}, {node_id_repr}, "
                 f"operation={self.operation})"
             )
         if self.node_type == NodeType.MACHINE:
             return (
-                f"Node(node_type={self.node_type.name}, id={self._node_id}, "
+                f"Node(node_type={self.node_type.name}, {node_id_repr}, "
                 f"machine_id={self._machine_id})"
             )
         if self.node_type == NodeType.JOB:
             return (
-                f"Node(node_type={self.node_type.name}, id={self._node_id}, "
+                f"Node(node_type={self.node_type.name}, {node_id_repr}, "
                 f"job_id={self._job_id})"
             )
-        return f"Node(node_type={self.node_type.name}, id={self._node_id})"
+        return f"Node(node_type={self.node_type.name}, {node_id_repr})"

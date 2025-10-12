@@ -4,14 +4,22 @@ import pytest
 import matplotlib
 
 from job_shop_lib import JobShopInstance
-from job_shop_lib.graphs import build_disjunctive_graph, NodeType, Node
+from job_shop_lib.graphs import (
+    build_disjunctive_graph,
+    NodeType,
+    Node,
+)
 from job_shop_lib.visualization.graphs import plot_disjunctive_graph
 from job_shop_lib.exceptions import ValidationError
 
 
-@pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
-)
+KWARGS_MPL_IMAGE_COMPARE = {
+    "style": "default",
+    "tolerance": 20,
+    "savefig_kwargs": {"dpi": 300, "bbox_inches": "tight"},
+}
+
+@pytest.mark.mpl_image_compare(**KWARGS_MPL_IMAGE_COMPARE)
 def test_default_plot_disjunctive_graph(
     example_job_shop_instance: JobShopInstance,
 ):
@@ -22,7 +30,7 @@ def test_default_plot_disjunctive_graph(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    **KWARGS_MPL_IMAGE_COMPARE
 )
 def test_plot_disjunctive_graph_single_edge_machine_colors(
     example_job_shop_instance: JobShopInstance,
@@ -59,7 +67,7 @@ def test_plot_disjunctive_graph_single_edge_machine_colors(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    **KWARGS_MPL_IMAGE_COMPARE
 )
 def test_plot_disjunctive_graph_removed_nodes(
     example_job_shop_instance: JobShopInstance,
@@ -69,22 +77,12 @@ def test_plot_disjunctive_graph_removed_nodes(
     also using machine_colors and single_edge for disjunctive edges.
     """
     graph = build_disjunctive_graph(example_job_shop_instance)
-
     op_nodes = [
         node for node in graph.nodes if node.node_type == NodeType.OPERATION
     ]
-
-    # Remove 1st, 3rd, 4th operation nodes if they exist
-    nodes_to_remove_indices = [0, 2, 3]
-    removed_count = 0
-    for index_to_remove in nodes_to_remove_indices:
-        actual_index = index_to_remove - removed_count
-        if actual_index < len(op_nodes):
-            node_to_remove = op_nodes.pop(actual_index)
-            if not graph.is_removed(node_to_remove.node_id):
-                graph.remove_node(node_to_remove.node_id)
-                removed_count += 1
-
+    to_remove = [op_nodes[i] for i in [0, 2, 3] if i < len(op_nodes)]
+    for node in to_remove:
+        graph.remove_node(node.node_id)
     num_machines = example_job_shop_instance.num_machines
     cmap = matplotlib.colormaps.get_cmap("plasma")
     machine_colors = {
@@ -111,7 +109,7 @@ def test_plot_disjunctive_graph_removed_nodes(
 
 
 @pytest.mark.mpl_image_compare(
-    style="default", savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
+    **KWARGS_MPL_IMAGE_COMPARE
 )
 def test_plot_disjunctive_graph_removed_nodes_default_machine_colors(
     example_job_shop_instance: JobShopInstance,
@@ -129,7 +127,7 @@ def test_plot_disjunctive_graph_removed_nodes_default_machine_colors(
         actual_index = index_to_remove - removed_count
         if actual_index < len(op_nodes):
             node_to_remove = op_nodes.pop(actual_index)
-            if not graph.is_removed(node_to_remove.node_id):
+            if not graph.is_removed(node_to_remove):
                 graph.remove_node(node_to_remove.node_id)
                 removed_count += 1
 

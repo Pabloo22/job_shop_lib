@@ -6,8 +6,8 @@ from job_shop_lib.exceptions import ValidationError
 from job_shop_lib import Operation, JobShopInstance, ScheduledOperation
 from job_shop_lib.dispatching import Dispatcher
 from job_shop_lib.reinforcement_learning import (
-    add_padding,
     create_edge_type_dict,
+    add_padding,
     map_values,
     get_optimal_actions,
     get_deadline_violation_penalty,

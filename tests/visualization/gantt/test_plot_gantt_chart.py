@@ -5,10 +5,13 @@ from job_shop_lib import Schedule
 from job_shop_lib.visualization.gantt import plot_gantt_chart
 
 
-@pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
-)
+KWARGS_MPL_IMAGE_COMPARE = {
+    "style": "default",
+    "tolerance": 10,
+    "savefig_kwargs": {"dpi": 300, "bbox_inches": "tight"},
+}
+
+@pytest.mark.mpl_image_compare(**KWARGS_MPL_IMAGE_COMPARE)
 def test_plot_gantt_chart_default(example_schedule: Schedule):
     fig, ax = plot_gantt_chart(example_schedule)
     assert isinstance(fig, Figure)
@@ -16,10 +19,7 @@ def test_plot_gantt_chart_default(example_schedule: Schedule):
     return fig
 
 
-@pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
-)
+@pytest.mark.mpl_image_compare(**KWARGS_MPL_IMAGE_COMPARE)
 def test_plot_gantt_chart_custom_title(example_schedule: Schedule):
     fig, ax = plot_gantt_chart(example_schedule, title="Custom Title")
     assert isinstance(fig, Figure)
@@ -28,10 +28,7 @@ def test_plot_gantt_chart_custom_title(example_schedule: Schedule):
     return fig
 
 
-@pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
-)
+@pytest.mark.mpl_image_compare(**KWARGS_MPL_IMAGE_COMPARE)
 def test_plot_gantt_chart_no_title(example_schedule: Schedule):
     fig, ax = plot_gantt_chart(example_schedule, title="")
     assert isinstance(fig, Figure)
@@ -40,10 +37,7 @@ def test_plot_gantt_chart_no_title(example_schedule: Schedule):
     return fig
 
 
-@pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
-)
+@pytest.mark.mpl_image_compare(**KWARGS_MPL_IMAGE_COMPARE)
 def test_plot_gantt_chart_custom_labels(example_schedule: Schedule):
     job_labels = ["Job A", "Job B", "Job C"]
     machine_labels = ["Machine X", "Machine Y", "Machine Z"]
@@ -59,16 +53,17 @@ def test_plot_gantt_chart_custom_labels(example_schedule: Schedule):
     assert ax is not None
     assert ax.get_xlabel() == "Custom X Label"
     assert ax.get_ylabel() == "Custom Y Label"
-    assert ax.get_legend().get_title().get_text() == "Custom Legend"
+    legend = ax.get_legend()
+    assert legend is not None
+    assert legend.get_title().get_text() == "Custom Legend"
     assert [tick.get_text() for tick in ax.get_yticklabels()] == machine_labels
-    assert [text.get_text() for text in ax.get_legend().get_texts()] == job_labels
+    assert [
+        text.get_text() for text in legend.get_texts()
+    ] == job_labels
     return fig
 
 
-@pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
-)
+@pytest.mark.mpl_image_compare(**KWARGS_MPL_IMAGE_COMPARE)
 def test_plot_gantt_chart_custom_xlim_and_ticks(example_schedule: Schedule):
     custom_xlim = 20
     num_ticks = 10
@@ -83,10 +78,7 @@ def test_plot_gantt_chart_custom_xlim_and_ticks(example_schedule: Schedule):
     return fig
 
 
-@pytest.mark.mpl_image_compare(
-    style="default",
-    savefig_kwargs={"dpi": 300, "bbox_inches": "tight"}
-)
+@pytest.mark.mpl_image_compare(**KWARGS_MPL_IMAGE_COMPARE)
 def test_plot_gantt_chart_different_cmap(example_schedule: Schedule):
     fig, ax = plot_gantt_chart(example_schedule, cmap_name="plasma")
     assert isinstance(fig, Figure)

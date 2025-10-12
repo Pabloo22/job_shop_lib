@@ -216,13 +216,13 @@ def plot_disjunctive_graph(
             graphviz_layout, prog="dot", args="-Grankdir=LR"
         )
 
-    temp_graph = copy.deepcopy(job_shop_graph.graph)
+    temp_graph = copy.deepcopy(job_shop_graph.get_networkx_graph())
     # Remove disjunctive edges to get a better layout
     temp_graph.remove_edges_from(
         [
             (u, v)
-            for u, v, d in job_shop_graph.graph.edges(data=True)
-            if d["type"] == EdgeType.DISJUNCTIVE
+            for u, v, d in job_shop_graph.get_networkx_graph().edges(data=True)
+            if d["type"][1] == EdgeType.DISJUNCTIVE.name
         ]
     )
 
@@ -244,7 +244,7 @@ def plot_disjunctive_graph(
         cmap_func = matplotlib.colormaps.get_cmap(color_map)
         remaining_machines = job_shop_graph.instance.num_machines
         for operation_node in operation_nodes:
-            if job_shop_graph.is_removed(operation_node.node_id):
+            if job_shop_graph.is_removed(operation_node):
                 continue
             machine_id = operation_node.operation.machine_id
             if machine_id not in machine_colors:
@@ -258,12 +258,12 @@ def plot_disjunctive_graph(
         node_colors: list[Any] = [
             _get_node_color(node)
             for node in job_shop_graph.nodes
-            if not job_shop_graph.is_removed(node.node_id)
+            if not job_shop_graph.is_removed(node)
         ]
     else:
         node_colors = []
         for node in job_shop_graph.nodes:
-            if job_shop_graph.is_removed(node.node_id):
+            if job_shop_graph.is_removed(node):
                 continue
             if node.node_type == NodeType.OPERATION:
                 machine_id = node.operation.machine_id
@@ -272,7 +272,7 @@ def plot_disjunctive_graph(
             node_colors.append(machine_colors[machine_id])
 
     nx.draw_networkx_nodes(
-        job_shop_graph.graph,
+        job_shop_graph.get_networkx_graph(),
         pos,
         node_size=node_size,
         node_color=node_colors,
@@ -284,13 +284,13 @@ def plot_disjunctive_graph(
     # ----------
     conjunctive_edges = [
         (u, v)
-        for u, v, d in job_shop_graph.graph.edges(data=True)
-        if d["type"] == EdgeType.CONJUNCTIVE
+        for u, v, d in job_shop_graph.get_networkx_graph().edges(data=True)
+        if d["type"][1] == EdgeType.CONJUNCTIVE.name
     ]
     disjunctive_edges: Iterable[tuple[int, int]] = [
         (u, v)
-        for u, v, d in job_shop_graph.graph.edges(data=True)
-        if d["type"] == EdgeType.DISJUNCTIVE
+        for u, v, d in job_shop_graph.get_networkx_graph().edges(data=True)
+        if d["type"][1] == EdgeType.DISJUNCTIVE.name
     ]
     if conjunctive_edges_additional_params is None:
         conjunctive_edges_additional_params = {}
@@ -298,7 +298,7 @@ def plot_disjunctive_graph(
         disjunctive_edges_additional_params = {}
 
     nx.draw_networkx_edges(
-        job_shop_graph.graph,
+        job_shop_graph.get_networkx_graph(),
         pos,
         edgelist=conjunctive_edges,
         width=edge_width,
@@ -317,7 +317,7 @@ def plot_disjunctive_graph(
                 disjunctive_edges_filtered.add((u, v))
             disjunctive_edges = disjunctive_edges_filtered
         nx.draw_networkx_edges(
-            job_shop_graph.graph,
+            job_shop_graph.get_networkx_graph(),
             pos,
             edgelist=disjunctive_edges,
             width=edge_width,
@@ -331,20 +331,20 @@ def plot_disjunctive_graph(
     labels = {}
     if job_shop_graph.nodes_by_type[NodeType.SOURCE]:
         source_node = job_shop_graph.nodes_by_type[NodeType.SOURCE][0]
-        if not job_shop_graph.is_removed(source_node.node_id):
+        if not job_shop_graph.is_removed(source_node):
             labels[source_node] = start_node_label
     if job_shop_graph.nodes_by_type[NodeType.SINK]:
         sink_node = job_shop_graph.nodes_by_type[NodeType.SINK][0]
         # check if the sink node is removed
-        if not job_shop_graph.is_removed(sink_node.node_id):
+        if not job_shop_graph.is_removed(sink_node):
             labels[sink_node] = end_node_label
     for operation_node in operation_nodes:
-        if job_shop_graph.is_removed(operation_node.node_id):
+        if job_shop_graph.is_removed(operation_node):
             continue
         labels[operation_node] = operation_node_labeler(operation_node)
 
     nx.draw_networkx_labels(
-        job_shop_graph.graph,
+        job_shop_graph.get_networkx_graph(),
         pos,
         labels=labels,
         font_color=node_font_color,

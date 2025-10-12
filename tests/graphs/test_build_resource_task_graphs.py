@@ -4,12 +4,10 @@ from job_shop_lib.graphs._build_resource_task_graphs import (
     build_resource_task_graph,
 )
 from job_shop_lib import JobShopInstance
-from job_shop_lib.benchmarking import load_all_benchmark_instances
 
 
-def test_expected_num_nodes_complete():
-    benchmark_instances = load_all_benchmark_instances()
-    for instance in list(benchmark_instances.values())[:10]:
+def test_expected_num_nodes_complete(first_ten_benchmark_instances):
+    for instance in first_ten_benchmark_instances:
         graph = build_complete_resource_task_graph(instance)
         expected_num_nodes = get_expected_num_nodes_for_complete_graph(
             instance
@@ -17,9 +15,8 @@ def test_expected_num_nodes_complete():
         assert len(graph.nodes) == expected_num_nodes
 
 
-def test_expected_num_nodes_with_jobs():
-    benchmark_instances = load_all_benchmark_instances()
-    for instance in list(benchmark_instances.values())[:10]:
+def test_expected_num_nodes_with_jobs(first_ten_benchmark_instances):
+    for instance in first_ten_benchmark_instances:
         graph = build_resource_task_graph_with_jobs(instance)
         expected_num_nodes = get_expected_num_nodes_for_graph_with_jobs(
             instance
@@ -27,17 +24,15 @@ def test_expected_num_nodes_with_jobs():
         assert len(graph.nodes) == expected_num_nodes
 
 
-def test_expected_num_nodes():
-    benchmark_instances = load_all_benchmark_instances()
-    for instance in list(benchmark_instances.values())[:10]:
+def test_expected_num_nodes(first_ten_benchmark_instances):
+    for instance in first_ten_benchmark_instances:
         graph = build_resource_task_graph(instance)
         expected_num_nodes = get_expected_num_nodes(instance)
         assert len(graph.nodes) == expected_num_nodes
 
 
-def test_expected_num_edges_complete():
-    benchmark_instances = load_all_benchmark_instances()
-    for instance in list(benchmark_instances.values())[:10]:
+def test_expected_num_edges_complete(first_ten_benchmark_instances):
+    for instance in first_ten_benchmark_instances:
         graph = build_complete_resource_task_graph(instance)
         expected_num_edges = get_expected_num_edges_for_complete_graph(
             instance
@@ -67,9 +62,8 @@ def test_expected_num_edges_example(example_job_shop_instance):
     assert graph.num_edges == expected_num_edges
 
 
-def test_expected_num_edges_with_jobs():
-    benchmark_instances = load_all_benchmark_instances()
-    for instance in list(benchmark_instances.values())[:10]:
+def test_expected_num_edges_with_jobs(first_ten_benchmark_instances):
+    for instance in first_ten_benchmark_instances:
         graph = build_resource_task_graph_with_jobs(instance)
         expected_num_edges = get_expected_num_edges_for_graph_with_jobs(
             instance
@@ -77,9 +71,8 @@ def test_expected_num_edges_with_jobs():
         assert graph.num_edges == expected_num_edges
 
 
-def test_expected_num_edges():
-    benchmark_instances = load_all_benchmark_instances()
-    for instance in list(benchmark_instances.values())[:10]:
+def test_expected_num_edges(first_ten_benchmark_instances):
+    for instance in first_ten_benchmark_instances:
         graph = build_resource_task_graph(instance)
         expected_num_edges = get_expected_num_edges(instance)
         assert graph.num_edges == expected_num_edges

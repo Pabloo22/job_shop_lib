@@ -94,7 +94,7 @@ def plot_resource_task_graph(
     fig.suptitle(title)
 
     # Create the networkx graph
-    graph = job_shop_graph.graph
+    graph = job_shop_graph.get_networkx_graph()
     nodes = job_shop_graph.non_removed_nodes()
 
     # Create the layout if it was not provided
@@ -114,9 +114,9 @@ def plot_resource_task_graph(
         if node_color_map is None
         else node_color_map
     )
-    node_colors = [
-        node_color_map(node) for node in job_shop_graph.nodes
-    ]  # We need to get the color of all nodes to avoid an index error
+    node_colors = {
+        node.node_id: node_color_map(node) for node in job_shop_graph.nodes
+    }  # We need to get the color of all nodes to avoid an index error
     if node_shapes is None:
         node_shapes = {
             "machine": "s",

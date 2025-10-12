@@ -257,17 +257,17 @@ disjunctive_graph = build_disjunctive_graph(instance)
 
  >>> disjunctive_graph.nodes_by_type
  defaultdict(list,
-            {<NodeType.OPERATION: 1>: [Node(node_type=OPERATION, value=O(m=0, d=1, j=0, p=0), id=0),
-              Node(node_type=OPERATION, value=O(m=1, d=1, j=0, p=1), id=1),
-              Node(node_type=OPERATION, value=O(m=2, d=7, j=0, p=2), id=2),
-              Node(node_type=OPERATION, value=O(m=1, d=5, j=1, p=0), id=3),
-              Node(node_type=OPERATION, value=O(m=2, d=1, j=1, p=1), id=4),
-              Node(node_type=OPERATION, value=O(m=0, d=1, j=1, p=2), id=5),
-              Node(node_type=OPERATION, value=O(m=2, d=1, j=2, p=0), id=6),
-              Node(node_type=OPERATION, value=O(m=0, d=3, j=2, p=1), id=7),
-              Node(node_type=OPERATION, value=O(m=1, d=2, j=2, p=2), id=8)],
-             <NodeType.SOURCE: 5>: [Node(node_type=SOURCE, value=None, id=9)],
-             <NodeType.SINK: 6>: [Node(node_type=SINK, value=None, id=10)]})
+            {<NodeType.OPERATION: 1>: [Node(node_type=OPERATION, value=O(m=0, d=1, j=0, p=0), id=("OPERATION", 0)),
+              Node(node_type=OPERATION, value=O(m=1, d=1, j=0, p=1), id=("OPERATION", 1)),
+              Node(node_type=OPERATION, value=O(m=2, d=7, j=0, p=2), id=("OPERATION", 2)),
+              Node(node_type=OPERATION, value=O(m=1, d=5, j=1, p=0), id=("OPERATION", 3)),
+              Node(node_type=OPERATION, value=O(m=2, d=1, j=1, p=1), id=("OPERATION", 4)),
+              Node(node_type=OPERATION, value=O(m=0, d=1, j=1, p=2), id=("OPERATION", 5)),
+              Node(node_type=OPERATION, value=O(m=2, d=1, j=2, p=0), id=("OPERATION", 6)),
+              Node(node_type=OPERATION, value=O(m=0, d=3, j=2, p=1), id=("OPERATION", 7)),
+              Node(node_type=OPERATION, value=O(m=1, d=2, j=2, p=2), id=("OPERATION", 8))],
+             <NodeType.SOURCE: 5>: [Node(node_type=SOURCE, value=None, id=('SOURCE', 0))],
+             <NodeType.SINK: 6>: [Node(node_type=SINK, value=None, id=('SINK', 0))]})
 ```
 
 Other attributes include:

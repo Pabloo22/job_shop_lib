@@ -12,12 +12,11 @@ import numpy as np
 from numpy.typing import NDArray
 
 from job_shop_lib import JobShopInstance, Operation
-from job_shop_lib.graphs import JobShopGraph
+from job_shop_lib.graphs import JobShopGraph, NodeType
 from job_shop_lib.graphs.graph_updaters import (
     GraphUpdater,
     ResidualGraphUpdater,
 )
-from job_shop_lib.exceptions import ValidationError
 from job_shop_lib.dispatching import (
     Dispatcher,
     filter_dominated_operations,
@@ -28,16 +27,24 @@ from job_shop_lib.dispatching.feature_observers import (
     CompositeFeatureObserver,
     FeatureObserver,
     FeatureObserverType,
+    FeatureType,
 )
 from job_shop_lib.visualization.gantt import GanttChartCreator
 from job_shop_lib.reinforcement_learning import (
     RewardObserver,
     MakespanReward,
-    add_padding,
     RenderConfig,
     ObservationSpaceKey,
     ObservationDict,
 )
+from job_shop_lib.exceptions import ValidationError
+
+
+_FEATURE_TYPE_STR_TO_NODE_TYPE = {
+    FeatureType.OPERATIONS.value: NodeType.OPERATION,
+    FeatureType.MACHINES.value: NodeType.MACHINE,
+    FeatureType.JOBS.value: NodeType.JOB,
+}
 
 
 class SingleJobShopGraphEnv(gym.Env):
@@ -51,13 +58,15 @@ class SingleJobShopGraphEnv(gym.Env):
     Observation Space:
         A dictionary with the following keys:
 
-        - "removed_nodes": Binary vector indicating removed graph nodes.
-        - "edge_list": Matrix of graph edges in COO format.
-        - Feature matrices: Keys corresponding to the composite observer
-          features (e.g., "operations", "jobs", "machines").
+        - "edge_index_dict": Dictionary mapping edge types to
+          their COO format indices.
+        - "available_operations_with_ids": List of available actions
+          represented as (operation_id, machine_id, job_id) tuples.
+        - "node_features_dict": (optional) Dictionary mapping node types to
+          their feature matrices.
 
     Action Space:
-        MultiDiscrete space representing (job_id, machine_id) pairs.
+        MultiDiscrete space representing (operation_id, machine_id) pairs.
 
     Render Modes:
 
@@ -85,17 +94,20 @@ class SingleJobShopGraphEnv(gym.Env):
 
         action_space:
             Defines the action space. The action is a tuple of two integers
-            (job_id, machine_id). The machine_id can be -1 if the selected
-            operation can only be scheduled in one machine.
+            (operation_id, machine_id). The machine_id can be -1 if the
+            selected operation can only be scheduled in one machine.
 
         observation_space:
             Defines the observation space. The observation is a dictionary
             with the following keys:
 
-            - "removed_nodes": Binary vector indicating removed graph nodes.
-            - "edge_list": Matrix of graph edges in COO format.
-            - Feature matrices: Keys corresponding to the composite observer
-                features (e.g., "operations", "jobs", "machines").
+            - "edge_index_dict": Dictionary mapping edge types to
+              their COO format indices.
+            - "available_operations_with_ids": List of available
+              actions represented as
+              (operation_id, machine_id, job_id) tuples.
+            - "node_features_dict": (optional) Dictionary mapping
+              node types to their feature matrices.
 
         render_mode:
             The mode for rendering the environment ("human", "save_video",
@@ -104,10 +116,6 @@ class SingleJobShopGraphEnv(gym.Env):
         gantt_chart_creator:
             Creates Gantt chart visualizations. See
             :class:`~job_shop_lib.visualization.GanttChartCreator`.
-
-        use_padding:
-            Whether to use padding in observations. Padding maintains the
-            observation space shape when the number of nodes changes.
 
     Args:
         job_shop_graph:
@@ -127,9 +135,6 @@ class SingleJobShopGraphEnv(gym.Env):
         render_config:
             Configuration for rendering (e.g., paths for saving videos
             or GIFs). See :class:`~job_shop_lib.visualization.RenderConfig`.
-        use_padding:
-            Whether to use padding in observations. Padding maintains the
-            observation space shape when the number of nodes changes.
     """
 
     metadata = {"render_modes": ["human", "save_video", "save_gif"]}
@@ -158,7 +163,6 @@ class SingleJobShopGraphEnv(gym.Env):
         ) = filter_dominated_operations,
         render_mode: str | None = None,
         render_config: RenderConfig | None = None,
-        use_padding: bool = True,
     ) -> None:
         super().__init__()
         # Used for resetting the environment
@@ -186,6 +190,7 @@ class SingleJobShopGraphEnv(gym.Env):
         self.action_space = gym.spaces.MultiDiscrete(
             [self.instance.num_jobs, self.instance.num_machines], start=[0, -1]
         )
+
         self.observation_space: gym.spaces.Dict = self._get_observation_space()
         self.render_mode = render_mode
         if render_config is None:
@@ -193,7 +198,6 @@ class SingleJobShopGraphEnv(gym.Env):
         self.gantt_chart_creator = GanttChartCreator(
             dispatcher=self.dispatcher, **render_config
         )
-        self.use_padding = use_padding
 
     @property
     def instance(self) -> JobShopInstance:
@@ -240,29 +244,60 @@ class SingleJobShopGraphEnv(gym.Env):
 
     def _get_observation_space(self) -> gym.spaces.Dict:
         """Returns the observation space dictionary."""
-        num_edges = self.job_shop_graph.num_edges
-        dict_space: dict[str, gym.Space] = {
-            ObservationSpaceKey.REMOVED_NODES.value: gym.spaces.MultiBinary(
-                len(self.job_shop_graph.nodes)
-            ),
-            ObservationSpaceKey.EDGE_INDEX.value: gym.spaces.MultiDiscrete(
-                np.full(
-                    (2, num_edges),
-                    fill_value=len(self.job_shop_graph.nodes) + 1,
+
+        obs_space = gym.spaces.Dict()
+        initial_edge_index_dict = self.initial_job_shop_graph.edge_index_dict
+        edge_index_space = gym.spaces.Dict(
+            {
+                key: gym.spaces.Box(  # type: ignore
+                    low=0,
+                    high=np.iinfo(np.int32).max,
+                    shape=edges.shape,
                     dtype=np.int32,
-                ),
-                start=np.full(
-                    (2, num_edges),
-                    fill_value=-1,  # -1 is used for padding
-                    dtype=np.int32,
-                ),
-            ),
-        }
-        for feature_type, matrix in self.composite_observer.features.items():
-            dict_space[feature_type.value] = gym.spaces.Box(
-                low=-np.inf, high=np.inf, shape=matrix.shape
+                )
+                for key, edges in initial_edge_index_dict.items()
+            }
+        )
+        obs_space[ObservationSpaceKey.EDGE_INDEX] = edge_index_space
+
+        num_available_actions = len(self.get_available_actions_with_ids())
+        available_actions_with_ids_space = gym.spaces.Box(
+            low=np.full((num_available_actions, 3), -1, dtype=np.int32),
+            high=np.array(
+                [
+                    len(self.job_shop_graph.nodes_by_type[NodeType.OPERATION])
+                    - 1,
+                    len(self.job_shop_graph.nodes_by_type[NodeType.MACHINE])
+                    - 1,
+                    len(self.job_shop_graph.nodes_by_type[NodeType.JOB]) - 1,
+                ],
+                dtype=np.int32,
             )
-        return gym.spaces.Dict(dict_space)
+            .reshape(1, 3)
+            .repeat(num_available_actions, axis=0),
+            shape=(num_available_actions, 3),
+            dtype=np.int32,
+        )
+        obs_space[ObservationSpaceKey.ACTION_MASK] = (
+            available_actions_with_ids_space
+        )
+        if not self.composite_observer.features:
+            return obs_space
+        node_features_space = gym.spaces.Dict(
+            {
+                feature_type.value: gym.spaces.Box(
+                    low=-np.inf,
+                    high=np.inf,
+                    shape=matrix.shape,
+                    dtype=np.float32,
+                )
+                for feature_type, matrix in
+                self.composite_observer.features.items()
+            }
+        )
+        obs_space[ObservationSpaceKey.NODE_FEATURES] = node_features_space
+
+        return obs_space
 
     def reset(
         self,
@@ -293,12 +328,7 @@ class SingleJobShopGraphEnv(gym.Env):
         super().reset(seed=seed, options=options)
         self.dispatcher.reset()
         obs = self.get_observation()
-        return obs, {
-            "feature_names": self.composite_observer.column_names,
-            "available_operations_with_ids": (
-                self.get_available_actions_with_ids()
-            ),
-        }
+        return obs, {"feature_names": self.composite_observer.column_names}
 
     def step(
         self, action: tuple[int, int]
@@ -308,8 +338,8 @@ class SingleJobShopGraphEnv(gym.Env):
         Args:
             action:
                 The action to take. The action is a tuple of two integers
-                (job_id, machine_id):
-                the job ID and the machine ID in which to schedule the
+                (operation_id, machine_id):
+                the operation ID and the machine ID in which to schedule the
                 operation.
 
         Returns:
@@ -321,14 +351,18 @@ class SingleJobShopGraphEnv(gym.Env):
             - Whether the episode was truncated (always False).
             - A dictionary with additional information. The dictionary
               contains the following keys: "feature_names", the names of the
-              features in the observation; and "available_operations_with_ids",
-              a list of available actions in the form of (operation_id,
-              machine_id, job_id).
+              features in the observation.
         """
-        job_id, machine_id = action
-        operation = self.dispatcher.next_operation(job_id)
-        if machine_id == -1:
+        node_operation_id, node_machine_id = action
+        operation = self.job_shop_graph.nodes_map[
+            ("operation", node_operation_id)
+        ].operation
+        if node_machine_id == -1:
             machine_id = operation.machine_id
+        else:
+            machine_id = self.job_shop_graph.nodes_map[
+                ("machine", node_machine_id)
+            ].machine_id
 
         self.dispatcher.dispatch(operation, machine_id)
 
@@ -337,40 +371,38 @@ class SingleJobShopGraphEnv(gym.Env):
         done = self.dispatcher.schedule.is_complete()
         truncated = False
         info: dict[str, Any] = {
-            "feature_names": self.composite_observer.column_names,
-            "available_operations_with_ids": (
-                self.get_available_actions_with_ids()
-            ),
+            "feature_names": self.composite_observer.column_names
         }
         return obs, reward, done, truncated, info
 
     def get_observation(self) -> ObservationDict:
         """Returns the current observation of the environment."""
-        observation: ObservationDict = {
-            ObservationSpaceKey.REMOVED_NODES.value: np.array(
-                self.job_shop_graph.removed_nodes, dtype=bool
-            ),
-            ObservationSpaceKey.EDGE_INDEX.value: self._get_edge_index(),
-        }
+        node_features_dict: dict[str, NDArray[np.float32]] = {}
+        removed_nodes = self.job_shop_graph.removed_nodes
+
         for feature_type, matrix in self.composite_observer.features.items():
-            observation[feature_type.value] = matrix
+            # Use the provided mapping for robust conversion
+            node_type = _FEATURE_TYPE_STR_TO_NODE_TYPE[feature_type.value]
+            removed_mask = removed_nodes.get(node_type.name.lower())
+
+            current_matrix = matrix
+            if removed_mask is not None:
+                # The mask is True for removed nodes; invert to get active ones
+                active_mask = ~np.array(removed_mask, dtype=bool)
+                current_matrix = matrix[active_mask]
+
+            node_features_dict[feature_type.value] = current_matrix
+
+        # Construct the final observation dictionary with the nested structure
+        observation: ObservationDict = {
+            ObservationSpaceKey.EDGE_INDEX:  # type: ignore
+            self.job_shop_graph.edge_index_dict,
+            ObservationSpaceKey.ACTION_MASK:  # type: ignore
+            self.get_available_actions_with_ids(),
+            ObservationSpaceKey.NODE_FEATURES:  # type: ignore
+            node_features_dict,
+        }
         return observation
-
-    def _get_edge_index(self) -> NDArray[np.int32]:
-        """Returns the edge index matrix."""
-        edge_index = np.array(
-            self.job_shop_graph.graph.edges(), dtype=np.int32
-        ).T
-
-        if self.use_padding:
-            output_shape = self.observation_space[
-                ObservationSpaceKey.EDGE_INDEX.value
-            ].shape
-            assert output_shape is not None  # For the type checker
-            edge_index = add_padding(
-                edge_index, output_shape=output_shape, dtype=np.int32
-            )
-        return edge_index
 
     def render(self):
         """Renders the environment.
@@ -391,19 +423,38 @@ class SingleJobShopGraphEnv(gym.Env):
         elif self.render_mode == "save_gif":
             self.gantt_chart_creator.create_gif()
 
-    def get_available_actions_with_ids(self) -> list[tuple[int, int, int]]:
+    def get_available_actions_with_ids(self) -> NDArray[np.int32]:
         """Returns a list of available actions in the form of
         (operation_id, machine_id, job_id)."""
         available_operations = self.dispatcher.available_operations()
         available_operations_with_ids = []
         for operation in available_operations:
-            job_id = operation.job_id
-            operation_id = operation.operation_id
-            for machine_id in operation.machines:
+            # For now only local operation ids are obtained
+            # from the graph
+            # jobs or machine ids will not be included
+            # if not present in the graph
+            operation_id = self.job_shop_graph.get_operation_node(
+                operation.operation_id
+            ).node_id[1]
+            if len(self.job_shop_graph.nodes_by_type[NodeType.JOB]) > 0:
+                job_id = self.job_shop_graph.get_job_node(
+                    operation.job_id
+                ).node_id[1]
+            else:
+                job_id = -1  # Use -1 to indicate job_id is not in the graph
+            if len(self.job_shop_graph.nodes_by_type[NodeType.MACHINE]) > 0:
+                for machine_id in operation.machines:
+                    machine_id = self.job_shop_graph.get_machine_node(
+                        machine_id
+                    ).node_id[1]
+                    available_operations_with_ids.append(
+                        [operation_id, machine_id, job_id]
+                    )
+            else:
                 available_operations_with_ids.append(
-                    (operation_id, machine_id, job_id)
+                    [operation_id, -1, job_id]
                 )
-        return available_operations_with_ids
+        return np.array(available_operations_with_ids, dtype=np.int32)
 
     def validate_action(self, action: tuple[int, int]) -> None:
         """Validates that the action is legal in the current state.

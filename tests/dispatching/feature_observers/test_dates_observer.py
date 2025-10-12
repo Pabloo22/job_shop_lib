@@ -70,9 +70,7 @@ def test_update_features(dispatcher_with_extras: Dispatcher):
     )
 
     while not dispatcher_with_extras.schedule.is_complete():
-        op = (
-            dispatcher_with_extras.available_operations()[0]
-        )
+        op = dispatcher_with_extras.available_operations()[0]
         dispatcher_with_extras.dispatch(op)
         current_time = dispatcher_with_extras.current_time()
         expected_features = initial_features - current_time

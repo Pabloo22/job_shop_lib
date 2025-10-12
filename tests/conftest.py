@@ -1,5 +1,6 @@
-import pytest
 import random
+
+import pytest
 
 from job_shop_lib import (
     JobShopInstance,
@@ -24,7 +25,10 @@ from job_shop_lib.graphs import (
     build_resource_task_graph,
     JobShopGraph,
 )
-from job_shop_lib.benchmarking import load_benchmark_instance
+from job_shop_lib.benchmarking import (
+    load_benchmark_instance,
+    load_all_benchmark_instances,
+)
 
 
 @pytest.fixture(name="job_shop_instance")
@@ -165,7 +169,11 @@ def single_job_shop_graph_env_ft06() -> SingleJobShopGraphEnv:
         DispatcherObserverConfig(
             FeatureObserverType.IS_READY,
             kwargs={"feature_types": [FeatureType.JOBS]},
-        )
+        ),
+        DispatcherObserverConfig(
+            FeatureObserverType.IS_COMPLETED,
+            kwargs={"feature_types": [FeatureType.OPERATIONS]},
+        ),
     ]
 
     env = SingleJobShopGraphEnv(
@@ -233,7 +241,11 @@ def multi_job_shop_graph_env() -> MultiJobShopGraphEnv:
         DispatcherObserverConfig(
             FeatureObserverType.IS_READY,
             kwargs={"feature_types": [FeatureType.JOBS]},
-        )
+        ),
+        DispatcherObserverConfig(
+            FeatureObserverType.IS_COMPLETED,
+            kwargs={"feature_types": [FeatureType.OPERATIONS]},
+        ),
     ]
 
     env = MultiJobShopGraphEnv(
@@ -348,3 +360,10 @@ def two_machines_instance() -> JobShopInstance:
     # Two jobs, each with one operation on different machines
     jobs = [[Operation(0, 5)], [Operation(1, 3)]]
     return JobShopInstance(jobs, name="TwoMachines")
+
+
+@pytest.fixture
+def first_ten_benchmark_instances() -> list[JobShopInstance]:
+    """Load the first ten benchmark instances."""
+    all_instances = load_all_benchmark_instances()
+    return list(all_instances.values())[:10]

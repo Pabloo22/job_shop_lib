@@ -17,7 +17,7 @@ from job_shop_lib.graphs.graph_updaters import ResidualGraphUpdater
 def _verify_all_nodes_removed(job_shop_graph: JobShopGraph):
     for node in job_shop_graph.nodes:
         assert job_shop_graph.is_removed(
-            node.node_id
+            node
         ), f"Node {node.node_id} was not removed."
 
 
