@@ -35,7 +35,7 @@ It also includes utilities for:
 - **Disjunctive graphs** (and any variant)
 - Training a GNN-based dispatcher using **reinforcement learning** or **imitation learning**
 
-JobShopLib design is intended to be modular and easy-to-use:
+JobShopLib's design is intended to be modular and easy-to-use:
 
 .. code-block:: python
 

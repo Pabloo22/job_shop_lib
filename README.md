@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/source/images/jslib_minimalist_logo_no_background_fixed.png" height="150px">
+<img src="https://raw.githubusercontent.com/Pabloo22/job_shop_lib/main/docs/source/images/jslib_minimalist_logo_no_background_fixed.png" height="150px">
 
 <h1>JobShopLib</h1>
 
@@ -11,60 +11,93 @@
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+<img src="https://raw.githubusercontent.com/Pabloo22/job_shop_lib/main/docs/source/examples/output/ft06_optimized.gif" alt="Example Gif">
 </div>
 
-JobShopLib is a Python package for creating, solving, and visualizing job shop scheduling problems (JSSP).
+JobShopLib is a Python package for **creating**, **solving**, and **visualizing**
+job shop scheduling problems.
 
-It follows a modular design, allowing users to easily extend the library with new solvers, dispatching rules, visualization functions, etc.
+It provides solvers based on:
 
-We support multiple solvers, including:
-- **Constraint Programming**: Based on OR-Tools' CP-SAT solver. It supports **release dates, deadlines, and due dates.** See the ["Solving the Problem" tutorial](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/02-Solving-the-Problem.ipynb) for an example.
-- **Dispatching Rules**: A set of predefined rules and the ability to create custom ones. They support arbitrary **setup times, machine breakdowns, release dates, deadlines, and due dates**. See the [following example](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/03-Dispatching-Rules.ipynb). You can also create videos or GIFs of the scheduling process. For creating GIFs or videos, see the [Save Gif example](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/04-Save-Gif.ipynb).
-- **Metaheuristics**: Currently, we have a **simulated annealing** implementation that supports **release dates, deadlines, and due dates**. We also support arbitrary neighborhood search strategies, including swapping operations in the critical path as described in the paper "Job Shop Scheduling by Simulated Annealing" by van Laarhoven et al. (1992); and energy functions. See our [simulated annealing tutorial](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/04-Simulated-Annealing.ipynb).
-- **Reinforcement Learning**: Two Gymnasium environments for solving the problem with **graph neural networks** (GNNs) or any other method. The environments support **setup times, release dates, deadlines, and due dates.** We're currently building a tutorial on how to use them.
+- **Graph neural networks** (Gymnasium environment)
+- **Dispatching rules**
+- **Simulated annealing**
+- **Constraint programming** (CP-SAT from Google OR-Tools)
 
-We also provide useful utilities, data structures, and visualization functions:
-- **Intuitive Data Structures**: Easily create, manage, and manipulate job shop instances and solutions with user-friendly data structures. See [Getting Started](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/00-Getting-Started.ipynb) and [How Solutions are Represented](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/01-How-Solutions-are-Represented.ipynb).
-- **Benchmark Instances**: Load well-known benchmark instances directly from the library without manual downloading. See [Load Benchmark Instances](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/examples/05-Load-Benchmark-Instances.ipynb).
-- **Random Instance Generation**: Create random instances with customizable sizes and properties. See [`this tutorial`](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/03-Generating-New-Instances.ipynb).
-- **Gantt Charts**: Visualize final schedules and how they are created iteratively by dispatching rule solvers or sequences of scheduling decisions with GIFs or videos.
-- **Graph Representations**: Represent and visualize instances as disjunctive graphs or agent-task graphs (introduced in the ScheduleNet paper). Build your own custom graphs with the `JobShopGraph` class. See the [Disjunctive Graphs](https://github.com/Pabloo22/job_shop_lib/blob/main/docs/source/tutorial/04-Disjunctive-Graphs.ipynb) and [Resource Task Graphs](https://job-shop-lib.readthedocs.io/en/stable/examples/07-Resource-Task-Graph.html) examples.
+It also includes utilities for:
 
-## Installation :package:
+- **Load benchmark instances**
+- **Generating random problems**
+- **Gantt charts**
+- **Disjunctive graphs** (and any variant)
+- Training a GNN-based dispatcher using **reinforcement learning** or **imitation learning**
 
+It supports:
+- **Multi-machine operations**
+- **Release dates**
+- **Deadlines and due dates**
+
+JobShopLib's design is intended to be modular and easy-to-use:
+
+
+```python
+import matplotlib.pyplot as plt
+plt.style.use("ggplot")
+
+from job_shop_lib import JobShopInstance, Operation
+from job_shop_lib.benchmarking import load_benchmark_instance
+from job_shop_lib.generation import GeneralInstanceGenerator
+from job_shop_lib.constraint_programming import ORToolsSolver
+from job_shop_lib.visualization import plot_gantt_chart, create_gif, plot_gantt_chart_wrapper
+from job_shop_lib.dispatching import DispatchingRuleSolver
+
+# Create your own instance manually,
+job_1 = [Operation(machines=0, duration=1), Operation(1, 1), Operation(2, 7)]
+job_2 = [Operation(1, 5), Operation(2, 1), Operation(0, 1)]
+job_3 = [Operation(2, 1), Operation(0, 3), Operation(1, 2)]
+jobs = [job_1, job_2, job_3]
+instance = JobShopInstance(jobs)
+
+# load a popular benchmark instance,
+ft06 = load_benchmark_instance("ft06")
+
+# or generate a random one.
+generator = GeneralInstanceGenerator(
+    duration_range=(5, 10), seed=42, num_jobs=5, num_machines=5
+)
+random_instance = generator.generate()
+
+# Solve it using constraint programming,
+solver = ORToolsSolver(max_time_in_seconds=10)
+ft06_schedule = solver(ft06)
+
+# Visualize the solution as a Gantt chart,
+fig, ax = plot_gantt_chart(ft06_schedule)
+plt.show()
+
+# or visualize how the solution is built step by step using a dispatching rule.
+mwkr_solver = DispatchingRuleSolver("most_work_remaining")
+plt.style.use("ggplot")
+plot_function = plot_gantt_chart_wrapper(
+    title="Solution with Most Work Remaining Rule"
+)
+create_gif(  # Creates the gif above
+    gif_path="ft06_optimized.gif",
+    instance=ft06,
+    solver=mwkr_solver,
+    plot_function=plot_function,
+    fps=4,
+)
+```
+
+## Installing :package:
 <!-- start installation -->
-
 ```bash
 pip install job-shop-lib
 ```
-
-or 
-
-```bash
-poetry add job-shop-lib
-```
-
 <!-- end installation -->
 
-## Publication :scroll:
-
-For an in-depth explanation of the library (v1.0.0), including its design, features, reinforcement learning environments, and some experiments, please refer to my [Bachelor's thesis](https://www.arxiv.org/abs/2506.13781).
-
-You can also cite the library using the following BibTeX entry:
-
-```bibtex
-@misc{arino2025jobshoplib,
-      title={Solving the Job Shop Scheduling Problem with Graph Neural Networks: A Customizable Reinforcement Learning Environment}, 
-      author={Pablo Ariño Fernández},
-      year={2025},
-      eprint={2506.13781},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2506.13781}, 
-}
-```
-
-## Some Examples :rocket:
+## Quick Start :rocket:
 
 ### Create a Job Shop Instance
 
@@ -170,11 +203,11 @@ ft06_schedule = solver(ft06)
 fig, ax = plot_gantt_chart(ft06_schedule)
 plt.show()
 ```
-![Example Gannt Chart](docs/source/images/ft06_solution.png)
+![Example Gannt Chart](https://raw.githubusercontent.com/Pabloo22/job_shop_lib/main/docs/source/images/ft06_solution.png)
 
 ### Solve an Instance with a Dispatching Rule Solver
 
-A dispatching rule is a heuristic guideline used to prioritize and sequence jobs on various machines. Supported dispatching rules are:
+A dispatching rule is a heuristic guideline used to prioritize and sequence jobs on various machines. Supported dispatching rules are (although you can also create your own):
 
 ```python
 class DispatchingRule(str, Enum):
@@ -207,7 +240,7 @@ create_gif(
 )
 ```
 
-![Example Gif](docs/source/examples/output/ft06_optimized.gif)
+![Example Gif](https://raw.githubusercontent.com/Pabloo22/job_shop_lib/main/docs/source/examples/output/ft06_optimized.gif)
 
 The dashed red line represents the current time step, which is computed as the earliest time when the next operation can start.
 
@@ -219,13 +252,7 @@ The dashed red line represents the current time step, which is computed as the e
 
 One of the main purposes of this library is to provide an easy way to encode instances as graphs. This can be very useful, not only for visualization purposes but also for developing graph neural network-based algorithms.
 
-A graph is represented by the `JobShopGraph` class, which internally stores a `networkx.DiGraph` object.
-
 ####  Disjunctive Graph
-
-The disjunctive graph is created by first adding nodes representing each operation in the jobs, along with two special nodes: a source $S$ and a sink $T$. Each operation node is linked to the next operation in its job sequence by **conjunctive edges**, forming a path from the source to the sink. These edges represent the order in which operations of a single job must be performed.
-
-Additionally, the graph includes **disjunctive edges** between operations that use the same machine but belong to different jobs. These edges are bidirectional, indicating that either of the connected operations can be performed first. The disjunctive edges thus represent the scheduling choices available: the order in which operations sharing a machine can be processed. Solving the job shop scheduling problem involves choosing a direction for each disjunctive edge such that the overall processing time is minimized.
 
 ```python
 from job_shop_lib.visualization import plot_disjunctive_graph
@@ -242,38 +269,11 @@ fig = plot_disjunctive_graph(
 plt.show()
 ```
 
-![Example Disjunctive Graph](docs/source/images/example_disjunctive_graph.png)
+![Example Disjunctive Graph](https://raw.githubusercontent.com/Pabloo22/job_shop_lib/main/docs/source/images/example_disjunctive_graph.png)
 
 
 > [!TIP]
 > Installing the optional dependency [PyGraphViz](https://pygraphviz.github.io/) is recommended.
-
-The `JobShopGraph` class provides easy access to the nodes, for example, to get all the nodes of a specific type:
-
-```python
-from job_shop_lib.graphs import build_disjunctive_graph
-
-disjunctive_graph = build_disjunctive_graph(instance)
-
- >>> disjunctive_graph.nodes_by_type
- defaultdict(list,
-            {<NodeType.OPERATION: 1>: [Node(node_type=OPERATION, value=O(m=0, d=1, j=0, p=0), id=0),
-              Node(node_type=OPERATION, value=O(m=1, d=1, j=0, p=1), id=1),
-              Node(node_type=OPERATION, value=O(m=2, d=7, j=0, p=2), id=2),
-              Node(node_type=OPERATION, value=O(m=1, d=5, j=1, p=0), id=3),
-              Node(node_type=OPERATION, value=O(m=2, d=1, j=1, p=1), id=4),
-              Node(node_type=OPERATION, value=O(m=0, d=1, j=1, p=2), id=5),
-              Node(node_type=OPERATION, value=O(m=2, d=1, j=2, p=0), id=6),
-              Node(node_type=OPERATION, value=O(m=0, d=3, j=2, p=1), id=7),
-              Node(node_type=OPERATION, value=O(m=1, d=2, j=2, p=2), id=8)],
-             <NodeType.SOURCE: 5>: [Node(node_type=SOURCE, value=None, id=9)],
-             <NodeType.SINK: 6>: [Node(node_type=SINK, value=None, id=10)]})
-```
-
-Other attributes include:
-- `nodes`: A list of all nodes in the graph.
-- `nodes_by_machine`: A nested list mapping each machine to its associated operation nodes, aiding in machine-specific analysis.
-- `nodes_by_job`: Similar to `nodes_by_machine`, but maps jobs to their operation nodes, useful for job-specific traversal.
 
 #### Resource-Task Graph
 
@@ -301,7 +301,7 @@ plt.show()
 ```
 
 <div align="center">
-<img src="docs/source/examples/output/agent_task_graph.png" width="300">
+<img src="https://raw.githubusercontent.com/Pabloo22/job_shop_lib/main/docs/source/examples/output/agent_task_graph.png" width="300">
 </div>
 <br>
 
@@ -312,7 +312,7 @@ The library generalizes this graph by allowing the addition of job nodes and a g
 ### Gymnasium Environments
 
 <div align="center">
-<img src="docs/source/images/rl_diagram.png">
+<img src="https://raw.githubusercontent.com/Pabloo22/job_shop_lib/main/docs/source/images/rl_diagram.png">
 </div>
 <br>
 
@@ -390,6 +390,23 @@ Any contribution is welcome, whether it's a small bug or documentation fix or a 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## Publication :scroll:
+
+For an in-depth explanation of the library (v1.0.0), including its design, features, reinforcement learning environments, and some experiments, please refer to https://www.arxiv.org/abs/2506.13781.
+
+You can also cite the library using the following BibTeX entry:
+
+```bibtex
+@misc{arino2025jobshoplib,
+      title={Solving the Job Shop Scheduling Problem with Graph Neural Networks: A Customizable Reinforcement Learning Environment}, 
+      author={Pablo Ariño Fernández},
+      year={2025},
+      eprint={2506.13781},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2506.13781}, 
+}
+```
 
 ## References :books:
 
