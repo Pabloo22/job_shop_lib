@@ -12,4 +12,4 @@ For plotting a disjunctive graph, we recommend using [Graphviz](https://graphviz
 
 ## Development
 
-See intructions in the [CONTRIBUTING.md](https://github.com/Pabloo22/job_shop_lib/blob/main/CONTRIBUTING.md) file.
+See instructions in the [CONTRIBUTING.md](https://github.com/Pabloo22/job_shop_lib/blob/main/CONTRIBUTING.md) file.
