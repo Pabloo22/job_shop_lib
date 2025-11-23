@@ -7,6 +7,7 @@
 [![Tests](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml/badge.svg)](https://github.com/Pabloo22/job_shop_lib/actions/workflows/tests.yaml)
 [![Documentation Status](https://readthedocs.org/projects/job-shop-lib/badge/?version=latest)](https://job-shop-lib.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/Pabloo22/job_shop_lib/graph/badge.svg?token=DWXLYJWAOZ)](https://codecov.io/gh/Pabloo22/job_shop_lib)
+[![PyPI version](https://img.shields.io/pypi/v/job_shop_lib)](https://pypi.org/project/job-shop-lib/)
 ![Python versions](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -440,4 +441,6 @@ You can also cite the library using the following BibTeX entry:
  - E. Taillard, "Benchmarks for basic scheduling problems," European
      Journal of Operational Research, vol. 64, no. 2, pp. 278–285, 1993.
 
-  - Park, Junyoung, Sanjar Bakhtiyar, and Jinkyoo Park. "ScheduleNet: Learn to solve multi-agent scheduling problems with reinforcement learning." arXiv preprint arXiv:2106.03051, 2021. 
+  - Park, Junyoung, Sanjar Bakhtiyar, and Jinkyoo Park. "ScheduleNet:
+    Learn to solve multi-agent scheduling problems with reinforcement
+    learning." arXiv preprint arXiv:2106.03051, 2021.
