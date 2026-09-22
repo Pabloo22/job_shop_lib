@@ -1,10 +1,12 @@
 import pytest
 
-from job_shop_lib import JobShopInstance
+from job_shop_lib import JobShopInstance, Operation
 from job_shop_lib.dispatching import (
     Dispatcher,
     HistoryObserver,
+    no_setup_time_calculator,
 )
+from job_shop_lib.dispatching._dispatcher import _dispatcher_cache
 from job_shop_lib.dispatching.rules import DispatchingRuleSolver
 from job_shop_lib.exceptions import ValidationError
 
@@ -236,6 +238,89 @@ def test_subscribe_and_unsubscribe(example_job_shop_instance: JobShopInstance):
     assert len(dispatcher.subscribers) == 1
     dispatcher.unsubscribe(history_observer)
     assert len(dispatcher.subscribers) == 0
+
+
+def _setup_time_of_ten(
+    dispatcher: Dispatcher, operation: Operation, machine_id: int
+) -> int:
+    return no_setup_time_calculator(dispatcher, operation, machine_id) + 10
+
+
+def test_uncompleted_operations_does_not_modify_unscheduled_operations():
+    jobs = [
+        [Operation(0, 5), Operation(1, 1)],
+        [Operation(1, 1), Operation(0, 5)],
+    ]
+    instance = JobShopInstance(jobs)
+    dispatcher = Dispatcher(instance)
+    # Runs on machine 0 during [0, 5), so it is still ongoing at time 0
+    dispatcher.dispatch(instance.jobs[0][0])
+
+    expected_unscheduled_operations = list(dispatcher.unscheduled_operations())
+    uncompleted_operations = dispatcher.uncompleted_operations()
+    unscheduled_operations = dispatcher.unscheduled_operations()
+
+    assert unscheduled_operations == expected_unscheduled_operations
+    assert not any(
+        dispatcher.is_scheduled(operation)
+        for operation in unscheduled_operations
+    )
+    assert unscheduled_operations is not uncompleted_operations
+    assert set(uncompleted_operations) == set(unscheduled_operations) | {
+        instance.jobs[0][0]
+    }
+
+
+def test_setting_ready_operations_filter_clears_cache(
+    example_job_shop_instance: JobShopInstance,
+):
+    dispatcher = Dispatcher(example_job_shop_instance)
+    assert len(dispatcher.available_operations()) == 3
+
+    dispatcher.ready_operations_filter = lambda _, operations: operations[:1]
+    assert len(dispatcher.available_operations()) == 1
+
+    dispatcher.ready_operations_filter = None
+    assert dispatcher.ready_operations_filter is None
+    assert len(dispatcher.available_operations()) == 3
+
+
+def test_setting_start_time_calculator_clears_cache(
+    example_job_shop_instance: JobShopInstance,
+):
+    dispatcher = Dispatcher(example_job_shop_instance)
+    assert dispatcher.current_time() == 0
+
+    dispatcher.start_time_calculator = _setup_time_of_ten
+    assert dispatcher.start_time_calculator is _setup_time_of_ten
+    assert dispatcher.current_time() == 10
+
+
+def test_dispatcher_cache_stores_none(
+    example_job_shop_instance: JobShopInstance,
+):
+    class CountingDispatcher(Dispatcher):
+        calls = 0
+
+        @_dispatcher_cache
+        def returns_none(self) -> None:
+            CountingDispatcher.calls += 1
+
+    dispatcher = CountingDispatcher(example_job_shop_instance)
+    dispatcher.returns_none()
+    dispatcher.returns_none()
+
+    assert CountingDispatcher.calls == 1
+
+
+def test_singleton_observer_error_message(
+    example_job_shop_instance: JobShopInstance,
+):
+    dispatcher = Dispatcher(example_job_shop_instance)
+    HistoryObserver(dispatcher)
+
+    with pytest.raises(ValidationError, match="_is_singleton"):
+        HistoryObserver(dispatcher)
 
 
 if __name__ == "__main__":

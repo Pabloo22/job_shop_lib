@@ -68,8 +68,8 @@ class DispatcherObserver(abc.ABC):
             dispatcher when it is initialized. Defaults to ``True``.
 
     Raises:
-        ValidationError: If ``is_singleton`` is ``True`` and an observer of the
-            same type already exists in the dispatcher's list of
+        ValidationError: If ``_is_singleton`` is ``True`` and an observer of
+            the same type already exists in the dispatcher's list of
             subscribers.
 
     Example:
@@ -111,8 +111,8 @@ class DispatcherObserver(abc.ABC):
             raise ValidationError(
                 f"An observer of type {self.__class__.__name__} already "
                 "exists in the dispatcher's list of subscribers. If you want "
-                "to create multiple instances of this observer, set "
-                "`is_singleton` to False."
+                "to create multiple instances of this observer, set the "
+                "class attribute `_is_singleton` to False."
             )
 
         self.dispatcher = dispatcher
@@ -147,6 +147,10 @@ class DispatcherObserver(abc.ABC):
 # pylint: disable=invalid-name
 ObserverType = TypeVar("ObserverType", bound=DispatcherObserver)
 
+# Sentinel used to detect cache misses, so that any value (including ``None``)
+# can be cached.
+_CACHE_MISS = object()
+
 
 def _dispatcher_cache(method):
     """Decorator to cache results of a method based on its name.
@@ -158,17 +162,21 @@ def _dispatcher_cache(method):
 
     The decorator is useful since the dispatcher class can clear the cache
     when the state of the dispatcher changes.
+
+    Since the cache key is the method's name, it must only be applied to
+    methods that take no arguments besides ``self``. Callers must not mutate
+    the returned objects, as they are shared with the cache.
     """
 
     @wraps(method)
-    def wrapper(self: Dispatcher, *args, **kwargs):
+    def wrapper(self: Dispatcher):
         # pylint: disable=protected-access
         cache_key = method.__name__
-        cached_result = self._cache.get(cache_key)
-        if cached_result is not None:
+        cached_result = self._cache.get(cache_key, _CACHE_MISS)
+        if cached_result is not _CACHE_MISS:
             return cached_result
 
-        result = method(self, *args, **kwargs)
+        result = method(self)
         self._cache[cache_key] = result
         return result
 
@@ -239,14 +247,8 @@ class Dispatcher:
         "_machine_next_available_time": "",
         "_job_next_operation_index": "",
         "_job_next_available_time": "",
-        "ready_operations_filter": (
-            "A function that filters out operations that are not ready to be "
-            "scheduled."
-        ),
-        "start_time_calculator": (
-            "A function that calculates the start time for a given operation "
-            "on a given machine."
-        ),
+        "_ready_operations_filter": "",
+        "_start_time_calculator": "",
         "subscribers": "A list of observers subscribed to the dispatcher.",
         "_cache": "A dictionary to cache the results of the cached methods.",
     }
@@ -264,8 +266,8 @@ class Dispatcher:
 
         self.instance = instance
         self.schedule = Schedule(self.instance)
-        self.ready_operations_filter = ready_operations_filter
-        self.start_time_calculator = start_time_calculator
+        self._ready_operations_filter = ready_operations_filter
+        self._start_time_calculator = start_time_calculator
         self.subscribers: list[DispatcherObserver] = []
 
         self._machine_next_available_time = [0] * self.instance.num_machines
@@ -278,6 +280,45 @@ class Dispatcher:
 
     def __repr__(self) -> str:
         return str(self)
+
+    @property
+    def ready_operations_filter(
+        self,
+    ) -> Callable[[Dispatcher, list[Operation]], list[Operation]] | None:
+        """A function that filters out operations that are not ready to be
+        scheduled.
+
+        Setting it clears the cache, so that cached results computed with the
+        previous filter are not returned.
+        """
+        return self._ready_operations_filter
+
+    @ready_operations_filter.setter
+    def ready_operations_filter(
+        self,
+        ready_operations_filter: (
+            Callable[[Dispatcher, list[Operation]], list[Operation]] | None
+        ),
+    ) -> None:
+        self._ready_operations_filter = ready_operations_filter
+        self._cache = {}
+
+    @property
+    def start_time_calculator(self) -> StartTimeCalculator:
+        """A function that calculates the start time for a given operation
+        on a given machine.
+
+        Setting it clears the cache, so that cached results computed with the
+        previous calculator are not returned.
+        """
+        return self._start_time_calculator
+
+    @start_time_calculator.setter
+    def start_time_calculator(
+        self, start_time_calculator: StartTimeCalculator
+    ) -> None:
+        self._start_time_calculator = start_time_calculator
+        self._cache = {}
 
     @property
     def machine_next_available_time(self) -> list[int]:
@@ -388,7 +429,7 @@ class Dispatcher:
                 The id of the machine on which the operation is to be
                 scheduled.
         """
-        return self.start_time_calculator(self, operation, machine_id)
+        return self._start_time_calculator(self, operation, machine_id)
 
     def _update_tracking_attributes(
         self, scheduled_operation: ScheduledOperation
@@ -473,8 +514,8 @@ class Dispatcher:
             scheduling.
         """
         available_operations = self.raw_ready_operations()
-        if self.ready_operations_filter is not None:
-            available_operations = self.ready_operations_filter(
+        if self._ready_operations_filter is not None:
+            available_operations = self._ready_operations_filter(
                 self, available_operations
             )
         return available_operations
@@ -602,7 +643,8 @@ class Dispatcher:
         only returned unscheduled operations. For the old behavior, use the
         `unscheduled_operations` method.
         """
-        uncompleted_operations = self.unscheduled_operations()
+        # Copy to avoid mutating the cached result of `unscheduled_operations`
+        uncompleted_operations = list(self.unscheduled_operations())
         uncompleted_operations.extend(
             scheduled_operation.operation
             for scheduled_operation in self.ongoing_operations()
