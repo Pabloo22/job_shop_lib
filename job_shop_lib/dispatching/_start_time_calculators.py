@@ -103,6 +103,10 @@ def get_breakdown_calculator(breakdowns: dict[int, list[tuple[int, int]]]):
                    (start_time, duration) tuples representing when
                    the machine breaks down.
 
+    Note:
+        Intervals may be supplied in any order. The supplied calendar is
+        read on each call, so subsequent updates are observed.
+
     Returns:
         A start time calculator function that accounts for breakdowns.
 
@@ -122,7 +126,9 @@ def get_breakdown_calculator(breakdowns: dict[int, list[tuple[int, int]]]):
             return default_start
 
         start_time = default_start
-        for breakdown_start, breakdown_duration in breakdowns[machine_id]:
+        for breakdown_start, breakdown_duration in sorted(
+            breakdowns[machine_id]
+        ):
             breakdown_end = breakdown_start + breakdown_duration
 
             start_during_breakdown = (

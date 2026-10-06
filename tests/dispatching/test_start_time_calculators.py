@@ -344,5 +344,41 @@ def test_get_arrival_calculator_numpy_array(
     assert dispatcher.start_time(job1_op0, 1) == 2
 
 
+@pytest.mark.parametrize(
+    "breakdowns,duration,expected_start",
+    [
+        ([(20, 10), (5, 10)], 10, 30),
+        ([(5, 10), (20, 10)], 10, 30),
+        ([(20, 10), (5, 10)], 5, 0),
+        ([(10, 5), (2, 8), (7, 4)], 4, 15),
+    ],
+)
+def test_breakdown_calendar_order_independent(
+    breakdowns, duration, expected_start
+):
+    """Input ordering must not allow an operation to overlap downtime."""
+    instance = JobShopInstance([[Operation(0, duration)]])
+    original = breakdowns.copy()
+    dispatcher = Dispatcher(
+        instance,
+        start_time_calculator=get_breakdown_calculator({0: breakdowns}),
+    )
+    assert dispatcher.start_time(instance.jobs[0][0], 0) == expected_start
+    assert breakdowns == original
+
+
+def test_breakdown_calendar_updates_are_observed():
+    """A calculator keeps observing updates to its supplied calendar."""
+    instance = JobShopInstance([[Operation(0, 10)]])
+    breakdowns = {0: [(20, 10)]}
+    dispatcher = Dispatcher(
+        instance,
+        start_time_calculator=get_breakdown_calculator(breakdowns),
+    )
+    assert dispatcher.start_time(instance.jobs[0][0], 0) == 0
+    breakdowns[0].append((5, 10))
+    assert dispatcher.start_time(instance.jobs[0][0], 0) == 30
+
+
 if __name__ == "__main__":
     pytest.main(["-vv", __file__])
